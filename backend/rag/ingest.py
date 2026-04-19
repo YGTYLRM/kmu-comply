@@ -115,23 +115,25 @@ def _split_oversized(text: str, header: str) -> list[str]:
     if len(text) <= MAX_CHUNK_CHARS:
         return [text]
 
-    positions = [m.start() for m in _RE_ABSATZ.finditer(text)]
-    if not positions:
-        # No Absatz markers — hard split at word boundaries
+    # Split on Absatz boundaries, keeping the marker with its paragraph
+    parts = re.split(r"(?m)(?=^\(\d+\))", text)
+    if len(parts) < 2:
+        # No Absatz markers — hard split at midpoint word boundary
         words = text.split()
         mid = len(words) // 2
         return [" ".join(words[:mid]), header + "\n" + " ".join(words[mid:])]
 
-    chunks, current_start = [], 0
-    for pos in positions[1:]:
-        segment = text[current_start:pos].strip()
-        if len(segment) >= MAX_CHUNK_CHARS:
-            chunks.append(header + "\n" + segment if current_start > 0 else segment)
-            current_start = pos
-    tail = text[current_start:].strip()
-    if tail:
-        chunks.append(header + "\n" + tail if current_start > 0 else tail)
-    return chunks or [text]
+    chunks: list[str] = []
+    current = ""
+    for part in parts:
+        if current and len(current) + len(part) > MAX_CHUNK_CHARS:
+            chunks.append(current.strip())
+            current = header + "\n" + part
+        else:
+            current += part
+    if current.strip():
+        chunks.append(current.strip())
+    return chunks or [text[:MAX_CHUNK_CHARS]]
 
 
 def _obligation(text: str) -> str:
@@ -264,11 +266,7 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     if regulation in ("bdsg", "lksg", "enefg") and path.suffix == ".txt":
         return _chunk_german_law(text, regulation, name, url)
 
-    if regulation == "gdpr":
-        chunks = _chunk_eu_law(text, regulation, name, url)
-        return chunks if chunks else _chunk_guidance(text, regulation, name, url)
-
-    if regulation == "csrd":
+    if regulation in ("gdpr", "csrd"):
         chunks = _chunk_eu_law(text, regulation, name, url)
         return chunks if chunks else _chunk_guidance(text, regulation, name, url)
 
@@ -279,9 +277,15 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
 # ChromaDB
 # ---------------------------------------------------------------------------
 
+_chroma: chromadb.PersistentClient | None = None
+
+
 def _chroma_client() -> chromadb.PersistentClient:
-    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-    return chromadb.PersistentClient(path=str(CHROMA_DIR))
+    global _chroma
+    if _chroma is None:
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+        _chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    return _chroma
 
 
 def ingest_regulation(
