@@ -174,25 +174,33 @@ def _make_chunk(
 
 
 def _chunk_german_law(text: str, regulation: str, filename: str, url: str) -> list[dict]:
-    chunks: list[dict] = []
+    # Collect all matches first, then deduplicate by section number keeping the longest.
+    # gesetze-im-internet.de pages contain both a TOC and the full text, so each § N
+    # appears twice — once as a short TOC entry and once with its actual content.
+    best: dict[str, dict] = {}
     for m in _RE_GERMAN_SECTION.finditer(text):
         num = m.group(1)
         body = m.group(2).strip()
-        if len(body) < 100:
-            continue  # TOC entry, skip
+        if len(body) < 80:
+            continue
         lines = body.splitlines()
         title = lines[0].strip() if lines else f"§ {num}"
         full = f"§ {num} {title}\n\n{body}"
-        header = f"§ {num} {title}"
-        for i, sub in enumerate(_split_oversized(full, header)):
-            chunks.append(_make_chunk(sub, regulation, f"§ {num}", title, "law",
+        key = f"§ {num}"
+        if key not in best or len(full) > len(best[key]["text"]):
+            best[key] = {"text": full, "title": title, "num": num}
+
+    chunks: list[dict] = []
+    for key, item in best.items():
+        header = f"§ {item['num']} {item['title']}"
+        for i, sub in enumerate(_split_oversized(item["text"], header)):
+            chunks.append(_make_chunk(sub, regulation, key, item["title"], "law",
                                       filename, url, str(i + 1) if i else ""))
     return chunks
 
 
 def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[dict]:
-    """Try German 'Artikel' then English 'Article' pattern."""
-    chunks: list[dict] = []
+    """Try German 'Artikel' then English 'Article' pattern. Deduplicate by article number."""
     pattern = _RE_EU_ARTIKEL
     label = "Artikel"
     matches = list(pattern.finditer(text))
@@ -201,6 +209,7 @@ def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[d
         label = "Article"
         matches = list(pattern.finditer(text))
 
+    best: dict[str, dict] = {}
     for m in matches:
         num = m.group(1)
         body = m.group(2).strip()
@@ -209,9 +218,15 @@ def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[d
         lines = body.splitlines()
         title = lines[0].strip() if lines else f"{label} {num}"
         full = f"{label} {num} {title}\n\n{body}"
-        header = f"{label} {num} {title}"
-        for i, sub in enumerate(_split_oversized(full, header)):
-            chunks.append(_make_chunk(sub, regulation, f"{label} {num}", title, "law",
+        key = f"{label} {num}"
+        if key not in best or len(full) > len(best[key]["text"]):
+            best[key] = {"text": full, "title": title, "num": num, "label": label}
+
+    chunks: list[dict] = []
+    for key, item in best.items():
+        header = f"{item['label']} {item['num']} {item['title']}"
+        for i, sub in enumerate(_split_oversized(item["text"], header)):
+            chunks.append(_make_chunk(sub, regulation, key, item["title"], "law",
                                       filename, url, str(i + 1) if i else ""))
     return chunks
 
