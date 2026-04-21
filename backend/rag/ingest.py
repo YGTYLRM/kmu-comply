@@ -23,6 +23,7 @@ import re
 from pathlib import Path
 
 import chromadb
+import pdfplumber
 from pypdf import PdfReader
 
 from backend.config import settings
@@ -35,7 +36,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "regulations"
-CHROMA_DIR = Path(settings.chroma_persist_dir)
+CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 
 # ~4.5 chars per token for German; cap at 1 500 tokens per chunk
 MAX_CHUNK_CHARS = 1_500 * 4
@@ -63,13 +64,21 @@ OFFICIAL_URLS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 def _extract_pdf(path: Path) -> str:
-    reader = PdfReader(str(path))
-    pages = []
-    for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            pages.append(text.strip())
-    return "\n".join(pages)
+    raw = path.read_bytes()
+    if not raw or raw[:4] != b"%PDF":
+        raise ValueError(f"Not a valid PDF (first bytes: {raw[:8]!r}): {path.name}")
+    try:
+        with pdfplumber.open(str(path)) as pdf:
+            pages = [p.extract_text() or "" for p in pdf.pages]
+        return "\n".join(p for p in pages if p.strip())
+    except Exception:
+        reader = PdfReader(str(path))
+        pages = []
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                pages.append(text.strip())
+        return "\n".join(pages)
 
 
 def _load(path: Path) -> str:
@@ -340,7 +349,11 @@ def ingest_regulation(
     total = 0
     for path in files:
         logger.info("Processing %s ...", path.name)
-        chunks = _chunks_for_file(path, regulation)
+        try:
+            chunks = _chunks_for_file(path, regulation)
+        except (ValueError, Exception) as exc:
+            logger.warning("  SKIPPED %s: %s", path.name, exc)
+            continue
         if not chunks:
             logger.warning("  No chunks from %s", path.name)
             continue
