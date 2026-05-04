@@ -56,7 +56,7 @@ class JobManager:
         job_id = str(uuid.uuid4())
         job = _Job(job_id=job_id, profile=profile)
         self._jobs[job_id] = job
-        asyncio.create_task(self._run_placeholder(job))
+        asyncio.create_task(self._run_pipeline(job))
         return job_id
 
     def get_status(self, job_id: str) -> Optional[StatusResponse]:
@@ -69,31 +69,30 @@ class JobManager:
             return job.report
         return None
 
-    async def _run_placeholder(self, job: _Job) -> None:
-        """
-        Placeholder pipeline runner — replaced by the real agent pipeline in Phase 3.
-        Currently only runs Step 1 (threshold determination) for Phase 1 demo.
-        """
-        from services.threshold_engine import determine_applicable_regulations
+    async def _run_pipeline(self, job: _Job) -> None:
+        from agent.compliance_agent import run_analysis
 
         job.status = JobStatus.RUNNING
 
+        def on_step(step: AnalysisStep) -> None:
+            job.current_step = step
+            for sp in job.steps:
+                if sp.step == step:
+                    sp.status = JobStatus.RUNNING
+                    return
+            job.steps.append(StepProgress(step=step, status=JobStatus.RUNNING))
+
         try:
-            step = StepProgress(
-                step=AnalysisStep.PROFILE_VALIDATION,
-                status=JobStatus.RUNNING,
-            )
-            job.steps.append(step)
-            job.current_step = AnalysisStep.PROFILE_VALIDATION
+            report = await run_analysis(job.job_id, job.profile, on_step=on_step)
 
-            applicable = determine_applicable_regulations(job.profile)
+            for sp in job.steps:
+                sp.status = JobStatus.COMPLETED
 
-            step.status = JobStatus.COMPLETED
-            step.message = f"{sum(1 for r in applicable if r.applies)}/{len(applicable)} regulations applicable."
-
-            job.status = JobStatus.PARTIAL
+            job.report = report
             job.current_step = None
-            job.error = "Full pipeline not yet implemented (Phase 3). Applicability determination completed."
+            job.status = (
+                JobStatus.PARTIAL if report.requires_manual_review else JobStatus.COMPLETED
+            )
 
         except Exception as exc:
             job.status = JobStatus.FAILED
