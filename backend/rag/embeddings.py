@@ -11,7 +11,7 @@ from functools import lru_cache
 
 from sentence_transformers import SentenceTransformer
 
-from backend.config import settings
+from config import settings
 
 logger = logging.getLogger(__name__)
 
