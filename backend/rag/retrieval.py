@@ -15,9 +15,9 @@ from functools import lru_cache
 import anthropic
 import chromadb
 
-from backend.config import settings
-from backend.rag.embeddings import embed_query
-from backend.rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS
+from config import settings
+from rag.embeddings import embed_query
+from rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS
 
 logger = logging.getLogger(__name__)
 
