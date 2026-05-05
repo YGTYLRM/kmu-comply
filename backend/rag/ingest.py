@@ -26,8 +26,8 @@ import chromadb
 import pdfplumber
 from pypdf import PdfReader
 
-from backend.config import settings
-from backend.rag.embeddings import embed_passages
+from config import settings
+from rag.embeddings import embed_passages
 
 logger = logging.getLogger(__name__)
 
