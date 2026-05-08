@@ -58,6 +58,16 @@ class CompanyProfile(BaseModel):
     )
     has_sustainability_report: bool = Field(default=False)
 
+    # Technology (NIS2 / AI Act)
+    is_critical_infrastructure_sector: bool = Field(
+        default=False,
+        description="Is the company in a critical or important sector under NIS2 (energy, transport, banking, health, digital infrastructure, etc.)?",
+    )
+    uses_ai_systems: bool = Field(
+        default=False,
+        description="Does the company develop, deploy, or operate AI systems?",
+    )
+
     # Existing compliance measures (free text, optional)
     existing_compliance_notes: Optional[str] = Field(
         None, max_length=2000, description="Any existing compliance measures the company has"
