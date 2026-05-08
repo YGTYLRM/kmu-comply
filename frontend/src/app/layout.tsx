@@ -6,14 +6,14 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "KMU-Comply — Regulatory Compliance for German SMEs",
-  description: "Preliminary compliance screening for German SMEs. Find out which regulations apply to your company and where your gaps are.",
+  title: "Complio — Regulatory Compliance Screening for German SMEs",
+  description: "Preliminary compliance screening for German SMEs. Find which regulations apply to your company and where your gaps are — in minutes.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
-      <body className={`${inter.className} min-h-screen bg-white text-slate-900 antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-dark-950 text-white antialiased`}>
         <Navbar />
         {children}
       </body>
