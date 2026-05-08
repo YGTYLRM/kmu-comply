@@ -43,9 +43,11 @@ const schema = z.object({
   annual_energy_consumption_mwh: optNum("Energy consumption"),
   has_energy_management_system: z.boolean().optional(),
   has_conducted_energy_audit:   z.boolean().optional(),
-  is_listed_company:            z.boolean().optional(),
-  has_sustainability_report:    z.boolean().optional(),
-  existing_compliance_notes:    z.string().optional(),
+  is_listed_company:                  z.boolean().optional(),
+  has_sustainability_report:          z.boolean().optional(),
+  is_critical_infrastructure_sector: z.boolean().optional(),
+  uses_ai_systems:                    z.boolean().optional(),
+  existing_compliance_notes:          z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof schema>;
@@ -77,9 +79,11 @@ function toProfile(data: ProfileFormData): CompanyProfile {
     annual_energy_consumption_mwh: data.annual_energy_consumption_mwh,
     has_energy_management_system:  data.has_energy_management_system,
     has_conducted_energy_audit:    data.has_conducted_energy_audit,
-    is_listed_company:             data.is_listed_company,
-    has_sustainability_report:     data.has_sustainability_report,
-    existing_compliance_notes:     data.existing_compliance_notes || undefined,
+    is_listed_company:                  data.is_listed_company,
+    has_sustainability_report:          data.has_sustainability_report,
+    is_critical_infrastructure_sector: data.is_critical_infrastructure_sector ?? false,
+    uses_ai_systems:                    data.uses_ai_systems ?? false,
+    existing_compliance_notes:          data.existing_compliance_notes || undefined,
   };
 }
 
