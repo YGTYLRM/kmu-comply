@@ -1,0 +1,125 @@
+DIRECTIVE (EU) 2022/2555 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL
+of 14 December 2022
+on measures for a high common level of cybersecurity across the Union (NIS2 Directive)
+
+Article 1
+Subject matter
+
+1. This Directive lays down measures aimed at achieving a high common level of cybersecurity across the Union, with a view to improving the functioning of the internal market.
+
+2. To that end, this Directive lays down:
+(a) obligations requiring Member States to adopt national cybersecurity strategies;
+(b) obligations requiring Member States to designate national competent authorities, single points of contact and CSIRTs;
+(c) cybersecurity risk-management measures and reporting obligations for entities;
+(d) rules and obligations for cybersecurity information sharing.
+
+Article 2
+Scope
+
+1. This Directive applies to public and private entities that are classified as essential entities or important entities and are of a type referred to in Annexes I and II. It does not apply to entities that qualify as microenterprises or small enterprises within the meaning of Commission Recommendation 2003/361/EC, unless they are identified entities under Article 2(2).
+
+2. This Directive shall also apply regardless of their size to:
+(a) providers of public electronic communications networks or publicly available electronic communications services;
+(b) trust service providers;
+(c) top-level domain (TLD) name registries and domain name system (DNS) service providers;
+(d) cloud computing service providers;
+(e) data centre service providers;
+(f) content delivery network providers;
+(g) managed service providers and managed security service providers;
+(h) providers of online marketplaces, online search engines, and social networking services platforms.
+
+Article 3
+Essential and important entities
+
+1. For the purposes of this Directive, essential entities are entities of a type referred to in Annex I that exceed the ceilings for medium-sized enterprises within the meaning of Article 2(1) of the Annex to Recommendation 2003/361/EC. Essential entities include:
+(a) providers of public electronic communications networks or of publicly available electronic communications services that are medium-sized enterprises;
+(b) trust service providers that are medium-sized enterprises;
+(c) top-level domain name registries and domain name system service providers;
+(d) entities identified under Article 2(2).
+
+Essential entity thresholds: more than 250 employees OR annual turnover exceeding EUR 50 million AND balance sheet total exceeding EUR 43 million. In sectors: energy, transport, banking, financial market infrastructures, health, drinking water, waste water, digital infrastructure, ICT service management, public administration, space.
+
+2. Important entities are entities of a type referred to in Annexes I and II, other than essential entities, that are medium-sized enterprises, with 50-250 employees or annual turnover EUR 10-50 million.
+
+Article 18
+Cybersecurity risk-management measures — general obligations
+
+1. Member States shall ensure that essential and important entities take appropriate and proportionate technical, operational, and organisational measures to manage the risks posed to the security of network and information systems that those entities use for their operations or for the provision of their services, and to prevent or minimise the impact of incidents on recipients of their services and on other services.
+
+2. The measures referred to in paragraph 1 shall be based on an all-hazards approach that aims to protect network and information systems and the physical environment of those systems from incidents, and shall include at least the following:
+(a) policies on risk analysis and information system security;
+(b) incident handling (prevention, detection, and response to incidents);
+(c) business continuity — backup management and disaster recovery, and crisis management;
+(d) supply chain security, including security-related aspects concerning the relationships between each entity and its direct suppliers or service providers;
+(e) security in network and information systems acquisition, development and maintenance, including vulnerability handling and disclosure;
+(f) policies and procedures to assess the effectiveness of cybersecurity risk-management measures;
+(g) basic cyber hygiene practices and cybersecurity training;
+(h) policies and procedures regarding the use of cryptography and, where appropriate, encryption;
+(i) human resources security, access control policies, and asset management;
+(j) the use of multi-factor authentication or continuous authentication solutions, secured voice, video and text communications, and secured emergency communication systems within the entity, where appropriate.
+
+Article 20
+Governance — management body responsibilities
+
+1. Member States shall ensure that the management bodies of essential and important entities approve the cybersecurity risk-management measures taken by those entities in accordance with Article 21, oversee its implementation, and can be held liable for infringements by those entities of the obligations laid down in this Directive.
+
+2. Member States shall ensure that the members of the management bodies of essential and important entities are required to follow training, and shall encourage essential and important entities to offer similar training to their employees on a regular basis, with a view to gaining sufficient knowledge and skills to identify risks and assess cybersecurity risk-management practices and their impact on the services provided by the entity.
+
+Article 21
+Cybersecurity risk-management measures — detailed requirements
+
+1. Member States shall ensure that essential and important entities take appropriate and proportionate technical and organisational measures to manage the risks posed to the security of network and information systems which those entities use in their operations or in the provision of their services.
+
+2. The measures shall be based on an all-hazards approach and shall include at least:
+(a) policies on risk analysis and information system security — a written cybersecurity policy approved by management;
+(b) incident handling — documented procedures for prevention, detection, response, and recovery from cybersecurity incidents;
+(c) business continuity — backup management, disaster recovery plan, crisis management procedures;
+(d) supply chain security — assessment of cybersecurity practices of direct suppliers and service providers;
+(e) security in network and information systems acquisition, development and maintenance;
+(f) vulnerability handling and coordinated disclosure policies;
+(g) basic cyber hygiene: patch management, password policies, network access control, anti-malware;
+(h) cybersecurity training for employees and management at least annually;
+(i) cryptography and encryption policies where appropriate;
+(j) human resources security, access control, and asset management procedures;
+(k) multi-factor authentication (MFA) for remote access and privileged access.
+
+Article 23
+Reporting obligations
+
+1. Member States shall ensure that essential and important entities notify, without undue delay, the competent authority or the CSIRT of any incident having a significant impact on the provision of their services.
+
+2. Entities shall submit:
+(a) an early warning without undue delay and in any event within 24 hours of becoming aware of the significant incident, indicating whether the incident is suspected of being caused by unlawful or malicious action and whether it is likely to have a cross-border impact;
+(b) an incident notification without undue delay and in any event within 72 hours of becoming aware of the significant incident;
+(c) a final report not later than one month after the submission of the incident notification.
+
+3. An incident shall be considered significant if it:
+(a) has caused or is capable of causing severe operational disruption of the services or financial loss for the entity concerned;
+(b) has affected or is capable of affecting other natural or legal persons by causing considerable material or non-material damage.
+
+Article 26
+Liability of management bodies
+
+Member States shall ensure that natural persons responsible for or acting as legal representatives of essential or important entities on the basis of a power to represent the entity, an authority to take decisions on behalf of the entity, or an authority to exercise control over the entity are liable for infringements of this Directive. The penalties for such infringements shall include temporary prohibition from exercising managerial functions.
+
+Article 32
+Supervision and enforcement of essential entities
+
+1. Member States shall ensure that the supervisory measures imposed on essential entities and the enforcement measures imposed on essential and important entities are effective, proportionate, and dissuasive.
+
+2. For essential entities, supervisory measures include:
+(a) on-site inspections and off-site supervision;
+(b) targeted security audits conducted by an independent body;
+(c) security scans based on objective risk assessment criteria;
+(d) requests for information necessary to assess cybersecurity measures.
+
+3. For important entities, supervisory measures are ex-post (reactive) and include:
+(a) on-site inspections following an incident or complaint;
+(b) requests for evidence of implementation of cybersecurity measures.
+
+Article 34
+General conditions for imposing administrative fines on essential and important entities
+
+1. Member States shall ensure that essential entities that fail to comply with the cybersecurity risk-management and reporting obligations are subject to administrative fines of a maximum of at least EUR 10,000,000 or of a maximum of at least 2% of the total worldwide annual turnover of the undertaking to which the essential entity belongs in the preceding financial year, whichever is higher.
+
+2. Member States shall ensure that important entities that fail to comply are subject to administrative fines of a maximum of at least EUR 7,000,000 or of a maximum of at least 1.4% of the total worldwide annual turnover of the undertaking to which the important entity belongs in the preceding financial year, whichever is higher.
