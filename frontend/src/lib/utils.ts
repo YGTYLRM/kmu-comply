@@ -26,4 +26,10 @@ export const REGULATION_LABEL: Record<string, string> = {
   enefg:      "EnEfG",
   csrd:       "CSRD",
   bdsg:       "BDSG",
+  nis2:       "NIS2",
+  eu_ai_act:  "EU AI Act",
+  hinschg:    "HinSchG",
+  arbschg:    "ArbSchG",
+  agg:        "AGG",
+  milog:      "MiLoG",
 };
