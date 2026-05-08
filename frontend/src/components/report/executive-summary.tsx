@@ -66,7 +66,7 @@ export function ExecutiveSummary({ report }: Props) {
         )}
 
         <div className="border-t border-white/[0.06] pt-4 space-y-1">
-          <p className="text-xs font-semibold text-slate-600">Preliminary screening — not a legal audit</p>
+          <p className="text-xs font-semibold text-slate-600">Preliminary screening, not a legal audit</p>
           <p className="text-xs text-slate-600 italic">{report.disclaimer}</p>
         </div>
       </CardContent>

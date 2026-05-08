@@ -129,7 +129,7 @@ export default function AnalyzePage() {
             className="text-center"
           >
             <h1 className="text-xl font-bold text-white tracking-tight">Company Profile</h1>
-            <p className="text-sm text-slate-500 mt-1">Step {step} of 5 — {STEP_TITLES[step - 1]}</p>
+            <p className="text-sm text-slate-500 mt-1">Step {step} of 5: {STEP_TITLES[step - 1]}</p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
         </div>
