@@ -164,6 +164,19 @@ def _build_query(profile: EnrichedCompanyProfile, regulation: Regulation) -> str
         return f"CSRD sustainability reporting ESG disclosure {base}"
     if regulation == Regulation.BDSG:
         return f"BDSG Bundesdatenschutzgesetz data protection {base}"
+    if regulation == Regulation.NIS2:
+        entity = "essential entity" if profile.employee_count >= 250 else "important entity"
+        return f"NIS2 cybersecurity risk management incident reporting {entity} {base}"
+    if regulation == Regulation.AI_ACT:
+        return f"EU AI Act high-risk AI system deployer transparency human oversight obligations {base}"
+    if regulation == Regulation.HINSCHG:
+        return f"HinSchG Hinweisgeberschutzgesetz whistleblower internal reporting channel {base}"
+    if regulation == Regulation.ARBSCHG:
+        return f"ArbSchG Gefaehrdungsbeurteilung risk assessment documentation employer {base}"
+    if regulation == Regulation.AGG:
+        return f"AGG Gleichbehandlung anti-discrimination employer obligations complaints {base}"
+    if regulation == Regulation.MILOG:
+        return f"MiLoG Mindestlohn minimum wage documentation working time records {base}"
     return f"{regulation.value} compliance obligations {base}"
 
 
