@@ -19,22 +19,22 @@ export function ScoreBreakdown({ report }: Props) {
         {applicable.map((s) => (
           <div key={s.regulation}>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm font-medium text-slate-700">
+              <span className="text-sm font-medium text-slate-300">
                 {REGULATION_LABEL[s.regulation] ?? s.regulation}
               </span>
-              <span className="text-sm font-semibold text-slate-900">{s.score_percent}%</span>
+              <span className="text-sm font-semibold text-white">{s.score_percent}%</span>
             </div>
             <Progress value={s.score_percent} className="h-2" />
-            <div className="flex gap-4 mt-1.5 text-xs text-slate-500">
-              <span className="text-green-600">{s.compliant} compliant</span>
-              <span className="text-yellow-600">{s.partially_compliant} partial</span>
-              <span className="text-red-600">{s.non_compliant} non-compliant</span>
-              {s.cannot_assess > 0 && <span className="text-slate-400">{s.cannot_assess} unassessed</span>}
+            <div className="flex gap-4 mt-1.5 text-xs text-slate-600">
+              <span className="text-emerald-500">{s.compliant} compliant</span>
+              <span className="text-amber-500">{s.partially_compliant} partial</span>
+              <span className="text-red-500">{s.non_compliant} non-compliant</span>
+              {s.cannot_assess > 0 && <span className="text-slate-600">{s.cannot_assess} unassessed</span>}
             </div>
           </div>
         ))}
         {applicable.length === 0 && (
-          <p className="text-sm text-slate-400 text-center py-4">No applicable regulations to score</p>
+          <p className="text-sm text-slate-600 text-center py-4">No applicable regulations to score</p>
         )}
       </CardContent>
     </Card>
