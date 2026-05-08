@@ -46,7 +46,7 @@ export function Step5Governance({ form }: Props) {
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
           {...register("existing_compliance_notes")}
         />
-        <p className="text-xs text-slate-500">Optional — helps the AI model provide more accurate gap analysis</p>
+        <p className="text-xs text-slate-500">Optional — helps the AI model produce a more accurate preliminary screening</p>
       </div>
     </div>
   );

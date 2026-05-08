@@ -117,15 +117,23 @@ export default function AnalyzePage() {
     }
   });
 
+  const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance"];
+
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
-      <div className="mb-8 flex flex-col items-center gap-4">
-        <h1 className="text-2xl font-bold text-slate-900">Company Profile</h1>
-        <StepIndicator steps={STEP_LABELS} current={step} />
+    <div className="min-h-[calc(100vh-64px)] bg-slate-50/50">
+      <div className="border-b border-slate-200/70 bg-white px-6 py-6">
+        <div className="mx-auto max-w-2xl flex flex-col items-center gap-5">
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Company Profile</h1>
+            <p className="text-sm text-slate-500 mt-1">Step {step} of 5 — {STEP_TITLES[step - 1]}</p>
+          </div>
+          <StepIndicator steps={STEP_LABELS} current={step} />
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="py-6">
+      <main className="mx-auto max-w-2xl px-6 py-8">
+      <Card className="shadow-card">
+        <CardContent className="py-7">
           <form onSubmit={onSubmit}>
             {step === 1 && <Step1Company form={form} />}
             {step === 2 && <Step2Financials form={form} />}
@@ -134,32 +142,33 @@ export default function AnalyzePage() {
             {step === 5 && <Step5Governance form={form} />}
 
             {submitError && (
-              <p className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="mt-5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 {submitError}
-              </p>
+              </div>
             )}
 
-            <div className="mt-6 flex justify-between">
+            <div className="mt-7 flex justify-between items-center pt-5 border-t border-slate-100">
               {step > 1 ? (
                 <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-                  Back
+                  ← Back
                 </Button>
               ) : (
                 <div />
               )}
               {step < 5 ? (
-                <Button type="button" onClick={advance}>
-                  Next
+                <Button type="button" onClick={advance} size="md">
+                  Continue →
                 </Button>
               ) : (
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Submitting…" : "Run analysis"}
+                <Button type="submit" size="md" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? "Submitting…" : "Run screening →"}
                 </Button>
               )}
             </div>
           </form>
         </CardContent>
       </Card>
-    </main>
+      </main>
+    </div>
   );
 }
