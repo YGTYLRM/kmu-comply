@@ -93,7 +93,7 @@ export function ProcessingView() {
               transition={{ duration: 0.25 }}
               className="text-sm text-slate-500 mt-1"
             >
-              {runningStep ? STEP_LABELS[runningStep] : "This usually takes 1–2 minutes"}
+              {runningStep ? STEP_LABELS[runningStep] : "This usually takes 1 to 2 minutes"}
             </motion.p>
           </AnimatePresence>
         </div>
