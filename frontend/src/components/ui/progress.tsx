@@ -12,11 +12,15 @@ interface ProgressProps {
 export function Progress({ value, className, indicatorClassName }: ProgressProps) {
   return (
     <RadixProgress.Root
-      className={cn("relative h-2 w-full overflow-hidden rounded-full bg-slate-100", className)}
+      className={cn("relative h-2 w-full overflow-hidden rounded-full bg-white/8", className)}
       value={value}
     >
       <RadixProgress.Indicator
-        className={cn("h-full w-full bg-brand-600 transition-all duration-300", indicatorClassName)}
+        className={cn(
+          "h-full w-full rounded-full transition-all duration-500 ease-out",
+          "bg-gradient-to-r from-brand-600 to-brand-400",
+          indicatorClassName
+        )}
         style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
       />
     </RadixProgress.Root>

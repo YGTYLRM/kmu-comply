@@ -4,9 +4,10 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200/80 bg-white shadow-card",
+        "rounded-2xl border border-white/[0.07] shadow-card-dark",
         className
       )}
+      style={{ background: "rgba(10,22,40,0.75)" }}
       {...props}
     />
   );
@@ -14,13 +15,13 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("px-6 py-4 border-b border-slate-100", className)} {...props} />
+    <div className={cn("px-6 py-4 border-b border-white/[0.06]", className)} {...props} />
   );
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("text-sm font-semibold text-slate-900 tracking-tight", className)} {...props} />
+    <h3 className={cn("text-sm font-semibold text-white tracking-tight", className)} {...props} />
   );
 }
 
