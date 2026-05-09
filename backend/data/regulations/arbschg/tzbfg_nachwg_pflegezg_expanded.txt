@@ -1,0 +1,75 @@
+Teilzeit- und Befristungsgesetz (TzBfG), Nachweisgesetz (NachwG), Pflegezeitgesetz (PflegeZG)
+TzBfG vom 21. Dezember 2000, NachwG vom 20. Juli 1995 (reformed 2022), PflegeZG vom 28. Mai 2008
+Sources: gesetze-im-internet.de/tzbfg / nachwg / pflegezg
+
+---
+
+arbschg TzBfG §1
+Title: Purpose — all employers must not discriminate against part-time or fixed-term workers
+Obligation: MUST
+Threshold: All employers regardless of size; applies to all employment relationships
+Text: The Teilzeit- und Befristungsgesetz (TzBfG) pursues three objectives: (1) promoting part-time work as a legitimate and respected form of employment; (2) establishing the legal conditions for valid fixed-term employment contracts; and (3) preventing discrimination against part-time and fixed-term workers. The law applies universally to all employers in Germany. The prohibition of discrimination against part-time and fixed-term workers is an absolute requirement — employers may not treat part-time or fixed-term employees less favourably than comparable full-time or permanent employees without objective justification. The TzBfG also gives employees a statutory right to request a reduction in working hours under certain conditions.
+Keywords: TzBfG, part-time, Teilzeitarbeit, fixed-term, befristet, discrimination prohibition, all employers, equal treatment
+
+---
+
+arbschg TzBfG §4
+Title: Pro-rata principle — part-time and fixed-term workers must receive proportional pay and benefits
+Obligation: MUST
+Threshold: All employers; applies to all part-time and fixed-term employees
+Text: Part-time employees must not receive worse treatment than comparable full-time employees unless objective reasons justify the difference. Compensation and all divisible monetary benefits must be granted proportionally according to the ratio of the part-time employee's working hours to those of a comparable full-time employee (pro-rata temporis principle). Fixed-term employees similarly must not be treated worse than comparable permanent employees without objective justification. Where employment conditions depend on seniority or length of service, the same periods apply to fixed-term workers. Employers who pay part-time employees a lower hourly rate or exclude them from bonus schemes without objective justification violate §4 TzBfG, giving rise to claims for equalisation.
+Keywords: pro-rata, Teilzeitarbeit Gleichbehandlung, proportional pay, fixed-term equal treatment, §4 TzBfG, divisible benefits, comparable employee
+
+---
+
+arbschg TzBfG §8
+Title: Right to reduce working hours — employer with 15+ employees must agree unless operational grounds exist
+Obligation: MUST
+Threshold: Employers with more than 15 employees; employees with more than 6 months employment
+Text: Employees who have been employed for more than six months by an employer with more than 15 employees have a statutory right to request a reduction in their working hours. The request must be made in text form at least three months before the desired start of the reduction, stating the desired scope and distribution of hours. The employer must discuss the request and must agree to the reduction and the proposed distribution unless urgent operational grounds prevent it. The employer must communicate their decision in text form at least one month before the desired start date. If the employer fails to respond in time, the employee's proposed hours are deemed agreed. Once agreed, the employee cannot request a further reduction for two years. A refused employee cannot request again for two years from the employer's decision. Employers must document their reasons for refusal.
+Keywords: Verringerung Arbeitszeit, right to part-time, §8 TzBfG, 15 employees, 6 months, operational grounds, text form, three months notice
+
+---
+
+arbschg TzBfG §12
+Title: On-call work — minimum 3 hours per call-in, 4 days advance notice mandatory
+Obligation: MUST
+Threshold: All employers using Arbeit-auf-Abruf (on-call work) arrangements
+Text: Where employer and employee agree that work is to be performed as and when needed (Arbeit auf Abruf), the agreement must specify the weekly and daily minimum working hours. If no weekly hours are agreed, 20 hours per week are deemed agreed. The employer must give the employee at least four days advance notice of the timing and duration of the work. Per call-in, the employee must be given at least three consecutive hours of work. If minimum hours are agreed, the employer may call the employee in for up to 25% additional hours above the agreed minimum; if maximum hours are agreed, the employer may reduce calls by no more than 20%. On-call work arrangements that do not comply with these requirements are partially void, with the statutory defaults applying instead.
+Keywords: Arbeit auf Abruf, on-call work, §12 TzBfG, 4 days notice, 3 hours minimum, weekly hours, 20 hours default, flexibility limits
+
+---
+
+arbschg TzBfG §14
+Title: Fixed-term employment — objective reason required; without reason maximum 2 years with 3 renewals
+Obligation: MUST
+Threshold: All employers concluding fixed-term employment contracts
+Text: Fixed-term employment contracts are only valid if there is an objective justification (sachlicher Grund). Permitted objective grounds include: temporary operational need; engagement for the period after completion of training; substituting for another employee on leave; nature of the work; probationary purpose; personal circumstances of the employee; budget-funded positions; or court settlement. Without an objective reason, fixed-term employment is permissible only up to a maximum duration of two years, with up to three renewals within that period, provided the employee has had no prior employment relationship with the same employer. During the first four years after company formation, contracts without grounds may run for up to four years. Employees aged 52 and over who were previously unemployed may be engaged on fixed-term contracts for up to five years without grounds. All fixed-term contracts must be concluded in writing before the employment begins, otherwise they are deemed permanent. Fixed-term contracts that expire without renewal terminate automatically without notice.
+Keywords: befristetes Arbeitsverhältnis, fixed-term, sachlicher Grund, 2 years maximum, 3 renewals, no prior employment, start-up exception, 4 years, written form, §14 TzBfG
+
+---
+
+arbschg NachwG §2
+Title: Written employment terms — employer must provide written document from day 1; 15 mandatory items
+Obligation: MUST
+Threshold: All employers; applies to all employees from day 1 of employment
+Text: Employers must document the essential terms of every employment relationship in writing and hand these to the employee before or on the first day of work. The written statement (Niederschrift) must contain at least: names and addresses of both parties; start date; expected duration (if fixed-term); place of work; job description; initial pay and due date; agreed working hours and rest periods; duration of probationary period; annual leave entitlement; notice periods and procedure; reference to applicable collective agreements. Where information changes, the employee must be informed within one day if the change relates to first-day items, within seven days for most other items, and within one month for remaining items. Non-compliance gives the employee a right to a fine of up to four weeks salary. Electronic transmission is permitted if the document is accessible, storable, and printable by the employee and the employer requests receipt confirmation.
+Keywords: Nachweisgesetz, NachwG, written employment terms, day 1, 15 mandatory items, Niederschrift, Arbeitsvertrag, employment contract, notice, §2 NachwG
+
+---
+
+arbschg PflegeZG §2
+Title: Short-term care leave — up to 10 days off work for acute care emergencies, no pay obligation
+Obligation: MUST
+Threshold: All employers; applies to all employees with close relatives in acute need of care
+Text: Employees may take up to ten working days off work if this is required to organise appropriate care for a close relative in an acutely arising care situation, or to ensure care provision during that period. Close relatives include parents, grandparents, spouses, partners, siblings, children, foster children, and their spouses or partners. The employee must immediately inform the employer of the absence and its likely duration. Upon request, the employee must provide a medical certificate or professional assessment confirming the relative's care dependency. The employer has no general obligation to continue paying wages during short-term care leave — entitlement to pay depends on applicable collective agreements or care support payments under SGB XI §44a(3). The right exists regardless of company size.
+Keywords: Pflegezeitgesetz, short-term care leave, 10 days, acute care, close relative, Pflegebedürftigkeit, §2 PflegeZG, no pay obligation
+
+---
+
+arbschg PflegeZG §3
+Title: Care leave — up to 6 months unpaid leave to care for relatives at home; dismissal protection
+Obligation: MUST
+Threshold: Employers with more than 15 employees; dismissal protection applies to all employers
+Text: Employees are entitled to full or partial leave of absence for up to six months to care for a close relative who requires care at home (häusliche Pflege). The employee must give at least ten working days advance notice in writing, stating the duration and scope of the leave. Where partial leave is requested, the employer must accommodate the proposed working time reduction unless urgent operational grounds prevent it. Employers with 15 or fewer employees are not obligated to grant care leave but must respond to requests with reasoned decisions within four weeks. The dismissal protection applies from the moment care leave is requested: the employer may not give notice of termination. During care leave, the employer has no obligation to pay remuneration unless otherwise agreed. Employees may also access care support loans (Pflegeunterstützungsgeld) through social insurance.
+Keywords: Pflegezeit, care leave, 6 months, häusliche Pflege, 15 employees, advance notice, dismissal protection, Kuendigungsschutz, §3 PflegeZG
