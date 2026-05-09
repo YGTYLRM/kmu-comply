@@ -1,0 +1,49 @@
+Mutterschutzgesetz (MuSchG)
+Gesetz zum Schutz von Muettern bei der Arbeit, in der Ausbildung und im Studium
+vom 23. Mai 2017 (BGBl. I S. 1228)
+Source: https://www.gesetze-im-internet.de/muschg_2018/
+
+---
+
+arbschg MuSchG §1
+Title: Purpose and scope — protection of health of pregnant, postpartum and breastfeeding women
+Obligation: MUST
+Threshold: All employers who employ or train women; no minimum size threshold
+Text: The Mutterschutzgesetz protects the physical and psychological health of pregnant women, women who have recently given birth, and nursing mothers at the workplace, in vocational training, and in study. It applies to all women in an employment relationship, vocational training, home work, and similar arrangements. The law simultaneously aims to prevent pregnancy-related disadvantages in working life. All employers — regardless of size — are subject to MuSchG obligations from the moment they are notified that an employee is pregnant, has recently given birth, or is breastfeeding. The protection applies throughout the entire pregnancy, for at least four months after childbirth, and for the duration of breastfeeding.
+Keywords: Mutterschutz, maternity protection, scope, pregnant, nursing, postpartum, employer obligation, all employers, health protection
+
+---
+
+arbschg MuSchG §3
+Title: Maternity leave before and after childbirth — prohibition on employment
+Obligation: MUST
+Threshold: All employers; applies automatically without any notification requirement by employer
+Text: Employers must not assign work to a pregnant woman during the six weeks before the expected date of childbirth unless she explicitly consents to working. The woman may withdraw this consent at any time. Following childbirth, employers must not employ the mother during the eight weeks after delivery. This protection extends to twelve weeks after premature births, multiple births (Mehrlingsgeburt), or births of children who are diagnosed with a disability within the eight-week post-birth period, if the mother requests the extension. The periods of mandatory maternity leave (Schutzfristen) are fully paid — the employer continues to pay the employee's average earnings, reimbursed through the statutory health insurance and employer supplement system. Maternity leave periods cannot be shortened even with the employee's consent (except for the pre-birth period).
+Keywords: Beschaeftigungsverbot, maternity leave, Schutzfrist, six weeks before birth, eight weeks after birth, twelve weeks premature, multiple birth, disability
+
+---
+
+arbschg MuSchG §9
+Title: Employer duty to protect health — risk assessment and individual accommodation
+Obligation: MUST
+Threshold: All employers from the moment they are notified of pregnancy, recent birth, or breastfeeding
+Text: Employers must assess working conditions and activities to identify and eliminate or minimise health risks for pregnant and nursing women and their children. The risk assessment under §5 ArbSchG must be extended to specifically consider the situation of pregnant and nursing employees. Where risks exist, employers must first attempt to redesign the working conditions (Gestaltung der Arbeitsbedingungen), then offer alternative work (Umsetzung auf einen anderen Arbeitsplatz), and as a last resort issue an individual employment prohibition (individuelles Beschaeftigungsverbot). Pregnant women must have access to appropriate rest facilities and must be permitted to take brief rest breaks as needed. The employer bears all costs of protective measures and may not pass them on to the employee.
+Keywords: Gesundheitsschutz, risk assessment, Gefaehrdungsbeurteilung, accommodation, Umsetzung, employment prohibition, rest breaks, cost
+
+---
+
+arbschg MuSchG §16
+Title: Medical employment prohibition — employer must follow physician's certification
+Obligation: MUST
+Threshold: All employers; triggered by medical certificate presented by the employee
+Text: Employers must not assign work to a pregnant woman where a physician's certificate (aertztliches Zeugnis) confirms that continuation of employment in the specific activity would endanger her health or the health of her child. Following childbirth, employers must not assign tasks that the mother is medically certified as unable to perform fully during the postpartum recovery period. The medical employment prohibition operates independently of the general pre-and post-birth prohibition under §3 MuSchG and applies on an individual basis. Employers must accept the medical certificate without questioning its content and must immediately take the woman out of the prohibited activity. The employer continues to pay the employee's average earnings during a medically certified employment prohibition.
+Keywords: aertztliches Beschaeftigungsverbot, medical certificate, individual employment prohibition, health certification, continued pay
+
+---
+
+arbschg MuSchG §24
+Title: Employer notification duty — employer must inform competent authority of pregnancies
+Obligation: MUST
+Threshold: All employers; triggered when employer is notified of pregnancy
+Text: Employers must notify the competent supervisory authority (Landesbehoerde) immediately upon being informed that an employee is pregnant or has recently given birth, if the employee's activities fall within a category that is subject to an employment prohibition. The notification allows supervisory authorities to monitor compliance and offer advice. Employers who discover a pregnancy in the context of a prohibited activity must act immediately to reassign the employee. Failure to notify constitutes an administrative offence. Employers must also keep records of pregnant and recently delivered employees and provide these records to supervisory authorities on request.
+Keywords: Anzeigepflicht, notification, supervisory authority, pregnancy notification, employer duty, administrative offence, record keeping
