@@ -225,6 +225,18 @@ def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:
     )
 
 
+def _strip_fences(text: str) -> str:
+    """Remove markdown code fences that some models wrap JSON in."""
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        # drop opening fence line and closing fence line
+        start = 1
+        end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
+        text = "\n".join(lines[start:end]).strip()
+    return text
+
+
 def _llm_call(
     prompt: str,
     parse_fn,
@@ -246,7 +258,7 @@ def _llm_call(
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return parse_fn(response.content[0].text.strip())
+            return parse_fn(_strip_fences(response.content[0].text))
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("%s: parse error attempt %d: %s", step_name, attempt + 1, exc)
             last_exc = exc
