@@ -21,6 +21,7 @@ from models.compliance_report import (
     RegulatoryChunk,
 )
 from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
+from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
 from rag.retrieval import deduplicate, rerank, retrieve
 from services.threshold_engine import determine_applicable_regulations
@@ -92,8 +93,9 @@ def run_gap_analysis(
     profile: EnrichedCompanyProfile,
     chunks: list[RegulatoryChunk],
     failures: list[str],
+    job_id: str = "",
 ) -> list[ComplianceGap]:
-    """LLM gap analysis, processed per regulation to stay within context budget."""
+    """LLM gap analysis, processed per regulation. Includes company doc evidence when available."""
     by_reg: dict[str, list[RegulatoryChunk]] = {}
     for chunk in chunks:
         by_reg.setdefault(chunk.regulation.value, []).append(chunk)
@@ -103,7 +105,16 @@ def run_gap_analysis(
 
     for reg_key, reg_chunks in by_reg.items():
         chunks_json = _chunks_to_json(reg_chunks)
-        prompt = gap_analysis_prompt(profile_json, chunks_json)
+
+        # Retrieve company doc evidence for this regulation
+        company_docs_json = ""
+        if job_id:
+            query = _build_query(profile, _reg_from_key(reg_key))
+            doc_chunks = retrieve_company_docs(job_id, query, top_k=6)
+            if doc_chunks:
+                company_docs_json = _doc_chunks_to_json(doc_chunks)
+
+        prompt = gap_analysis_prompt(profile_json, chunks_json, company_docs_json)
         gaps = _llm_call(prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures)
         all_gaps.extend(gaps)
 
@@ -206,6 +217,23 @@ def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
         except Exception as exc:
             logger.warning("could not parse retrieval chunk: %s", exc)
     return result
+
+
+def _reg_from_key(reg_key: str) -> Regulation:
+    try:
+        return Regulation(reg_key)
+    except ValueError:
+        return Regulation.GDPR  # safe fallback
+
+
+def _doc_chunks_to_json(chunks: list[dict]) -> str:
+    import json
+    parts = []
+    for c in chunks:
+        parts.append(
+            f"[Source: {c.get('source', 'uploaded document')}]\n{c['text'][:800]}"
+        )
+    return "\n\n---\n\n".join(parts)
 
 
 def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:

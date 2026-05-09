@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from pydantic import BaseModel
+from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
@@ -83,10 +85,43 @@ async def validate_profile(profile: CompanyProfile):
     )
 
 
+class AnalyzeRequest(BaseModel):
+    profile: CompanyProfile
+    doc_session_id: Optional[str] = None
+
+
+@app.post("/api/documents")
+async def upload_documents(files: list[UploadFile] = File(...)):
+    """Upload company documents before analysis. Returns a doc_session_id."""
+    from services.document_store import document_store
+
+    session_id = document_store.create_session()
+    saved: list[str] = []
+    errors: list[str] = []
+
+    for f in files:
+        try:
+            content = await f.read()
+            name = document_store.save_file(session_id, f.filename or "upload", content)
+            saved.append(name)
+        except ValueError as e:
+            errors.append(str(e))
+
+    if not saved and errors:
+        document_store.clear(session_id)
+        raise HTTPException(status_code=400, detail="; ".join(errors))
+
+    return {
+        "doc_session_id": session_id,
+        "files_saved": saved,
+        "errors": errors,
+    }
+
+
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(profile: CompanyProfile):
+async def analyze(body: AnalyzeRequest):
     """Submit a company profile for compliance analysis. Returns a job_id."""
-    job_id = await job_manager.create_job(profile)
+    job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
     return AnalyzeResponse(
         job_id=job_id,
         status=JobStatus.PENDING,
