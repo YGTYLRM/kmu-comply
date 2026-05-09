@@ -212,6 +212,8 @@ class ContactRequest(BaseModel):
     name: str
     email: str
     company: Optional[str] = None
+    phone: Optional[str] = None
+    topic: Optional[str] = None
     message: str
 
 
@@ -223,20 +225,47 @@ async def contact(req: ContactRequest):
     import resend
     resend.api_key = settings.resend_api_key
 
+    subject = f"Contact: {req.name}"
+    if req.topic:
+        subject += f" — {req.topic}"
+    if req.company:
+        subject += f" ({req.company})"
+
+    rows = [
+        ("Name",    req.name),
+        ("Email",   req.email),
+        ("Company", req.company or "Not provided"),
+        ("Phone",   req.phone   or "Not provided"),
+        ("Topic",   req.topic   or "Not specified"),
+    ]
+
+    rows_html = "".join(
+        f'<tr><td style="padding:8px 12px 8px 0;color:#64748b;font-size:13px;white-space:nowrap;vertical-align:top">{k}</td>'
+        f'<td style="padding:8px 0;font-size:14px;color:#0f172a">{v}</td></tr>'
+        for k, v in rows
+    )
+
     html = f"""
-    <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
-      <h2 style="margin:0 0 20px;color:#0f172a">New contact via Complio</h2>
-      <table style="width:100%;border-collapse:collapse">
-        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:90px">Name</td>
-            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.name}</td></tr>
-        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td>
-            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.email}</td></tr>
-        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Company</td>
-            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.company or "Not provided"}</td></tr>
+    <div style="font-family:sans-serif;max-width:580px;margin:0 auto;padding:32px 24px">
+      <div style="margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;margin-bottom:8px">
+          Complio — New Contact
+        </div>
+        <h2 style="margin:0;font-size:20px;color:#0f172a">{req.name} got in touch</h2>
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+        {rows_html}
       </table>
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0"/>
-      <p style="font-size:13px;color:#64748b;margin:0 0 8px">Message</p>
-      <p style="font-size:14px;color:#0f172a;line-height:1.6;white-space:pre-wrap">{req.message}</p>
+
+      <div style="background:#f8fafc;border-radius:10px;padding:16px 20px">
+        <p style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px">Message</p>
+        <p style="font-size:14px;color:#1e293b;line-height:1.7;white-space:pre-wrap;margin:0">{req.message}</p>
+      </div>
+
+      <p style="margin-top:24px;font-size:12px;color:#94a3b8">
+        Reply directly to this email to respond to {req.name}.
+      </p>
     </div>
     """
 
@@ -244,7 +273,7 @@ async def contact(req: ContactRequest):
         "from": "Complio <onboarding@resend.dev>",
         "to": [settings.contact_email],
         "reply_to": req.email,
-        "subject": f"Contact: {req.name} ({req.company or req.email})",
+        "subject": subject,
         "html": html,
     })
 
