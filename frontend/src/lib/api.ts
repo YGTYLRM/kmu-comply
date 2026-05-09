@@ -28,10 +28,21 @@ export const api = {
       body: JSON.stringify(profile),
     }),
 
-  analyze: (profile: CompanyProfile) =>
+  uploadDocuments: async (files: File[]): Promise<{ doc_session_id: string; files_saved: string[] }> => {
+    const form = new FormData();
+    files.forEach((f) => form.append("files", f));
+    const res = await fetch(`${BASE}/api/documents`, { method: "POST", body: form });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail ?? `HTTP ${res.status}`);
+    }
+    return res.json();
+  },
+
+  analyze: (profile: CompanyProfile, docSessionId?: string) =>
     request<AnalyzeResponse>("/api/analyze", {
       method: "POST",
-      body: JSON.stringify(profile),
+      body: JSON.stringify({ profile, doc_session_id: docSessionId ?? null }),
     }),
 
   getStatus: (jobId: string) =>
