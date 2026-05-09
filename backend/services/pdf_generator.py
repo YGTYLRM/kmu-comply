@@ -1,11 +1,11 @@
 """
-PDF Report Generator for KMU-Comply compliance reports.
-Uses fpdf (not fpdf2). Public entry point: generate_pdf(report) -> bytes.
+PDF Report Generator for Complio compliance reports.
+Public entry point: generate_pdf(report) -> bytes.
 """
-
 from __future__ import annotations
 
 import io
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -34,751 +34,768 @@ REG_LABELS: dict[str, str] = {
     "milog":      "MiLoG",
 }
 
-# Colour palette
-NAVY        = (15,  33,  69)
-NAVY_LIGHT  = (25,  55, 110)
-WHITE       = (255, 255, 255)
-LIGHT_GREY  = (245, 246, 248)
-MID_GREY    = (180, 185, 195)
-DARK_GREY   = (80,  90, 105)
-BLACK       = (30,  30,  30)
+# Palette
+NAVY       = (12,  28,  64)
+NAVY_MID   = (30,  58, 112)
+WHITE      = (255, 255, 255)
+LIGHT_BG   = (246, 248, 251)
+BORDER     = (218, 223, 232)
+TEXT_DARK  = (28,  36,  50)
+TEXT_MID   = (86,  96, 112)
+TEXT_LIGHT = (145, 155, 170)
 
-# Status colours (R, G, B)
-STATUS_COLOURS: dict[ComplianceStatus, tuple[int, int, int]] = {
-    ComplianceStatus.COMPLIANT:           (39,  174,  96),   # green
-    ComplianceStatus.PARTIALLY_COMPLIANT: (230, 162,   0),   # amber
-    ComplianceStatus.NON_COMPLIANT:       (192,  57,  43),   # red
-    ComplianceStatus.CANNOT_ASSESS:       (127, 140, 148),   # grey
+STATUS_COLORS: dict[ComplianceStatus, tuple] = {
+    ComplianceStatus.COMPLIANT:           (30,  150,  70),
+    ComplianceStatus.PARTIALLY_COMPLIANT: (200, 120,   0),
+    ComplianceStatus.NON_COMPLIANT:       (180,  35,  25),
+    ComplianceStatus.CANNOT_ASSESS:       (115, 125, 140),
 }
-
 STATUS_LABELS: dict[ComplianceStatus, str] = {
     ComplianceStatus.COMPLIANT:           "Compliant",
     ComplianceStatus.PARTIALLY_COMPLIANT: "Partial",
     ComplianceStatus.NON_COMPLIANT:       "Non-Compliant",
     ComplianceStatus.CANNOT_ASSESS:       "Cannot Assess",
 }
-
-PRIORITY_COLOURS: dict[Priority, tuple[int, int, int]] = {
-    Priority.CRITICAL: (192,  57,  43),  # red
-    Priority.HIGH:     (211, 105,  26),  # orange
-    Priority.MEDIUM:   (230, 162,   0),  # amber
-    Priority.LOW:      (39,  174,  96),  # green
+PRIORITY_COLORS: dict[Priority, tuple] = {
+    Priority.CRITICAL: (180,  35,  25),
+    Priority.HIGH:     (195,  85,  15),
+    Priority.MEDIUM:   (200, 120,   0),
+    Priority.LOW:      (30,  150,  70),
 }
 
-PAGE_W    = 210   # A4 mm
+PAGE_W    = 210
 PAGE_H    = 297
-MARGIN    = 18
+MARGIN    = 16
 CONTENT_W = PAGE_W - 2 * MARGIN
 
 
 # ---------------------------------------------------------------------------
-# Text sanitiser
+# Text helpers
 # ---------------------------------------------------------------------------
 
 def _s(text: Optional[str]) -> str:
-    """Sanitise arbitrary text for safe output in latin-1 fpdf cells."""
+    """Sanitise text for latin-1 fpdf output."""
     if text is None:
         return ""
     text = str(text)
-    # Unicode dashes -> hyphen
-    text = text.replace("—", "-")   # em dash
-    text = text.replace("–", "-")   # en dash
-    # Curly / smart quotes -> straight
+    # Dashes
+    text = text.replace("—", "-").replace("–", "-")
+    # Smart quotes
     text = text.replace("‘", "'").replace("’", "'")
     text = text.replace("“", '"').replace("”", '"')
-    # Ellipsis character
+    # Ellipsis
     text = text.replace("…", "...")
+    # Section sign
+    text = text.replace("§", "§")
     # German umlauts -> ASCII digraphs
     text = (text
-            .replace("\xe4", "ae").replace("\xc4", "Ae")
-            .replace("\xf6", "oe").replace("\xd6", "Oe")
-            .replace("\xfc", "ue").replace("\xdc", "Ue")
-            .replace("\xdf", "ss"))
-    # Encode to latin-1, replacing anything still unrepresentable
+            .replace("ä", "ae").replace("Ä", "Ae")
+            .replace("ö", "oe").replace("Ö", "Oe")
+            .replace("ü", "ue").replace("Ü", "Ue")
+            .replace("ß", "ss"))
     return text.encode("latin-1", errors="replace").decode("latin-1")
+
+
+def _clean_evidence(text: Optional[str]) -> str:
+    """Remove raw field_name=value patterns from LLM evidence output."""
+    if not text:
+        return ""
+    # Replace patterns like has_dpo=false, employee_count=62, etc.
+    text = re.sub(r'\b\w+=(?:true|false|null|\d+(?:\.\d+)?)\b', '', text)
+    # Clean up extra spaces left behind
+    text = re.sub(r'  +', ' ', text).strip()
+    # Remove leading/trailing punctuation artifacts
+    text = re.sub(r'^[\s,;.]+', '', text)
+    return text
 
 
 def _reg_label(reg_value: str) -> str:
     return REG_LABELS.get(reg_value, reg_value.upper())
 
 
-def _score_colour(score: float) -> tuple[int, int, int]:
+def _score_color(score: float) -> tuple:
     if score >= 75:
-        return (39, 174, 96)    # green
+        return (30, 150, 70)
     if score >= 40:
-        return (230, 162, 0)    # amber
-    return (192, 57, 43)        # red
+        return (200, 120, 0)
+    return (180, 35, 25)
+
+
+# ---------------------------------------------------------------------------
+# Row height helper
+# ---------------------------------------------------------------------------
+
+def _text_lines(pdf: FPDF, text: str, width: float, line_h: float) -> int:
+    """Return the number of lines multi_cell would produce (dry run)."""
+    lines = pdf.multi_cell(width, line_h, _s(text), dry_run=True, output="LINES")
+    return max(1, len(lines))
+
+
+def _row_h(pdf: FPDF, text: str, width: float, line_h: float = 5.0, pad: float = 3.0) -> float:
+    return _text_lines(pdf, text, width, line_h) * line_h + pad
 
 
 # ---------------------------------------------------------------------------
 # PDF class
 # ---------------------------------------------------------------------------
 
-class KMUPdf(FPDF):
-    """Custom FPDF subclass with branded header/footer and shared layout helpers."""
-
-    def __init__(self, company_name: str):
+class ComplioPdf(FPDF):
+    def __init__(self, company_name: str, date_str: str):
         super().__init__(orientation="P", unit="mm", format="A4")
         self.company_name = company_name
-        self.set_auto_page_break(auto=True, margin=20)
+        self.date_str = date_str
+        self._cover_page = True
+        self.set_auto_page_break(auto=True, margin=18)
         self.set_margins(MARGIN, MARGIN, MARGIN)
-        self._is_cover = False
-
-    # ------------------------------------------------------------------
-    # Header / footer overrides
-    # ------------------------------------------------------------------
 
     def header(self):
-        if self._is_cover:
+        if self._cover_page:
             return
-        # Thin navy running header bar
+        # Thin top bar
         self.set_fill_color(*NAVY)
-        self.rect(0, 0, PAGE_W, 14, style="F")
-        # Logo (small, ~7 mm height)
+        self.rect(0, 0, PAGE_W, 11, style="F")
+        # Logo
         if LOGO_PATH.exists():
             try:
-                self.image(str(LOGO_PATH), x=MARGIN, y=3.5, h=7)
+                self.image(str(LOGO_PATH), x=MARGIN, y=2.5, h=6)
             except Exception:
-                pass
-        # Company name right-aligned in header
-        self.set_xy(0, 3)
-        self.set_font("Helvetica", "B", 8)
+                self.set_xy(MARGIN, 2)
+                self.set_font("Helvetica", "B", 9)
+                self.set_text_color(*WHITE)
+                self.cell(40, 7, "Complio")
+        # Company name right-aligned
+        self.set_font("Helvetica", "", 7.5)
         self.set_text_color(*WHITE)
-        self.cell(PAGE_W - MARGIN, 8, _s(self.company_name), align="R")
-        self.set_text_color(*BLACK)
-        # Push content below the header bar
-        self.set_y(16)
+        self.set_xy(0, 2.5)
+        self.cell(PAGE_W - MARGIN, 6, _s(self.company_name), align="R")
+        self.set_text_color(*TEXT_DARK)
+        self.set_y(14)
 
     def footer(self):
-        if self._is_cover:
+        if self._cover_page:
             return
-        self.set_y(-12)
+        self.set_y(-11)
         self.set_font("Helvetica", "", 7)
-        self.set_text_color(*MID_GREY)
-        self.cell(0, 5, f"Page {self.page_no()}", align="C")
-        self.set_text_color(*BLACK)
+        self.set_text_color(*TEXT_LIGHT)
+        self.cell(CONTENT_W // 2, 5, "Complio - Preliminary Compliance Screening")
+        self.cell(CONTENT_W // 2, 5, f"Page {self.page_no()}", align="R")
+        self.set_text_color(*TEXT_DARK)
 
     # ------------------------------------------------------------------
-    # Reusable layout helpers
+    # Layout helpers
     # ------------------------------------------------------------------
 
-    def section_title(self, title: str):
-        """Bold navy section heading with underline rule."""
-        self.ln(4)
-        self.set_font("Helvetica", "B", 13)
-        self.set_text_color(*NAVY)
-        self.cell(CONTENT_W, 8, _s(title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        # Underline rule
-        self.set_draw_color(*NAVY_LIGHT)
-        self.set_line_width(0.5)
-        self.line(MARGIN, self.get_y(), PAGE_W - MARGIN, self.get_y())
-        self.set_draw_color(0, 0, 0)
-        self.set_line_width(0.2)
-        self.set_text_color(*BLACK)
-        self.ln(3)
-
-    def sub_title(self, title: str):
-        self.set_font("Helvetica", "B", 10)
-        self.set_text_color(*NAVY_LIGHT)
-        self.cell(CONTENT_W, 6, _s(title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        self.set_text_color(*BLACK)
-        self.ln(1)
-
-    def body_text(self, text: str, indent: float = 0):
-        self.set_font("Helvetica", "", 9)
-        self.set_text_color(*DARK_GREY)
-        self.set_x(MARGIN + indent)
-        self.multi_cell(CONTENT_W - indent, 5, _s(text))
-        self.set_text_color(*BLACK)
-
-    def label_value_row(self, label: str, value: str, label_w: float = 42, indent: float = 0):
-        """Print a bold label followed by wrapped value text."""
-        x0 = MARGIN + indent
-        y0 = self.get_y()
-        self.set_x(x0)
-        self.set_font("Helvetica", "B", 9)
-        self.set_text_color(*DARK_GREY)
-        self.cell(label_w, 5, _s(label + ":"))
-        self.set_font("Helvetica", "", 9)
-        self.set_text_color(*BLACK)
-        self.set_xy(x0 + label_w, y0)
-        self.multi_cell(CONTENT_W - indent - label_w, 5, _s(value))
-
-    def reg_subheading(self, reg_key: str):
-        """Full-width navy sub-heading bar for a regulation section."""
-        self.ln(3)
-        self.set_fill_color(*NAVY_LIGHT)
+    def section_heading(self, title: str, top_pad: float = 6.0):
+        self.ln(top_pad)
+        self.set_fill_color(*NAVY)
         self.set_text_color(*WHITE)
         self.set_font("Helvetica", "B", 10)
         self.set_x(MARGIN)
-        self.cell(CONTENT_W, 8, _s(_reg_label(reg_key)), fill=True,
+        self.cell(CONTENT_W, 8, _s(title), fill=True,
                   new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        self.set_text_color(*BLACK)
+        self.set_text_color(*TEXT_DARK)
         self.ln(2)
 
-    def separator_line(self):
-        self.set_draw_color(*MID_GREY)
-        self.set_line_width(0.2)
+    def sub_heading(self, title: str):
+        self.ln(3)
+        self.set_font("Helvetica", "B", 9.5)
+        self.set_text_color(*NAVY_MID)
+        self.set_x(MARGIN)
+        self.cell(CONTENT_W, 6, _s(title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        self.set_draw_color(*BORDER)
+        self.set_line_width(0.3)
         self.line(MARGIN, self.get_y(), PAGE_W - MARGIN, self.get_y())
-        self.set_draw_color(0, 0, 0)
+        self.set_line_width(0.2)
+        self.set_text_color(*TEXT_DARK)
         self.ln(2)
 
-    def ensure_space(self, mm: float = 40):
-        """Add a new page if less than mm space remains."""
+    def body(self, text: str, indent: float = 0):
+        self.set_font("Helvetica", "", 9)
+        self.set_text_color(*TEXT_MID)
+        self.set_x(MARGIN + indent)
+        self.multi_cell(CONTENT_W - indent, 5, _s(text))
+        self.set_text_color(*TEXT_DARK)
+
+    def reg_banner(self, reg_key: str):
+        """Full-width regulation sub-banner."""
+        self.ln(4)
+        self.set_fill_color(*NAVY_MID)
+        self.set_text_color(*WHITE)
+        self.set_font("Helvetica", "B", 9)
+        self.set_x(MARGIN)
+        self.cell(CONTENT_W, 7, _s(_reg_label(reg_key)),
+                  fill=True, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        self.set_text_color(*TEXT_DARK)
+        self.ln(1)
+
+    def ensure(self, mm: float = 35.0):
         if self.get_y() > PAGE_H - mm:
             self.add_page()
-            self.ln(2)
 
 
 # ---------------------------------------------------------------------------
-# Section builders
+# Cover page
 # ---------------------------------------------------------------------------
 
-def _build_cover(pdf: KMUPdf, report: ComplianceReport):
-    """
-    Cover page: dark navy top block (~120 mm) with logo placed directly
-    on the dark background (no white box). White lower area with stats.
-    """
-    pdf._is_cover = True
+def _build_cover(pdf: ComplioPdf, report: ComplianceReport):
+    pdf._cover_page = True
     pdf.add_page()
 
-    COVER_TOP = 122  # height of dark block in mm
+    DARK_H = 118  # height of dark block
 
-    # --- Dark navy top block ---
+    # Dark block
     pdf.set_fill_color(*NAVY)
-    pdf.rect(0, 0, PAGE_W, COVER_TOP, style="F")
+    pdf.rect(0, 0, PAGE_W, DARK_H, style="F")
 
-    # Logo directly on dark background
+    # Logo
+    logo_y = 10
     if LOGO_PATH.exists():
         try:
-            pdf.image(str(LOGO_PATH), x=MARGIN, y=10, h=18)
+            pdf.image(str(LOGO_PATH), x=MARGIN, y=logo_y, h=14)
         except Exception:
-            pass
+            pdf.set_xy(MARGIN, logo_y + 1)
+            pdf.set_font("Helvetica", "B", 14)
+            pdf.set_text_color(*WHITE)
+            pdf.cell(60, 10, "Complio")
 
-    # "KMU-Comply" text (shown regardless of logo, acts as fallback label)
-    pdf.set_xy(MARGIN, 11)
-    pdf.set_font("Helvetica", "B", 11)
+    # Report label
+    pdf.set_xy(MARGIN, 30)
+    pdf.set_font("Helvetica", "", 8)
+    pdf.set_text_color(130, 165, 215)
+    pdf.cell(CONTENT_W, 5, "PRELIMINARY COMPLIANCE SCREENING REPORT")
+
+    # Company name
+    pdf.set_xy(MARGIN, 39)
+    pdf.set_font("Helvetica", "B", 26)
     pdf.set_text_color(*WHITE)
-    pdf.cell(80, 8, "KMU-Comply")
+    pdf.multi_cell(CONTENT_W - 42, 13, _s(report.company_name))
 
-    # Report type label
-    pdf.set_xy(MARGIN, 34)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(160, 185, 220)
-    pdf.cell(CONTENT_W, 6, "COMPLIANCE ASSESSMENT REPORT")
-
-    # Company name (large)
-    pdf.set_xy(MARGIN, 44)
-    pdf.set_font("Helvetica", "B", 22)
-    pdf.set_text_color(*WHITE)
-    pdf.multi_cell(CONTENT_W - 42, 11, _s(report.company_name))
-
-    # Generated date
+    # Date
+    pdf.set_xy(MARGIN, 76)
+    pdf.set_font("Helvetica", "", 8)
+    pdf.set_text_color(130, 165, 215)
     date_str = report.generated_at[:10] if report.generated_at else ""
-    pdf.set_xy(MARGIN, 72)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(160, 185, 220)
-    pdf.cell(CONTENT_W, 5, _s(f"Generated: {date_str}"))
+    pdf.cell(CONTENT_W, 5, f"Generated  {date_str}")
 
-    # --- Score badge (top-right of dark block) ---
-    score    = report.overall_score_percent
-    sc       = _score_colour(score)
-    badge_x  = PAGE_W - MARGIN - 38
-    badge_y  = 42
-    badge_w  = 38
-    badge_h  = 28
+    # --- Score block (top-right, inside dark area) ---
+    score  = report.overall_score_percent
+    sc     = _score_color(score)
+    bx     = PAGE_W - MARGIN - 36
+    by     = 37
+    bw     = 36
+    bh     = 32
 
     pdf.set_fill_color(*sc)
-    pdf.rect(badge_x, badge_y, badge_w, badge_h, style="F")
+    pdf.rect(bx, by, bw, bh, style="F")
+    # Score number
     pdf.set_text_color(*WHITE)
-    pdf.set_font("Helvetica", "B", 22)
-    pdf.set_xy(badge_x, badge_y + 4)
-    pdf.cell(badge_w, 12, f"{score:.0f}%", align="C")
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_xy(badge_x, badge_y + 17)
-    pdf.cell(badge_w, 6, "Overall Score", align="C")
+    pdf.set_font("Helvetica", "B", 26)
+    pdf.set_xy(bx, by + 4)
+    pdf.cell(bw, 14, f"{score:.0f}%", align="C")
+    # Label
+    pdf.set_font("Helvetica", "", 7.5)
+    pdf.set_xy(bx, by + 20)
+    pdf.cell(bw, 6, "Overall Score", align="C")
 
-    # --- Stats row (bottom of dark block) ---
-    n_applicable = sum(1 for r in report.applicable_regulations if r.applies)
-    n_gaps       = len(report.gap_analysis)
-    n_actions    = len(report.action_plan)
-    n_critical   = sum(1 for a in report.action_plan if a.priority == Priority.CRITICAL)
+    # --- Stats strip (bottom of dark block) ---
+    n_app      = sum(1 for r in report.applicable_regulations if r.applies)
+    n_gaps     = len(report.gap_analysis)
+    n_actions  = len(report.action_plan)
+    n_critical = sum(1 for a in report.action_plan if a.priority == Priority.CRITICAL)
+    stats = [(str(n_app), "Regulations"), (str(n_gaps), "Gaps"),
+             (str(n_actions), "Actions"), (str(n_critical), "Critical")]
 
-    stats = [
-        (str(n_applicable), "Regulations"),
-        (str(n_gaps),        "Gaps Found"),
-        (str(n_actions),     "Actions"),
-        (str(n_critical),    "Critical"),
-    ]
-    stat_w = CONTENT_W / len(stats)
-    stat_y = 82
-
+    sw = CONTENT_W / 4
+    sy = 88
     for i, (val, lbl) in enumerate(stats):
-        sx = MARGIN + i * stat_w
-        pdf.set_fill_color(*NAVY_LIGHT)
-        pdf.rect(sx, stat_y, stat_w - 2, 16, style="F")
-        pdf.set_xy(sx, stat_y + 1)
-        pdf.set_font("Helvetica", "B", 14)
+        sx = MARGIN + i * sw
+        if i > 0:
+            pdf.set_draw_color(60, 90, 150)
+            pdf.set_line_width(0.4)
+            pdf.line(sx, sy + 2, sx, sy + 14)
+            pdf.set_line_width(0.2)
+        pdf.set_xy(sx, sy)
+        pdf.set_font("Helvetica", "B", 18)
         pdf.set_text_color(*WHITE)
-        pdf.cell(stat_w - 2, 8, val, align="C")
-        pdf.set_xy(sx, stat_y + 9)
+        pdf.cell(sw, 10, val, align="C")
+        pdf.set_xy(sx, sy + 10)
         pdf.set_font("Helvetica", "", 7)
-        pdf.set_text_color(160, 185, 220)
-        pdf.cell(stat_w - 2, 5, lbl, align="C")
+        pdf.set_text_color(130, 165, 215)
+        pdf.cell(sw, 5, lbl, align="C")
 
-    pdf.set_text_color(*BLACK)
+    pdf.set_text_color(*TEXT_DARK)
 
-    # --- White lower area ---
-
-    # "Applicable Regulations" label
-    pdf.set_xy(MARGIN, COVER_TOP + 8)
-    pdf.set_font("Helvetica", "B", 10)
+    # --- White lower section ---
+    # Applicable regulations chips
+    pdf.set_xy(MARGIN, DARK_H + 8)
+    pdf.set_font("Helvetica", "B", 8)
     pdf.set_text_color(*NAVY)
-    pdf.cell(CONTENT_W, 6, "Applicable Regulations")
-    pdf.ln(8)
+    pdf.cell(CONTENT_W, 5, "Applicable Regulations")
+    pdf.ln(7)
 
     applicable = [r for r in report.applicable_regulations if r.applies]
-    col_w = CONTENT_W / 3
-
-    for i, reg_app in enumerate(applicable):
+    chip_w = (CONTENT_W - 4) / 3
+    for i, reg in enumerate(applicable):
         col = i % 3
         row = i // 3
-        rx = MARGIN + col * col_w
-        ry = COVER_TOP + 18 + row * 8
-        label = _reg_label(reg_app.regulation.value)
-        pdf.set_fill_color(*LIGHT_GREY)
-        pdf.rect(rx, ry, col_w - 2, 6, style="F")
-        pdf.set_xy(rx, ry)
-        pdf.set_font("Helvetica", "B", 8)
-        pdf.set_text_color(*NAVY_LIGHT)
-        pdf.cell(col_w - 2, 6, _s(label), align="C")
+        rx = MARGIN + col * (chip_w + 2)
+        ry = DARK_H + 16 + row * 9
+        pdf.set_fill_color(*LIGHT_BG)
+        pdf.set_draw_color(*BORDER)
+        pdf.rect(rx, ry, chip_w, 7, style="FD")
+        pdf.set_xy(rx, ry + 0.5)
+        pdf.set_font("Helvetica", "B", 7.5)
+        pdf.set_text_color(*NAVY_MID)
+        pdf.cell(chip_w, 6, _s(_reg_label(reg.regulation.value)), align="C")
 
-    # --- Disclaimer at bottom of cover ---
+    # Disclaimer
     pdf.set_xy(MARGIN, PAGE_H - 22)
-    pdf.set_font("Helvetica", "I", 7)
-    pdf.set_text_color(*MID_GREY)
-    pdf.multi_cell(
-        CONTENT_W, 4,
+    pdf.set_font("Helvetica", "I", 6.5)
+    pdf.set_text_color(*TEXT_LIGHT)
+    pdf.multi_cell(CONTENT_W, 3.5,
         "This report is generated by an AI system and does not constitute legal advice. "
-        "Consult a qualified legal professional before making compliance decisions."
-    )
+        "Consult a qualified legal professional before making compliance decisions. "
+        "Complio is a preliminary screening tool only.")
+    pdf.set_text_color(*TEXT_DARK)
 
-    pdf._is_cover = False
+    pdf._cover_page = False
 
 
-def _build_executive_summary(pdf: KMUPdf, report: ComplianceReport):
+# ---------------------------------------------------------------------------
+# Executive summary  (no forced add_page — flows directly after cover)
+# ---------------------------------------------------------------------------
+
+def _build_summary(pdf: ComplioPdf, report: ComplianceReport):
     pdf.add_page()
-    pdf.section_title("1. Executive Summary")
+    pdf.section_heading("1. Executive Summary")
 
     if report.executive_summary:
-        pdf.body_text(report.executive_summary)
+        pdf.body(report.executive_summary)
     else:
-        pdf.body_text("No executive summary available.")
-
-    if report.inferred_characteristics:
-        pdf.ln(4)
-        pdf.sub_title("Inferred Company Characteristics")
-        pdf.set_font("Helvetica", "", 9)
-        pdf.set_text_color(*DARK_GREY)
-        for ch in report.inferred_characteristics:
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("- " + ch))
-        pdf.set_text_color(*BLACK)
+        pdf.body("No executive summary generated.")
 
     if report.validation_warnings:
         pdf.ln(4)
-        pdf.sub_title("Validation Warnings")
-        pdf.set_font("Helvetica", "", 9)
+        pdf.sub_heading("Validation Warnings")
         for w in report.validation_warnings:
-            pdf.set_text_color(192, 57, 43)
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("! " + w))
-        pdf.set_text_color(*BLACK)
+            pdf.set_x(MARGIN + 3)
+            pdf.set_font("Helvetica", "", 8.5)
+            pdf.set_text_color(180, 40, 30)
+            pdf.multi_cell(CONTENT_W - 3, 5, _s("- " + w))
+        pdf.set_text_color(*TEXT_DARK)
 
-    if report.requires_manual_review:
-        pdf.ln(4)
-        pdf.sub_title("Sections Requiring Manual Review")
-        pdf.set_font("Helvetica", "", 9)
-        for item in report.requires_manual_review:
-            pdf.set_text_color(211, 105, 26)
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("- " + item))
-        pdf.set_text_color(*BLACK)
-
-
-def _build_regulation_applicability(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("2. Regulation Applicability")
-
-    pdf.body_text(
-        "The table below summarises which regulations apply to your organisation "
-        "based on the submitted company profile."
-    )
-    pdf.ln(4)
-
-    # Column widths
-    col_reg    = 48
-    col_app    = 22
-    col_reason = CONTENT_W - col_reg - col_app
-
-    # Header row
-    pdf.set_fill_color(*NAVY)
-    pdf.set_text_color(*WHITE)
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.set_x(MARGIN)
-    pdf.cell(col_reg,    7, "Regulation", fill=True)
-    pdf.cell(col_app,    7, "Applies",    fill=True, align="C")
-    pdf.cell(col_reason, 7, "Reason",     fill=True)
-    pdf.ln()
+    # --- Applicability table on the same page (continue) ---
+    pdf.ln(6)
+    pdf.section_heading("2. Regulation Applicability")
 
     pdf.set_font("Helvetica", "", 8.5)
-    for idx, reg_app in enumerate(report.applicable_regulations):
-        fill = LIGHT_GREY if idx % 2 == 0 else WHITE
-        label        = _reg_label(reg_app.regulation.value)
-        applies_str  = "Yes" if reg_app.applies else "No"
-        applies_col  = (39, 174, 96) if reg_app.applies else MID_GREY
-        reason_text  = _s(reg_app.reason)
-
-        row_y = pdf.get_y()
-
-        # Regulation name
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_x(MARGIN)
-        pdf.cell(col_reg, 6, _s(label), fill=True)
-
-        # Applies badge
-        pdf.set_fill_color(*applies_col)
-        pdf.set_text_color(*WHITE)
-        pdf.set_font("Helvetica", "B", 8)
-        pdf.cell(col_app, 6, applies_str, fill=True, align="C")
-
-        # Reason - multi_cell resets x; use set_xy after
-        reason_x = MARGIN + col_reg + col_app
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_xy(reason_x, row_y)
-        pdf.multi_cell(col_reason, 6, reason_text, fill=True)
-
-        # Ensure cursor is below the tallest cell in this row
-        new_y = max(pdf.get_y(), row_y + 6)
-        pdf.set_xy(MARGIN, new_y)
-        pdf.set_font("Helvetica", "", 8.5)
-
-    pdf.set_text_color(*BLACK)
-
-
-def _build_score_breakdown(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("3. Score Breakdown")
-
-    # --- Overall score ---
-    score = report.overall_score_percent
-    sc    = _score_colour(score)
-
-    pdf.set_font("Helvetica", "B", 32)
-    pdf.set_text_color(*sc)
-    pdf.cell(CONTENT_W, 16, f"{score:.1f}%", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(*DARK_GREY)
-    pdf.cell(CONTENT_W, 5, "Overall Compliance Score", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_text_color(*BLACK)
-    pdf.ln(5)
-
-    if not report.regulation_scores:
-        pdf.body_text("No regulation scores available.")
-        return
+    pdf.body(
+        "The table below shows which regulations apply to your organisation "
+        "based on the submitted company profile."
+    )
+    pdf.ln(3)
 
     # Column widths
-    col_reg  = 40
-    col_pct  = 18
-    col_bar  = 52
-    col_stat = 12
-    col_tot  = 16
+    cw_reg    = 38
+    cw_app    = 20
+    cw_reason = CONTENT_W - cw_reg - cw_app
 
     # Header
     pdf.set_fill_color(*NAVY)
     pdf.set_text_color(*WHITE)
     pdf.set_font("Helvetica", "B", 8)
     pdf.set_x(MARGIN)
-    pdf.cell(col_reg,  6, "Regulation",  fill=True)
-    pdf.cell(col_pct,  6, "Score",       fill=True, align="C")
-    pdf.cell(col_bar,  6, "Progress",    fill=True)
-    pdf.cell(col_stat, 6, "C",           fill=True, align="C")
-    pdf.cell(col_stat, 6, "Part.",       fill=True, align="C")
-    pdf.cell(col_stat, 6, "NC",          fill=True, align="C")
-    pdf.cell(col_stat, 6, "N/A",         fill=True, align="C")
-    pdf.cell(col_tot,  6, "Total",       fill=True, align="C")
+    pdf.cell(cw_reg,    6, "Regulation", fill=True)
+    pdf.cell(cw_app,    6, "Applies",    fill=True, align="C")
+    pdf.cell(cw_reason, 6, "Reason",     fill=True)
+    pdf.ln()
+    pdf.set_text_color(*TEXT_DARK)
+
+    LINE_H  = 4.5
+    for idx, reg_app in enumerate(report.applicable_regulations):
+        label   = _reg_label(reg_app.regulation.value)
+        applies = reg_app.applies
+        reason  = _s(reg_app.reason or "")
+
+        # Pre-calculate row height from the reason column
+        pdf.set_font("Helvetica", "", 8)
+        rh = _row_h(pdf, reason, cw_reason, LINE_H, pad=2.0)
+        rh = max(rh, 7.0)
+
+        pdf.ensure(rh + 4)
+
+        row_y = pdf.get_y()
+        bg    = LIGHT_BG if idx % 2 == 0 else WHITE
+
+        # Regulation name
+        pdf.set_fill_color(*bg)
+        pdf.set_text_color(*TEXT_MID)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_xy(MARGIN, row_y)
+        pdf.cell(cw_reg, rh, _s(label), fill=True)
+
+        # Applies badge
+        badge_col = (30, 150, 70) if applies else (145, 155, 170)
+        pdf.set_fill_color(*badge_col)
+        pdf.set_text_color(*WHITE)
+        pdf.set_font("Helvetica", "B", 7.5)
+        pdf.set_xy(MARGIN + cw_reg, row_y)
+        pdf.cell(cw_app, rh, "Yes" if applies else "No", fill=True, align="C")
+
+        # Reason — multi_cell at absolute x
+        pdf.set_fill_color(*bg)
+        pdf.set_text_color(*TEXT_MID)
+        pdf.set_font("Helvetica", "", 7.5)
+        pdf.set_xy(MARGIN + cw_reg + cw_app, row_y)
+        pdf.multi_cell(cw_reason, LINE_H, reason, fill=True)
+
+        # Move cursor to end of row
+        pdf.set_xy(MARGIN, row_y + rh)
+
+    pdf.set_text_color(*TEXT_DARK)
+
+
+# ---------------------------------------------------------------------------
+# Score breakdown
+# ---------------------------------------------------------------------------
+
+def _build_scores(pdf: ComplioPdf, report: ComplianceReport):
+    pdf.add_page()
+    pdf.section_heading("3. Score Breakdown")
+
+    if not report.regulation_scores:
+        pdf.body("No regulation scores available.")
+        return
+
+    # Overall score banner
+    score  = report.overall_score_percent
+    sc     = _score_color(score)
+    ban_y  = pdf.get_y()
+    ban_h  = 20
+
+    pdf.set_fill_color(*sc)
+    pdf.rect(MARGIN, ban_y, CONTENT_W, ban_h, style="F")
+    pdf.set_text_color(*WHITE)
+    pdf.set_font("Helvetica", "B", 30)
+    pdf.set_xy(MARGIN, ban_y + 1)
+    pdf.cell(CONTENT_W, 12, f"{score:.1f}%", align="C")
+    pdf.set_font("Helvetica", "", 8)
+    pdf.set_xy(MARGIN, ban_y + 13)
+    pdf.cell(CONTENT_W, 5, "Overall Compliance Score", align="C")
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.set_y(ban_y + ban_h + 6)
+
+    # Per-regulation table
+    cw_reg  = 38
+    cw_pct  = 16
+    cw_bar  = 50
+    cw_stat = 11
+    cw_tot  = 14
+
+    # Header
+    pdf.set_fill_color(*NAVY)
+    pdf.set_text_color(*WHITE)
+    pdf.set_font("Helvetica", "B", 7.5)
+    pdf.set_x(MARGIN)
+    pdf.cell(cw_reg,  6, "Regulation",  fill=True)
+    pdf.cell(cw_pct,  6, "Score",       fill=True, align="C")
+    pdf.cell(cw_bar,  6, "Progress",    fill=True)
+    pdf.cell(cw_stat, 6, "C",           fill=True, align="C")
+    pdf.cell(cw_stat, 6, "P",           fill=True, align="C")
+    pdf.cell(cw_stat, 6, "NC",          fill=True, align="C")
+    pdf.cell(cw_stat, 6, "?",           fill=True, align="C")
+    pdf.cell(cw_tot,  6, "Total",       fill=True, align="C")
     pdf.ln()
 
-    row_h = 7
+    ROW_H = 7
 
     for idx, rs in enumerate(report.regulation_scores):
-        fill       = LIGHT_GREY if idx % 2 == 0 else WHITE
-        bar_colour = _score_colour(rs.score_percent)
-        label      = _reg_label(rs.regulation.value)
-        row_y      = pdf.get_y()
+        bg        = LIGHT_BG if idx % 2 == 0 else WHITE
+        bar_col   = _score_color(rs.score_percent)
+        label     = _reg_label(rs.regulation.value)
+        row_y     = pdf.get_y()
 
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_x(MARGIN)
-        pdf.cell(col_reg, row_h, _s(label), fill=True)
+        pdf.ensure(ROW_H + 2)
+        row_y = pdf.get_y()
 
-        # Score % in bar colour
-        pdf.set_text_color(*bar_colour)
+        # Regulation name
+        pdf.set_fill_color(*bg)
+        pdf.set_text_color(*TEXT_DARK)
         pdf.set_font("Helvetica", "B", 8)
-        pdf.cell(col_pct, row_h, f"{rs.score_percent:.0f}%", fill=True, align="C")
+        pdf.set_x(MARGIN)
+        pdf.cell(cw_reg, ROW_H, _s(label), fill=True)
 
-        # Progress bar drawn at absolute coordinates
-        bar_x = MARGIN + col_reg + col_pct
-        bar_y = row_y + 1.5
-        bar_h = 4.0
-        # Track
-        pdf.set_fill_color(*LIGHT_GREY)
-        pdf.rect(bar_x, bar_y, col_bar, bar_h, style="F")
-        # Fill
-        filled_w = col_bar * (max(0.0, min(100.0, rs.score_percent)) / 100.0)
-        if filled_w > 0:
-            pdf.set_fill_color(*bar_colour)
-            pdf.rect(bar_x, bar_y, filled_w, bar_h, style="F")
+        # Score %
+        pdf.set_text_color(*bar_col)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.cell(cw_pct, ROW_H, f"{rs.score_percent:.0f}%", fill=True, align="C")
 
-        # Restore fill & continue cells after bar
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_xy(bar_x + col_bar, row_y)
-        pdf.cell(col_stat, row_h, str(rs.compliant),           fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.partially_compliant), fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.non_compliant),        fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.cannot_assess),        fill=True, align="C")
-        pdf.cell(col_tot,  row_h, str(rs.total_requirements),   fill=True, align="C")
+        # Progress bar (drawn at absolute position)
+        bx = MARGIN + cw_reg + cw_pct
+        by = row_y + 1.8
+        bh = 3.5
+        pdf.set_fill_color(*BORDER)
+        pdf.rect(bx, by, cw_bar, bh, style="F")
+        filled = cw_bar * max(0.0, min(100.0, rs.score_percent)) / 100.0
+        if filled > 0:
+            pdf.set_fill_color(*bar_col)
+            pdf.rect(bx, by, filled, bh, style="F")
+
+        # Stats cells
+        pdf.set_fill_color(*bg)
+        pdf.set_text_color(*TEXT_MID)
+        pdf.set_font("Helvetica", "", 7.5)
+        pdf.set_xy(bx + cw_bar, row_y)
+        pdf.cell(cw_stat, ROW_H, str(rs.compliant),           fill=True, align="C")
+        pdf.cell(cw_stat, ROW_H, str(rs.partially_compliant), fill=True, align="C")
+        pdf.cell(cw_stat, ROW_H, str(rs.non_compliant),        fill=True, align="C")
+        pdf.cell(cw_stat, ROW_H, str(rs.cannot_assess),        fill=True, align="C")
+        pdf.cell(cw_tot,  ROW_H, str(rs.total_requirements),   fill=True, align="C")
         pdf.ln()
 
-    pdf.set_text_color(*BLACK)
+    pdf.set_text_color(*TEXT_DARK)
     pdf.ln(3)
-
-    # Legend
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_text_color(*DARK_GREY)
+    pdf.set_font("Helvetica", "", 7.5)
+    pdf.set_text_color(*TEXT_LIGHT)
     pdf.set_x(MARGIN)
     pdf.cell(CONTENT_W, 5,
-             "C = Compliant   Part. = Partially Compliant   NC = Non-Compliant   N/A = Cannot Assess")
-    pdf.ln()
-    pdf.set_text_color(*BLACK)
+             "C = Compliant   P = Partial   NC = Non-Compliant   ? = Cannot Assess")
+    pdf.set_text_color(*TEXT_DARK)
 
 
-def _build_gap_analysis(pdf: KMUPdf, report: ComplianceReport):
+# ---------------------------------------------------------------------------
+# Gap analysis
+# ---------------------------------------------------------------------------
+
+def _build_gaps(pdf: ComplioPdf, report: ComplianceReport):
     pdf.add_page()
-    pdf.section_title("4. Gap Analysis")
-
-    pdf.body_text(
-        "This section details every assessed requirement. Full evidence and deficiency "
-        "descriptions are provided for each finding. No text is truncated."
+    pdf.section_heading("4. Gap Analysis")
+    pdf.body(
+        "Every assessed requirement is listed below, grouped by regulation. "
+        "Evidence and gap descriptions are shown in full."
     )
 
-    # Group gaps by regulation
     gaps_by_reg: dict[str, list] = {}
     for gap in report.gap_analysis:
         gaps_by_reg.setdefault(gap.regulation.value, []).append(gap)
 
     for reg_key, gaps in gaps_by_reg.items():
-        pdf.reg_subheading(reg_key)
+        pdf.reg_banner(reg_key)
 
         for gap in gaps:
-            pdf.ensure_space(42)
+            # Estimate space needed
+            ev_text  = _clean_evidence(gap.evidence)
+            def_text = _clean_evidence(gap.deficiency_description)
 
-            status_colour = STATUS_COLOURS.get(gap.status, MID_GREY)
-            status_label  = STATUS_LABELS.get(gap.status, str(gap.status))
+            pdf.set_font("Helvetica", "", 8.5)
+            ev_lines  = _text_lines(pdf, ev_text,  CONTENT_W - 8, 4.8)
+            def_lines = _text_lines(pdf, def_text, CONTENT_W - 8, 4.8) if def_text else 0
+            needed = 10 + ev_lines * 4.8 + (def_lines * 4.8 + 6 if def_text else 0) + 6
+            pdf.ensure(needed)
 
-            # --- Article heading row ---
-            row_y   = pdf.get_y()
-            art_str = f"Art. {_s(gap.article_number)} - {_s(gap.article_title)}"
+            status_col   = STATUS_COLORS.get(gap.status,  (120, 130, 145))
+            status_label = STATUS_LABELS.get(gap.status, str(gap.status))
+            art_str      = f"Art. {_s(gap.article_number)}  |  {_s(gap.article_title)}"
+            row_y        = pdf.get_y()
 
-            pdf.set_fill_color(*LIGHT_GREY)
+            # Article header row
+            pdf.set_fill_color(*LIGHT_BG)
             pdf.rect(MARGIN, row_y, CONTENT_W, 7, style="F")
 
-            # Article text (leave 36 mm on right for badge)
-            pdf.set_xy(MARGIN + 2, row_y)
-            pdf.set_font("Helvetica", "B", 9)
-            pdf.set_text_color(*NAVY_LIGHT)
-            pdf.cell(CONTENT_W - 36, 7, _s(art_str))
+            # Left: status colour strip
+            pdf.set_fill_color(*status_col)
+            pdf.rect(MARGIN, row_y, 3, 7, style="F")
+
+            # Article text
+            pdf.set_xy(MARGIN + 5, row_y + 0.5)
+            pdf.set_font("Helvetica", "B", 8.5)
+            pdf.set_text_color(*TEXT_DARK)
+            pdf.cell(CONTENT_W - 42, 6, _s(art_str))
 
             # Status badge
-            badge_x = MARGIN + CONTENT_W - 34
-            pdf.set_fill_color(*status_colour)
+            badge_x = MARGIN + CONTENT_W - 36
+            pdf.set_fill_color(*status_col)
             pdf.set_text_color(*WHITE)
             pdf.set_font("Helvetica", "B", 7)
-            pdf.rect(badge_x, row_y + 1, 34, 5, style="F")
+            pdf.rect(badge_x, row_y + 1, 36, 5, style="F")
             pdf.set_xy(badge_x, row_y + 1)
-            pdf.cell(34, 5, _s(status_label), align="C")
+            pdf.cell(36, 5, _s(status_label), align="C")
 
             pdf.set_xy(MARGIN, row_y + 8)
-            pdf.set_text_color(*BLACK)
+            pdf.set_text_color(*TEXT_DARK)
 
-            # --- Evidence (full, no truncation) ---
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.cell(22, 5, "Evidence:")
-            pdf.ln()
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "", 8)
-            pdf.multi_cell(CONTENT_W - 3, 5, _s(gap.evidence))
-
-            # --- Deficiency (full, no truncation) ---
-            if gap.deficiency_description:
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.set_text_color(192, 57, 43)
-                pdf.cell(30, 5, "Deficiency:")
+            # Evidence block
+            if ev_text:
+                pdf.set_x(MARGIN + 4)
+                pdf.set_font("Helvetica", "B", 7.5)
+                pdf.set_text_color(*TEXT_MID)
+                pdf.cell(18, 4.5, "Evidence:")
                 pdf.ln()
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "", 8)
-                pdf.set_text_color(*DARK_GREY)
-                pdf.multi_cell(CONTENT_W - 3, 5, _s(gap.deficiency_description))
+                pdf.set_x(MARGIN + 4)
+                pdf.set_font("Helvetica", "", 8.5)
+                pdf.set_text_color(*TEXT_DARK)
+                pdf.multi_cell(CONTENT_W - 8, 4.8, _s(ev_text))
 
-            pdf.set_text_color(*BLACK)
+            # Deficiency block
+            if def_text:
+                pdf.ln(1)
+                pdf.set_x(MARGIN + 4)
+                pdf.set_font("Helvetica", "B", 7.5)
+                pdf.set_text_color(175, 35, 25)
+                pdf.cell(22, 4.5, "Gap:")
+                pdf.ln()
+                pdf.set_x(MARGIN + 4)
+                pdf.set_font("Helvetica", "", 8.5)
+                pdf.set_text_color(*TEXT_MID)
+                pdf.multi_cell(CONTENT_W - 8, 4.8, _s(def_text))
+
+            pdf.set_text_color(*TEXT_DARK)
             pdf.ln(2)
-            pdf.separator_line()
+            # Separator
+            pdf.set_draw_color(*BORDER)
+            pdf.set_line_width(0.2)
+            pdf.line(MARGIN, pdf.get_y(), PAGE_W - MARGIN, pdf.get_y())
+            pdf.ln(2)
 
 
-def _build_action_plan(pdf: KMUPdf, report: ComplianceReport):
+# ---------------------------------------------------------------------------
+# Action plan
+# ---------------------------------------------------------------------------
+
+def _build_actions(pdf: ComplioPdf, report: ComplianceReport):
     pdf.add_page()
-    pdf.section_title("5. Action Plan")
-
-    pdf.body_text(
-        "The following actions are recommended to address identified compliance gaps. "
-        "Priority and effort are indicated for each item. Full action text is shown."
+    pdf.section_heading("5. Action Plan")
+    pdf.body(
+        "Recommended actions to address identified compliance gaps, "
+        "ordered by priority."
     )
-    pdf.ln(3)
+    pdf.ln(2)
 
     if not report.action_plan:
-        pdf.body_text("No remediation actions required.")
+        pdf.body("No remediation actions required.")
         return
 
-    # Group by regulation
     actions_by_reg: dict[str, list] = {}
     for action in report.action_plan:
         actions_by_reg.setdefault(action.regulation.value, []).append(action)
 
     for reg_key, actions in actions_by_reg.items():
-        pdf.reg_subheading(reg_key)
+        pdf.reg_banner(reg_key)
 
         for act in actions:
-            pdf.ensure_space(45)
+            action_text = _s(act.action)
+            pdf.set_font("Helvetica", "", 8.5)
+            act_lines = _text_lines(pdf, action_text, CONTENT_W - 6, 5.0)
+            needed    = act_lines * 5.0 + 20
+            pdf.ensure(needed)
 
-            priority_colour = PRIORITY_COLOURS.get(act.priority, MID_GREY)
-            row_y           = pdf.get_y()
-            badge_w         = 24
+            prio_col = PRIORITY_COLORS.get(act.priority, (120, 130, 145))
+            row_y    = pdf.get_y()
 
             # Priority badge
-            pdf.set_fill_color(*priority_colour)
+            badge_w = 22
+            pdf.set_fill_color(*prio_col)
             pdf.set_text_color(*WHITE)
-            pdf.set_font("Helvetica", "B", 8)
+            pdf.set_font("Helvetica", "B", 7.5)
             pdf.rect(MARGIN, row_y, badge_w, 6, style="F")
             pdf.set_xy(MARGIN, row_y)
             pdf.cell(badge_w, 6, _s(act.priority.value), align="C")
 
-            # Article reference
-            pdf.set_text_color(*NAVY_LIGHT)
+            # Article ref
+            pdf.set_text_color(*NAVY_MID)
             pdf.set_font("Helvetica", "B", 8)
-            pdf.set_xy(MARGIN + badge_w + 2, row_y)
-            pdf.cell(CONTENT_W - badge_w - 2, 6, _s(f"Art. {act.article_number}"))
+            pdf.set_xy(MARGIN + badge_w + 3, row_y)
+            pdf.cell(CONTENT_W - badge_w - 3, 6, _s(f"Art. {act.article_number}"))
             pdf.ln()
 
-            # Full action text (no truncation)
+            # Action text
             pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "", 9)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.multi_cell(CONTENT_W - 3, 5, _s(act.action))
+            pdf.set_font("Helvetica", "", 8.5)
+            pdf.set_text_color(*TEXT_DARK)
+            pdf.multi_cell(CONTENT_W - 6, 5.0, action_text)
 
-            # Effort & Deadline
+            # Effort + deadline row
             pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.cell(22, 5, "Effort:")
-            pdf.set_font("Helvetica", "", 8)
-            pdf.cell(52, 5, _s(act.estimated_effort))
-
+            pdf.set_font("Helvetica", "B", 7.5)
+            pdf.set_text_color(*TEXT_MID)
+            pdf.cell(16, 5, "Effort:")
+            pdf.set_font("Helvetica", "", 7.5)
+            pdf.set_text_color(*TEXT_DARK)
+            pdf.cell(48, 5, _s(act.estimated_effort))
             if act.deadline:
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.cell(22, 5, "Deadline:")
-                pdf.set_font("Helvetica", "", 8)
+                pdf.set_font("Helvetica", "B", 7.5)
+                pdf.set_text_color(*TEXT_MID)
+                pdf.cell(18, 5, "Deadline:")
+                pdf.set_font("Helvetica", "", 7.5)
+                pdf.set_text_color(*TEXT_DARK)
                 pdf.cell(0, 5, _s(act.deadline))
             pdf.ln()
 
-            # Dependencies
-            if act.dependencies:
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.set_text_color(*DARK_GREY)
-                pdf.cell(30, 5, "Dependencies:")
-                pdf.set_font("Helvetica", "", 8)
-                pdf.multi_cell(CONTENT_W - 33, 5, _s(", ".join(act.dependencies)))
-
-            pdf.set_text_color(*BLACK)
             pdf.ln(2)
-            pdf.separator_line()
+            pdf.set_draw_color(*BORDER)
+            pdf.set_line_width(0.2)
+            pdf.line(MARGIN, pdf.get_y(), PAGE_W - MARGIN, pdf.get_y())
+            pdf.ln(2)
+
+    pdf.set_text_color(*TEXT_DARK)
 
 
-def _build_closing(pdf: KMUPdf, report: ComplianceReport):
+# ---------------------------------------------------------------------------
+# Closing
+# ---------------------------------------------------------------------------
+
+def _build_closing(pdf: ComplioPdf, report: ComplianceReport):
     pdf.add_page()
-    pdf.section_title("6. Closing & Disclaimer")
+    pdf.section_heading("6. Next Steps & Disclaimer")
 
-    pdf.ln(2)
-    pdf.sub_title("Recommended Next Steps")
-
-    next_steps = [
+    pdf.sub_heading("Recommended Next Steps")
+    steps = [
         "Review each gap finding with your legal or compliance team.",
         "Prioritise Critical and High priority action items immediately.",
         "Establish a compliance calendar with realistic deadlines from the Action Plan.",
-        "Re-run this assessment after implementing changes to track your progress.",
-        "Consult a qualified legal counsel for binding compliance decisions.",
+        "Re-run this screening after implementing changes to track progress.",
+        "Engage a qualified legal counsel for binding compliance decisions.",
     ]
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(*DARK_GREY)
-    for step in next_steps:
-        pdf.set_x(MARGIN + 4)
-        pdf.multi_cell(CONTENT_W - 4, 5, _s(f"- {step}"))
-    pdf.set_text_color(*BLACK)
+    for step in steps:
+        pdf.set_x(MARGIN + 3)
+        pdf.set_font("Helvetica", "", 9)
+        pdf.set_text_color(*TEXT_MID)
+        pdf.multi_cell(CONTENT_W - 3, 5.5, _s(f"•  {step}"))
+    pdf.set_text_color(*TEXT_DARK)
 
-    pdf.ln(6)
-    pdf.sub_title("Legal Disclaimer")
+    pdf.ln(8)
+    pdf.sub_heading("Legal Disclaimer")
 
-    # Shaded disclaimer box
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.set_text_color(*DARK_GREY)
     disc_y = pdf.get_y()
-    # First pass: render to measure height
-    pdf.set_x(MARGIN + 3)
-    pdf.multi_cell(CONTENT_W - 6, 5, _s(report.disclaimer))
-    disc_end_y = pdf.get_y()
-    box_h = disc_end_y - disc_y + 4
+    pdf.set_fill_color(*LIGHT_BG)
+    pdf.set_draw_color(*BORDER)
+    pdf.set_line_width(0.3)
 
-    # Draw background rect then re-render text on top
-    pdf.set_fill_color(*LIGHT_GREY)
-    pdf.rect(MARGIN, disc_y - 2, CONTENT_W, box_h, style="F")
-    pdf.set_xy(MARGIN + 3, disc_y)
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.set_text_color(*DARK_GREY)
-    pdf.multi_cell(CONTENT_W - 6, 5, _s(report.disclaimer))
+    # Draw background box (estimate height)
+    disc_text = _s(report.disclaimer)
+    pdf.set_font("Helvetica", "I", 8.5)
+    lines = _text_lines(pdf, disc_text, CONTENT_W - 10, 5.0)
+    box_h = lines * 5.0 + 10
+    pdf.rect(MARGIN, disc_y, CONTENT_W, box_h, style="FD")
 
-    pdf.set_text_color(*BLACK)
+    pdf.set_xy(MARGIN + 5, disc_y + 5)
+    pdf.set_text_color(*TEXT_MID)
+    pdf.multi_cell(CONTENT_W - 10, 5.0, disc_text)
+    pdf.set_text_color(*TEXT_DARK)
+
     pdf.ln(10)
-
-    # Branding footer block
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Helvetica", "B", 9)
     pdf.set_text_color(*NAVY)
-    pdf.cell(CONTENT_W, 6, "KMU-Comply - AI-Powered Compliance for German SMEs",
+    pdf.set_x(MARGIN)
+    pdf.cell(CONTENT_W, 6, "Complio - Preliminary Compliance Screening for German SMEs",
              align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_text_color(*MID_GREY)
+    pdf.set_font("Helvetica", "", 7.5)
+    pdf.set_text_color(*TEXT_LIGHT)
+    pdf.set_x(MARGIN)
     pdf.cell(CONTENT_W, 5,
              "This report was generated automatically and is not a substitute for legal advice.",
              align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_text_color(*BLACK)
+    pdf.set_text_color(*TEXT_DARK)
 
 
 # ---------------------------------------------------------------------------
@@ -786,29 +803,19 @@ def _build_closing(pdf: KMUPdf, report: ComplianceReport):
 # ---------------------------------------------------------------------------
 
 def generate_pdf(report: ComplianceReport) -> bytes:
-    """
-    Generate a professional compliance PDF report and return raw bytes.
-
-    Args:
-        report: A fully populated ComplianceReport instance.
-
-    Returns:
-        PDF file contents as bytes, suitable for HTTP streaming or writing to disk.
-    """
-    pdf = KMUPdf(company_name=report.company_name)
+    date_str = report.generated_at[:10] if report.generated_at else ""
+    pdf = ComplioPdf(company_name=report.company_name, date_str=date_str)
 
     _build_cover(pdf, report)
-    _build_executive_summary(pdf, report)
-    _build_regulation_applicability(pdf, report)
-    _build_score_breakdown(pdf, report)
-    _build_gap_analysis(pdf, report)
-    _build_action_plan(pdf, report)
+    _build_summary(pdf, report)
+    _build_scores(pdf, report)
+    _build_gaps(pdf, report)
+    _build_actions(pdf, report)
     _build_closing(pdf, report)
 
     raw = pdf.output()
     if isinstance(raw, (bytes, bytearray)):
         return bytes(raw)
-    # fpdf may return a string in older builds
     buf = io.BytesIO()
     buf.write(raw if isinstance(raw, bytes) else raw.encode("latin-1"))
     return buf.getvalue()
