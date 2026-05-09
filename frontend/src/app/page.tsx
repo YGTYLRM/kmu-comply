@@ -7,6 +7,7 @@ import {
   ArrowRight, CheckCircle2, FileSearch, Zap, ShieldCheck,
   BarChart3, ListChecks, AlertTriangle, Check, Plus, Minus,
   Building2, Factory, Truck, Stethoscope, ShoppingBag, Briefcase,
+  FileText,
 } from "lucide-react";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
@@ -203,6 +204,68 @@ function MockReport() {
               {label}
             </span>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DocUploadVisual() {
+  return (
+    <div className="space-y-4">
+      <div
+        className="rounded-2xl border border-white/[0.08] p-5"
+        style={{ background: "rgba(10,22,40,0.75)" }}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-600 mb-4">Documents attached</p>
+        <div className="space-y-2.5">
+          {[
+            "privacy_policy.pdf",
+            "data_processing_agreement.pdf",
+            "it_security_policy.pdf",
+          ].map((name) => (
+            <div key={name} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
+              <FileText className="h-4 w-4 text-slate-500 flex-shrink-0" />
+              <span className="text-xs text-slate-400 flex-1 font-mono truncate">{name}</span>
+              <div className="flex items-center gap-1 text-emerald-400 flex-shrink-0">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span className="text-[10px] font-semibold">Indexed</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-center">
+        <div className="h-7 w-px bg-gradient-to-b from-brand-500/40 to-transparent" />
+      </div>
+
+      <div
+        className="rounded-2xl border border-brand-500/20 p-5 shadow-glow-blue-sm"
+        style={{ background: "rgba(10,22,40,0.88)" }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <span className="text-xs font-bold text-slate-300">GDPR · Art. 13 · Transparency</span>
+          </div>
+          <span className="rounded-full border border-amber-500/25 bg-amber-500/15 px-2.5 py-1 text-[10px] font-bold text-amber-400">PARTIAL</span>
+        </div>
+
+        <div className="rounded-xl border border-white/[0.06] bg-brand-500/5 px-4 py-3 mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-400/70 mb-1.5">
+            From privacy_policy.pdf
+          </p>
+          <p className="text-xs text-slate-400 italic leading-relaxed">
+            &ldquo;Section 3.1: We inform users of their rights under Articles 12 to 22 of the GDPR and the right to lodge a complaint...&rdquo;
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-red-400/70 mb-1.5">Gap identified</p>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            No retention period stated. Art. 13(2)(a) requires the period for which personal data will be stored.
+          </p>
         </div>
       </div>
     </div>
@@ -407,6 +470,62 @@ export default function HomePage() {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Document upload explainer ─────────────────────────── */}
+      <section className="border-t border-white/[0.05] py-16 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease }}
+            >
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Document upload</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight mb-6">
+                Upload your documents.<br />Get real verdicts.
+              </h2>
+              <p className="text-slate-400 leading-relaxed mb-8">
+                Profile answers give a solid baseline. Attach your actual company documents and Complio reads them directly, citing specific passages as evidence. Items that would otherwise be uncertain become concrete findings.
+              </p>
+
+              <div className="space-y-3 mb-10">
+                {[
+                  "Privacy policy and cookie notice",
+                  "Data processing agreements",
+                  "IT and information security policy",
+                  "HR handbook and employment contracts",
+                  "Energy audit or environmental reports",
+                ].map((doc) => (
+                  <div key={doc} className="flex items-center gap-3 text-sm text-slate-400">
+                    <FileText className="h-4 w-4 flex-shrink-0 text-brand-400" />
+                    {doc}
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href="/analyze"
+                className="group inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300"
+              >
+                Try it now
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease, delay: 0.12 }}
+            >
+              <DocUploadVisual />
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
