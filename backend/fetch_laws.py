@@ -18,9 +18,16 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; compliance-research/1.0)"}
 LAWS_TO_FETCH = [
     # ── Employment / HR ──────────────────────────────────────────────────────
     ("arbschg", "aentg_2009",   "AEntG — Arbeitnehmer-Entsendegesetz (Posted Workers Act)"),
-    ("arbschg", "sgb_3",        "SGB III — Kurzarbeit / unemployment insurance"),
+    ("arbschg", "sgb_3",        "SGB III — Unemployment and short-time work insurance"),
     ("arbschg", "sgb_7",        "SGB VII — Statutory accident insurance (Unfallversicherung)"),
     ("arbschg", "sgb_11",       "SGB XI — Long-term care insurance (Pflegeversicherung)"),
+    ("arbschg", "fpfzg",        "FPfZG — Familienpflegezeitgesetz (Family care leave)"),
+    ("arbschg", "sgb_6",        "SGB VI — Statutory pension insurance (Rentenversicherung)"),
+    ("arbschg", "sgb_2",        "SGB II — Basic income support, employer integration obligations"),
+    # ── Tax — applies to every registered business ───────────────────────────
+    ("compliance_guides", "gewstg",      "GewStG — Gewerbesteuergesetz (Trade Tax Act)"),
+    ("compliance_guides", "ao_1977",     "AO — Abgabenordnung (General Tax Code, accounting obligations)"),
+    ("compliance_guides", "estg",        "EStG — Einkommensteuergesetz (Income Tax Act, business income)"),
     # ── Consumer / Commercial ────────────────────────────────────────────────
     ("compliance_guides", "uwg_2004",    "UWG — Gesetz gegen den unlauteren Wettbewerb (Unfair Competition)"),
     ("compliance_guides", "gmbhg",       "GmbHG — GmbH-Gesetz (Private Limited Companies Act)"),
@@ -28,10 +35,17 @@ LAWS_TO_FETCH = [
     ("compliance_guides", "hwo",         "HwO — Handwerksordnung (Skilled Trades Act)"),
     ("compliance_guides", "netzdg",      "NetzDG — Network Enforcement Act (social media platforms)"),
     ("compliance_guides", "ustg_1980",   "UStG — Umsatzsteuergesetz (VAT Act)"),
+    ("compliance_guides", "prodhaftg",   "ProdHaftG — Produkthaftungsgesetz (Product Liability Act)"),
+    ("compliance_guides", "inso",        "InsO — Insolvenzordnung (Insolvency Act, employer obligations)"),
+    ("compliance_guides", "owig_1968",   "OWiG — Ordnungswidrigkeitengesetz (Administrative Offences Act, fines)"),
+    # ── Digital / Telecom ────────────────────────────────────────────────────
+    ("compliance_guides", "tkg_2021",    "TKG 2021 — Telekommunikationsgesetz (Telecommunications Act)"),
     # ── Environmental / Product ──────────────────────────────────────────────
     ("compliance_guides", "battg",       "BattG — Batteriegesetz (Batteries Act)"),
-    ("compliance_guides", "elektrog_2015", "ElektroG — Elektro- und Elektronikgerätegesetz (WEEE)"),
+    ("compliance_guides", "elektrog_2015", "ElektroG — Elektro- und Elektronikgeraetegesetz (WEEE)"),
     ("compliance_guides", "krwg",        "KrWG — Kreislaufwirtschaftsgesetz (Waste Management Act)"),
+    ("compliance_guides", "whg_2009",    "WHG — Wasserhaushaltsgesetz (Water Resources Management Act)"),
+    ("compliance_guides", "bimschg",     "BImSchG — Bundes-Immissionsschutzgesetz (Federal Emissions Protection Act)"),
 ]
 
 def get_full_text_url(prefix: str) -> str | None:
