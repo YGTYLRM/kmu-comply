@@ -10,7 +10,7 @@ import { ScoreBreakdown } from "@/components/report/score-breakdown";
 import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Download } from "lucide-react";
+import { Loader2, ArrowLeft, Download, AlertTriangle } from "lucide-react";
 
 export default function ReportPage() {
   const params  = useParams();
@@ -43,12 +43,33 @@ export default function ReportPage() {
   }
 
   if (error || !report) {
+    const isNotFound = error?.includes("404") || error?.includes("not found");
+    const isOffline  = error?.toLowerCase().includes("fetch") || error?.toLowerCase().includes("network");
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-24">
-        <p className="text-sm text-red-400">{error ?? "Report not found"}</p>
-        <Button variant="outline" onClick={() => router.push("/analyze")}>
-          New analysis
-        </Button>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 pt-24 px-6">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20">
+          <AlertTriangle className="h-8 w-8 text-red-400" />
+        </div>
+        <div className="text-center max-w-sm">
+          <h2 className="text-lg font-bold text-white mb-2">
+            {isNotFound ? "Report not found" : isOffline ? "Cannot reach server" : "Something went wrong"}
+          </h2>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {isNotFound
+              ? "This report may have expired or the link is invalid. Reports are available for 1 hour after generation."
+              : isOffline
+              ? "The backend server is not responding. Make sure it is running on port 8000 and refresh."
+              : (error ?? "An unexpected error occurred.")}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button variant="outline" onClick={() => loadReport()}>
+            Try again
+          </Button>
+          <Button onClick={() => router.push("/analyze")}>
+            New screening
+          </Button>
+        </div>
       </div>
     );
   }

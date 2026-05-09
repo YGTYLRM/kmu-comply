@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 import { StepIndicator } from "@/components/profile-form/step-indicator";
 import { Step1Company } from "@/components/profile-form/step1-company";
 import { Step2Financials } from "@/components/profile-form/step2-financials";
@@ -124,7 +125,12 @@ export default function AnalyzePage() {
       sessionStorage.setItem("kmu_job_id", job_id);
       router.push(`/analyze/processing?jobId=${job_id}`);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Submission failed");
+      const msg = err instanceof Error ? err.message : "Submission failed";
+      const isOffline = msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network");
+      setSubmitError(isOffline
+        ? "Cannot reach the server. Make sure the backend is running and try again."
+        : msg
+      );
     }
   });
 
@@ -166,8 +172,18 @@ export default function AnalyzePage() {
                   {step === 6 && <Step6Documents    files={files} onChange={setFiles} />}
 
                   {submitError && (
-                    <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-3 text-sm text-red-400">
-                      {submitError}
+                    <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-400">{submitError}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSubmitError(null)}
+                        className="self-start text-xs text-red-400/70 hover:text-red-300 underline transition-colors"
+                      >
+                        Dismiss and try again
+                      </button>
                     </div>
                   )}
 
