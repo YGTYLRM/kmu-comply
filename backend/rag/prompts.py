@@ -164,13 +164,21 @@ Output ONLY a valid JSON array:
     "article_number": "Art. 30",
     "article_title": "Records of processing activities",
     "status": "NON_COMPLIANT",
-    "evidence": "Profile shows has_processing_records=false with 150 employees and non-occasional processing — Art. 30 records are mandatory for all controllers that do not qualify for the SME exception.",
-    "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) maintained — required under Art. 30(1) GDPR."
+    "evidence": "The company does not maintain Records of Processing Activities. With non-occasional processing and over 20 staff regularly handling personal data, Art. 30(1) GDPR records are mandatory and the SME exception does not apply.",
+    "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) in place. Must document all processing operations including purpose, data categories, and retention periods."
   }}
 ]
 
+CRITICAL LANGUAGE RULES — apply to every evidence and deficiency_description field:
+- Write in plain English that any business owner with no legal background can understand.
+- Never write JSON field names (e.g. never write has_dpo, has_processing_records, employee_count=62, =true, =false, etc.)
+- Describe the compliance situation in human terms: "The company has no Data Protection Officer" not "has_dpo=false"
+- State what the requirement actually means in practice before saying whether it is met.
+- For deficiency_description: explain WHY this is a problem and what could go wrong if it stays unresolved.
+- Evidence should read like a short paragraph a consultant would write, not a log entry.
+
 Constraints:
-- Every assessment MUST have a non-empty evidence field citing specific profile fields or document passages
+- Every assessment MUST have a non-empty evidence field in plain English
 - Only assess articles applicable to this company based on its profile
 - deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
 - Be consistent: same profile facts produce the same status
