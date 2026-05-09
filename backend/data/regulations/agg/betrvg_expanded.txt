@@ -1,0 +1,48 @@
+Betriebsverfassungsgesetz (BetrVG)
+Betriebsverfassungsgesetz vom 15. Januar 1972 (BGBl. I S. 13)
+Source: https://www.gesetze-im-internet.de/betrvg/
+
+---
+
+agg BetrVG §1
+Title: Works council formation — mandatory in establishments with 5 or more eligible employees
+Obligation: MUST
+Threshold: Establishments (Betriebe) with at least 5 permanent employees eligible to vote, of whom 3 are eligible to stand for election
+Text: Works councils (Betriebsraete) must be elected in all establishments with at least five permanent employees who are eligible to vote, provided at least three of them are eligible to stand for election. The obligation to hold works council elections rests with the employer. Works councils represent all employees in the establishment, including part-time and fixed-term employees. In groups of companies, a group works council (Konzernbetriebsrat) may be established. The establishment threshold applies to the individual establishment (Betrieb), not the company as a whole. Employers may not prevent or obstruct works council elections; doing so is a criminal offence under §119 BetrVG. Once a works council exists, extensive co-determination rights apply under §§87 et seq.
+Keywords: BetrVG, Betriebsrat, works council, 5 employees, election threshold, establishment, employer obligation, Betrieb
+
+---
+
+agg BetrVG §87
+Title: Works council co-determination — technical monitoring systems, working time, and performance monitoring
+Obligation: MUST
+Threshold: All employers with an established works council (i.e. 5+ eligible employees in the establishment)
+Text: The works council has mandatory co-determination rights in social matters including: the arrangement of daily work start and end times including breaks; temporary extension or reduction of normal working hours; time, place, and method of wage payment; setting up and using technical devices intended to monitor employee conduct or performance (technische Einrichtungen die dazu bestimmt sind das Verhalten oder die Leistung der Arbeitnehmer zu ueberwachen); principles of remuneration and introduction of new remuneration methods; setting performance-related pay rates; general holiday schedules; introduction of short-time work; safety regulations; and management of company housing. Any implementation of employee monitoring technology — including GPS tracking, productivity monitoring software, email scanning, CCTV, and AI-based performance assessment — requires prior works council agreement. Without a works council agreement, the employer may not implement such systems. Disputes are resolved by a binding conciliation board (Einigungsstelle).
+Keywords: Mitbestimmung, co-determination, technical monitoring, §87 BetrVG, performance monitoring, working time, CCTV, employee surveillance, conciliation board
+
+---
+
+agg BetrVG §99
+Title: Works council approval required before hiring, grading, transfer, or reassignment
+Obligation: MUST
+Threshold: Employers with more than 20 employees eligible to vote who have a works council
+Text: In establishments with more than 20 employees eligible to vote, the employer must inform the works council before every hiring, grading, regrading, or transfer and obtain the works council's approval. The employer must provide all relevant documents including application materials and personal information. The works council has one week to grant or withhold approval in writing. Silence constitutes approval. The works council may refuse approval if the hiring or transfer would violate laws, regulations, or collective agreements; would cause disproportionate disadvantage to other employees; the required internal job posting was omitted; or there is concern that workplace peace would be disturbed through unlawful conduct. If the works council refuses, the employer must apply to the labour court. Hiring a person without proper works council involvement renders the employment relationship not automatically void but the employer is subject to enforcement.
+Keywords: Einstellung, hiring approval, Versetzung, transfer, works council consent, one week, labour court, §99 BetrVG, 20 employees
+
+---
+
+agg BetrVG §102
+Title: Works council consultation mandatory before every dismissal — dismissal without hearing is invalid
+Obligation: MUST
+Threshold: All employers with an established works council — applies to every dismissal regardless of company size
+Text: The employer must consult the works council before every dismissal and must disclose to the works council the reasons for the dismissal. A dismissal effected without prior consultation of the works council is void (unwirksam). The works council must be given one week for ordinary dismissals and three days for extraordinary dismissals to express its position. If the works council objects in writing within these periods, the employer must continue employing the employee until the final resolution of any unfair dismissal claim. The works council may object on grounds including: neglect of social considerations in selection; availability of alternative employment in the company; possibility of retraining; or that the employee would accept modified contract terms. A failure to properly consult the works council — even if the dismissal is otherwise justified — renders the dismissal legally void.
+Keywords: Betriebsratsanhoerung, works council consultation before dismissal, §102 BetrVG, dismissal void, one week, continued employment, Kuendigungsschutz
+
+---
+
+agg BetrVG §111
+Title: Works council rights in major operational changes — Betriebsaenderung
+Obligation: MUST
+Threshold: Establishments with more than 20 employees eligible to vote
+Text: In establishments with more than 20 employees eligible to vote, the employer must inform the works council in full and in good time of planned major operational changes (Betriebsaenderungen) that would significantly prejudice the interests of employees, and must negotiate a reconciliation of interests (Interessenausgleich). Major operational changes include: significant restriction or closure of the establishment; relocation; merger with other establishments; significant organisational changes; introduction of fundamentally new working methods or production processes. If a reconciliation of interests cannot be reached, employees who suffer disadvantages as a result of the operational change may claim a social plan (Sozialplan) payment. The employer is also liable for damages if they implement the operational change without attempting to reach a reconciliation of interests.
+Keywords: Betriebsaenderung, operational change, reconciliation of interests, Interessenausgleich, Sozialplan, closure, relocation, 20 employees, §111 BetrVG
