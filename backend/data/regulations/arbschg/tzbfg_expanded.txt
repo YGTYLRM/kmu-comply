@@ -1,0 +1,49 @@
+Teilzeit- und Befristungsgesetz (TzBfG)
+Gesetz ueber Teilzeitarbeit und befristete Arbeitsvertraege
+vom 21. Dezember 2000 (BGBl. I S. 1966)
+Source: https://www.gesetze-im-internet.de/tzbfg/
+
+---
+
+arbschg TzBfG §1
+Title: Purpose — promotes part-time work and regulates fixed-term contracts for all employers
+Obligation: MUST
+Threshold: All employers regardless of size; specific rights depend on company size thresholds
+Text: The TzBfG pursues three objectives: promoting part-time work to enable flexible working arrangements; establishing the legal conditions under which fixed-term employment contracts are permitted; and preventing discrimination against part-time and fixed-term workers. The law applies to all employment relationships in Germany. Its provisions supplement general employment law. Employers must comply with the TzBfG regardless of their sector, size, or collective agreement status. The prohibition on discrimination against part-time and fixed-term employees is unconditional and applies from the first day of employment.
+Keywords: TzBfG, part-time, Teilzeitarbeit, fixed-term, befristet, anti-discrimination, all employers, flexible working
+
+---
+
+arbschg TzBfG §4
+Title: Prohibition of discrimination against part-time and fixed-term workers — pro-rata principle
+Obligation: MUST
+Threshold: All employers with part-time or fixed-term employees
+Text: Part-time workers must not receive worse treatment than comparable full-time workers unless objective reasons justify the difference. Compensation and all other divisible monetary or in-kind benefits must be granted on a pro-rata basis corresponding to the part-time employee's working hours relative to a comparable full-time employee. Fixed-term employees must not be treated less favourably than comparable permanent employees without objective justification. Where benefits depend on length of service, the same service periods apply to fixed-term and permanent employees unless there are objective grounds for differentiation. This prohibition covers pay, bonuses, access to training, promotion, and all working conditions. An objective ground must be genuine and proportionate — cost savings alone do not constitute an objective reason.
+Keywords: Diskriminierungsverbot, pro-rata, part-time discrimination, fixed-term discrimination, comparable employees, objective grounds, §4 TzBfG
+
+---
+
+arbschg TzBfG §8
+Title: Right to reduce working hours — employer with 15+ employees must agree unless operational grounds prevent it
+Obligation: MUST
+Threshold: Employers with more than 15 employees (excluding apprentices); employee must have been employed for more than 6 months
+Text: Employees employed for more than 6 months may request a reduction of their contractual working hours. The request must be made in text form at least 3 months before the desired start date and must include the proposed distribution of working hours. The employer must agree to the reduction and the proposed distribution unless urgent operational grounds oppose it. Operational grounds include significant impairment of organisation, work processes, safety, or disproportionate costs. The employer must communicate their decision in text form at least 1 month before the desired start. If neither party agrees, the employee's proposed distribution becomes binding. The employee cannot make a new reduction request for 2 years following the employer's decision. After 2 years, a new request for further reduction or for return to former hours may be made.
+Keywords: Teilzeitanspruch, right to part-time, working hours reduction, 15 employees, 6 months employment, operational grounds, §8 TzBfG, return to full-time
+
+---
+
+arbschg TzBfG §12
+Title: On-call work — minimum 3-hour call-ins, 4 days advance notice required
+Obligation: MUST
+Threshold: All employers using on-call work arrangements (Arbeit auf Abruf)
+Text: Employers and employees may agree that work be performed as workload arises (Arbeit auf Abruf). If weekly working hours are not specified in the agreement, 20 hours per week are deemed agreed. The employer must call in the employee for at least 3 consecutive hours per call. The employer must establish reference hours or days for potential calls and must notify the employee of the work schedule at least 4 days in advance. Where minimum weekly hours are set, the employer may call additional work of at most 25% above the minimum. Where maximum hours are set, the employer may reduce calls by at most 20% below the maximum. Continued pay during illness is based on average hours worked in the 3 months preceding illness. These protections cannot be contracted out of to the employee's detriment.
+Keywords: Arbeit auf Abruf, on-call work, 3 hours minimum, 4 days notice, weekly hours, §12 TzBfG, reference hours
+
+---
+
+arbschg TzBfG §14
+Title: Fixed-term contracts require objective justification or are limited to 2 years without reason
+Obligation: MUST
+Threshold: All employers — fixed-term contract without objective grounds requires no prior employment with same employer
+Text: Fixed-term employment contracts (befristete Arbeitsvertraege) are only permitted where there is an objective ground (sachlicher Grund), such as: temporary operational need for the work; the position is temporary in nature; the employee is a substitute for an absent employee; the work is a trial period; the employee's personal circumstances justify temporary employment; the position is funded from budget allocated for a limited period; or the fixed-term was agreed in a court settlement. Without an objective ground, a fixed-term contract is only permissible for up to 2 years in total with up to 3 renewals within that period, provided the employee has not previously been employed by the same employer in any capacity. New companies may use fixed-term contracts without objective grounds for up to 4 years from company formation. All fixed-term contracts must be agreed in writing before work commences — otherwise the employment is deemed permanent.
+Keywords: befristeter Arbeitsvertrag, fixed-term, sachlicher Grund, objective reason, 2 years, 3 renewals, writing requirement, §14 TzBfG, no prior employment
