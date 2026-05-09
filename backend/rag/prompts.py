@@ -62,10 +62,29 @@ Prioritise these as evidence. Quote specific passages in your evidence field.
 """ if has_docs else ""
 
     cannot_assess_note = (
-        "- CANNOT_ASSESS: only if both the profile AND the uploaded documents lack information needed"
+        "- CANNOT_ASSESS: ONLY if neither the profile, nor the uploaded documents, nor industry norms "
+        "provide ANY basis for assessment. This must be extremely rare — under 2% of items."
         if has_docs
-        else "- CANNOT_ASSESS: the profile lacks information needed to determine compliance"
+        else "- CANNOT_ASSESS: ABSOLUTE LAST RESORT only. Do NOT use because a policy document is missing. "
+        "Absence of a measure IS evidence of non-compliance. Use NON_COMPLIANT or PARTIALLY_COMPLIANT instead."
     )
+
+    profile_field_guidance = """
+Profile fields ARE your evidence — treat them as direct compliance indicators:
+- has_processing_records=false → NON_COMPLIANT on Art. 30 GDPR (records are mandatory, no exception)
+- has_dpo=false → assess DPO requirement against the thresholds (employee count, data type)
+- has_supply_chain_abroad=false → COMPLIANT on LkSG foreign supplier obligations
+- has_energy_management_system=false → NON_COMPLIANT on ISO 50001 requirements if applicable
+- has_conducted_energy_audit=false → NON_COMPLIANT on audit obligations if applicable
+- uses_ai_systems=true → company is subject to EU AI Act obligations (assess accordingly)
+- is_critical_infrastructure_sector → determines NIS2 entity classification
+- processes_special_category_data=true → stricter GDPR obligations apply
+- Employee count and revenue → determine which size-based thresholds apply
+
+Absence of implementation = NON_COMPLIANT, not CANNOT_ASSESS.
+Partial information = PARTIALLY_COMPLIANT with explanation, not CANNOT_ASSESS.
+Only use CANNOT_ASSESS when the requirement depends on something genuinely unknowable from all available data.
+"""
 
     doc_instruction = """
 When company documents are provided, your evidence MUST cite specific passages.
@@ -75,7 +94,7 @@ When company documents are provided, your evidence MUST cite specific passages.
 
     return f"""<task>
 For each regulatory requirement provided, assess this company's compliance status.
-{"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile and retrieved regulation text."}
+{"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile fields and retrieved regulation text. The profile IS sufficient to assess the vast majority of requirements."}
 </task>
 
 <company_profile>
@@ -88,10 +107,12 @@ For each regulatory requirement provided, assess this company's compliance statu
 
 <instructions>
 Assess each requirement chunk. Use exactly these status values:
-- COMPLIANT: evidence shows the company meets this requirement
-- PARTIALLY_COMPLIANT: the company partially meets it — specific gaps exist
-- NON_COMPLIANT: the company does not meet this requirement
+- COMPLIANT: profile fields or documents confirm the company meets this requirement
+- PARTIALLY_COMPLIANT: the company partially meets it — profile confirms some but not all aspects
+- NON_COMPLIANT: profile fields show the requirement is not met (missing measure, wrong threshold, absence of documented activity)
 {cannot_assess_note}
+
+{profile_field_guidance}
 {doc_instruction}
 Output ONLY a valid JSON array:
 [
@@ -100,16 +121,17 @@ Output ONLY a valid JSON array:
     "article_number": "Art. 30",
     "article_title": "Records of processing activities",
     "status": "NON_COMPLIANT",
-    "evidence": "Profile shows has_processing_records=false with 150 employees and non-occasional processing — Art. 30 records are mandatory.",
+    "evidence": "Profile shows has_processing_records=false with 150 employees and non-occasional processing — Art. 30 records are mandatory for all controllers that do not qualify for the SME exception.",
     "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) maintained — required under Art. 30(1) GDPR."
   }}
 ]
 
 Constraints:
-- Every assessment MUST have a non-empty evidence field
-- Only assess articles applicable to this company
+- Every assessment MUST have a non-empty evidence field citing specific profile fields or document passages
+- Only assess articles applicable to this company based on its profile
 - deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
-- Be consistent: same facts produce the same status
+- Be consistent: same profile facts produce the same status
+- Target: 98%+ of items should be COMPLIANT, PARTIALLY_COMPLIANT, or NON_COMPLIANT
 </instructions>"""
 
 
