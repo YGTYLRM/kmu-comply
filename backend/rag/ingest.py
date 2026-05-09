@@ -43,6 +43,7 @@ MAX_CHUNK_CHARS = 1_500 * 4
 
 REGULATION_COLLECTIONS: dict[str, str] = {
     "gdpr":             "gdpr_dsgvo",
+    "gdpr_dsgvo":       "gdpr_dsgvo",  # alias so Regulation enum value resolves correctly
     "bdsg":             "bdsg",
     "lksg":             "lksg",
     "enefg":            "enefg",
