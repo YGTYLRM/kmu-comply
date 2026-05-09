@@ -12,6 +12,7 @@ import { Step2Financials } from "@/components/profile-form/step2-financials";
 import { Step3Data } from "@/components/profile-form/step3-data";
 import { Step4SupplyEnergy } from "@/components/profile-form/step4-supply-energy";
 import { Step5Governance } from "@/components/profile-form/step5-governance";
+import { Step6Documents } from "@/components/profile-form/step6-documents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
@@ -52,7 +53,7 @@ const schema = z.object({
 
 export type ProfileFormData = z.infer<typeof schema>;
 
-const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance"];
+const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Documents"];
 
 const STEP_FIELDS: (keyof ProfileFormData)[][] = [
   ["company_name", "industry", "employee_count"],
@@ -87,11 +88,12 @@ function toProfile(data: ProfileFormData): CompanyProfile {
   };
 }
 
-const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance"];
+const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Documents"];
 
 export default function AnalyzePage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [files, setFiles] = useState<File[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<ProfileFormData>({
@@ -113,7 +115,12 @@ export default function AnalyzePage() {
   const onSubmit = form.handleSubmit(async (data) => {
     setSubmitError(null);
     try {
-      const { job_id } = await api.analyze(toProfile(data));
+      let docSessionId: string | undefined;
+      if (files.length > 0) {
+        const { doc_session_id } = await api.uploadDocuments(files);
+        docSessionId = doc_session_id;
+      }
+      const { job_id } = await api.analyze(toProfile(data), docSessionId);
       sessionStorage.setItem("kmu_job_id", job_id);
       router.push(`/analyze/processing?jobId=${job_id}`);
     } catch (err) {
@@ -156,6 +163,7 @@ export default function AnalyzePage() {
                   {step === 3 && <Step3Data         form={form} />}
                   {step === 4 && <Step4SupplyEnergy form={form} />}
                   {step === 5 && <Step5Governance   form={form} />}
+                  {step === 6 && <Step6Documents    files={files} onChange={setFiles} />}
 
                   {submitError && (
                     <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-3 text-sm text-red-400">
@@ -171,13 +179,17 @@ export default function AnalyzePage() {
                     ) : (
                       <div />
                     )}
-                    {step < 5 ? (
+                    {step < 6 ? (
                       <Button type="button" onClick={advance} size="md">
                         Continue →
                       </Button>
                     ) : (
                       <Button type="submit" size="md" disabled={form.formState.isSubmitting}>
-                        {form.formState.isSubmitting ? "Submitting…" : "Run screening →"}
+                        {form.formState.isSubmitting
+                          ? files.length > 0 ? "Uploading docs…" : "Submitting…"
+                          : files.length > 0
+                            ? `Run screening with ${files.length} doc${files.length !== 1 ? "s" : ""} →`
+                            : "Run screening →"}
                       </Button>
                     )}
                   </div>
