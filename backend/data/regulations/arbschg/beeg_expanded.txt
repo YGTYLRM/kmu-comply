@@ -1,0 +1,40 @@
+Bundeselterngeld- und Elternzeitgesetz (BEEG)
+Gesetz zum Elterngeld und zur Elternzeit
+vom 5. Dezember 2006 (BGBl. I S. 2748)
+Source: https://www.gesetze-im-internet.de/beeg/
+
+---
+
+arbschg BEEG §1
+Title: Parental benefit entitlement — employees entitled to Elterngeld while on parental leave
+Obligation: MUST
+Threshold: All employers; applies to all employees who are parents of a child born or placed for adoption
+Text: Employees who reside in Germany, live with their child, personally care for and raise the child, and do not work full-time (defined as not more than 32 hours per week on average per month) are entitled to parental benefit (Elterngeld). The entitlement exists for periods up to 14 months per child (shared between both parents), with each parent entitled to at least 2 and at most 12 months individually. Elterngeld replaces 65-100% of net income lost due to reduced or stopped work, with a minimum payment of EUR 300 and a maximum of EUR 1,800 per month. Employers must grant parental leave on application by the employee and must not dismiss the employee during the period from application until the end of parental leave. The employer's obligation to grant parental leave exists regardless of the size of the company.
+Keywords: Elterngeld, parental benefit, Elternzeit, parental leave, all employers, 32 hours, 14 months, Elterngeldanspruch, dismissal protection
+
+---
+
+arbschg BEEG §15
+Title: Parental leave entitlement — up to 3 years per child, up to 24 months transferable to age 8
+Obligation: MUST
+Threshold: All employers regardless of size; applies to all employees in an employment relationship after birth or adoption
+Text: Employees are entitled to parental leave (Elternzeit) until the child's third birthday. An additional period of up to 24 months may be taken between the child's third birthday and the child's eighth birthday. Each parent can divide their parental leave into up to three separate periods; a third period requires the employer's consent. During parental leave, the employee may work part-time (up to 32 hours per week on average). The employer must grant a reduction in working hours to between 15 and 32 hours per week during parental leave if the employer has more than 15 employees, the employment has lasted more than 6 months, and at least 7 or 13 weeks' notice is given (depending on the child's age). If the employer does not respond to a request to reduce working hours within the required period, consent is deemed granted.
+Keywords: Elternzeit, parental leave, three years, 24 months, transferable, part-time during leave, working time reduction, 15 employees, three periods, §15 BEEG
+
+---
+
+arbschg BEEG §16
+Title: Parental leave application — 7 or 13 weeks written notice required; employer must confirm in writing
+Obligation: MUST
+Threshold: All employers; employees must comply with notice requirements, employer must comply with confirmation duty
+Text: Employees requesting parental leave must notify the employer in text form (Textform) at least 7 weeks before the desired start of parental leave for children up to age 3, or at least 13 weeks before the desired start for periods between the child's third and eighth birthday. When applying for parental leave for the first 2 years of the child's life, the employee must simultaneously declare which time periods within a 2-year window are to be used for parental leave. The employer must confirm the granting of parental leave in writing. If the employee changes employers during parental leave, the new employer may request documentation of the parental leave already taken from the previous employer. Early termination of parental leave is possible with the employer's consent, or without consent in certain circumstances (birth of another child, serious hardship). The employer may refuse early termination only if urgent operational needs prevent it.
+Keywords: Elternzeit application, 7 weeks notice, 13 weeks notice, Textform, employer confirmation, written confirmation, §16 BEEG, declaration of periods
+
+---
+
+arbschg BEEG §18
+Title: Dismissal protection during parental leave — termination prohibited from application until end of leave
+Obligation: MUST
+Threshold: All employers; applies to all employees who have applied for or are on parental leave
+Text: Employers are prohibited from giving notice of termination of employment from the moment the employee has applied for parental leave until the end of the parental leave period. The protection begins 8 weeks before the start of parental leave for children up to age 3, and 14 weeks before the start for periods between ages 3 and 8. Termination is only permissible in exceptional circumstances with the prior approval of the competent state supervisory authority (Behoerde fuer Arbeitsschutz). The dismissal protection also extends to employees who work part-time during parental leave, and to those who receive parental benefit while working reduced hours without formally taking parental leave. Employers who dismiss an employee in violation of this prohibition may face criminal prosecution and the dismissal will be void. The protection applies regardless of the length of the employment relationship or the company's size.
+Keywords: Kuendigungsschutz, dismissal protection, parental leave, Elternzeit, termination prohibited, state authority approval, §18 BEEG, void dismissal, exceptional circumstances
