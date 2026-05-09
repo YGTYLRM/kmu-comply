@@ -1,0 +1,58 @@
+Entgelttransparenzgesetz (EntgTranspG)
+Gesetz zur Foerderung der Entgelttransparenz zwischen Frauen und Maennern
+vom 30. Juni 2017 (BGBl. I S. 2152)
+Source: https://www.gesetze-im-internet.de/entgtranspg/
+
+---
+
+agg EntgTranspG §1
+Title: Purpose — elimination of pay discrimination on grounds of sex
+Obligation: MUST
+Threshold: All employers; individual right to information from employers with 200+ employees
+Text: The Entgelttransparenzgesetz establishes the principle of equal pay for equal work and work of equal value for women and men, and provides mechanisms for employees to verify whether pay discrimination on grounds of sex exists. The law implements Article 157 TFEU and the EU equal pay principle. It applies to all employers in Germany but imposes different obligations depending on employer size: employers with 200 or more employees must respond to individual pay information requests (§10), and employers with 500 or more employees subject to collective agreements must prepare and publish pay equality reports (§17 et seq.). The absence of pay discrimination is a legal obligation under §7 AGG in conjunction with §3 EntgTranspG.
+Keywords: Entgelttransparenz, pay transparency, equal pay, pay discrimination, sex discrimination, employer obligation, 200 employees, 500 employees
+
+---
+
+agg EntgTranspG §3
+Title: Prohibition of pay discrimination on grounds of sex
+Obligation: MUST
+Threshold: All employers regardless of size
+Text: Employers must not pay employees less than employees of the other sex for equal work or work of equal value on grounds of sex. The prohibition of pay discrimination applies to all components of remuneration including base salary, bonuses, allowances, overtime pay, travel expenses, and all other benefits in cash or in kind. A lower pay for work of equal value is presumed to be discriminatory unless the employer demonstrates objective justification not related to sex. The prohibition applies to all phases of the employment relationship and covers recruitment, promotion, and termination-related pay decisions. Violations expose the employer to claims for compensation under §15 AGG and to pay equalisation claims.
+Keywords: Lohngleichheitsgebot, pay discrimination prohibition, equal pay, work of equal value, sex discrimination, objective justification, compensation claim
+
+---
+
+agg EntgTranspG §10
+Title: Individual right to information on equal pay — employees may request median salary of comparison group
+Obligation: MUST
+Threshold: Employers with 200 or more employees (in the private sector, regular headcount)
+Text: Employees of employers with at least 200 employees have an individual right to request information about the pay of colleagues of the other sex performing equal or equivalent work. The employee must identify a comparable activity as the reference point for the information request. The employer must provide the statistically calculated median monthly gross remuneration of employees of the other sex performing the comparable activity, converted to full-time equivalent, as well as the median of up to two individual remuneration components. Requests must be submitted in text form. Employers must respond within three months. Employees may not make repeat requests within two years unless circumstances have substantially changed. In companies with a works council, the request is handled through the works council.
+Keywords: Auskunftsrecht, individual right to information, pay comparison, median salary, comparable activity, 200 employees, works council, text form
+
+---
+
+agg EntgTranspG §11
+Title: Information procedure — employer must provide median and explanation of pay criteria
+Obligation: MUST
+Threshold: Employers with 200 or more employees
+Text: When responding to an individual pay information request under §10, employers must provide: (1) the criteria and procedures used to determine their own pay and the comparable pay; and (2) the statistically calculated median gross monthly salary of employees of the other sex performing comparable work, expressed as a full-time equivalent based on a calendar year. Where pay is set by statutory regulation or collective agreement, the employer may satisfy the obligation by referencing the applicable rules and indicating where they can be inspected. The employer must not identify individual comparator employees and must protect data privacy in the response. Where fewer than five employees of the comparison sex perform comparable work, the employer may decline to provide specific comparative figures and must say so.
+Keywords: Auskunftspflicht, information procedure, median salary, pay criteria, collective agreement, data privacy, fewer than five, full-time equivalent
+
+---
+
+agg EntgTranspG §13
+Title: Works council tasks — monitoring pay equality and access to wage data
+Obligation: MUST
+Threshold: Employers with a works council (Betriebsrat) under the Betriebsverfassungsgesetz
+Text: The works council is responsible for promoting equal pay for women and men within its duties under the Betriebsverfassungsgesetz. The employer must grant the works council committee access to the lists of gross wages and salaries of employees, broken down by sex and including all remuneration components. The works council may request analyses of the pay situation and must be given the information necessary to assess whether equal pay obligations are being met. The employer must inform the works council in writing whether the pay arrangements in the company are based on collective agreements. Works council access to wage data does not affect individual employees' right to information under §10.
+Keywords: Betriebsrat, works council, Lohnliste, wage list, pay equality monitoring, gross salary access, Betriebsverfassungsgesetz, employer obligation
+
+---
+
+agg EntgTranspG §17
+Title: Pay equality report — mandatory for employers with 500+ employees covered by collective agreement
+Obligation: MUST
+Threshold: Private employers with 500 or more employees who are bound by or apply a collective agreement
+Text: Employers with 500 or more employees who are subject to or apply a collective agreement must prepare a pay equality report (Bericht zur Gleichstellung und Entgelttransparenz) covering the past five years. The report must describe the measures taken to promote equal pay, the pay structure in the company, and the results of any analyses conducted. The report must be incorporated into the existing management report (Lagebericht) or published separately. Where no collective agreement applies, equivalent obligations do not arise under §17 but the employer remains subject to the individual information request obligation under §10. The pay equality report must be made available to employees and their representatives.
+Keywords: Entgeltgleichheitsbericht, pay equality report, 500 employees, collective agreement, five years, management report, publication obligation
