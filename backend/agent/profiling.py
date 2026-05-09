@@ -81,7 +81,12 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
             )
-            data = json.loads(response.content[0].text.strip())
+            raw = response.content[0].text.strip()
+            if raw.startswith("```"):
+                lines = raw.splitlines()
+                end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
+                raw = "\n".join(lines[1:end]).strip()
+            data = json.loads(raw)
 
             llm_chars: list[str] = data.get("inferred_characteristics", [])
             llm_warnings: list[str] = data.get("validation_warnings", [])
