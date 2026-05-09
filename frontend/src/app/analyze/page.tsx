@@ -13,6 +13,9 @@ import { Step2Financials } from "@/components/profile-form/step2-financials";
 import { Step3Data } from "@/components/profile-form/step3-data";
 import { Step4SupplyEnergy } from "@/components/profile-form/step4-supply-energy";
 import { Step5Governance } from "@/components/profile-form/step5-governance";
+import { Step7Privacy } from "@/components/profile-form/step7-privacy";
+import { Step8Security } from "@/components/profile-form/step8-security";
+import { Step9Workplace } from "@/components/profile-form/step9-workplace";
 import { Step6Documents } from "@/components/profile-form/step6-documents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +28,8 @@ const optNum = (label: string) =>
     z.number().positive(`${label} must be positive`).optional()
   );
 
+const optBool = z.boolean().optional();
+
 const schema = z.object({
   company_name:                 z.string().min(1, "Company name is required"),
   industry:                     z.string().min(1, "Industry is required"),
@@ -35,30 +40,66 @@ const schema = z.object({
   ),
   annual_revenue_eur:           optNum("Revenue"),
   balance_sheet_total_eur:      optNum("Balance sheet total"),
-  processes_personal_data:      z.boolean().optional(),
-  processes_special_category_data: z.boolean().optional(),
-  processing_is_occasional:     z.boolean().optional(),
-  has_dpo:                      z.boolean().optional(),
-  has_processing_records:       z.boolean().optional(),
-  has_supply_chain_abroad:      z.boolean().optional(),
+  processes_personal_data:      optBool,
+  processes_special_category_data: optBool,
+  processing_is_occasional:     optBool,
+  has_dpo:                      optBool,
+  has_processing_records:       optBool,
+  has_supply_chain_abroad:      optBool,
   supply_chain_countries_raw:   z.string().optional(),
   annual_energy_consumption_mwh: optNum("Energy consumption"),
-  has_energy_management_system: z.boolean().optional(),
-  has_conducted_energy_audit:   z.boolean().optional(),
-  is_listed_company:                  z.boolean().optional(),
-  has_sustainability_report:          z.boolean().optional(),
-  is_critical_infrastructure_sector: z.boolean().optional(),
-  uses_ai_systems:                    z.boolean().optional(),
-  existing_compliance_notes:          z.string().optional(),
+  has_energy_management_system: optBool,
+  has_conducted_energy_audit:   optBool,
+  is_listed_company:            optBool,
+  has_sustainability_report:    optBool,
+  is_critical_infrastructure_sector: optBool,
+  uses_ai_systems:              optBool,
+  // Step 7 — Privacy & Policies
+  has_privacy_policy:           optBool,
+  has_processor_agreements:     optBool,
+  has_data_breach_procedure:    optBool,
+  has_tom_documentation:        optBool,
+  has_data_retention_policy:    optBool,
+  has_data_protection_training: optBool,
+  transfers_data_outside_eea:   optBool,
+  has_consent_management:       optBool,
+  // Step 8 — Security & Technology
+  has_information_security_policy:      optBool,
+  has_incident_response_plan:           optBool,
+  has_business_continuity_plan:         optBool,
+  has_vulnerability_management:         optBool,
+  has_mfa_implemented:                  optBool,
+  has_supply_chain_security_assessment: optBool,
+  has_security_awareness_training:      optBool,
+  ai_systems_are_high_risk:             optBool,
+  has_ai_risk_assessment:               optBool,
+  has_ai_usage_documentation:           optBool,
+  has_human_oversight_procedure:        optBool,
+  // Step 9 — Workplace & HR
+  has_gefaehrdungsbeurteilung:           optBool,
+  has_gefaehrdungsbeurteilung_documented: optBool,
+  has_first_aid_measures:               optBool,
+  has_employee_safety_training:         optBool,
+  has_anti_discrimination_policy:       optBool,
+  has_agc_complaints_procedure:         optBool,
+  has_working_time_records:             optBool,
+  uses_subcontractors:                  optBool,
+  has_whistleblower_channel:            optBool,
+  has_whistleblower_policy:             optBool,
+  has_lksg_policy_statement:            optBool,
+  has_supplier_code_of_conduct:         optBool,
+  has_supplier_risk_assessment:         optBool,
+  has_lksg_complaints_procedure:        optBool,
+  existing_compliance_notes:            z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof schema>;
 
-const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Documents"];
+const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Policies", "Security", "Workplace", "Documents"];
 
 const STEP_FIELDS: (keyof ProfileFormData)[][] = [
   ["company_name", "industry", "employee_count"],
-  [], [], [], [],
+  [], [], [], [], [], [], [], [],
 ];
 
 function toProfile(data: ProfileFormData): CompanyProfile {
@@ -81,15 +122,51 @@ function toProfile(data: ProfileFormData): CompanyProfile {
     annual_energy_consumption_mwh: data.annual_energy_consumption_mwh,
     has_energy_management_system:  data.has_energy_management_system,
     has_conducted_energy_audit:    data.has_conducted_energy_audit,
-    is_listed_company:                  data.is_listed_company,
-    has_sustainability_report:          data.has_sustainability_report,
+    is_listed_company:             data.is_listed_company,
+    has_sustainability_report:     data.has_sustainability_report,
     is_critical_infrastructure_sector: data.is_critical_infrastructure_sector ?? false,
-    uses_ai_systems:                    data.uses_ai_systems ?? false,
-    existing_compliance_notes:          data.existing_compliance_notes || undefined,
+    uses_ai_systems:               data.uses_ai_systems ?? false,
+    // Step 7
+    has_privacy_policy:            data.has_privacy_policy,
+    has_processor_agreements:      data.has_processor_agreements,
+    has_data_breach_procedure:     data.has_data_breach_procedure,
+    has_tom_documentation:         data.has_tom_documentation,
+    has_data_retention_policy:     data.has_data_retention_policy,
+    has_data_protection_training:  data.has_data_protection_training,
+    transfers_data_outside_eea:    data.transfers_data_outside_eea,
+    has_consent_management:        data.has_consent_management,
+    // Step 8
+    has_information_security_policy:      data.has_information_security_policy,
+    has_incident_response_plan:           data.has_incident_response_plan,
+    has_business_continuity_plan:         data.has_business_continuity_plan,
+    has_vulnerability_management:         data.has_vulnerability_management,
+    has_mfa_implemented:                  data.has_mfa_implemented,
+    has_supply_chain_security_assessment: data.has_supply_chain_security_assessment,
+    has_security_awareness_training:      data.has_security_awareness_training,
+    ai_systems_are_high_risk:             data.ai_systems_are_high_risk,
+    has_ai_risk_assessment:               data.has_ai_risk_assessment,
+    has_ai_usage_documentation:           data.has_ai_usage_documentation,
+    has_human_oversight_procedure:        data.has_human_oversight_procedure,
+    // Step 9
+    has_gefaehrdungsbeurteilung:            data.has_gefaehrdungsbeurteilung,
+    has_gefaehrdungsbeurteilung_documented: data.has_gefaehrdungsbeurteilung_documented,
+    has_first_aid_measures:               data.has_first_aid_measures,
+    has_employee_safety_training:         data.has_employee_safety_training,
+    has_anti_discrimination_policy:       data.has_anti_discrimination_policy,
+    has_agc_complaints_procedure:         data.has_agc_complaints_procedure,
+    has_working_time_records:             data.has_working_time_records,
+    uses_subcontractors:                  data.uses_subcontractors,
+    has_whistleblower_channel:            data.has_whistleblower_channel,
+    has_whistleblower_policy:             data.has_whistleblower_policy,
+    has_lksg_policy_statement:            data.has_lksg_policy_statement,
+    has_supplier_code_of_conduct:         data.has_supplier_code_of_conduct,
+    has_supplier_risk_assessment:         data.has_supplier_risk_assessment,
+    has_lksg_complaints_procedure:        data.has_lksg_complaints_procedure,
+    existing_compliance_notes:            data.existing_compliance_notes || undefined,
   };
 }
 
-const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Documents"];
+const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Documents"];
 
 export default function AnalyzePage() {
   const router = useRouter();
@@ -146,7 +223,7 @@ export default function AnalyzePage() {
             className="text-center"
           >
             <h1 className="text-xl font-bold text-white tracking-tight">Company Profile</h1>
-            <p className="text-sm text-slate-500 mt-1">Step {step} of 5: {STEP_TITLES[step - 1]}</p>
+            <p className="text-sm text-slate-500 mt-1">Step {step} of 9: {STEP_TITLES[step - 1]}</p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
         </div>
@@ -169,7 +246,10 @@ export default function AnalyzePage() {
                   {step === 3 && <Step3Data         form={form} />}
                   {step === 4 && <Step4SupplyEnergy form={form} />}
                   {step === 5 && <Step5Governance   form={form} />}
-                  {step === 6 && <Step6Documents    files={files} onChange={setFiles} />}
+                  {step === 6 && <Step7Privacy      form={form} />}
+                  {step === 7 && <Step8Security     form={form} />}
+                  {step === 8 && <Step9Workplace    form={form} />}
+                  {step === 9 && <Step6Documents    files={files} onChange={setFiles} />}
 
                   {submitError && (
                     <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
@@ -195,7 +275,7 @@ export default function AnalyzePage() {
                     ) : (
                       <div />
                     )}
-                    {step < 6 ? (
+                    {step < 9 ? (
                       <Button type="button" onClick={advance} size="md">
                         Continue →
                       </Button>
