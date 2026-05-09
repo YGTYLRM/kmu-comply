@@ -21,6 +21,12 @@ BASE = Path(__file__).parent
 # All URLs point to documents published by official EU/national bodies.
 # ---------------------------------------------------------------------------
 GUIDANCE_PDFS = [
+    # Full GDPR text — English version from EUR-Lex (official EU legal database)
+    (
+        "../gdpr/gdpr_full_text.pdf",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679",
+        "GDPR (EU) 2016/679 — Full Text (EUR-Lex)",
+    ),
     # EDPB Guidelines 05/2020 on consent (Art. 6/7 GDPR)
     (
         "edpb_consent_guidelines_2020.pdf",
