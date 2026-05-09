@@ -334,6 +334,14 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
         chunks = _chunk_eu_law(text, regulation, name, url)
         return chunks if chunks else _chunk_guidance(text, regulation, name, url)
 
+    # For compliance_guides text files that look like German law (contain § sections),
+    # use the German law chunker so § N sections are properly split
+    if regulation == "compliance_guides" and path.suffix == ".txt":
+        if _RE_GERMAN_SECTION.search(text):
+            chunks = _chunk_german_law(text, regulation, name, url)
+            if chunks:
+                return chunks
+
     return _chunk_guidance(text, regulation, name, url)
 
 
