@@ -47,6 +47,18 @@ frontend/.next/
 frontend/out/
 frontend/.env.local
 frontend/.env.production
+frontend/tsconfig.tsbuildinfo
+
+# Root-level dev tools (puppeteer etc.)
+node_modules/
+package.json
+package-lock.json
+screenshot.mjs
+ss-*.png
+
+# Private notes — never track
+.dev-notes.md
+SESSION_LOG.md
 
 # Logs
 *.log
