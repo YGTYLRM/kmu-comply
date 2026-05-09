@@ -66,7 +66,7 @@ class JobManager:
 
     def get_report(self, job_id: str) -> Optional[ComplianceReport]:
         job = self._jobs.get(job_id)
-        if job and job.status == JobStatus.COMPLETED:
+        if job and job.status in (JobStatus.COMPLETED, JobStatus.PARTIAL):
             return job.report
         return None
 
