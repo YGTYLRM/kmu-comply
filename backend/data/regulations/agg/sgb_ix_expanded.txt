@@ -1,0 +1,39 @@
+Sozialgesetzbuch Neuntes Buch (SGB IX) — Rehabilitation und Teilhabe von Menschen mit Behinderungen
+Relevant sections: Part 3 (Schwerbehindertenrecht) — employer obligations
+Source: https://www.gesetze-im-internet.de/sgb_9_2018/
+
+---
+
+agg SGB IX §163
+Title: Mandatory employment quota — employers with 20+ employees must employ 5% severely disabled persons
+Obligation: MUST
+Threshold: Private and public employers with 20 or more employees (Beschaeftigungspflicht)
+Text: Employers with 20 or more employees (Arbeitsplaetze) are legally obligated to employ severely disabled persons (schwerbehinderte Menschen) at a rate of at least 5% of their total workforce. Severely disabled persons are those with a degree of disability (Grad der Behinderung, GdB) of at least 50, or those equated with severely disabled persons under §2(3) SGB IX. Employers who fail to meet the 5% quota must pay a compensatory levy (Ausgleichsabgabe) per unfilled mandatory position per month: EUR 140 per month if the quota is met at 3-4.9%, EUR 245 if at 2-2.9%, and EUR 360 if below 2%. Employers must maintain a register of severely disabled employees and report annually by 31 March to the Federal Employment Agency. The quota applies to each individual establishment, not the company as a whole.
+Keywords: Beschaeftigungspflicht, employment quota, schwerbehindert, 5 percent, 20 employees, Ausgleichsabgabe, compensatory levy, annual report, severely disabled
+
+---
+
+agg SGB IX §164
+Title: Employer obligations toward severely disabled employees — non-discrimination and workplace accommodation
+Obligation: MUST
+Threshold: All employers who employ severely disabled persons; notification obligations apply from the moment a severely disabled person applies for employment
+Text: Employers must not discriminate against severely disabled employees on grounds of their disability. Employers must ensure that at least the prescribed number of severely disabled persons can find permanent and disability-appropriate employment. Severely disabled employees have a right to appropriate workplace accommodation including: preferred consideration for suitable vacancies in the same company; necessary technical aids and accessible workplace design; appropriate job assignments that do not exceed their physical or mental capacity; and consideration for part-time work where necessitated by the disability. Employers must promptly inform the disability representative (Schwerbehindertenvertretung) of all applications from severely disabled persons and all placement proposals from the employment agency. Employers who do not invite a severely disabled applicant to an interview must be able to justify this decision by reference to manifestly insufficient qualifications.
+Keywords: Gleichstellungspflicht, non-discrimination disabled, workplace accommodation, disability-appropriate employment, Schwerbehindertenvertretung, interview obligation, job application
+
+---
+
+agg SGB IX §165
+Title: Invitation to interview — severely disabled applicants must be invited unless manifestly unqualified
+Obligation: MUST
+Threshold: Public employers unconditionally; private employers as part of their general anti-discrimination obligations under AGG
+Text: Public sector employers must invite severely disabled applicants to interview unless they manifestly lack the professional qualifications required for the position. For private employers, this obligation arises under the general prohibition of discrimination on grounds of disability in §7 AGG in conjunction with §1 AGG. Failure to invite a severely disabled applicant to interview is an indicator of discrimination that shifts the burden of proof to the employer under §22 AGG. Employers must document the reasons for any non-invitation of a severely disabled applicant and retain this documentation. The obligation to invite to interview applies regardless of whether the employer has already met its 5% quota under §163 SGB IX.
+Keywords: Vorstellungsgespraech, interview invitation, severely disabled applicant, public employer, disability discrimination, burden of proof, AGG, manifestly unqualified
+
+---
+
+agg SGB IX §167
+Title: Company integration management — mandatory for employees absent 6+ weeks within 12 months
+Obligation: MUST
+Threshold: All employers; applies when any employee (not only disabled) has been unable to work for more than 6 weeks within the past 12 months
+Text: When an employee has been unable to work — continuously or repeatedly — for more than six weeks within a period of twelve months, the employer must conduct occupational integration management (betriebliches Eingliederungsmanagement, BEM). BEM aims to identify how the work incapacity can be overcome, how further incapacity can be prevented, and how the employment relationship can be maintained. The employer must inform the employee about the process and its objectives, about the type and scope of data collected, and must obtain the employee's consent before commencing BEM. The disability representative and the works council must be involved where the employee concerned has a disability. Employers who do not conduct BEM cannot ordinarily rely on incapacity-related reasons to justify dismissal. BEM is not limited to severely disabled employees but applies to all employees who meet the six-week threshold.
+Keywords: betriebliches Eingliederungsmanagement, BEM, occupational integration management, six weeks, work incapacity, dismissal protection, employer obligation, disability representative, consent

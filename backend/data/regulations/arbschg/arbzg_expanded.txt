@@ -1,0 +1,103 @@
+Arbeitszeitgesetz (ArbZG)
+Gesetz ueber die Arbeitszeit der Arbeitnehmerinnen und Arbeitnehmer
+vom 6. Juni 1994 (BGBl. I S. 1170, 1171)
+Source: https://www.gesetze-im-internet.de/arbzg/
+
+---
+
+arbschg ArbZG §1
+Title: Purpose — protection of workers' health and safety through working time limits
+Obligation: MUST
+Threshold: All employers in Germany; applies to all employees regardless of sector
+Text: The Arbeitszeitgesetz aims to ensure the safety and health of employees by setting maximum working times, minimum rest periods, and special rules for night and shift work. It applies to all employees in Germany across all sectors and activities. Compliance with working time limits is a direct occupational health obligation that complements the Arbeitsschutzgesetz. Violations of working time limits constitute a violation of the employer's fundamental duty under §3 ArbSchG to ensure the safety and health of employees.
+Keywords: Arbeitszeitgesetz, ArbZG, working time, purpose, scope, employer obligation, health protection
+
+---
+
+arbschg ArbZG §3
+Title: Maximum daily working time — 8 hours standard, 10 hours with averaging
+Obligation: MUST
+Threshold: All employers; applies to all employees
+Text: The daily working time of employees must not exceed eight hours. It may be extended to up to ten hours only if the average working time does not exceed eight hours per working day within a reference period of six calendar months or twenty-four weeks. The eight-hour limit applies per calendar day (0:00–24:00). Employers must monitor and document working time to ensure compliance with the averaging requirement. Violations of the daily maximum are an administrative offence under §22 ArbZG and may constitute a criminal offence under §23 ArbZG if they endanger health.
+Keywords: daily working time, 8 hours, 10 hours, Hoechstarbeitszeit, averaging period, six months, employer obligation, health protection
+
+---
+
+arbschg ArbZG §4
+Title: Rest breaks — mandatory interruption of work for sessions exceeding 6 hours
+Obligation: MUST
+Threshold: All employers; applies to all employees working more than 6 hours per day
+Text: Work must be interrupted in advance by rest breaks of at least thirty minutes for working times of more than six up to nine hours, and at least forty-five minutes for working times of more than nine hours. The rest breaks may be divided into time periods of at least fifteen minutes each. Employees must not work for more than six consecutive hours without a rest break. Breaks during which the employee is not required to be available and may freely use their time are considered rest breaks within the meaning of §4 ArbZG. Waiting times during which the employee must remain ready to work at short notice do not count as rest breaks.
+Keywords: Ruhepausen, rest breaks, 30 minutes, 45 minutes, six hours, consecutive work, Pausenpflicht, mandatory break
+
+---
+
+arbschg ArbZG §5
+Title: Daily rest period — minimum 11 hours uninterrupted rest between shifts
+Obligation: MUST
+Threshold: All employers; applies to all employees
+Text: Employees must receive an uninterrupted rest period of at least eleven hours after the end of daily work before the beginning of the next working day. In hospitals and other care facilities, restaurants, the transport sector, broadcasting, agriculture, and similar sectors, the rest period may be shortened to ten hours provided that the shortened rest period is compensated within one calendar month or four weeks by an extension of another rest period to at least twelve hours. The daily rest period must not be interrupted by any work obligation.
+Keywords: Ruhezeit, rest period, 11 hours, daily rest, inter-shift rest, Erholungszeit, hospital exception, transport exception
+
+---
+
+arbschg ArbZG §6
+Title: Night and shift work — special health protections and medical examinations
+Obligation: MUST
+Threshold: All employers who operate night or shift work arrangements
+Text: The working time of night workers must not exceed eight hours per working day on average over a reference period of one calendar month or four weeks. It may be extended to ten hours only if the eight-hour average is maintained. Employers must offer night workers a medical examination before commencing night work and thereafter every three years — for workers over the age of fifty, annually. Medical examinations must be conducted by an occupational physician. Employers must enable night workers whose health is endangered by night work to transfer to a suitable day position if one is available. Night work shall be kept to a minimum extent.
+Keywords: Nachtarbeit, night work, shift work, 8 hours, medical examination, Pflichtuntersuchung, health risk, day position, Schichtarbeit
+
+---
+
+arbschg ArbZG §7
+Title: Deviations by collective agreement — extension of daily working time beyond 10 hours
+Obligation: MAY
+Threshold: Employers with applicable collective agreements (Tarifvertrag) or works agreements
+Text: Collective agreements may permit: extension of working time beyond ten hours per working day where the nature of the work or extraordinary circumstances require it; modification of rest break rules; shortening of rest periods with compensatory measures; and adjustment of night work arrangements. In sectors without collective agreements, works agreements may implement equivalent provisions within the limits set by applicable collective agreements in comparable sectors. Any deviation must be justified by the specific operational requirements and must not endanger the health of employees. Deviations under collective agreements do not exempt employers from their basic occupational health obligations under the ArbSchG.
+Keywords: Tarifvertrag, collective agreement, Betriebsvereinbarung, works agreement, deviation, 10 hours extension, sector-specific rules
+
+---
+
+arbschg ArbZG §9
+Title: Sunday and public holiday rest — general prohibition on employment
+Obligation: MUST
+Threshold: All employers; applies to all employees
+Text: Employees must not be employed on Sundays and public holidays between 0:00 and 24:00 hours. Multi-shift operations may shift the rest period associated with Sunday or a public holiday to begin up to six hours before or after midnight, provided that the employees then receive a corresponding uninterrupted rest period of at least twenty-four hours after the end of the working shift. Employers may not schedule regular working time on Sundays without a specific statutory permission under §10 ArbZG or a regulatory permit.
+Keywords: Sonntagsruhe, Sunday rest, holiday, Feiertagsruhe, 24 hours, shift operations, prohibition on work, religious protection
+
+---
+
+arbschg ArbZG §10
+Title: Permitted Sunday and holiday work — exhaustive list of permitted sectors
+Obligation: CONDITIONAL
+Threshold: Employers in specifically enumerated sectors
+Text: Employees may be employed on Sundays and public holidays in the following sectors and activities where this is necessitated by operational requirements: emergency and rescue services, public security, hospitals and care facilities, hotels and restaurants, transport, broadcasting, agriculture, bakeries (limited to 3 hours before noon), retail in tourist areas, sport and entertainment events, museums, and other specifically enumerated areas. Sunday work permitted under §10 must be compensated by the granting of a substitute free day within the periods prescribed by §11 ArbZG. Employers relying on a §10 exemption must be able to demonstrate which specific category applies to their operations.
+Keywords: Sunday work exception, Sonn- und Feiertagsarbeit, permitted sectors, hospital, transport, retail, bakery, agriculture, substitute rest day
+
+---
+
+arbschg ArbZG §11
+Title: Compensatory rest for Sunday work — substitute free day within statutory period
+Obligation: MUST
+Threshold: All employers who employ workers on Sundays under §10 ArbZG
+Text: Employees who work on Sundays must be given a substitute free day within two weeks of the Sunday worked. Employees who work on public holidays must receive a substitute free day within eight weeks of the public holiday worked. At least fifteen Sundays per year must remain free from work for every employee. The substitute free day must be a full calendar day free from work obligation and must be scheduled in consultation with the employee where operationally possible. Failure to grant the substitute free day is an administrative offence under §22 ArbZG.
+Keywords: Ersatzruhetag, substitute free day, Sunday work compensation, 15 Sundays, 2 weeks, 8 weeks, compensatory rest
+
+---
+
+arbschg ArbZG §16
+Title: Posting and recording obligations — working time records mandatory for extended hours
+Obligation: MUST
+Threshold: All employers; records required for hours exceeding the 8-hour daily limit
+Text: Employers must post the text of the ArbZG and the applicable collective agreement provisions at the workplace in a visible location. Employers must record the working time of employees that exceeds the daily limit under §3 sentence 1 (i.e., hours worked beyond 8 per day). Records must be retained for at least two years and must be made available to supervisory authorities on demand. In sectors with particularly high risks of working time violations — including construction, hospitality, transport, logistics, and the meat industry — more comprehensive recording obligations apply under special legislation. Electronic recording systems satisfy the requirement if they produce verifiable records.
+Keywords: Aufzeichnungspflicht, working time records, posting obligation, 2 years retention, supervisory authority, documentation
+
+---
+
+arbschg ArbZG §22
+Title: Administrative fines for working time violations
+Obligation: MUST
+Threshold: All employers; enforceable by labour supervisory authorities (Landesbehoerden)
+Text: Violations of the ArbZG — including exceeding daily or weekly working time limits, failing to provide rest breaks or rest periods, employing workers on Sundays without authorisation, or failing to maintain working time records — are administrative offences and may be fined up to EUR 30,000 per violation. Violations of posting obligations carry fines of up to EUR 5,000. Intentional or repeated violations that endanger the health of employees are criminal offences under §23 ArbZG and may be prosecuted with imprisonment of up to one year or a criminal fine. Supervisory authorities are the labour inspection agencies of each federal state.
+Keywords: Bussgeldbeschraenkungen, Ordnungswidrigkeit, ArbZG fine, 30000 EUR, administrative offence, criminal offence, labour inspection
