@@ -40,7 +40,7 @@ export function Step6Documents({ files, onChange }: Props) {
       }
     });
 
-    if (bad.length) setError(`Skipped: ${bad.join(", ")} — only PDF and TXT files up to 15 MB.`);
+    if (bad.length) setError(`Skipped: ${bad.join(", ")}. Only PDF and TXT files up to 15 MB are accepted.`);
     if (valid.length) onChange([...files, ...valid]);
   }, [files, onChange]);
 
@@ -56,7 +56,7 @@ export function Step6Documents({ files, onChange }: Props) {
         <p className="text-sm text-slate-400 leading-relaxed">
           Upload your company documents to get evidence-backed assessments instead of questionnaire-only results. The AI will read your actual policies and cite specific clauses.
         </p>
-        <p className="text-xs text-slate-600 mt-1.5">Optional — you can skip and run the screening without documents.</p>
+        <p className="text-xs text-slate-600 mt-1.5">Optional. You can skip and run the screening without documents.</p>
       </div>
 
       {/* Drop zone */}
@@ -83,7 +83,7 @@ export function Step6Documents({ files, onChange }: Props) {
         </div>
         <div className="text-center">
           <p className="text-sm font-semibold text-slate-300">Drop files here or click to browse</p>
-          <p className="text-xs text-slate-600 mt-1">PDF, TXT — up to 15 MB per file</p>
+          <p className="text-xs text-slate-600 mt-1">PDF or TXT, up to 15 MB per file</p>
         </div>
       </label>
 
