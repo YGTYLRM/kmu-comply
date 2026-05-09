@@ -248,7 +248,7 @@ export default function HomePage() {
     <main className="bg-dark-950">
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 sm:pt-28 pb-12 sm:pb-16">
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 sm:pt-28 pb-12 sm:pb-16">
         <div className="pointer-events-none absolute inset-0">
           <div className="animate-orb-1 absolute -top-32 right-0 h-[700px] w-[700px] rounded-full bg-brand-600/15 blur-[140px]" />
           <div className="animate-orb-2 absolute bottom-0 -left-32 h-[500px] w-[500px] rounded-full bg-cyan-500/8 blur-[120px]" />
