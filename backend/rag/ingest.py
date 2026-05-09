@@ -42,21 +42,33 @@ CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 MAX_CHUNK_CHARS = 1_500 * 4
 
 REGULATION_COLLECTIONS: dict[str, str] = {
-    "gdpr": "gdpr_dsgvo",
-    "bdsg": "bdsg",
-    "lksg": "lksg",
-    "enefg": "enefg",
-    "csrd": "csrd",
-    "compliance_guides": "compliance_guides",
+    "gdpr":             "gdpr_dsgvo",
+    "bdsg":             "bdsg",
+    "lksg":             "lksg",
+    "enefg":            "enefg",
+    "csrd":             "csrd",
+    "compliance_guides":"compliance_guides",
+    "nis2":             "nis2",
+    "eu_ai_act":        "eu_ai_act",
+    "hinschg":          "hinschg",
+    "arbschg":          "arbschg",
+    "agg":              "agg",
+    "milog":            "milog",
 }
 
 OFFICIAL_URLS: dict[str, str] = {
-    "gdpr": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
-    "bdsg": "https://www.gesetze-im-internet.de/bdsg_2018/",
-    "lksg": "https://www.gesetze-im-internet.de/lksg/",
-    "enefg": "https://www.gesetze-im-internet.de/enefg/",
-    "csrd": "https://eur-lex.europa.eu/eli/dir/2022/2464/oj/eng",
-    "compliance_guides": "https://www.edpb.europa.eu",
+    "gdpr":             "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+    "bdsg":             "https://www.gesetze-im-internet.de/bdsg_2018/",
+    "lksg":             "https://www.gesetze-im-internet.de/lksg/",
+    "enefg":            "https://www.gesetze-im-internet.de/enefg/",
+    "csrd":             "https://eur-lex.europa.eu/eli/dir/2022/2464/oj/eng",
+    "compliance_guides":"https://www.edpb.europa.eu",
+    "nis2":             "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022L2555",
+    "eu_ai_act":        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202401689",
+    "hinschg":          "https://www.gesetze-im-internet.de/hinschg/",
+    "arbschg":          "https://www.gesetze-im-internet.de/arbschg/",
+    "agg":              "https://www.gesetze-im-internet.de/agg/",
+    "milog":            "https://www.gesetze-im-internet.de/milog/",
 }
 
 # ---------------------------------------------------------------------------
@@ -287,10 +299,10 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     text = _load(path)
     name = path.name
 
-    if regulation in ("bdsg", "lksg", "enefg") and path.suffix == ".txt":
+    if regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "agg", "milog") and path.suffix == ".txt":
         return _chunk_german_law(text, regulation, name, url)
 
-    if regulation in ("gdpr", "csrd"):
+    if regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
         chunks = _chunk_eu_law(text, regulation, name, url)
         return chunks if chunks else _chunk_guidance(text, regulation, name, url)
 

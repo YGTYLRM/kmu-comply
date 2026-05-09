@@ -2,11 +2,17 @@ from enum import Enum
 
 
 class Regulation(str, Enum):
-    GDPR = "gdpr_dsgvo"
-    LKSG = "lksg"
-    ENEFG = "enefg"
-    CSRD = "csrd"
-    BDSG = "bdsg"
+    GDPR    = "gdpr_dsgvo"
+    LKSG    = "lksg"
+    ENEFG   = "enefg"
+    CSRD    = "csrd"
+    BDSG    = "bdsg"
+    NIS2    = "nis2"
+    AI_ACT  = "eu_ai_act"
+    HINSCHG = "hinschg"
+    ARBSCHG = "arbschg"
+    AGG     = "agg"
+    MILOG   = "milog"
 
 
 class Industry(str, Enum):
