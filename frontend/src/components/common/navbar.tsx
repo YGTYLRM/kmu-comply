@@ -29,7 +29,7 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl pointer-events-auto">
         {/* Floating pill */}
         <div
-          className="rounded-[20px] border border-white/[0.10] shadow-[0_4px_24px_rgba(0,0,0,0.5)] overflow-hidden"
+          className="rounded-[20px] border border-white/[0.10] shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
           style={{
             background: "rgba(14, 21, 40, 0.92)",
             backdropFilter: "blur(20px)",
@@ -52,13 +52,13 @@ export function Navbar() {
 
             {/* Desktop nav links */}
             <nav className="hidden md:flex items-center gap-0.5 ml-3">
-              <a href="#how-it-works" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
+              <a href="/#how-it-works" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
                 How it works
               </a>
-              <a href="#features" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
+              <a href="/#features" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
                 Features
               </a>
-              <a href="#pricing" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
+              <a href="/#pricing" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
                 Pricing
               </a>
               <Link href="/contact" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
@@ -91,13 +91,13 @@ export function Navbar() {
           {mobileOpen && (
             <div className="md:hidden border-t border-white/[0.08] px-4 pb-4 pt-2">
               <nav className="flex flex-col gap-1">
-                <a href="#how-it-works" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                <a href="/#how-it-works" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   How it works
                 </a>
-                <a href="#features" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                <a href="/#features" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   Features
                 </a>
-                <a href="#pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                <a href="/#pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   Pricing
                 </a>
                 <Link href="/contact" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
