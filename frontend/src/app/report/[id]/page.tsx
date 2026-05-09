@@ -9,6 +9,7 @@ import { ApplicabilityMatrix } from "@/components/report/applicability-matrix";
 import { ScoreBreakdown } from "@/components/report/score-breakdown";
 import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
+import { DocumentNudge } from "@/components/report/document-nudge";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Download, AlertTriangle } from "lucide-react";
 
@@ -134,6 +135,7 @@ export default function ReportPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="flex flex-col gap-5"
         >
+          <DocumentNudge report={report} />
           <ExecutiveSummary report={report} />
           <div className="grid lg:grid-cols-2 gap-5">
             <ApplicabilityMatrix report={report} />
