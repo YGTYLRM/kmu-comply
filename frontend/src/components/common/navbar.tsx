@@ -2,31 +2,34 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 
 export function Navbar() {
-  const [scrolled,   setScrolled]   = useState(false);
+  const [hidden,     setHidden]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const lastY = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setHidden(y > 80 && y > lastY.current);
+      lastY.current = y;
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 pt-3 md:pt-4 pointer-events-none">
+    <div className={cn(
+      "fixed top-0 left-0 right-0 z-50 px-4 md:px-8 pt-3 md:pt-4 pointer-events-none transition-transform duration-300",
+      hidden && "-translate-y-full"
+    )}>
       <div className="mx-auto max-w-7xl pointer-events-auto">
         {/* Floating pill */}
         <div
-          className={cn(
-            "rounded-[20px] border transition-all duration-300 overflow-hidden",
-            scrolled
-              ? "border-white/[0.12] shadow-[0_8px_40px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.05)]"
-              : "border-white/[0.10] shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
-          )}
+          className="rounded-[20px] border border-white/[0.10] shadow-[0_4px_24px_rgba(0,0,0,0.5)] overflow-hidden"
           style={{
             background: "rgba(14, 21, 40, 0.92)",
             backdropFilter: "blur(20px)",
