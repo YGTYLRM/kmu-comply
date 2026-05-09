@@ -50,27 +50,49 @@ Constraints:
 </instructions>"""
 
 
-def gap_analysis_prompt(profile_json: str, chunks_json: str) -> str:
+def gap_analysis_prompt(profile_json: str, chunks_json: str, company_docs_json: str = "") -> str:
+    has_docs = bool(company_docs_json.strip())
+
+    docs_section = f"""
+<company_documents>
+The following passages were retrieved from documents the company uploaded.
+Prioritise these as evidence. Quote specific passages in your evidence field.
+{company_docs_json}
+</company_documents>
+""" if has_docs else ""
+
+    cannot_assess_note = (
+        "- CANNOT_ASSESS: only if both the profile AND the uploaded documents lack information needed"
+        if has_docs
+        else "- CANNOT_ASSESS: the profile lacks information needed to determine compliance"
+    )
+
+    doc_instruction = """
+When company documents are provided, your evidence MUST cite specific passages.
+  COMPLIANT example: "Privacy policy (Section 3.2) states: 'We collect name and email address for service delivery' — satisfying Art. 13(1)(c) GDPR."
+  NON_COMPLIANT example: "No whistleblower reporting channel found in uploaded documents. Required by §12 HinSchG."
+""" if has_docs else ""
+
     return f"""<task>
 For each regulatory requirement provided, assess this company's compliance status.
-Base your assessment only on the company profile and retrieved regulation text below.
+{"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile and retrieved regulation text."}
 </task>
 
 <company_profile>
 {profile_json}
 </company_profile>
-
+{docs_section}
 <retrieved_regulations>
 {chunks_json}
 </retrieved_regulations>
 
 <instructions>
 Assess each requirement chunk. Use exactly these status values:
-- COMPLIANT: the profile shows the company meets this requirement
+- COMPLIANT: evidence shows the company meets this requirement
 - PARTIALLY_COMPLIANT: the company partially meets it — specific gaps exist
 - NON_COMPLIANT: the company does not meet this requirement
-- CANNOT_ASSESS: the profile lacks information needed to determine compliance
-
+{cannot_assess_note}
+{doc_instruction}
 Output ONLY a valid JSON array:
 [
   {{
@@ -78,17 +100,16 @@ Output ONLY a valid JSON array:
     "article_number": "Art. 30",
     "article_title": "Records of processing activities",
     "status": "NON_COMPLIANT",
-    "evidence": "The profile shows has_processing_records=false and employee_count=150 with non-occasional processing, making Art. 30 GDPR records mandatory.",
+    "evidence": "Profile shows has_processing_records=false with 150 employees and non-occasional processing — Art. 30 records are mandatory.",
     "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) maintained — required under Art. 30(1) GDPR."
   }}
 ]
 
 Constraints:
-- Every assessment MUST have a non-empty evidence field explaining the reasoning
-- Only assess articles that apply to this company based on its profile
-- Do NOT assess articles for regulations that do not apply to this company
+- Every assessment MUST have a non-empty evidence field
+- Only assess articles applicable to this company
 - deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
-- Be consistent: same facts should always produce the same status
+- Be consistent: same facts produce the same status
 </instructions>"""
 
 
