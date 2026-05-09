@@ -153,11 +153,20 @@ async def get_report(job_id: str):
 
 @app.post("/api/report/{job_id}/pdf")
 async def generate_pdf(job_id: str):
+    from fastapi.responses import Response
+    from services.pdf_generator import generate_pdf as _gen_pdf
+
     report = job_manager.get_report(job_id)
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found or not completed.")
-    # PDF generation implemented in Phase 4
-    raise HTTPException(status_code=501, detail="PDF generation not yet implemented.")
+
+    pdf_bytes = _gen_pdf(report)
+    filename  = f"complio-screening-{report.company_name.replace(' ', '-')[:40]}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @app.get("/api/regulations", response_model=RegulationsListResponse)
