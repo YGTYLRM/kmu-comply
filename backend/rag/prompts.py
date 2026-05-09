@@ -71,15 +71,58 @@ Prioritise these as evidence. Quote specific passages in your evidence field.
 
     profile_field_guidance = """
 Profile fields ARE your evidence — treat them as direct compliance indicators:
-- has_processing_records=false → NON_COMPLIANT on Art. 30 GDPR (records are mandatory, no exception)
-- has_dpo=false → assess DPO requirement against the thresholds (employee count, data type)
-- has_supply_chain_abroad=false → COMPLIANT on LkSG foreign supplier obligations
-- has_energy_management_system=false → NON_COMPLIANT on ISO 50001 requirements if applicable
-- has_conducted_energy_audit=false → NON_COMPLIANT on audit obligations if applicable
-- uses_ai_systems=true → company is subject to EU AI Act obligations (assess accordingly)
-- is_critical_infrastructure_sector → determines NIS2 entity classification
-- processes_special_category_data=true → stricter GDPR obligations apply
-- Employee count and revenue → determine which size-based thresholds apply
+
+GDPR / BDSG:
+- has_processing_records=false → NON_COMPLIANT on Art. 30 GDPR
+- has_dpo=false → assess DPO requirement against thresholds (employee count, data type)
+- has_privacy_policy=false → NON_COMPLIANT on Art. 13/14 GDPR
+- has_processor_agreements=false → NON_COMPLIANT on Art. 28 GDPR
+- has_data_breach_procedure=false → NON_COMPLIANT on Art. 33/34 GDPR
+- has_tom_documentation=false → NON_COMPLIANT on Art. 32 GDPR
+- has_data_retention_policy=false → NON_COMPLIANT on Art. 5(1)(e) GDPR
+- has_data_protection_training=false → NON_COMPLIANT on Art. 29/32(4) GDPR
+- transfers_data_outside_eea=true → assess Art. 44-49 GDPR transfer safeguards
+- has_consent_management=false → NON_COMPLIANT on Art. 6/7 GDPR where consent is the legal basis
+- processes_special_category_data=true → stricter GDPR Art. 9 obligations apply
+
+NIS2 (applies if is_critical_infrastructure_sector=true):
+- has_information_security_policy=false → NON_COMPLIANT on Art. 21(2)(a) NIS2
+- has_incident_response_plan=false → NON_COMPLIANT on Art. 21(2)(b) NIS2
+- has_business_continuity_plan=false → NON_COMPLIANT on Art. 21(2)(c) NIS2
+- has_vulnerability_management=false → NON_COMPLIANT on Art. 21(2)(e) NIS2
+- has_mfa_implemented=false → NON_COMPLIANT on Art. 21(2)(j) NIS2
+- has_supply_chain_security_assessment=false → NON_COMPLIANT on Art. 21(2)(d) NIS2
+- has_security_awareness_training=false → NON_COMPLIANT on Art. 21(2)(g) NIS2
+
+EU AI Act (applies if uses_ai_systems=true):
+- ai_systems_are_high_risk=true → full high-risk obligations apply (Arts. 9-17)
+- has_ai_risk_assessment=false → NON_COMPLIANT on Art. 9 EU AI Act
+- has_ai_usage_documentation=false → NON_COMPLIANT on Art. 13 EU AI Act
+- has_human_oversight_procedure=false → NON_COMPLIANT on Art. 14 EU AI Act
+
+HinSchG (applies if employee_count >= 50):
+- has_whistleblower_channel=false → NON_COMPLIANT on §12 HinSchG
+- has_whistleblower_policy=false → PARTIALLY_COMPLIANT at best on §13 HinSchG
+
+ArbSchG (applies to ALL employers):
+- has_gefaehrdungsbeurteilung=false → NON_COMPLIANT on §5 ArbSchG
+- has_gefaehrdungsbeurteilung_documented=false → NON_COMPLIANT on §6 ArbSchG
+- has_first_aid_measures=false → NON_COMPLIANT on §10 ArbSchG
+- has_employee_safety_training=false → NON_COMPLIANT on §12 ArbSchG
+
+AGG (applies to ALL employers):
+- has_anti_discrimination_policy=false → NON_COMPLIANT on §12 AGG
+- has_agc_complaints_procedure=false → NON_COMPLIANT on §13 AGG
+
+MiLoG (applies to ALL employers):
+- has_working_time_records=false → NON_COMPLIANT on §17 MiLoG for covered workers
+- uses_subcontractors=true → principal liability applies under §13 MiLoG
+
+LkSG (applies if has_supply_chain_abroad=true and thresholds met):
+- has_lksg_policy_statement=false → NON_COMPLIANT on §6 LkSG
+- has_supplier_code_of_conduct=false → NON_COMPLIANT on §6 LkSG
+- has_supplier_risk_assessment=false → NON_COMPLIANT on §5 LkSG
+- has_lksg_complaints_procedure=false → NON_COMPLIANT on §8 LkSG
 
 Absence of implementation = NON_COMPLIANT, not CANNOT_ASSESS.
 Partial information = PARTIALLY_COMPLIANT with explanation, not CANNOT_ASSESS.
