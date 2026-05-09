@@ -1,7 +1,9 @@
 // Domain types mirroring the backend Pydantic models.
 // Keep in sync with backend/models/*.py.
 
-export type Regulation = "gdpr_dsgvo" | "lksg" | "enefg" | "csrd" | "bdsg";
+export type Regulation =
+  | "gdpr_dsgvo" | "lksg" | "enefg" | "csrd" | "bdsg"
+  | "nis2" | "eu_ai_act" | "hinschg" | "arbschg" | "agg" | "milog";
 export type Industry =
   | "it_software" | "manufacturing" | "healthcare" | "retail"
   | "finance" | "logistics" | "construction" | "energy"
@@ -33,6 +35,8 @@ export interface CompanyProfile {
   has_conducted_energy_audit?: boolean;
   is_listed_company?: boolean;
   has_sustainability_report?: boolean;
+  is_critical_infrastructure_sector?: boolean;
+  uses_ai_systems?: boolean;
   existing_compliance_notes?: string;
 }
 
