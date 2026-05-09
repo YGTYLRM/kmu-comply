@@ -206,3 +206,46 @@ async def list_regulations():
         ),
     ]
     return RegulationsListResponse(regulations=regs)
+
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    company: Optional[str] = None
+    message: str
+
+
+@app.post("/api/contact")
+async def contact(req: ContactRequest):
+    if not settings.resend_api_key or not settings.contact_email:
+        raise HTTPException(status_code=503, detail="Contact not configured.")
+
+    import resend
+    resend.api_key = settings.resend_api_key
+
+    html = f"""
+    <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
+      <h2 style="margin:0 0 20px;color:#0f172a">New contact via Complio</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:90px">Name</td>
+            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.name}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td>
+            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.email}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Company</td>
+            <td style="padding:8px 0;font-size:14px;color:#0f172a">{req.company or "Not provided"}</td></tr>
+      </table>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0"/>
+      <p style="font-size:13px;color:#64748b;margin:0 0 8px">Message</p>
+      <p style="font-size:14px;color:#0f172a;line-height:1.6;white-space:pre-wrap">{req.message}</p>
+    </div>
+    """
+
+    resend.Emails.send({
+        "from": "Complio <onboarding@resend.dev>",
+        "to": [settings.contact_email],
+        "reply_to": req.email,
+        "subject": f"Contact: {req.name} ({req.company or req.email})",
+        "html": html,
+    })
+
+    return {"ok": True}
