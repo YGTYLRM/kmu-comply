@@ -10,15 +10,37 @@ import { ScoreBreakdown } from "@/components/report/score-breakdown";
 import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Download } from "lucide-react";
+import { useState } from "react";
 
 export default function ReportPage() {
-  const params = useParams();
-  const router = useRouter();
-  const jobId  = params.id as string;
-  const { report, loading, error, fetch } = useReport(jobId);
+  const params  = useParams();
+  const router  = useRouter();
+  const jobId   = params.id as string;
+  const { report, loading, error, fetch: loadReport } = useReport(jobId);
+  const [downloading, setDownloading] = useState(false);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  const downloadPdf = async () => {
+    setDownloading(true);
+    try {
+      const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+      const res  = await window.fetch(`${BASE}/api/report/${jobId}/pdf`, { method: "POST" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob     = await res.blob();
+      const url      = URL.createObjectURL(blob);
+      const a        = document.createElement("a");
+      a.href         = url;
+      a.download     = `complio-screening-${jobId.slice(0, 8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("PDF download failed:", e);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  useEffect(() => { loadReport(); }, [loadReport]);
 
   if (loading) {
     return (
@@ -73,10 +95,24 @@ export default function ReportPage() {
                 </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
-              <ArrowLeft className="h-3.5 w-3.5" />
-              New screening
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadPdf}
+                disabled={downloading}
+              >
+                {downloading
+                  ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  : <Download className="h-3.5 w-3.5" />
+                }
+                {downloading ? "Generating..." : "Download PDF"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
+                <ArrowLeft className="h-3.5 w-3.5" />
+                New screening
+              </Button>
+            </div>
           </motion.div>
         </div>
       </div>
