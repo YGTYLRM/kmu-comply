@@ -1,0 +1,204 @@
+Allgemeines Gleichbehandlungsgesetz (AGG)
+vom 14. August 2006 (BGBl. I S. 1897)
+zuletzt geaendert durch Artikel 8 des Gesetzes vom 3. April 2013
+Expanded Article Reference for Compliance Screening
+
+---
+
+agg §1
+Title: Purpose — prevent and eliminate disadvantage on protected grounds
+Obligation: MUST
+Threshold: All employers; applies to all employment relationships and access to employment in Germany
+Text: The purpose of the Allgemeines Gleichbehandlungsgesetz (AGG) is to prevent or eliminate disadvantage on grounds of race or ethnic origin, sex, religion or belief, disability, age, or sexual identity. These seven characteristics are the protected grounds under the AGG, and the law prohibits discrimination based on any of them in the areas of employment, vocational training, and access to goods and services. All employers in Germany — regardless of size, sector, or legal form — must ensure compliance with the AGG in all aspects of the employment relationship. The AGG implements several EU anti-discrimination directives, including Directive 2000/43/EC (race and ethnic origin), Directive 2000/78/EC (employment and occupation), and Directive 2006/54/EC (sex equality in employment).
+Keywords: anti-discrimination, protected grounds, race, ethnic origin, sex, religion, disability, age, sexual identity, AGG purpose, equal treatment
+
+---
+
+agg §2(1)
+Title: Scope of prohibited grounds — employment conditions, vocational training, and membership in organisations
+Obligation: MUST
+Threshold: All employers and occupational associations in Germany
+Text: Disadvantage based on any of the grounds listed in §1 AGG is unlawful in respect of: the conditions, including selection criteria and conditions of employment, for access to employment and self-employment; employment and working conditions, including pay and conditions of dismissal; access to all forms and all levels of vocational guidance, vocational training, advanced vocational training, and retraining, including practical work experience; and membership of and involvement in an employees' or employers' organisation or any organisation whose members carry on a particular profession, including benefits provided by such organisations. The AGG therefore applies throughout the entire employment lifecycle from recruitment and selection through to the termination of the employment relationship.
+Keywords: employment scope, vocational training, working conditions, pay, dismissal, membership organisations, AGG scope, employment lifecycle, selection criteria
+
+---
+
+agg §3(1)
+Title: Direct discrimination — less favourable treatment on a protected ground
+Obligation: MUST
+Threshold: All employers; prohibition is absolute subject to specific statutory exceptions
+Text: Direct discrimination occurs when a person is treated less favourably than another person in a comparable situation on grounds of race or ethnic origin, sex, religion or belief, disability, age, or sexual identity, is treated less favourably or would be treated less favourably. Direct discrimination does not require that the less favourable treatment be intentional; it is sufficient that a protected ground was a factor in the decision, even if the decision-maker was not consciously aware of it. The concept of comparable situation does not require identical circumstances but requires that the persons being compared are in a materially similar position. Direct discrimination can only be justified in very limited statutory circumstances — for essential occupational requirements under §8, for religious organisations under §9, or on grounds of age under §10.
+Keywords: direct discrimination, less favourable treatment, comparable situation, protected ground, intent irrelevant, unmittelbare Benachteiligung, justification, AGG
+
+---
+
+agg §3(2)
+Title: Indirect discrimination — apparently neutral provision placing persons at particular disadvantage
+Obligation: MUST
+Threshold: All employers; applies to all employment policies, criteria, and practices
+Text: Indirect discrimination occurs when an apparently neutral provision, criterion, or practice places persons of a particular race or ethnic origin, religion or belief, disability, age, or sexual identity at a particular disadvantage compared to other persons, unless that provision, criterion, or practice is objectively justified by a legitimate aim and the means of achieving that aim are appropriate and necessary. Unlike direct discrimination, indirect discrimination does not involve overtly different treatment; rather, it arises where a facially neutral rule has a disproportionately adverse effect on persons sharing a protected characteristic. Employers must critically examine their employment policies and practices for potential indirect discriminatory effects, including policies on working hours, qualification requirements, dress codes, and language requirements.
+Keywords: indirect discrimination, neutral provision, particular disadvantage, objective justification, proportionality, legitimate aim, mittelbare Benachteiligung, employment practice
+
+---
+
+agg §3(3)
+Title: Harassment — unwanted conduct that violates dignity and creates a hostile environment
+Obligation: MUST
+Threshold: All employers; prohibition applies to conduct by employer, managers, colleagues, and third parties
+Text: Harassment constitutes discrimination within the meaning of the AGG. Harassment is defined as unwanted conduct related to one of the grounds listed in §1 AGG that has the purpose or effect of violating the dignity of the person concerned and of creating an intimidating, hostile, degrading, humiliating, or offensive environment. Harassment does not require repeated conduct; a single act of sufficient gravity may constitute harassment. The standard is objective — what matters is whether the conduct would reasonably be experienced as violating dignity and creating a hostile environment by a reasonable person sharing the characteristics of the complainant — but the subjective experience of the affected person is also relevant. Employers must take proactive preventive measures against harassment and must respond appropriately when harassment is reported or identified.
+Keywords: harassment, Belaestitgung, dignity, hostile environment, unwanted conduct, single act, objective standard, sexual harassment, AGG
+
+---
+
+agg §3(4)
+Title: Sexual harassment — a specific form of harassment constituting discrimination
+Obligation: MUST
+Threshold: All employers; applies to conduct by the employer, managers, colleagues, customers, and other third parties in the workplace
+Text: Sexual harassment is a specific form of harassment and constitutes discrimination under the AGG. Sexual harassment is defined as unwanted conduct of a sexual nature — including unwanted sexual acts or requests to perform sexual acts, sexually motivated physical contact, remarks of a sexual nature, and the unwanted display, use, or posting of pornographic material — that has the purpose or effect of violating the dignity of the person concerned, in particular where an intimidating, hostile, degrading, humiliating, or offensive environment is created. Employers must take immediate and appropriate action when an employee reports sexual harassment, regardless of whether the person accused of harassment is a fellow employee, a manager, a client, a customer, or a third party interacting with the employee in the course of work.
+Keywords: sexual harassment, sexuelle Belaestitgung, unwanted sexual conduct, sexually motivated, pornographic material, employer response, dignity, hostile environment
+
+---
+
+agg §7(1)
+Title: Prohibition on discrimination — employees must not be disadvantaged on grounds of §1
+Obligation: MUST
+Threshold: All employers; applies to all employees as defined in §6 AGG
+Text: Employees must not be disadvantaged on any of the grounds listed in §1 AGG. This prohibition applies even where the person who engages in discriminatory conduct merely assumes — without actual knowledge — that a ground listed in §1 exists in relation to the person being disadvantaged. For example, if an employer declines to promote an employee in the mistaken belief that the employee is of a particular religion, this may constitute discrimination even if the employee does not in fact hold that religion. The prohibition in §7(1) is comprehensive and applies to all decisions and actions by the employer that affect the employment relationship, including decisions on recruitment, assignment of duties, pay, training, promotion, performance appraisal, and dismissal.
+Keywords: discrimination prohibition, Benachteiligungsverbot, assumed ground, protected characteristic, employer decision, employment relationship, comprehensive prohibition
+
+---
+
+agg §7(3)
+Title: Instruction to discriminate constitutes discrimination
+Obligation: MUST
+Threshold: All employers and persons in management or supervisory positions
+Text: An instruction to discriminate against a person constitutes an act of discrimination within the meaning of the AGG. This means that where a manager, director, or other person instructs an employee, contractor, or agent to treat another person less favourably on a protected ground, the person giving the instruction has themselves committed an act of discrimination prohibited by the AGG. The prohibition on instructed discrimination is intended to prevent the use of intermediaries or agents to implement discriminatory policies while shielding the ultimate decision-maker from liability. Employers must ensure that management and supervisory staff are trained not to give or carry out discriminatory instructions, and that employees who refuse to carry out such instructions are protected from negative consequences.
+Keywords: discriminatory instruction, Weisung, management liability, instruction to discriminate, agent, intermediary, management training, anti-discrimination
+
+---
+
+agg §8
+Title: Justification of direct discrimination — genuine and determining occupational requirement
+Obligation: MUST
+Threshold: Employers seeking to apply a discriminatory requirement as an occupational requirement
+Text: Different treatment on account of one of the grounds listed in §1 AGG does not constitute unlawful discrimination where, by reason of the nature of the particular occupational activities or the context in which they are carried out, the characteristic in question constitutes a genuine and determining occupational requirement, provided that the objective is a legitimate one and the requirement is proportionate. The justification is narrow and applies only where the characteristic is truly essential to performing the particular job — for example, where the authenticity of a performance requires an actor of a particular ethnic background, or where a specific age is a legal requirement for a safety-critical role. Employers must be able to demonstrate the genuine occupational requirement objectively and may not rely on assumptions, stereotypes, or the preferences of customers or third parties.
+Keywords: genuine occupational requirement, wesentliche berufliche Anforderung, justification, proportionality, legitimate objective, exception, §8 AGG
+
+---
+
+agg §11
+Title: Job advertisements must not contain discriminatory criteria or requirements
+Obligation: MUST
+Threshold: All employers and persons placing employment advertisements
+Text: A position must not be advertised in a discriminatory manner, in particular job advertisements must not contain characteristics that discriminate on any of the grounds listed in §1 AGG. This prohibition applies to all forms of job advertising, including advertisements placed in newspapers, online platforms, employment agencies, internal vacancy notices, and social media. Discriminatory elements in job advertisements include specifying an age range for applicants, requiring a particular sex without a genuine occupational requirement, describing physical attributes that are not genuinely necessary for the role, and using language that signals a preference for applicants of a particular national background. Employers must also be aware that requiring language skills beyond what is genuinely necessary for the role may constitute indirect discrimination on grounds of ethnic origin. A discriminatory job advertisement can itself give rise to a claim for compensation under §15(2) AGG.
+Keywords: job advertisement, discriminatory advertisement, Stellenanzeige, recruitment, age discrimination, sex discrimination, ethnic origin, language requirement, application process
+
+---
+
+agg §12(1)
+Title: Employer must take necessary measures to protect employees from discrimination
+Obligation: MUST
+Threshold: All employers; this is a proactive and not only reactive obligation
+Text: The employer is obligated to take the necessary measures to protect employees from disadvantage on any of the grounds listed in §1 AGG. This protection includes proactive preventive measures. The employer must not wait for discrimination to occur before taking action but must implement organisational, procedural, and training measures designed to prevent discrimination and harassment from occurring in the first place. Necessary measures may include implementing and enforcing an equal opportunities policy, establishing clear and transparent recruitment and performance management processes, ensuring that decision-makers are trained in anti-discrimination law and practice, and creating an environment in which employees feel safe to report discrimination without fear of reprisal.
+Keywords: proactive protection, employer obligation, anti-discrimination measures, equal opportunities, prevention, organisational measures, §12 AGG
+
+---
+
+agg §12(2)
+Title: Employer must inform employees of the unlawfulness of discrimination — including through training
+Obligation: SHOULD
+Threshold: All employers; obligation is to notify through appropriate means including training
+Text: The employer must, in an appropriate manner — in particular in the context of vocational training and further training — draw employees' attention to the unlawfulness of discrimination on the grounds listed in §1 AGG, and must work to ensure that such discrimination does not occur. Where the employer has trained employees in a suitable manner for the purpose of preventing discrimination, this will be regarded as fulfilment of the employer's obligation to take protective measures under §12(1). This provision establishes training as a key instrument of AGG compliance. Training should cover what constitutes discrimination and harassment, how employees can report concerns, and what consequences will follow a finding that discrimination occurred. The law does not prescribe training frequency, but annual refresher training is generally considered appropriate.
+Keywords: employee notification, anti-discrimination training, AGG training, employer obligation, awareness, unlawfulness, vocational training, prevention, §12(2) AGG
+
+---
+
+agg §12(3)
+Title: Employer must take appropriate measures to stop discrimination occurring within the company
+Obligation: MUST
+Threshold: All employers where discrimination by an employee against another employee has been identified
+Text: Where an employee violates the prohibition of discrimination in §7(1) AGG, the employer must take appropriate, necessary, and proportionate measures in the individual case to stop the discrimination. Such measures include warning (Abmahnung), reassignment, transfer to a different workplace, or dismissal of the person responsible for the discrimination. The choice of measure must be proportionate to the gravity of the conduct; minor first-time incidents may warrant a warning, whereas severe or repeated acts of harassment or discrimination may justify immediate dismissal. The employer must act promptly when discrimination is identified or credibly reported; delay in responding may itself constitute a breach of the employer's duty under §12 and may expose the employer to liability under §15(1) AGG.
+Keywords: remedial action, Abmahnung, warning, transfer, dismissal, proportionality, employer response, discrimination by employee, §12(3) AGG
+
+---
+
+agg §12(4)
+Title: Employer must display or make accessible the text of the AGG in the company
+Obligation: MUST
+Threshold: All employers
+Text: The employer must make the text of the AGG and the relevant provision of §61b of the Arbeitsgerichtsgesetz (labour court law), as well as information about the bodies within the company responsible for handling complaints under §13 AGG, known in the company in an appropriate manner. This may be done by posting the texts in a prominent place on the company premises, making them available in written form to all employees, or by using the information and communication technology ordinarily used in the company. The purpose of this obligation is to ensure that all employees are aware of their rights under the AGG and know where and how to make a complaint if they believe they have been discriminated against. The posting or making available of the AGG text should be updated if the law is amended.
+Keywords: AGG posting, employee information, display obligation, workplace notice, complaint body, §12(4) AGG, employee rights, accessibility
+
+---
+
+agg §13(1)
+Title: Employees have the right to file a complaint with the employer if they feel discriminated against
+Obligation: MUST
+Threshold: All employers; employees have the right to complain; employers must process complaints
+Text: Employees have the right to file a complaint with the competent bodies of the company, enterprise, or authority if they consider that they have been disadvantaged on one of the grounds listed in §1 AGG by the employer, by a superior, by other employees, or by third parties in the context of their employment relationship. The right to complain must be communicated to employees as part of the employer's obligation under §12(4) AGG. The employer must designate a body or person responsible for receiving and processing AGG complaints, and must inform employees of the identity and contact details of this body. The complaints procedure must be accessible to all employees, including temporary workers, workers on probation, and those in atypical employment relationships.
+Keywords: right to complain, Beschwerderecht, AGG complaint, complaint procedure, designated body, employee rights, third-party discrimination, §13 AGG
+
+---
+
+agg §13(2)
+Title: Employer must examine and communicate the result of the complaint to the employee
+Obligation: MUST
+Threshold: All employers who receive a complaint under §13(1) AGG
+Text: Complaints submitted under §13(1) AGG must be examined by the employer and the result of the examination must be communicated to the employee who made the complaint. The employer must conduct a genuine and objective investigation of the complaint, including reviewing the facts alleged, consulting with relevant persons, and assessing whether the conduct complained of constitutes a violation of the AGG. The employee making the complaint must be informed of the outcome of the investigation and the decision reached, including what follow-up measures have been or will be taken. While the AGG does not specify a time limit for resolving complaints, the employer should act promptly and without undue delay, particularly where the discrimination or harassment is ongoing.
+Keywords: complaint examination, investigation obligation, notification of outcome, employer duty, complaint response, follow-up measures, AGG procedure, §13(2) AGG
+
+---
+
+agg §14
+Title: Right to refuse work without loss of pay where employer fails to act against harassment
+Obligation: MUST
+Threshold: Employees subject to harassment or severe disadvantage under §3(3) or §3(4) AGG where employer has not acted
+Text: Where the employer fails to take any measures, or takes measures that are manifestly unsuitable, to stop harassment in the workplace as referred to in §3(3) or §3(4) AGG, the employees concerned have the right to refuse to perform their work without forfeiting their entitlement to remuneration, to the extent that this is necessary for their protection. This right of refusal applies where the harassment is ongoing and the employer's inaction or manifestly inadequate response has made continued work in the affected environment untenable. The right to refuse work under §14 AGG is a significant remedy that creates an immediate financial incentive for employers to respond promptly and effectively to complaints of harassment and discrimination.
+Keywords: right to refuse work, Leistungsverweigerungsrecht, harassment, employer inaction, no loss of remuneration, §14 AGG, ongoing harassment, protective measure
+
+---
+
+agg §15(1)
+Title: Employer must compensate material damage caused by discrimination
+Obligation: MUST
+Threshold: All employers that have violated the prohibition on discrimination under §7(1) AGG
+Text: Where an employer infringes the prohibition of discrimination, the employer is obligated to compensate the damage suffered as a result. This obligation to pay compensation in respect of material damage applies unless the employer is able to demonstrate that they were not responsible for the breach of their duty — for example, because they took all reasonable measures to prevent discrimination and the discriminatory act occurred outside the scope of what was reasonably foreseeable or preventable. Material damage includes quantifiable financial losses such as lost earnings, costs incurred in seeking alternative employment, and expenses arising directly from the discriminatory treatment. The employer cannot limit their liability for material damage by agreement.
+Keywords: compensation, material damage, Schadensersatz, employer liability, AGG violation, discriminatory treatment, financial loss, lost earnings, §15(1) AGG
+
+---
+
+agg §15(2)
+Title: Employee may claim compensation for non-material damage — generally up to 3 months' salary for non-appointment
+Obligation: MUST
+Threshold: Employers that have violated the prohibition on discrimination; applies to all employment-related discrimination
+Text: In addition to compensation for material damage, an employee who suffers discrimination on grounds of §1 AGG may claim appropriate compensation in money for non-material damage. Non-material damage includes injury to dignity, personal integrity, professional standing, and psychological harm caused by the discriminatory treatment. Where the discrimination concerned non-appointment to a position (e.g., rejection at the recruitment stage) and the applicant would not have been appointed even in the absence of discrimination, the compensation for non-material damage must not exceed three months' salary. This cap does not apply where the person would have been appointed but for the discrimination, or where the discrimination relates to other aspects of the employment relationship. Claims for non-material damage under §15(2) must be asserted within two months of the discriminatory act becoming known.
+Keywords: non-material damage, Entschädigung, compensation, three months salary, non-appointment, personal dignity, psychological harm, two-month deadline, §15(2) AGG
+
+---
+
+agg §15(4)
+Title: Compensation claims must be asserted in writing within two months of knowledge of the discriminatory act
+Obligation: MUST
+Threshold: Employees asserting claims for compensation under §15(1) or §15(2) AGG; employers must be aware of this limitation period
+Text: A claim for compensation or damages under §15(1) or §15(2) AGG must be asserted by the aggrieved employee in writing within two months of the employee obtaining knowledge of the discriminatory treatment. The two-month period begins from the point at which the employee became aware — or should have become aware — of the facts giving rise to the discrimination claim. In the context of recruitment, the period begins when the applicant receives notice of rejection. This limitation period is substantive rather than merely procedural, meaning that claims asserted after the two-month period has expired will generally be time-barred regardless of their merits. Employers should be aware of this limitation period when dealing with delayed complaints, as it affects the legal exposure arising from discriminatory acts.
+Keywords: two-month limitation period, assertion obligation, written assertion, time limit, Ausschlussfrist, compensation claim, discrimination claim, §15(4) AGG
+
+---
+
+agg §16(1)
+Title: Employer must not penalise employees who exercise rights under the AGG or support others
+Obligation: MUST
+Threshold: All employers; prohibition is absolute
+Text: The employer must not disadvantage or penalise employees because they exercise their rights under the AGG — including exercising the right to complain under §13, refusing to perform work under §14, or asserting claims for compensation under §15 — or because they support or assist other employees in exercising such rights. This prohibition on victimisation means that an employee who makes a complaint about discrimination, assists a colleague in making a complaint, gives evidence in AGG-related proceedings, or simply exercises any right granted by the AGG must not suffer any negative employment consequences as a result of that exercise of their rights. Victimisation itself constitutes a violation of the AGG and gives rise to the same remedies as discrimination, including claims for compensation under §15.
+Keywords: victimisation prohibition, retaliation ban, §16 AGG, exercise of rights, complaint support, witness protection, AGG remedies, anti-retaliation
+
+---
+
+agg §22
+Title: Shared burden of proof — employee must establish facts suggesting discrimination; employer must rebut
+Obligation: MUST
+Threshold: Courts and employers in AGG discrimination proceedings
+Text: In civil proceedings under the AGG, if the aggrieved party establishes facts from which it may be presumed that there has been discrimination on one of the grounds listed in §1 AGG, the burden of proof shifts to the other party to prove that there has been no breach of the provisions on prohibition of discrimination. This shared burden of proof rule — which derives from EU anti-discrimination directives — means that a claimant does not need to prove discrimination conclusively; rather, they need only to establish a prima facie case (Indizien) from which discrimination may be inferred. Once this prima facie case is established, the employer must then prove that the decision or conduct was not motivated by the protected characteristic. Employers must therefore maintain clear documentation of their employment decisions to be able to demonstrate objective, non-discriminatory reasons when required.
+Keywords: burden of proof, shared burden, prima facie case, Beweislast, discrimination presumption, employer defence, documentation, objective justification, §22 AGG
+
+---
