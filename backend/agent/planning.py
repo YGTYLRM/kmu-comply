@@ -21,6 +21,7 @@ from models.compliance_report import (
     RegulatoryChunk,
 )
 from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
+from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
 from rag.retrieval import deduplicate, rerank, retrieve
 from services.threshold_engine import determine_applicable_regulations
@@ -92,8 +93,9 @@ def run_gap_analysis(
     profile: EnrichedCompanyProfile,
     chunks: list[RegulatoryChunk],
     failures: list[str],
+    job_id: str = "",
 ) -> list[ComplianceGap]:
-    """LLM gap analysis, processed per regulation to stay within context budget."""
+    """LLM gap analysis, processed per regulation. Includes company doc evidence when available."""
     by_reg: dict[str, list[RegulatoryChunk]] = {}
     for chunk in chunks:
         by_reg.setdefault(chunk.regulation.value, []).append(chunk)
@@ -103,7 +105,16 @@ def run_gap_analysis(
 
     for reg_key, reg_chunks in by_reg.items():
         chunks_json = _chunks_to_json(reg_chunks)
-        prompt = gap_analysis_prompt(profile_json, chunks_json)
+
+        # Retrieve company doc evidence for this regulation
+        company_docs_json = ""
+        if job_id:
+            query = _build_query(profile, _reg_from_key(reg_key))
+            doc_chunks = retrieve_company_docs(job_id, query, top_k=6)
+            if doc_chunks:
+                company_docs_json = _doc_chunks_to_json(doc_chunks)
+
+        prompt = gap_analysis_prompt(profile_json, chunks_json, company_docs_json)
         gaps = _llm_call(prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures)
         all_gaps.extend(gaps)
 
@@ -164,6 +175,19 @@ def _build_query(profile: EnrichedCompanyProfile, regulation: Regulation) -> str
         return f"CSRD sustainability reporting ESG disclosure {base}"
     if regulation == Regulation.BDSG:
         return f"BDSG Bundesdatenschutzgesetz data protection {base}"
+    if regulation == Regulation.NIS2:
+        entity = "essential entity" if profile.employee_count >= 250 else "important entity"
+        return f"NIS2 cybersecurity risk management incident reporting {entity} {base}"
+    if regulation == Regulation.AI_ACT:
+        return f"EU AI Act high-risk AI system deployer transparency human oversight obligations {base}"
+    if regulation == Regulation.HINSCHG:
+        return f"HinSchG Hinweisgeberschutzgesetz whistleblower internal reporting channel {base}"
+    if regulation == Regulation.ARBSCHG:
+        return f"ArbSchG Gefaehrdungsbeurteilung risk assessment documentation employer {base}"
+    if regulation == Regulation.AGG:
+        return f"AGG Gleichbehandlung anti-discrimination employer obligations complaints {base}"
+    if regulation == Regulation.MILOG:
+        return f"MiLoG Mindestlohn minimum wage documentation working time records {base}"
     return f"{regulation.value} compliance obligations {base}"
 
 
@@ -195,6 +219,23 @@ def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
     return result
 
 
+def _reg_from_key(reg_key: str) -> Regulation:
+    try:
+        return Regulation(reg_key)
+    except ValueError:
+        return Regulation.GDPR  # safe fallback
+
+
+def _doc_chunks_to_json(chunks: list[dict]) -> str:
+    import json
+    parts = []
+    for c in chunks:
+        parts.append(
+            f"[Source: {c.get('source', 'uploaded document')}]\n{c['text'][:800]}"
+        )
+    return "\n\n---\n\n".join(parts)
+
+
 def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:
     return json.dumps(
         [
@@ -210,6 +251,18 @@ def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:
         ],
         indent=2,
     )
+
+
+def _strip_fences(text: str) -> str:
+    """Remove markdown code fences that some models wrap JSON in."""
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        # drop opening fence line and closing fence line
+        start = 1
+        end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
+        text = "\n".join(lines[start:end]).strip()
+    return text
 
 
 def _llm_call(
@@ -233,7 +286,7 @@ def _llm_call(
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return parse_fn(response.content[0].text.strip())
+            return parse_fn(_strip_fences(response.content[0].text))
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("%s: parse error attempt %d: %s", step_name, attempt + 1, exc)
             last_exc = exc
