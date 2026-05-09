@@ -10,9 +10,10 @@ from models.enums import AnalysisStep, JobStatus
 
 
 class _Job:
-    def __init__(self, job_id: str, profile: CompanyProfile) -> None:
+    def __init__(self, job_id: str, profile: CompanyProfile, doc_session_id: Optional[str] = None) -> None:
         self.job_id = job_id
         self.profile = profile
+        self.doc_session_id = doc_session_id
         self.status = JobStatus.PENDING
         self.current_step: Optional[AnalysisStep] = None
         self.steps: list[StepProgress] = []
@@ -52,9 +53,9 @@ class JobManager:
             except asyncio.CancelledError:
                 pass
 
-    async def create_job(self, profile: CompanyProfile) -> str:
+    async def create_job(self, profile: CompanyProfile, doc_session_id: Optional[str] = None) -> str:
         job_id = str(uuid.uuid4())
-        job = _Job(job_id=job_id, profile=profile)
+        job = _Job(job_id=job_id, profile=profile, doc_session_id=doc_session_id)
         self._jobs[job_id] = job
         asyncio.create_task(self._run_pipeline(job))
         return job_id
@@ -83,7 +84,11 @@ class JobManager:
             job.steps.append(StepProgress(step=step, status=JobStatus.RUNNING))
 
         try:
-            report = await run_analysis(job.job_id, job.profile, on_step=on_step)
+            report = await run_analysis(
+                job.job_id, job.profile,
+                on_step=on_step,
+                doc_session_id=job.doc_session_id,
+            )
 
             for sp in job.steps:
                 sp.status = JobStatus.COMPLETED
@@ -108,4 +113,16 @@ class JobManager:
                 if j.created_at.timestamp() < cutoff
             ]
             for jid in expired:
-                del self._jobs[jid]
+                job = self._jobs.pop(jid)
+                # Clean up per-job ChromaDB collection and temp docs
+                try:
+                    from rag.company_ingest import delete_company_docs
+                    delete_company_docs(jid)
+                except Exception:
+                    pass
+                if job.doc_session_id:
+                    try:
+                        from services.document_store import document_store
+                        document_store.clear(job.doc_session_id)
+                    except Exception:
+                        pass
