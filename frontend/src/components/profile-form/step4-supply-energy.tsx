@@ -42,7 +42,7 @@ export function Step4SupplyEnergy({ form }: Props) {
         type="number"
         min={0}
         placeholder="7500"
-        hint="Required for EnEfG — leave blank if unknown"
+        hint="Required for EnEfG. Leave blank if unknown."
         error={errors.annual_energy_consumption_mwh?.message}
         {...register("annual_energy_consumption_mwh")}
       />
