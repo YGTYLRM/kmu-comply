@@ -28,6 +28,7 @@ async def run_analysis(
     job_id: str,
     profile: CompanyProfile,
     on_step: Callable[[AnalysisStep], None] | None = None,
+    doc_session_id: str | None = None,
 ) -> ComplianceReport:
     """
     Execute the full 6-step compliance analysis pipeline.
@@ -57,18 +58,29 @@ async def run_analysis(
     logger.info("job %s step 2: applicability determination", job_id)
     applicability = await loop.run_in_executor(None, determine_applicability, enriched)
 
-    # Step 3 — RAG retrieval
+    # Step 3 — RAG retrieval + optional company doc ingestion
     notify(AnalysisStep.ARTICLE_RETRIEVAL)
     logger.info("job %s step 3: article retrieval", job_id)
     chunks = await loop.run_in_executor(
         None, retrieve_regulatory_context, enriched, applicability
     )
 
-    # Step 4 — gap analysis
+    # Ingest company documents if provided
+    if doc_session_id:
+        from rag.company_ingest import ingest_company_documents
+        from services.document_store import document_store
+        file_paths = document_store.list_files(doc_session_id)
+        if file_paths:
+            logger.info("job %s: ingesting %d company documents", job_id, len(file_paths))
+            await loop.run_in_executor(
+                None, ingest_company_documents, job_id, file_paths
+            )
+
+    # Step 4 — gap analysis (with company doc evidence if available)
     notify(AnalysisStep.GAP_ANALYSIS)
     logger.info("job %s step 4: gap analysis", job_id)
     gaps = await loop.run_in_executor(
-        None, run_gap_analysis, enriched, chunks, failures
+        None, run_gap_analysis, enriched, chunks, failures, job_id
     )
 
     # Step 5 — action plan
