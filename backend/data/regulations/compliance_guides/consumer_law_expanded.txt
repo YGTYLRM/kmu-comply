@@ -1,0 +1,57 @@
+Consumer and Business Law Essentials — BGB AGB, PAngV, VSBG, ProdSG
+Key provisions relevant to German SMEs dealing with consumers and business partners
+Sources: gesetze-im-internet.de (BGB, PAngV, VSBG, ProdSG)
+
+---
+
+compliance_guides BGB §307
+Title: General terms and conditions — clauses that unreasonably disadvantage the other party are void
+Obligation: MUST
+Threshold: All businesses using standard terms and conditions (Allgemeine Geschäftsbedingungen — AGB) with customers or business partners
+Text: Provisions in general terms and conditions (AGB) are void if they unreasonably disadvantage the contracting partner contrary to the requirements of good faith (Treu und Glauben). Unreasonable disadvantage is presumed if a provision: (1) is incompatible with the essential principles of the statutory rule from which it deviates; or (2) restricts essential rights or duties arising from the nature of the contract to such an extent that the contractual purpose is endangered. Provisions that are not clear and comprehensible may themselves constitute an unreasonable disadvantage. §§308-309 BGB contain specific prohibited and presumptively invalid clauses. AGB that attempt to exclude liability for personal injury caused by negligence, shorten statutory limitation periods unreasonably, or impose penalties without proportionality are void. Businesses must review their AGB against these standards. Courts review AGB at the request of any party.
+Keywords: AGB, Allgemeine Geschäftsbedingungen, general terms, §307 BGB, void, unreasonable disadvantage, good faith, clear and comprehensible, consumer protection
+
+---
+
+compliance_guides BGB §308-309
+Title: Specific void AGB clauses — list of presumptively and absolutely prohibited standard terms
+Obligation: MUST
+Threshold: All businesses using AGB with consumers (B2C); less strict standards apply in B2B contexts
+Text: §308 BGB lists clauses that are presumptively invalid in AGB unless the business can justify them: excessively long acceptance periods; excessively late performance dates; automatic extension clauses with insufficient notice periods; and clauses reserving the right to change prices or services after conclusion. §309 BGB lists absolutely void AGB clauses that cannot be justified regardless of context, including: exclusion of liability for personal injury and death; penalty clauses that are not genuinely pre-estimated damages; return policies that are more restrictive than statutory law; limitation of the right to withhold performance; and very short grace periods for notice. In B2C relationships, courts apply these rules strictly. In B2B relationships, some latitude exists but the fundamental fairness standard of §307 still applies.
+Keywords: §308 BGB, §309 BGB, void AGB clauses, B2C, prohibited terms, exclusion liability, penalty clause, price change, automatic extension
+
+---
+
+compliance_guides PAngV §1
+Title: Price display obligation — total price including VAT must be clearly shown to consumers
+Obligation: MUST
+Threshold: All businesses offering goods or services to consumers (Verbraucher) in Germany; applies to shops, websites, catalogues, and advertising
+Text: The Preisangabenverordnung requires businesses to clearly display the total price (Gesamtpreis) for every product or service offered to consumers. The total price must include all applicable taxes, in particular VAT (Umsatzsteuer), and all other price components. The price must be: clearly associated with the offer or advertisement; easily recognisable; legible; and must conform to the principles of price clarity and price accuracy. For goods sold by weight, volume, length, or area, the unit price (Grundpreis) per kilogram, litre, metre, or square metre must be displayed alongside the total price. Online shops must display the final total price before the consumer commits to purchase. Failure to display the correct total price constitutes an act of unfair competition (UWG) and may result in injunctions from competitors or consumer organisations.
+Keywords: Preisangabenpflicht, total price, VAT included, Grundpreis, unit price, consumer, PAngV, price clarity, price accuracy, online shop
+
+---
+
+compliance_guides VSBG §36
+Title: Obligation to inform consumers about dispute resolution options — applies to all businesses with websites
+Obligation: MUST
+Threshold: All businesses that sell to consumers and maintain a website or use general terms and conditions; also applies to businesses that cannot or will not use ADR
+Text: All businesses that sell goods or provide services to consumers and maintain a website or use general terms and conditions must inform consumers: (1) whether they are willing or obligated to participate in consumer dispute resolution proceedings before a recognised consumer dispute resolution body (Verbraucherschlichtungsstelle); and (2) if willing, which body is competent. This information must be provided on the website in an easily accessible location and in the AGB. Businesses that employ 10 or fewer people are generally not required to participate but must still inform about their unwillingness. Online businesses must additionally provide a link to the EU online dispute resolution platform (ODR-Plattform) at ec.europa.eu/consumers/odr. The obligation applies even where the business does not participate in alternative dispute resolution.
+Keywords: VSBG, consumer dispute resolution, Verbraucherschlichtungsstelle, §36 VSBG, website obligation, AGB, ODR-Plattform, 10 employees, inform consumers
+
+---
+
+compliance_guides ProdSG §3
+Title: General product safety requirement — all products must not endanger health or safety
+Obligation: MUST
+Threshold: All businesses that manufacture, import, or place products on the German market (Hersteller and Einführer); also applies to distributors (Haendler)
+Text: Products placed on the German market must be safe — they must not endanger the safety and health of persons during normal or reasonably foreseeable use, taking into account the entire foreseeable lifespan of the product. When assessing product safety, the following are considered: the product's physical, chemical, and biological properties; packaging and labelling; instructions for assembly, installation, and maintenance; the effects of the product in combination with other products; the categories of consumers who may use it, especially children and elderly; and the presentation of the product. German-language instructions and warnings are mandatory when use without them would pose risks. Products subject to specific regulations (CE marking, harmonised standards) must comply with those regulations. Distributors who modify or rebrand a product take on manufacturer liability. Non-compliant products must be withdrawn from the market and authorities notified.
+Keywords: Produktsicherheit, product safety, ProdSG §3, general safety requirement, CE marking, German-language instructions, manufacturer, importer, distributor liability
+
+---
+
+compliance_guides SGB IV §7
+Title: Employment definition — distinguishing employees from self-employed freelancers (Scheinselbständigkeit)
+Obligation: MUST
+Threshold: All businesses using service providers or contractors who could be classified as employees
+Text: Employment (Beschäftigung) in the sense of social security law means non-self-employed work, in particular within an employment relationship. Indicators of employment are: working according to instructions (Weisungsgebundenheit) in terms of time, place, and content; and integration into the employer's organisational structure. Self-employment is indicated by: entrepreneurial risk; independent organisation of work; multiple clients; no integration into the organisational structure. The assessment is based on the overall picture of the working relationship, not the contractual label. Disguised employment relationships (Scheinselbständigkeit) result in the commissioning company being liable for all social security contributions (approximately 20% of remuneration) retroactively for up to 4 years, plus fines. Companies using freelancers must conduct a careful classification analysis. The Deutsche Rentenversicherung offers a status determination procedure (Statusfeststellungsverfahren) for clarity.
+Keywords: Scheinselbständigkeit, sham self-employment, §7 SGB IV, employment indicators, Weisungsgebundenheit, social security, retroactive liability, Statusfeststellungsverfahren, freelancer
