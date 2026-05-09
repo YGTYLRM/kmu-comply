@@ -23,18 +23,20 @@ export function Navbar() {
           : "bg-transparent"
       )}
     >
-      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center group">
+      <div className="mx-auto flex h-24 max-w-7xl items-center gap-10 px-8 py-3">
+        {/* Logo — hard left */}
+        <Link href="/" className="flex-shrink-0 group">
           <Image
-            src="/logo-transparent.png"
+            src="/logo-dark-bg.png"
             alt="Complio"
-            width={120}
-            height={32}
-            className="h-8 w-auto brightness-0 invert group-hover:opacity-80 transition-opacity duration-200"
+            width={240}
+            height={64}
+            className="h-20 w-auto group-hover:opacity-80 transition-opacity duration-200"
             priority
           />
         </Link>
 
+        {/* Nav links — right next to logo */}
         <nav className="hidden md:flex items-center gap-1">
           <a
             href="#how-it-works"
@@ -50,9 +52,12 @@ export function Navbar() {
           </a>
         </nav>
 
+        {/* Spacer pushes CTA to far right */}
+        <div className="flex-1" />
+
         <Link
           href="/analyze"
-          className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
+          className="rounded-xl bg-brand-600 px-6 py-3 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
         >
           Get started
         </Link>
