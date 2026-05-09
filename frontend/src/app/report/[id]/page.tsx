@@ -18,26 +18,10 @@ export default function ReportPage() {
   const router  = useRouter();
   const jobId   = params.id as string;
   const { report, loading, error, fetch: loadReport } = useReport(jobId);
-  const [downloading, setDownloading] = useState(false);
+  const [downloading] = useState(false);
 
-  const downloadPdf = async () => {
-    setDownloading(true);
-    try {
-      const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-      const res  = await window.fetch(`${BASE}/api/report/${jobId}/pdf`, { method: "POST" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob     = await res.blob();
-      const url      = URL.createObjectURL(blob);
-      const a        = document.createElement("a");
-      a.href         = url;
-      a.download     = `complio-screening-${jobId.slice(0, 8)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("PDF download failed:", e);
-    } finally {
-      setDownloading(false);
-    }
+  const downloadPdf = () => {
+    window.open(`/report/${jobId}/print`, "_blank");
   };
 
   useEffect(() => { loadReport(); }, [loadReport]);
@@ -102,11 +86,8 @@ export default function ReportPage() {
                 onClick={downloadPdf}
                 disabled={downloading}
               >
-                {downloading
-                  ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  : <Download className="h-3.5 w-3.5" />
-                }
-                {downloading ? "Generating..." : "Download PDF"}
+                <Download className="h-3.5 w-3.5" />
+                Download PDF
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
                 <ArrowLeft className="h-3.5 w-3.5" />
