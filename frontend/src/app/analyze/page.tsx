@@ -129,9 +129,9 @@ export default function AnalyzePage() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-dark-950">
+    <div className="min-h-screen bg-dark-950 pt-24">
       {/* Page header */}
-      <div className="border-b border-white/[0.06] bg-dark-900/60 px-6 py-6">
+      <div className="border-b border-white/[0.06] bg-dark-900/60 px-4 sm:px-6 py-6">
         <div className="mx-auto max-w-2xl flex flex-col items-center gap-5">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -146,7 +146,7 @@ export default function AnalyzePage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-2xl px-6 py-8">
+      <main className="mx-auto max-w-2xl px-4 sm:px-6 py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
