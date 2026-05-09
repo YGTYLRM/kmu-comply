@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useReport } from "@/hooks/useReport";
@@ -11,24 +11,27 @@ import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Download } from "lucide-react";
-import { useState } from "react";
 
 export default function ReportPage() {
   const params  = useParams();
   const router  = useRouter();
   const jobId   = params.id as string;
   const { report, loading, error, fetch: loadReport } = useReport(jobId);
-  const [downloading] = useState(false);
-
-  const downloadPdf = () => {
-    window.open(`/report/${jobId}/print`, "_blank");
-  };
+  const [headerOpacity, setHeaderOpacity] = useState(1);
 
   useEffect(() => { loadReport(); }, [loadReport]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      setHeaderOpacity(Math.max(0, 1 - window.scrollY / 220));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center pt-24">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 rounded-2xl bg-brand-500/10 border border-brand-500/25 flex items-center justify-center shadow-glow-blue-sm">
             <Loader2 className="h-6 w-6 animate-spin text-brand-400" />
@@ -41,7 +44,7 @@ export default function ReportPage() {
 
   if (error || !report) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-24">
         <p className="text-sm text-red-400">{error ?? "Report not found"}</p>
         <Button variant="outline" onClick={() => router.push("/analyze")}>
           New analysis
@@ -55,50 +58,55 @@ export default function ReportPage() {
   const scoreBg    = score >= 75 ? "bg-emerald-500/10 border-emerald-500/25" : score >= 50 ? "bg-amber-500/10 border-amber-500/25" : "bg-red-500/10 border-red-500/25";
 
   return (
-    <div className="bg-dark-950 min-h-screen">
-      {/* Report header */}
-      <div className="border-b border-white/[0.06] bg-dark-900/60">
-        <div className="mx-auto max-w-5xl px-6 py-6">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y:  0 }}
-            transition={{ duration: 0.4 }}
-            className="flex items-start justify-between gap-4 flex-wrap"
-          >
-            <div className="flex items-start gap-4">
-              <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border ${scoreBg}`}>
-                <span className={`text-xl font-bold ${scoreColor}`}>{score}%</span>
+    <div className="bg-dark-950 min-h-screen pt-24">
+      {/* Report header — geometric diagonal bottom, fades on scroll */}
+      <div style={{ opacity: headerOpacity, transition: "opacity 0.1s linear" }}>
+        <div
+          className="bg-dark-900/85 backdrop-blur-sm"
+          style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%)" }}
+        >
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-6 pb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y:  0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-start justify-between gap-4 flex-wrap"
+            >
+              <div className="flex items-start gap-4">
+                <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border ${scoreBg}`}>
+                  <span className={`text-xl font-bold ${scoreColor}`}>{score}%</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white tracking-tight">{report.company_name}</h1>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    Preliminary Screening ·{" "}
+                    {new Date(report.generated_at).toLocaleDateString("en-GB", {
+                      day: "numeric", month: "short", year: "numeric",
+                    })}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">{report.company_name}</h1>
-                <p className="text-sm text-slate-500 mt-0.5">
-                  Preliminary Screening ·{" "}
-                  {new Date(report.generated_at).toLocaleDateString("en-GB", {
-                    day: "numeric", month: "short", year: "numeric",
-                  })}
-                </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <a
+                  href={`/report/${jobId}/print`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download PDF
+                </a>
+                <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  New screening
+                </Button>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={downloadPdf}
-                disabled={downloading}
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download PDF
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
-                <ArrowLeft className="h-3.5 w-3.5" />
-                New screening
-              </Button>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
