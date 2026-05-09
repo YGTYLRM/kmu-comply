@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Building2, MessageSquare, User, CheckCircle2 } from "lucide-react";
+import { Mail, Building2, MessageSquare, User, CheckCircle2, AlertCircle } from "lucide-react";
+
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 function Field({
   icon: Icon,
@@ -24,11 +26,39 @@ function Field({
 }
 
 export default function ContactPage() {
-  const [sent, setSent] = useState(false);
+  const [sent,    setSent]    = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError(null);
+
+    const fd = new FormData(e.currentTarget);
+    const body = {
+      name:    fd.get("name")    as string,
+      email:   fd.get("email")   as string,
+      company: fd.get("company") as string || undefined,
+      message: fd.get("message") as string,
+    };
+
+    try {
+      const res = await fetch(`${BASE}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail ?? "Something went wrong. Please try again.");
+      }
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,7 +88,7 @@ export default function ContactPage() {
                 <CheckCircle2 className="h-7 w-7 text-emerald-400" />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">Message sent</h2>
-              <p className="text-sm text-slate-500">We will get back to you shortly.</p>
+              <p className="text-sm text-slate-500">We will get back to you within one business day.</p>
             </motion.div>
           ) : (
             <form
@@ -83,11 +113,19 @@ export default function ContactPage() {
                 />
               </div>
 
+              {error && (
+                <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-3 text-sm text-red-400">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  {error}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
+                disabled={loading}
+                className="rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors duration-200 shadow-glow-blue-sm hover:shadow-glow-blue disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send message
+                {loading ? "Sending..." : "Send message"}
               </button>
             </form>
           )}
