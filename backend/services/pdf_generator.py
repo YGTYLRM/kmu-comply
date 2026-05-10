@@ -356,7 +356,6 @@ def _gap_card(g) -> str:
         f'<div style="flex:1;padding:5.5pt 10pt;display:flex;align-items:center;justify-content:space-between;gap:8pt;">'
         f'<div>'
         f'<div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{art_n} &nbsp;&middot;&nbsp; {art_t}</div>'
-        f'<div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:1.5pt;">{_h(_reg(g.regulation.value))}</div>'
         f'</div>'
         f'<div style="{FONT}display:inline-flex;align-items:center;gap:4pt;font-size:7pt;font-weight:700;'
         f'padding:3pt 9pt;border-radius:20pt;border:1pt solid {cm["br"]};'
