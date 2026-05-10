@@ -61,7 +61,7 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "GDPR/DSGVO, BDSG, LkSG, EnEfG, and CSRD screened in a single run." },
+  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "11 German and EU regulations screened in a single run — GDPR, NIS2, AI Act, LkSG, CSRD and more." },
   { icon: Zap,           color: "text-amber-400",   bg: "bg-amber-500/10",   title: "Results in minutes",       desc: "Automated screening. A solid starting point before engaging a legal consultant." },
   { icon: ListChecks,    color: "text-emerald-400", bg: "bg-emerald-500/10", title: "Concrete action plan",     desc: "Each gap comes with a prioritised action from CRITICAL to LOW, with effort and deadline." },
   { icon: BarChart3,     color: "text-purple-400",  bg: "bg-purple-500/10",  title: "Per-regulation scoring",   desc: "Compliance score per regulation so you know exactly where to focus first." },
@@ -79,7 +79,7 @@ const PLANS = [
     cta: "Get started",
     features: [
       "Single compliance screening",
-      "All 5 regulations covered",
+      "All 11 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -95,7 +95,7 @@ const PLANS = [
     cta: "Get started",
     features: [
       "Unlimited screenings",
-      "All 5 regulations covered",
+      "All 11 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -130,7 +130,7 @@ const FAQS = [
   },
   {
     q: "Which regulations does Complio cover?",
-    a: "Currently five: GDPR/DSGVO (data protection), BDSG (German federal data protection), LkSG (supply chain due diligence), EnEfG (energy efficiency), and CSRD (corporate sustainability reporting). Coverage expands as regulations evolve.",
+    a: "Currently 11: GDPR/DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU AI Act, HinSchG (whistleblower protection), ArbSchG (workplace safety), AGG (anti-discrimination), and MiLoG (minimum wage). Each regulation is applied only where your company meets the relevant thresholds. Coverage continues to expand.",
   },
   {
     q: "How accurate are the results?",
@@ -396,7 +396,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-              {["No account required", "Results in minutes", "5 regulations in one report"].map((t) => (
+              {["No account required", "Results in minutes", "11 regulations in one report"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   {t}
@@ -696,7 +696,7 @@ export default function HomePage() {
               compliance gaps?
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-lg">
-              Get a detailed compliance screening across 5 German and EU regulations. Not a substitute for legal advice.
+              Get a detailed compliance screening across 11 German and EU regulations. Not a substitute for legal advice.
             </p>
             <Link href="/analyze" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
               Get started
