@@ -5,7 +5,6 @@ Playwright/Chromium renderer. Zero external margin — all spacing in HTML.
 from __future__ import annotations
 import base64, re
 from pathlib import Path
-from typing import Optional
 from playwright.sync_api import sync_playwright
 from models.compliance_report import ComplianceReport
 from models.enums import ComplianceStatus, Priority
@@ -62,44 +61,48 @@ def _logo():
         except: pass
     return ""
 
-# Shared inline style values
 FONT  = "font-family:'Inter',Arial,sans-serif;"
 NAVY  = "#0f172a"
-BLUE  = "#1d4ed8"
-M     = "14mm"   # horizontal margin for body text
+BLUE  = "#2563eb"
+M     = "14mm"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Page header bar — embedded in every content page
+# Page header bar — dark bar + blue accent line underneath
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _hbar(company: str, section: str, logo: str) -> str:
-    logo_el = (f'<img src="{logo}" style="height:11pt;vertical-align:middle;" alt="Complio">'
+    logo_el = (f'<img src="{logo}" style="height:12pt;vertical-align:middle;" alt="Complio">'
                if logo else
-               f'<span style="font-weight:800;font-size:11pt;color:#fff;">{FONT}Complio</span>')
-    return f"""<div style="{FONT}background:{NAVY};padding:5mm {M};
-        display:flex;align-items:center;justify-content:space-between;">
-  <div>{logo_el}</div>
-  <div style="text-align:right;">
-    <div style="font-size:7.5pt;color:#94a3b8;">{_h(company)}</div>
-    <div style="font-size:6.5pt;color:#475569;text-transform:uppercase;letter-spacing:.8pt;margin-top:1pt;">{_h(section)}</div>
+               f'<span style="font-weight:800;font-size:11pt;color:#fff;{FONT}">Complio</span>')
+    return f"""<div>
+  <div style="{FONT}background:{NAVY};padding:5.5mm {M};
+      display:flex;align-items:center;justify-content:space-between;">
+    <div>{logo_el}</div>
+    <div style="text-align:right;">
+      <div style="font-size:7.5pt;color:#94a3b8;font-weight:500;">{_h(company)}</div>
+      <div style="font-size:6pt;color:#64748b;text-transform:uppercase;letter-spacing:.9pt;margin-top:2pt;">{_h(section)}</div>
+    </div>
   </div>
+  <div style="height:2.5pt;background:linear-gradient(90deg,{BLUE} 0%,{BLUE} 55%,rgba(37,99,235,0) 100%);"></div>
 </div>"""
 
 
 def _body_open() -> str:
     return f'<div style="padding:7mm {M} 12mm;">'
 
-
 def _body_close() -> str:
     return '</div>'
 
 
 def _sec_title(num: str, title: str) -> str:
-    return f"""<div style="{FONT}font-size:6pt;font-weight:600;letter-spacing:2pt;
-        text-transform:uppercase;color:{BLUE};margin-bottom:2mm;">{num}</div>
+    return f"""<div style="display:flex;align-items:center;gap:6pt;margin-bottom:3mm;">
+  <span style="display:inline-block;width:18pt;height:2pt;background:{BLUE};border-radius:1pt;flex-shrink:0;"></span>
+  <div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:2.2pt;
+      text-transform:uppercase;color:{BLUE};">{num}</div>
+</div>
 <div style="{FONT}font-size:17pt;font-weight:800;color:{NAVY};letter-spacing:-.3pt;
-        line-height:1.1;margin-bottom:2mm;padding-bottom:3mm;
-        border-bottom:2pt solid #f1f5f9;">{title}</div>"""
+    line-height:1.1;margin-bottom:2mm;padding-bottom:3mm;
+    border-bottom:2pt solid #f1f5f9;">{title}</div>"""
 
 
 def _sec_sub(text: str) -> str:
@@ -120,59 +123,72 @@ def _cover(report: ComplianceReport, logo: str) -> str:
     n_act  = len(report.action_plan)
     n_crit = sum(1 for a in report.action_plan if a.priority == Priority.CRITICAL)
 
-    logo_el = (f'<img src="{logo}" style="height:30pt;" alt="Complio">'
+    logo_el = (f'<img src="{logo}" style="height:32pt;" alt="Complio">'
                if logo else
                f'<span style="{FONT}font-size:22pt;font-weight:800;color:#fff;">Complio</span>')
 
     chips = "".join(
         f'<span style="{FONT}font-size:7pt;font-weight:600;color:#93c5fd;'
-        f'background:rgba(59,130,246,.12);border:1pt solid rgba(147,197,253,.3);'
-        f'border-radius:20pt;padding:2pt 9pt;margin:0 2mm 2mm 0;display:inline-block;">'
+        f'background:rgba(59,130,246,.12);border:1pt solid rgba(147,197,253,.25);'
+        f'border-radius:20pt;padding:2.5pt 10pt;margin:0 2mm 2.5mm 0;display:inline-block;">'
         f'{_h(_reg(r.regulation.value))}</span>'
         for r in report.applicable_regulations if r.applies
     )
 
-    def stat(n, lbl, color="#fff"):
-        return f"""<div style="text-align:center;padding:0 6mm;">
-      <div style="{FONT}font-size:22pt;font-weight:800;color:{color};line-height:1;">{n}</div>
-      <div style="{FONT}font-size:6pt;font-weight:600;text-transform:uppercase;
-          letter-spacing:.8pt;color:#475569;margin-top:1.5mm;">{lbl}</div>
+    def stat(n, lbl, color="#e2e8f0"):
+        return f"""<div style="text-align:center;padding:0 7mm;">
+      <div style="{FONT}font-size:24pt;font-weight:800;color:{color};line-height:1;letter-spacing:-.5pt;">{n}</div>
+      <div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;
+          letter-spacing:.9pt;color:#475569;margin-top:2mm;">{lbl}</div>
     </div>"""
 
-    divider = '<div style="width:1pt;height:10mm;background:rgba(255,255,255,.1);margin:0 2mm;"></div>'
+    divider = '<div style="width:1pt;height:12mm;background:rgba(255,255,255,0.08);margin:0 1mm;align-self:center;"></div>'
 
     return f"""
-<div style="width:100%;height:297mm;background:linear-gradient(145deg,#020817 0%,#0c1a40 55%,#0f2052 100%);
+<div style="width:100%;height:297mm;
+    background:linear-gradient(150deg,#020817 0%,#061230 35%,#0c1a45 65%,#0a1540 100%);
     display:flex;flex-direction:column;page-break-after:always;overflow:hidden;position:relative;">
 
+  <!-- Glow orb behind score area -->
+  <div style="position:absolute;left:0;top:38%;width:100mm;height:100mm;
+      border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,0.18) 0%,transparent 65%);
+      pointer-events:none;"></div>
+
+  <!-- Subtle right accent bar -->
+  <div style="position:absolute;right:0;top:0;bottom:0;width:1pt;
+      background:linear-gradient(180deg,transparent 0%,rgba(37,99,235,0.4) 40%,rgba(37,99,235,0.4) 60%,transparent 100%);"></div>
+
   <!-- Top bar -->
-  <div style="padding:9mm {M} 0;display:flex;align-items:center;justify-content:space-between;">
+  <div style="padding:9mm {M} 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
     {logo_el}
     <div style="{FONT}font-size:6.5pt;font-weight:600;letter-spacing:1.8pt;text-transform:uppercase;
-        color:#93c5fd;border:1pt solid rgba(147,197,253,.3);padding:3pt 9pt;border-radius:20pt;">
+        color:#93c5fd;border:1pt solid rgba(147,197,253,.25);padding:3.5pt 10pt;border-radius:20pt;">
       Regulatory Compliance Assessment
     </div>
   </div>
 
   <!-- Hero -->
-  <div style="flex:1;padding:10mm {M} 5mm;display:flex;flex-direction:column;justify-content:center;">
-    <div style="{FONT}font-size:7pt;font-weight:600;letter-spacing:2pt;text-transform:uppercase;
-        color:#3b82f6;margin-bottom:4mm;">Autonomous AI Compliance Agent</div>
-    <div style="{FONT}font-size:33pt;font-weight:800;color:#fff;line-height:1.1;
-        letter-spacing:-.8pt;margin-bottom:4mm;max-width:155mm;">{_h(report.company_name)}</div>
-    <div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:8mm;">Report issued {_h(date)}</div>
+  <div style="flex:1;padding:10mm {M} 5mm;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">
+    <div style="{FONT}font-size:7pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;
+        color:{BLUE};margin-bottom:4mm;">Autonomous AI Compliance Agent</div>
+    <div style="{FONT}font-size:34pt;font-weight:800;color:#f8fafc;line-height:1.08;
+        letter-spacing:-.8pt;margin-bottom:3mm;max-width:155mm;">{_h(report.company_name)}</div>
+    <div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Report issued {_h(date)}</div>
 
     <!-- Score + stats row -->
     <div style="display:flex;align-items:center;gap:0;">
-      <!-- Score ring -->
-      <div style="width:26mm;height:26mm;border-radius:50%;border:2.5pt solid {sc};
-          background:{sbg}20;display:flex;flex-direction:column;align-items:center;
-          justify-content:center;flex-shrink:0;margin-right:6mm;">
-        <div style="{FONT}font-size:15pt;font-weight:800;color:{sc};line-height:1;">
-          {report.overall_score_percent:.0f}%
+      <!-- Score ring with glow -->
+      <div style="position:relative;margin-right:7mm;flex-shrink:0;">
+        <div style="width:36mm;height:36mm;border-radius:50%;border:3pt solid {sc};
+            background:rgba(15,23,42,0.6);
+            box-shadow:0 0 22pt {sc}55,0 0 6pt {sc}33;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="{FONT}font-size:17pt;font-weight:800;color:{sc};line-height:1;letter-spacing:-.5pt;">
+            {report.overall_score_percent:.0f}%
+          </div>
+          <div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;
+              letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>
         </div>
-        <div style="{FONT}font-size:5.5pt;font-weight:600;text-transform:uppercase;
-            letter-spacing:.8pt;color:{sc};opacity:.75;margin-top:1pt;">Score</div>
       </div>
       {divider}
       {stat(n_app, "Regulations")}
@@ -185,13 +201,13 @@ def _cover(report: ComplianceReport, logo: str) -> str:
     </div>
   </div>
 
-  <!-- Bottom -->
-  <div style="padding:0 {M} 8mm;">
-    <div style="border-top:1pt solid rgba(255,255,255,.08);margin-bottom:5mm;"></div>
-    <div style="{FONT}font-size:6.5pt;font-weight:600;letter-spacing:1.5pt;text-transform:uppercase;
-        color:#475569;margin-bottom:3mm;">Applicable Regulations</div>
-    <div>{chips}</div>
-    <div style="{FONT}font-size:7pt;color:#334155;line-height:1.6;margin-top:5mm;">
+  <!-- Bottom section -->
+  <div style="padding:0 {M} 9mm;position:relative;z-index:1;">
+    <div style="height:1pt;background:linear-gradient(90deg,rgba(255,255,255,0.1) 0%,transparent 100%);margin-bottom:5mm;"></div>
+    <div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;
+        color:#475569;margin-bottom:3.5mm;">Applicable Regulations</div>
+    <div style="line-height:1;">{chips}</div>
+    <div style="{FONT}font-size:7pt;color:#334155;line-height:1.65;margin-top:5mm;">
       Complio checks your company against German and EU regulations using an autonomous AI agent.
       This report shows where gaps likely exist. It is not a legal audit and does not replace a lawyer.
     </div>
@@ -212,7 +228,6 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
                         for w in report.validation_warnings)
         warns = f'<div style="margin-top:5mm;"><div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2mm;">Warnings</div><ul style="padding-left:14pt;">{items}</ul></div>'
 
-    # Table column widths must sum to 100%
     rows = ""
     for r in report.applicable_regulations:
         bg = "#fafafa" if report.applicable_regulations.index(r) % 2 == 1 else "#fff"
@@ -222,13 +237,13 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
           <td style="{FONT}padding:6pt 9pt;font-weight:600;font-size:8.5pt;width:22%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;">{_h(_reg(r.regulation.value))}</td>
           <td style="padding:6pt 9pt;text-align:center;width:12%;border-bottom:1pt solid #f1f5f9;">
             <span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;
-                padding:2pt 7pt;border-radius:20pt;{badge_style}">{'Yes' if r.applies else 'No'}</span>
+                padding:2pt 8pt;border-radius:20pt;{badge_style}">{'Yes' if r.applies else 'No'}</span>
           </td>
           <td style="{FONT}padding:6pt 9pt;font-size:8.5pt;color:#334155;line-height:1.55;width:66%;border-bottom:1pt solid #f1f5f9;">{_h(_c(r.reason))}</td>
         </tr>"""
 
     return f"""
-<div style="page-break-before:always;">
+<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Executive Summary", logo)}
   {_body_open()}
     {_sec_title("Section 01", "Executive Summary")}
@@ -238,15 +253,16 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
     <div style="margin-top:8mm;">
       {_sec_title("Section 02", "Regulation Applicability")}
       {_sec_sub("Which regulations apply to your company, based on your size, industry, and how you operate.")}
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;
+          border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">
         <thead>
           <tr>
             <th style="{FONT}background:{NAVY};color:#fff;font-size:7.5pt;font-weight:600;
-                padding:5.5pt 9pt;text-align:left;width:22%;">Regulation</th>
+                padding:6pt 9pt;text-align:left;width:22%;">Regulation</th>
             <th style="{FONT}background:{NAVY};color:#fff;font-size:7.5pt;font-weight:600;
-                padding:5.5pt 9pt;text-align:center;width:12%;">Applies</th>
+                padding:6pt 9pt;text-align:center;width:12%;">Applies</th>
             <th style="{FONT}background:{NAVY};color:#fff;font-size:7.5pt;font-weight:600;
-                padding:5.5pt 9pt;text-align:left;width:66%;">Reason</th>
+                padding:6pt 9pt;text-align:left;width:66%;">Reason</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -271,13 +287,13 @@ def _scores(report: ComplianceReport, logo: str) -> str:
 
     def sbox(n, lbl, c):
         return f"""<td style="width:25%;padding:0 2mm;">
-          <div style="{FONT}border:1pt solid #e2e8f0;border-radius:6pt;padding:4mm;text-align:center;background:#fafafa;">
-            <div style="font-size:18pt;font-weight:800;color:{c};line-height:1;margin-bottom:1mm;">{n}</div>
+          <div style="{FONT}border:1pt solid #e2e8f0;border-radius:8pt;padding:4.5mm;text-align:center;
+              background:#fafafa;box-shadow:0 1pt 4pt rgba(0,0,0,0.05);">
+            <div style="font-size:20pt;font-weight:800;color:{c};line-height:1;margin-bottom:1.5mm;">{n}</div>
             <div style="font-size:6.5pt;font-weight:600;text-transform:uppercase;letter-spacing:.8pt;color:#94a3b8;">{lbl}</div>
           </div>
         </td>"""
 
-    # Score table rows — widths must sum to 100%: 28+10+38+8+8+8 = 100
     rows = ""
     for i, rs in enumerate(report.regulation_scores):
         bc  = _sc(rs.score_percent)
@@ -287,8 +303,8 @@ def _scores(report: ComplianceReport, logo: str) -> str:
           <td style="{FONT}padding:6pt 8pt;font-weight:600;font-size:8.5pt;width:28%;">{_h(_reg(rs.regulation.value))}</td>
           <td style="{FONT}padding:6pt 8pt;text-align:center;font-weight:800;font-size:10pt;color:{bc};width:10%;">{rs.score_percent:.0f}%</td>
           <td style="padding:6pt 8pt;width:38%;">
-            <div style="height:6pt;background:#f1f5f9;border-radius:10pt;overflow:hidden;">
-              <div style="height:6pt;width:{bw}%;background:{bc};border-radius:10pt;"></div>
+            <div style="height:8pt;background:#f1f5f9;border-radius:10pt;overflow:hidden;">
+              <div style="height:8pt;width:{bw}%;background:linear-gradient(90deg,{bc}cc,{bc});border-radius:10pt;"></div>
             </div>
           </td>
           <td style="{FONT}padding:6pt 8pt;text-align:center;color:#16a34a;font-weight:600;font-size:8.5pt;width:8%;">{rs.compliant}</td>
@@ -297,22 +313,31 @@ def _scores(report: ComplianceReport, logo: str) -> str:
         </tr>"""
 
     return f"""
-<div style="page-break-before:always;">
+<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Score Breakdown", logo)}
   {_body_open()}
     {_sec_title("Section 03", "Score Breakdown")}
 
     <!-- Hero score -->
-    <div style="background:{sbg};border:1.5pt solid {sbr};border-radius:8pt;
-        padding:7mm 9mm;margin-bottom:6mm;display:flex;align-items:center;gap:8mm;">
-      <div style="{FONT}font-size:44pt;font-weight:800;color:{sc};letter-spacing:-2pt;line-height:1;flex-shrink:0;">
-        {report.overall_score_percent:.1f}%
+    <div style="background:{sbg};border:1.5pt solid {sbr};border-radius:10pt;
+        padding:7mm 9mm;margin-bottom:6mm;display:flex;align-items:center;gap:9mm;
+        box-shadow:0 2pt 10pt rgba(0,0,0,0.06);">
+      <div style="position:relative;flex-shrink:0;">
+        <div style="width:38mm;height:38mm;border-radius:50%;border:3pt solid {sc};
+            background:rgba(255,255,255,0.6);box-shadow:0 0 14pt {sc}33;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="{FONT}font-size:20pt;font-weight:800;color:{sc};letter-spacing:-1pt;line-height:1;">
+            {report.overall_score_percent:.1f}%
+          </div>
+          <div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;
+              letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>
+        </div>
       </div>
       <div>
-        <div style="{FONT}font-size:10pt;font-weight:700;color:{NAVY};margin-bottom:2mm;">Overall Compliance Score</div>
-        <div style="{FONT}font-size:8pt;color:#64748b;line-height:1.6;">
-          {len(report.regulation_scores)} regulations checked &nbsp;|&nbsp;
-          {n_t} requirements assessed &nbsp;|&nbsp;
+        <div style="{FONT}font-size:11pt;font-weight:700;color:{NAVY};margin-bottom:2.5mm;">Overall Compliance Score</div>
+        <div style="{FONT}font-size:8pt;color:#64748b;line-height:1.7;">
+          {len(report.regulation_scores)} regulations checked &nbsp;&middot;&nbsp;
+          {n_t} requirements assessed &nbsp;&middot;&nbsp;
           {len(report.gap_analysis)} gaps found
         </div>
       </div>
@@ -328,25 +353,23 @@ def _scores(report: ComplianceReport, logo: str) -> str:
       </tr>
     </table>
 
-    <!-- Score table: col widths 28+10+38+8+8+8 = 100 -->
-    <table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">
+    <!-- Score table -->
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;
+        border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">
       <thead>
         <tr>
-          <th style="{FONT}background:#f1f5f9;color:#64748b;font-size:7pt;font-weight:600;
-              text-transform:uppercase;letter-spacing:.5pt;padding:4pt 8pt;text-align:left;
-              border-bottom:1.5pt solid #e2e8f0;width:28%;">Regulation</th>
-          <th style="{FONT}background:#f1f5f9;color:#64748b;font-size:7pt;font-weight:600;
-              text-transform:uppercase;letter-spacing:.5pt;padding:4pt 8pt;text-align:center;
-              border-bottom:1.5pt solid #e2e8f0;width:10%;">Score</th>
-          <th style="{FONT}background:#f1f5f9;color:#64748b;font-size:7pt;font-weight:600;
-              text-transform:uppercase;letter-spacing:.5pt;padding:4pt 8pt;
-              border-bottom:1.5pt solid #e2e8f0;width:38%;">Progress</th>
-          <th style="{FONT}background:#f1f5f9;color:#16a34a;font-size:7pt;font-weight:600;
-              padding:4pt 8pt;text-align:center;border-bottom:1.5pt solid #e2e8f0;width:8%;">C</th>
-          <th style="{FONT}background:#f1f5f9;color:#b45309;font-size:7pt;font-weight:600;
-              padding:4pt 8pt;text-align:center;border-bottom:1.5pt solid #e2e8f0;width:8%;">P</th>
-          <th style="{FONT}background:#f1f5f9;color:#dc2626;font-size:7pt;font-weight:600;
-              padding:4pt 8pt;text-align:center;border-bottom:1.5pt solid #e2e8f0;width:8%;">NC</th>
+          <th style="{FONT}background:{NAVY};color:#e2e8f0;font-size:7pt;font-weight:600;
+              text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:left;width:28%;">Regulation</th>
+          <th style="{FONT}background:{NAVY};color:#e2e8f0;font-size:7pt;font-weight:600;
+              text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:center;width:10%;">Score</th>
+          <th style="{FONT}background:{NAVY};color:#e2e8f0;font-size:7pt;font-weight:600;
+              text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;width:38%;">Progress</th>
+          <th style="{FONT}background:{NAVY};color:#4ade80;font-size:7pt;font-weight:700;
+              padding:5pt 8pt;text-align:center;width:8%;">C</th>
+          <th style="{FONT}background:{NAVY};color:#fbbf24;font-size:7pt;font-weight:700;
+              padding:5pt 8pt;text-align:center;width:8%;">P</th>
+          <th style="{FONT}background:{NAVY};color:#f87171;font-size:7pt;font-weight:700;
+              padding:5pt 8pt;text-align:center;width:8%;">NC</th>
         </tr>
       </thead>
       <tbody>{rows}</tbody>
@@ -359,7 +382,7 @@ def _scores(report: ComplianceReport, logo: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Section 4 — Gap Analysis (one page per regulation)
+# Section 4 — Gap Analysis
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _gap_card(g) -> str:
@@ -371,25 +394,26 @@ def _gap_card(g) -> str:
 
     fix = ""
     if defic:
-        fix = f"""<div style="margin-top:5pt;padding:5pt 8pt;
-            border-left:3pt solid #dc2626;background:#fef2f2;border-radius:0 4pt 4pt 0;">
-          <div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;
-              letter-spacing:1pt;color:#dc2626;margin-bottom:2pt;">What needs to change</div>
-          <div style="{FONT}font-size:8.5pt;color:#7f1d1d;line-height:1.6;">{defic}</div>
+        fix = f"""<div style="margin-top:6pt;padding:6pt 9pt;
+            border-left:3.5pt solid #dc2626;background:#fef2f2;border-radius:0 5pt 5pt 0;">
+          <div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;
+              letter-spacing:1.1pt;color:#dc2626;margin-bottom:2.5pt;">What needs to change</div>
+          <div style="{FONT}font-size:8.5pt;color:#7f1d1d;line-height:1.65;">{defic}</div>
         </div>"""
 
-    return f"""<div style="border:1pt solid #e2e8f0;border-radius:6pt;
-        margin-bottom:4mm;overflow:hidden;page-break-inside:avoid;">
+    return f"""<div style="border:1pt solid #e8edf2;border-radius:8pt;
+        margin-bottom:4mm;overflow:hidden;page-break-inside:avoid;
+        box-shadow:0 1pt 6pt rgba(0,0,0,0.07);">
   <!-- Card header -->
-  <div style="display:flex;align-items:stretch;background:#f8fafc;border-bottom:1pt solid #f1f5f9;">
-    <div style="width:4pt;background:{cm['c']};flex-shrink:0;"></div>
-    <div style="flex:1;padding:5pt 9pt;display:flex;align-items:center;justify-content:space-between;gap:6pt;">
+  <div style="display:flex;align-items:stretch;background:#f1f5f9;border-bottom:1pt solid #e8edf2;">
+    <div style="width:5pt;background:{cm['c']};flex-shrink:0;"></div>
+    <div style="flex:1;padding:5.5pt 10pt;display:flex;align-items:center;justify-content:space-between;gap:8pt;">
       <div>
-        <div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art. {art_n} &nbsp;·&nbsp; {art_t}</div>
-        <div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:1pt;">{_h(_reg(g.regulation.value))}</div>
+        <div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{art_n} &nbsp;&middot;&nbsp; {art_t}</div>
+        <div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:1.5pt;">{_h(_reg(g.regulation.value))}</div>
       </div>
       <div style="{FONT}display:inline-flex;align-items:center;gap:4pt;font-size:7pt;font-weight:700;
-          padding:2.5pt 8pt;border-radius:20pt;border:1pt solid {cm['br']};
+          padding:3pt 9pt;border-radius:20pt;border:1pt solid {cm['br']};
           background:{cm['bg']};color:{cm['c']};white-space:nowrap;flex-shrink:0;">
         <span style="width:5pt;height:5pt;border-radius:50%;background:{cm['c']};display:inline-block;"></span>
         {_h(cm['label'])}
@@ -397,9 +421,9 @@ def _gap_card(g) -> str:
     </div>
   </div>
   <!-- Card body -->
-  <div style="padding:6pt 9pt 7pt 13pt;">
+  <div style="padding:7pt 10pt 8pt 14pt;background:#fff;">
     <div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;
-        letter-spacing:1pt;color:#94a3b8;margin-bottom:2pt;">Assessment</div>
+        letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5pt;">Assessment</div>
     <div style="{FONT}font-size:8.5pt;color:#334155;line-height:1.65;">{ev}</div>
     {fix}
   </div>
@@ -408,7 +432,7 @@ def _gap_card(g) -> str:
 
 def _gaps(report: ComplianceReport, logo: str) -> str:
     if not report.gap_analysis:
-        return f"""<div style="page-break-before:always;">
+        return f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Gap Analysis", logo)}
   {_body_open()}{_sec_title("Section 04","Gap Analysis")}<p>No gaps found.</p>{_body_close()}
 </div>"""
@@ -417,8 +441,7 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
     for g in report.gap_analysis:
         by_reg.setdefault(g.regulation.value, []).append(g)
 
-    # Section intro page
-    html = f"""<div style="page-break-before:always;">
+    html = f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Gap Analysis", logo)}
   {_body_open()}
     {_sec_title("Section 04", "Gap Analysis")}
@@ -426,24 +449,23 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
   {_body_close()}
 </div>"""
 
-    # One page per regulation
     for reg_key, gaps in by_reg.items():
         n_c = sum(1 for g in gaps if g.status == ComplianceStatus.COMPLIANT)
         n_p = sum(1 for g in gaps if g.status == ComplianceStatus.PARTIALLY_COMPLIANT)
         n_n = sum(1 for g in gaps if g.status == ComplianceStatus.NON_COMPLIANT)
         cards = "".join(_gap_card(g) for g in gaps)
 
-        html += f"""<div style="page-break-before:always;">
+        html += f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, f"Gap Analysis — {_reg(reg_key)}", logo)}
   {_body_open()}
     <div style="margin-bottom:5mm;">
       <div style="{FONT}display:inline-flex;align-items:center;gap:6pt;font-size:8pt;
           font-weight:700;text-transform:uppercase;letter-spacing:1.2pt;color:{BLUE};">
-        <span style="width:3pt;height:14pt;background:{BLUE};border-radius:2pt;display:inline-block;"></span>
+        <span style="width:3.5pt;height:14pt;background:{BLUE};border-radius:2pt;display:inline-block;"></span>
         {_h(_reg(reg_key))}
       </div>
-      <div style="{FONT}font-size:7.5pt;color:#94a3b8;margin-top:2mm;">
-        {n_c} compliant &nbsp;·&nbsp; {n_p} partial &nbsp;·&nbsp; {n_n} non-compliant
+      <div style="{FONT}font-size:7.5pt;color:#94a3b8;margin-top:2.5mm;">
+        {n_c} compliant &nbsp;&middot;&nbsp; {n_p} partial &nbsp;&middot;&nbsp; {n_n} non-compliant
       </div>
     </div>
     {cards}
@@ -454,24 +476,25 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Section 5 — Action Plan (one page per regulation)
+# Section 5 — Action Plan
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _action_card(a) -> str:
     pm  = P.get(a.priority, P[Priority.LOW])
-    dl  = f"&nbsp;&nbsp;<b>Deadline:</b> {_h(_c(a.deadline))}" if a.deadline else ""
-    return f"""<div style="border:1pt solid #e2e8f0;border-radius:6pt;
-        margin-bottom:4mm;overflow:hidden;page-break-inside:avoid;">
-  <div style="display:flex;align-items:center;gap:7pt;padding:5pt 9pt;
-      background:#f8fafc;border-bottom:1pt solid #f1f5f9;">
+    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Deadline:</b> {_h(_c(a.deadline))}" if a.deadline else ""
+    return f"""<div style="border:1pt solid #e8edf2;border-radius:8pt;
+        margin-bottom:4mm;overflow:hidden;page-break-inside:avoid;
+        box-shadow:0 1pt 6pt rgba(0,0,0,0.07);">
+  <div style="display:flex;align-items:center;gap:8pt;padding:5.5pt 10pt;
+      background:#f1f5f9;border-bottom:1pt solid #e8edf2;">
     <span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;
-        padding:2pt 8pt;border-radius:20pt;border:1pt solid {pm['br']};
+        padding:2.5pt 9pt;border-radius:20pt;border:1pt solid {pm['br']};
         background:{pm['bg']};color:{pm['c']};flex-shrink:0;">{_h(pm['label'])}</span>
-    <span style="{FONT}font-size:8pt;font-weight:700;color:{NAVY};">Art. {_h(_c(a.article_number))}</span>
+    <span style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{_h(_c(a.article_number))}</span>
     <span style="{FONT}font-size:7pt;color:#94a3b8;margin-left:auto;">{_h(_reg(a.regulation.value))}</span>
   </div>
-  <div style="padding:6pt 9pt 7pt;">
-    <div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4pt;">{_h(_c(a.action))}</div>
+  <div style="padding:7pt 10pt 8pt;background:#fff;">
+    <div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4.5pt;">{_h(_c(a.action))}</div>
     <div style="{FONT}font-size:7.5pt;color:#64748b;">
       <b style="color:#374151;">Effort:</b> {_h(_c(a.estimated_effort))}{dl}
     </div>
@@ -481,7 +504,7 @@ def _action_card(a) -> str:
 
 def _actions(report: ComplianceReport, logo: str) -> str:
     if not report.action_plan:
-        return f"""<div style="page-break-before:always;">
+        return f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Action Plan", logo)}
   {_body_open()}{_sec_title("Section 05","Action Plan")}<p>No actions required.</p>{_body_close()}
 </div>"""
@@ -490,7 +513,7 @@ def _actions(report: ComplianceReport, logo: str) -> str:
     for a in report.action_plan:
         by_reg.setdefault(a.regulation.value, []).append(a)
 
-    html = f"""<div style="page-break-before:always;">
+    html = f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Action Plan", logo)}
   {_body_open()}
     {_sec_title("Section 05", "Action Plan")}
@@ -500,13 +523,13 @@ def _actions(report: ComplianceReport, logo: str) -> str:
 
     for reg_key, acts in by_reg.items():
         cards = "".join(_action_card(a) for a in acts)
-        html += f"""<div style="page-break-before:always;">
+        html += f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, f"Action Plan — {_reg(reg_key)}", logo)}
   {_body_open()}
     <div style="margin-bottom:5mm;">
       <div style="{FONT}display:inline-flex;align-items:center;gap:6pt;font-size:8pt;
           font-weight:700;text-transform:uppercase;letter-spacing:1.2pt;color:{BLUE};">
-        <span style="width:3pt;height:14pt;background:{BLUE};border-radius:2pt;display:inline-block;"></span>
+        <span style="width:3.5pt;height:14pt;background:{BLUE};border-radius:2pt;display:inline-block;"></span>
         {_h(_reg(reg_key))}
       </div>
     </div>
@@ -529,27 +552,35 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         "Run this assessment again after you make changes. You will see the score move.",
         "For anything you are unsure about, talk to a lawyer before acting on it.",
     ]
-    items = "".join(f'<li style="{FONT}font-size:9pt;color:#334155;margin-bottom:5pt;line-height:1.65;">{s}</li>'
-                    for s in steps)
-    return f"""<div style="page-break-before:always;">
+    items = "".join(
+        f"""<div style="display:flex;align-items:flex-start;gap:8pt;margin-bottom:5mm;">
+          <div style="{FONT}width:18pt;height:18pt;border-radius:50%;background:{NAVY};
+              color:#fff;font-size:7.5pt;font-weight:700;display:flex;align-items:center;
+              justify-content:center;flex-shrink:0;margin-top:1pt;">{i+1}</div>
+          <div style="{FONT}font-size:9pt;color:#334155;line-height:1.65;flex:1;">{s}</div>
+        </div>"""
+        for i, s in enumerate(steps)
+    )
+    return f"""<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">
   {_hbar(report.company_name, "Next Steps", logo)}
   {_body_open()}
     {_sec_title("Section 06", "Next Steps")}
     {_sec_sub("You know where you stand now. Here is what to do next.")}
-    <ul style="padding-left:16pt;">{items}</ul>
+    <div style="margin-top:2mm;">{items}</div>
 
     <div style="margin-top:8mm;">
       <div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;
-          letter-spacing:1pt;color:#94a3b8;margin-bottom:2mm;">Legal Disclaimer</div>
-      <div style="{FONT}padding:5.5mm 6mm;background:#f8fafc;border:1pt solid #e2e8f0;
-          border-radius:6pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;">
+          letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Legal Disclaimer</div>
+      <div style="{FONT}padding:6mm 7mm;background:#f8fafc;border:1pt solid #e8edf2;
+          border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;
+          box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">
         {_h(report.disclaimer)}
       </div>
     </div>
 
     <div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;
         text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">
-      <strong style="color:{NAVY};">Complio</strong> &nbsp;·&nbsp; Autonomous Regulatory Compliance for German SMEs<br>
+      <strong style="color:{NAVY};">Complio</strong> &nbsp;&middot;&nbsp; Autonomous Regulatory Compliance for German SMEs<br>
       <span style="font-size:7pt;">Produced by an AI agent. Not a certified legal audit. Not legal advice.</span>
     </div>
   {_body_close()}
@@ -586,7 +617,7 @@ def generate_pdf(report: ComplianceReport) -> bytes:
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         pg      = browser.new_page()
-        pg.set_viewport_size({"width": 794, "height": 1123})   # A4 at 96dpi
+        pg.set_viewport_size({"width": 794, "height": 1123})
         pg.set_content(html, wait_until="networkidle")
         pdf_bytes = pg.pdf(
             format="A4",
