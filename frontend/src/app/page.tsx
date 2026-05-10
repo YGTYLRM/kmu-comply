@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileSearch, Zap, ShieldCheck,
@@ -303,6 +303,49 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function PricingCTA({ plan }: { plan: typeof PLANS[0] }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = useCallback(async () => {
+    if (plan.cta === "Contact us") {
+      window.location.href = "/contact";
+      return;
+    }
+    if (plan.name === "Enterprise") return;
+
+    setLoading(true);
+    const planKey = plan.name.toLowerCase(); // "starter" | "professional"
+    const base = window.location.origin;
+    try {
+      const res = await fetch("/api/backend/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: planKey,
+          success_url: `${base}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${base}/checkout/cancel`,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      setLoading(false);
+    }
+  }, [plan]);
+
+  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
+    plan.highlight
+      ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
+      : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+  }`;
+
+  return (
+    <button onClick={handleClick} disabled={loading} className={cls}>
+      {loading ? "Redirecting…" : plan.cta}
+    </button>
   );
 }
 
@@ -610,16 +653,7 @@ export default function HomePage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.cta === "Contact us" ? "mailto:hello@complio.io" : "/analyze"}
-                  className={`w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 ${
-                    plan.highlight
-                      ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
-                      : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
+                <PricingCTA plan={plan} />
               </motion.div>
             ))}
           </motion.div>
