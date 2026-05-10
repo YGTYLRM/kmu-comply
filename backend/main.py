@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
@@ -280,3 +280,45 @@ async def contact(req: ContactRequest):
     })
 
     return {"ok": True}
+
+
+# ── Stripe ────────────────────────────────────────────────────────────────────
+
+class CheckoutRequest(BaseModel):
+    plan: str                   # "starter" | "professional"
+    success_url: str
+    cancel_url: str
+
+
+@app.post("/api/checkout")
+async def create_checkout(req: CheckoutRequest):
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=503, detail="Payments not configured.")
+    from services.stripe_service import create_checkout_session
+    try:
+        url = create_checkout_session(req.plan, req.success_url, req.cancel_url)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"url": url}
+
+
+@app.get("/api/checkout/verify")
+async def verify_checkout(session_id: str):
+    """Success page calls this to exchange a Stripe session_id for an access token."""
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=503, detail="Payments not configured.")
+    from services.stripe_service import verify_session
+    token = verify_session(session_id)
+    if not token:
+        raise HTTPException(status_code=402, detail="Payment not confirmed.")
+    return {"token": token}
+
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+    if not settings.stripe_webhook_secret:
+        raise HTTPException(status_code=503, detail="Webhook not configured.")
+    payload = await request.body()
+    from services.stripe_service import handle_webhook
+    token = handle_webhook(payload, stripe_signature or "")
+    return {"received": True}
