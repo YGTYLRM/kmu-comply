@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { StepIndicator } from "@/components/profile-form/step-indicator";
@@ -173,6 +173,12 @@ export default function AnalyzePage() {
   const [step, setStep] = useState(1);
   const [files, setFiles] = useState<File[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_STRIPE_ENABLED !== "true") return;
+    const token = localStorage.getItem("complio_access_token");
+    if (!token) router.replace("/#pricing");
+  }, [router]);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
