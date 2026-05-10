@@ -119,8 +119,12 @@ async def upload_documents(files: list[UploadFile] = File(...)):
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(body: AnalyzeRequest):
+async def analyze(body: AnalyzeRequest, x_access_token: Optional[str] = Header(None)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
+    if settings.stripe_enabled:
+        from services.stripe_service import validate_token
+        if not x_access_token or not validate_token(x_access_token):
+            raise HTTPException(status_code=402, detail="Valid payment required to run a screening.")
     job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
     return AnalyzeResponse(
         job_id=job_id,
