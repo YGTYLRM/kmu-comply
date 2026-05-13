@@ -155,6 +155,16 @@ async def get_report(job_id: str):
     return report
 
 
+@app.get("/api/report/{job_id}/profile")
+async def get_profile(job_id: str):
+    """Return the original company profile submitted for this job (for re-assessment pre-fill)."""
+    from services.report_store import load_profile
+    profile = load_profile(job_id)
+    if profile is None:
+        raise HTTPException(status_code=404, detail="Profile not found for this job.")
+    return profile
+
+
 @app.post("/api/report/{job_id}/pdf")
 async def generate_pdf_endpoint(job_id: str):
     import asyncio
@@ -173,6 +183,13 @@ async def generate_pdf_endpoint(job_id: str):
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@app.get("/api/reports")
+async def list_reports():
+    """List all persisted reports, newest first. Returns summary metadata only."""
+    from services.report_store import list_recent
+    return {"reports": list_recent()}
 
 
 @app.get("/api/regulations", response_model=RegulationsListResponse)
