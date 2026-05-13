@@ -140,6 +140,10 @@ For each regulatory requirement provided, assess this company's compliance statu
 {"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile fields and retrieved regulation text. The profile IS sufficient to assess the vast majority of requirements."}
 </task>
 
+<applicability_notice>
+IMPORTANT: Applicability determination has already been completed before this step using a separate deterministic rule engine. The regulations and articles you are receiving are confirmed to apply to this company. Do NOT use the retrieved legal text to re-determine whether a regulation applies or what size/revenue thresholds trigger obligations — that has already been decided. Your sole job is to assess HOW WELL the company currently meets each provided article requirement. Do not adjust compliance status based on size thresholds you read in the retrieved text.
+</applicability_notice>
+
 <company_profile>
 {profile_json}
 </company_profile>
