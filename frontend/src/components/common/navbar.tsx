@@ -5,13 +5,15 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Bell, LayoutDashboard } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { api } from "@/lib/api";
 
 export function Navbar() {
-  const [hidden,     setHidden]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [userEmail,  setUserEmail]  = useState<string | null>(null);
+  const [hidden,       setHidden]       = useState(false);
+  const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [userEmail,    setUserEmail]    = useState<string | null>(null);
+  const [unreadCount,  setUnreadCount]  = useState(0);
   const lastY = useRef(0);
   const router = useRouter();
 
@@ -22,8 +24,19 @@ export function Navbar() {
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUserEmail(session?.user?.email ?? null);
+      if (session) {
+        api.getUnreadCount().then(d => setUnreadCount(d.count)).catch(() => {});
+      } else {
+        setUnreadCount(0);
+      }
     });
-    return () => subscription.unsubscribe();
+
+    // Poll unread count every 60s when logged in
+    const interval = setInterval(() => {
+      if (userEmail) api.getUnreadCount().then(d => setUnreadCount(d.count)).catch(() => {});
+    }, 60_000);
+
+    return () => { subscription.unsubscribe(); clearInterval(interval); };
   }, []);
 
   const handleLogout = async () => {
@@ -96,12 +109,26 @@ export function Navbar() {
             {/* Desktop CTA */}
             {userEmail ? (
               <div className="hidden md:flex items-center gap-2">
-                <span className="text-xs text-slate-500 flex items-center gap-1.5">
-                  <User className="h-3 w-3" />{userEmail}
-                </span>
+                <Link href="/dashboard"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Dashboard
+                </Link>
+                <Link href="/dashboard"
+                  onClick={() => api.markNotificationsRead().catch(() => {})}
+                  className="relative inline-flex items-center justify-center h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <Bell className="h-3.5 w-3.5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </Link>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   Sign out
