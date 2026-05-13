@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     # Supabase / Database
     supabase_url: str = ""
-    supabase_secret_key: str = ""
+    supabase_service_role_key: str = ""  # Full admin key — bypasses RLS, never expose to clients
     database_url: str = ""
 
     # CORS (comma-separated list of allowed origins)
