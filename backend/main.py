@@ -66,8 +66,13 @@ async def lifespan(app: FastAPI):
     from services.report_store import load_all_owners
     _job_owners.update(load_all_owners())
     await job_manager.start()
+    # Start monitoring scheduler
+    from services.scheduler import start_scheduler
+    start_scheduler()
     yield
     await job_manager.stop()
+    from services.scheduler import stop_scheduler
+    stop_scheduler()
 
 
 app = FastAPI(
@@ -195,7 +200,24 @@ async def upload_documents(files: list[UploadFile] = File(...), current_user: di
 async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current_user)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
     _check_rate_limit(current_user["id"])
-    job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id, user_id=current_user["id"])
+
+    # Upsert company in DB so it can be monitored going forward
+    company_id: Optional[str] = None
+    if settings.database_url:
+        try:
+            from services.db_service import upsert_company
+            company_id = await upsert_company(current_user["id"], body.profile)
+        except Exception as exc:
+            # Non-fatal — analysis still runs, just won't be monitored
+            import logging
+            logging.getLogger(__name__).warning("analyze: db upsert failed: %s", exc)
+
+    job_id = await job_manager.create_job(
+        body.profile,
+        doc_session_id=body.doc_session_id,
+        user_id=current_user["id"],
+        company_id=company_id,
+    )
     _job_owners[job_id] = current_user["id"]
     return AnalyzeResponse(
         job_id=job_id,
