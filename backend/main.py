@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header, Depends
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from collections import defaultdict
+from time import time
 
 from config import settings
 from models import (
@@ -22,6 +25,31 @@ from services.auth_service import get_current_user, get_optional_user
 
 job_manager = JobManager(ttl_seconds=settings.job_ttl_seconds)
 
+# Simple in-memory rate limiter: user_id → list of timestamps
+_analyze_calls: dict[str, list[float]] = defaultdict(list)
+ANALYZE_LIMIT = 10   # max requests
+ANALYZE_WINDOW = 3600  # per hour
+
+# Job ownership: job_id → user_id (guards report endpoints)
+_job_owners: dict[str, str] = {}
+
+
+def _check_rate_limit(user_id: str) -> None:
+    now = time()
+    calls = [t for t in _analyze_calls[user_id] if now - t < ANALYZE_WINDOW]
+    _analyze_calls[user_id] = calls
+    if len(calls) >= ANALYZE_LIMIT:
+        raise HTTPException(status_code=429, detail="Rate limit reached. Maximum 10 screenings per hour.")
+    _analyze_calls[user_id].append(now)
+
+
+def _assert_owns_job(job_id: str, user_id: str) -> None:
+    owner = _job_owners.get(job_id)
+    if owner is None:
+        return  # legacy job from before auth — allow
+    if owner != user_id:
+        raise HTTPException(status_code=403, detail="Access denied.")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,12 +68,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_allowed_origins = [o.strip() for o in (settings.allowed_origins or "http://localhost:3000,http://localhost:3001").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Access-Token"],
 )
 
 
@@ -113,7 +143,7 @@ class AnalyzeRequest(BaseModel):
 
 
 @app.post("/api/documents")
-async def upload_documents(files: list[UploadFile] = File(...)):
+async def upload_documents(files: list[UploadFile] = File(...), current_user: dict = Depends(get_current_user)):
     """Upload company documents before analysis. Returns a doc_session_id."""
     from services.document_store import document_store
 
@@ -141,13 +171,11 @@ async def upload_documents(files: list[UploadFile] = File(...)):
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(body: AnalyzeRequest, x_access_token: Optional[str] = Header(None)):
+async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current_user)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
-    if settings.stripe_enabled:
-        from services.stripe_service import validate_token
-        if not x_access_token or not validate_token(x_access_token):
-            raise HTTPException(status_code=402, detail="Valid payment required to run a screening.")
+    _check_rate_limit(current_user["id"])
     job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
+    _job_owners[job_id] = current_user["id"]
     return AnalyzeResponse(
         job_id=job_id,
         status=JobStatus.PENDING,
@@ -156,7 +184,8 @@ async def analyze(body: AnalyzeRequest, x_access_token: Optional[str] = Header(N
 
 
 @app.get("/api/status/{job_id}", response_model=StatusResponse)
-async def get_status(job_id: str):
+async def get_status(job_id: str, current_user: dict = Depends(get_current_user)):
+    _assert_owns_job(job_id, current_user["id"])
     status = job_manager.get_status(job_id)
     if status is None:
         raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
@@ -164,7 +193,8 @@ async def get_status(job_id: str):
 
 
 @app.get("/api/report/{job_id}", response_model=ComplianceReport)
-async def get_report(job_id: str):
+async def get_report(job_id: str, current_user: dict = Depends(get_current_user)):
+    _assert_owns_job(job_id, current_user["id"])
     report = job_manager.get_report(job_id)
     if report is None:
         status = job_manager.get_status(job_id)
@@ -178,8 +208,8 @@ async def get_report(job_id: str):
 
 
 @app.get("/api/report/{job_id}/profile")
-async def get_profile(job_id: str):
-    """Return the original company profile submitted for this job (for re-assessment pre-fill)."""
+async def get_profile(job_id: str, current_user: dict = Depends(get_current_user)):
+    _assert_owns_job(job_id, current_user["id"])
     from services.report_store import load_profile
     profile = load_profile(job_id)
     if profile is None:
@@ -188,11 +218,12 @@ async def get_profile(job_id: str):
 
 
 @app.post("/api/report/{job_id}/pdf")
-async def generate_pdf_endpoint(job_id: str):
+async def generate_pdf_endpoint(job_id: str, current_user: dict = Depends(get_current_user)):
     import asyncio
     from fastapi.responses import Response
     from services.pdf_generator import generate_pdf as _gen_pdf
 
+    _assert_owns_job(job_id, current_user["id"])
     report = job_manager.get_report(job_id)
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found or not completed.")
@@ -208,10 +239,14 @@ async def generate_pdf_endpoint(job_id: str):
 
 
 @app.get("/api/reports")
-async def list_reports():
-    """List all persisted reports, newest first. Returns summary metadata only."""
+async def list_reports(current_user: dict = Depends(get_current_user)):
+    """List persisted reports for the current user, newest first."""
     from services.report_store import list_recent
-    return {"reports": list_recent()}
+    all_reports = list_recent()
+    user_job_ids = {jid for jid, uid in _job_owners.items() if uid == current_user["id"]}
+    # Include reports with no owner (legacy) only if they exist — filter to user's own
+    user_reports = [r for r in all_reports if r["job_id"] not in _job_owners or r["job_id"] in user_job_ids]
+    return {"reports": user_reports}
 
 
 @app.get("/api/regulations", response_model=RegulationsListResponse)
@@ -262,10 +297,19 @@ class ContactRequest(BaseModel):
     message: str
 
 
+_contact_calls: dict[str, list[float]] = defaultdict(list)
+
 @app.post("/api/contact")
-async def contact(req: ContactRequest):
+async def contact(req: ContactRequest, request: Request):
     if not settings.resend_api_key or not settings.contact_email:
         raise HTTPException(status_code=503, detail="Contact not configured.")
+    ip = request.client.host if request.client else "unknown"
+    now = time()
+    recent = [t for t in _contact_calls[ip] if now - t < 3600]
+    _contact_calls[ip] = recent
+    if len(recent) >= 5:
+        raise HTTPException(status_code=429, detail="Too many contact requests. Try again later.")
+    _contact_calls[ip].append(now)
 
     import resend
     resend.api_key = settings.resend_api_key

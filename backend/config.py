@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     supabase_secret_key: str = ""
     database_url: str = ""
 
+    # CORS (comma-separated list of allowed origins)
+    allowed_origins: str = "http://localhost:3000,http://localhost:3001"
+
     # LLM
     llm_temperature: float = 0.0
     llm_timeout_seconds: int = 120
