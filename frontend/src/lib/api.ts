@@ -4,6 +4,7 @@ import type {
   StatusResponse,
   ComplianceReport,
 } from "./types";
+export type { CompanyProfile };
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -59,4 +60,18 @@ export const api = {
 
   downloadPdf: (jobId: string) =>
     request<Blob>(`/api/report/${jobId}/pdf`, { method: "POST" }),
+
+  listReports: () =>
+    request<{ reports: ReportSummary[] }>("/api/reports"),
+
+  getProfile: (jobId: string) =>
+    request<CompanyProfile>(`/api/report/${jobId}/profile`),
 };
+
+export interface ReportSummary {
+  job_id: string;
+  company_name: string;
+  generated_at: string;
+  overall_score_percent: number;
+  applicable_regulation_count: number;
+}
