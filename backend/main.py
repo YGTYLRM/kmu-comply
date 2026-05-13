@@ -1,11 +1,13 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header, Depends
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from collections import defaultdict
 from time import time
+import html
 
 from config import settings
 from models import (
@@ -46,7 +48,11 @@ def _check_rate_limit(user_id: str) -> None:
 def _assert_owns_job(job_id: str, user_id: str) -> None:
     owner = _job_owners.get(job_id)
     if owner is None:
-        return  # legacy job from before auth — allow
+        # Not in memory — check disk (handles post-restart scenario)
+        from services.report_store import get_owner
+        owner = get_owner(job_id)
+    if owner is None:
+        return  # truly legacy report with no recorded owner — allow
     if owner != user_id:
         raise HTTPException(status_code=403, detail="Access denied.")
 
@@ -56,6 +62,9 @@ async def lifespan(app: FastAPI):
     if settings.database_url:
         from db.database import init_db
         await init_db()
+    # Rebuild in-memory ownership map from persisted reports
+    from services.report_store import load_all_owners
+    _job_owners.update(load_all_owners())
     await job_manager.start()
     yield
     await job_manager.stop()
@@ -75,8 +84,20 @@ app.add_middleware(
     allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Access-Token"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -107,7 +128,7 @@ async def sync_profile(current_user: dict = Depends(get_current_user)):
 
 
 @app.post("/api/profile/validate", response_model=ProfileValidationResponse)
-async def validate_profile(profile: CompanyProfile):
+async def validate_profile(profile: CompanyProfile, current_user: dict = Depends(get_current_user)):
     """Validate a company profile without running analysis."""
     from models.company_profile import EnrichedCompanyProfile
 
@@ -174,7 +195,7 @@ async def upload_documents(files: list[UploadFile] = File(...), current_user: di
 async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current_user)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
     _check_rate_limit(current_user["id"])
-    job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
+    job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id, user_id=current_user["id"])
     _job_owners[job_id] = current_user["id"]
     return AnalyzeResponse(
         job_id=job_id,
@@ -242,11 +263,7 @@ async def generate_pdf_endpoint(job_id: str, current_user: dict = Depends(get_cu
 async def list_reports(current_user: dict = Depends(get_current_user)):
     """List persisted reports for the current user, newest first."""
     from services.report_store import list_recent
-    all_reports = list_recent()
-    user_job_ids = {jid for jid, uid in _job_owners.items() if uid == current_user["id"]}
-    # Include reports with no owner (legacy) only if they exist — filter to user's own
-    user_reports = [r for r in all_reports if r["job_id"] not in _job_owners or r["job_id"] in user_job_ids]
-    return {"reports": user_reports}
+    return {"reports": list_recent(user_id=current_user["id"])}
 
 
 @app.get("/api/regulations", response_model=RegulationsListResponse)
@@ -320,12 +337,20 @@ async def contact(req: ContactRequest, request: Request):
     if req.company:
         subject += f" ({req.company})"
 
+    # Escape all user-supplied content before embedding in HTML
+    esc_name    = html.escape(req.name)
+    esc_email   = html.escape(req.email)
+    esc_company = html.escape(req.company or "Not provided")
+    esc_phone   = html.escape(req.phone   or "Not provided")
+    esc_topic   = html.escape(req.topic   or "Not specified")
+    esc_message = html.escape(req.message)
+
     rows = [
-        ("Name",    req.name),
-        ("Email",   req.email),
-        ("Company", req.company or "Not provided"),
-        ("Phone",   req.phone   or "Not provided"),
-        ("Topic",   req.topic   or "Not specified"),
+        ("Name",    esc_name),
+        ("Email",   esc_email),
+        ("Company", esc_company),
+        ("Phone",   esc_phone),
+        ("Topic",   esc_topic),
     ]
 
     rows_html = "".join(
@@ -334,13 +359,13 @@ async def contact(req: ContactRequest, request: Request):
         for k, v in rows
     )
 
-    html = f"""
+    email_html = f"""
     <div style="font-family:sans-serif;max-width:580px;margin:0 auto;padding:32px 24px">
       <div style="margin-bottom:24px">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;margin-bottom:8px">
           Complio — New Contact
         </div>
-        <h2 style="margin:0;font-size:20px;color:#0f172a">{req.name} got in touch</h2>
+        <h2 style="margin:0;font-size:20px;color:#0f172a">{esc_name} got in touch</h2>
       </div>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
@@ -349,11 +374,11 @@ async def contact(req: ContactRequest, request: Request):
 
       <div style="background:#f8fafc;border-radius:10px;padding:16px 20px">
         <p style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px">Message</p>
-        <p style="font-size:14px;color:#1e293b;line-height:1.7;white-space:pre-wrap;margin:0">{req.message}</p>
+        <p style="font-size:14px;color:#1e293b;line-height:1.7;white-space:pre-wrap;margin:0">{esc_message}</p>
       </div>
 
       <p style="margin-top:24px;font-size:12px;color:#94a3b8">
-        Reply directly to this email to respond to {req.name}.
+        Reply directly to this email to respond to {esc_name}.
       </p>
     </div>
     """
@@ -363,7 +388,7 @@ async def contact(req: ContactRequest, request: Request):
         "to": [settings.contact_email],
         "reply_to": req.email,
         "subject": subject,
-        "html": html,
+        "html": email_html,
     })
 
     return {"ok": True}
@@ -377,10 +402,18 @@ class CheckoutRequest(BaseModel):
     cancel_url: str
 
 
+def _validate_redirect_url(url: str) -> None:
+    allowed = [o.rstrip("/") for o in _allowed_origins]
+    if not any(url.startswith(origin) for origin in allowed):
+        raise HTTPException(status_code=400, detail="Invalid redirect URL.")
+
+
 @app.post("/api/checkout")
-async def create_checkout(req: CheckoutRequest):
+async def create_checkout(req: CheckoutRequest, current_user: dict = Depends(get_current_user)):
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="Payments not configured.")
+    _validate_redirect_url(req.success_url)
+    _validate_redirect_url(req.cancel_url)
     from services.stripe_service import create_checkout_session
     try:
         url = create_checkout_session(req.plan, req.success_url, req.cancel_url)
@@ -390,7 +423,7 @@ async def create_checkout(req: CheckoutRequest):
 
 
 @app.get("/api/checkout/verify")
-async def verify_checkout(session_id: str):
+async def verify_checkout(session_id: str, current_user: dict = Depends(get_current_user)):
     """Success page calls this to exchange a Stripe session_id for an access token."""
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="Payments not configured.")
@@ -407,5 +440,8 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         raise HTTPException(status_code=503, detail="Webhook not configured.")
     payload = await request.body()
     from services.stripe_service import handle_webhook
-    token = handle_webhook(payload, stripe_signature or "")
+    try:
+        handle_webhook(payload, stripe_signature or "")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid webhook signature.")
     return {"received": True}
