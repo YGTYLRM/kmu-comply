@@ -45,7 +45,10 @@ export function ProcessingView() {
         setSteps(status.steps);
         if (status.status === "completed") {
           clearInterval(intervalRef.current!);
-          router.push(`/report/${jobId}`);
+          const prevJobId = sessionStorage.getItem("kmu_prev_job_id");
+          sessionStorage.removeItem("kmu_prev_job_id");
+          const dest = prevJobId ? `/report/${jobId}?prev=${prevJobId}` : `/report/${jobId}`;
+          router.push(dest);
         } else if (status.status === "failed") {
           clearInterval(intervalRef.current!);
           setError(status.error ?? "Analysis failed. Please try again.");

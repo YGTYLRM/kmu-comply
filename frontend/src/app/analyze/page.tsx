@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { StepIndicator } from "@/components/profile-form/step-indicator";
@@ -168,11 +168,15 @@ function toProfile(data: ProfileFormData): CompanyProfile {
 
 const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Documents"];
 
-export default function AnalyzePage() {
-  const router = useRouter();
+function AnalyzeInner() {
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const fromJobId    = searchParams.get("from");
+
   const [step, setStep] = useState(1);
   const [files, setFiles] = useState<File[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [prefilling, setPrefilling]   = useState(!!fromJobId);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_STRIPE_ENABLED !== "true") return;
@@ -190,6 +194,71 @@ export default function AnalyzePage() {
     },
   });
 
+  useEffect(() => {
+    if (!fromJobId) return;
+    api.getProfile(fromJobId)
+      .then((p) => {
+        form.reset({
+          company_name:                    p.company_name,
+          industry:                        p.industry as string,
+          country:                         p.country ?? "",
+          employee_count:                  p.employee_count,
+          annual_revenue_eur:              p.annual_revenue_eur,
+          balance_sheet_total_eur:         p.balance_sheet_total_eur,
+          processes_personal_data:         p.processes_personal_data,
+          processes_special_category_data: p.processes_special_category_data,
+          processing_is_occasional:        p.processing_is_occasional,
+          has_dpo:                         p.has_dpo,
+          has_processing_records:          p.has_processing_records,
+          has_supply_chain_abroad:         p.has_supply_chain_abroad,
+          supply_chain_countries_raw:      p.supply_chain_countries?.join(", ") ?? "",
+          annual_energy_consumption_mwh:   p.annual_energy_consumption_mwh,
+          has_energy_management_system:    p.has_energy_management_system,
+          has_conducted_energy_audit:      p.has_conducted_energy_audit,
+          is_listed_company:               p.is_listed_company,
+          has_sustainability_report:       p.has_sustainability_report,
+          is_critical_infrastructure_sector: p.is_critical_infrastructure_sector,
+          uses_ai_systems:                 p.uses_ai_systems,
+          has_privacy_policy:              p.has_privacy_policy,
+          has_processor_agreements:        p.has_processor_agreements,
+          has_data_breach_procedure:       p.has_data_breach_procedure,
+          has_tom_documentation:           p.has_tom_documentation,
+          has_data_retention_policy:       p.has_data_retention_policy,
+          has_data_protection_training:    p.has_data_protection_training,
+          transfers_data_outside_eea:      p.transfers_data_outside_eea,
+          has_consent_management:          p.has_consent_management,
+          has_information_security_policy:      p.has_information_security_policy,
+          has_incident_response_plan:           p.has_incident_response_plan,
+          has_business_continuity_plan:         p.has_business_continuity_plan,
+          has_vulnerability_management:         p.has_vulnerability_management,
+          has_mfa_implemented:                  p.has_mfa_implemented,
+          has_supply_chain_security_assessment: p.has_supply_chain_security_assessment,
+          has_security_awareness_training:      p.has_security_awareness_training,
+          ai_systems_are_high_risk:             p.ai_systems_are_high_risk,
+          has_ai_risk_assessment:               p.has_ai_risk_assessment,
+          has_ai_usage_documentation:           p.has_ai_usage_documentation,
+          has_human_oversight_procedure:        p.has_human_oversight_procedure,
+          has_gefaehrdungsbeurteilung:            p.has_gefaehrdungsbeurteilung,
+          has_gefaehrdungsbeurteilung_documented: p.has_gefaehrdungsbeurteilung_documented,
+          has_first_aid_measures:               p.has_first_aid_measures,
+          has_employee_safety_training:         p.has_employee_safety_training,
+          has_anti_discrimination_policy:       p.has_anti_discrimination_policy,
+          has_agc_complaints_procedure:         p.has_agc_complaints_procedure,
+          has_working_time_records:             p.has_working_time_records,
+          uses_subcontractors:                  p.uses_subcontractors,
+          has_whistleblower_channel:            p.has_whistleblower_channel,
+          has_whistleblower_policy:             p.has_whistleblower_policy,
+          has_lksg_policy_statement:            p.has_lksg_policy_statement,
+          has_supplier_code_of_conduct:         p.has_supplier_code_of_conduct,
+          has_supplier_risk_assessment:         p.has_supplier_risk_assessment,
+          has_lksg_complaints_procedure:        p.has_lksg_complaints_procedure,
+          existing_compliance_notes:            p.existing_compliance_notes ?? "",
+        });
+      })
+      .catch(() => { /* silently ignore — user can fill manually */ })
+      .finally(() => setPrefilling(false));
+  }, [fromJobId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const advance = async () => {
     const fields = STEP_FIELDS[step - 1];
     const valid  = fields.length === 0 || (await form.trigger(fields));
@@ -206,6 +275,8 @@ export default function AnalyzePage() {
       }
       const { job_id } = await api.analyze(toProfile(data), docSessionId);
       sessionStorage.setItem("kmu_job_id", job_id);
+      if (fromJobId) sessionStorage.setItem("kmu_prev_job_id", fromJobId);
+      else sessionStorage.removeItem("kmu_prev_job_id");
       router.push(`/analyze/processing?jobId=${job_id}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Submission failed";
@@ -228,8 +299,12 @@ export default function AnalyzePage() {
             transition={{ duration: 0.4 }}
             className="text-center"
           >
-            <h1 className="text-xl font-bold text-white tracking-tight">Company Profile</h1>
-            <p className="text-sm text-slate-500 mt-1">Step {step} of 9: {STEP_TITLES[step - 1]}</p>
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              {fromJobId ? "Re-run Screening" : "Company Profile"}
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              {prefilling ? "Loading previous profile…" : `Step ${step} of 9: ${STEP_TITLES[step - 1]}`}
+            </p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
         </div>
@@ -302,5 +377,17 @@ export default function AnalyzePage() {
         </AnimatePresence>
       </main>
     </div>
+  );
+}
+
+export default function AnalyzePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-slate-500 text-sm">Loading…</div>
+      </div>
+    }>
+      <AnalyzeInner />
+    </Suspense>
   );
 }
