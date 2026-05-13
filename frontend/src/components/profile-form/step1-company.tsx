@@ -27,6 +27,12 @@ export function Step1Company({ form }: Props) {
   const { register, control, formState: { errors } } = form;
   return (
     <div className="flex flex-col gap-5">
+      <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.05] px-4 py-3">
+        <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Preliminary screening — not legal advice</p>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          This tool provides an automated preliminary assessment only. Results do not constitute legal advice and should be verified with a qualified attorney before taking action.
+        </p>
+      </div>
       <Input
         label="Company name"
         required
