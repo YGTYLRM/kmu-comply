@@ -307,16 +307,53 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 function PricingCTA({ plan }: { plan: typeof PLANS[0] }) {
-  const planParam = plan.name.toLowerCase(); // "starter" | "professional" | "enterprise"
-  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 ${
+  const [loading, setLoading] = useState(false);
+  const planParam = plan.name.toLowerCase();
+  const stripeEnabled = process.env.NEXT_PUBLIC_STRIPE_ENABLED === "true";
+  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
     plan.highlight
       ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
       : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
   }`;
+
+  if (!stripeEnabled || planParam === "enterprise") {
+    return (
+      <Link href={`/contact?plan=${planParam}`} className={cls}>
+        {plan.cta}
+      </Link>
+    );
+  }
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const base = window.location.origin;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          plan: planParam,
+          success_url: `${base}/account/billing`,
+          cancel_url:  `${base}/#pricing`,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Link href={`/contact?plan=${planParam}`} className={cls}>
-      {plan.cta}
-    </Link>
+    <button onClick={handleClick} disabled={loading} className={cls}>
+      {loading ? "Redirecting…" : plan.cta}
+    </button>
   );
 }
 

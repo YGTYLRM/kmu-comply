@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, User, Bell, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, Bell, LayoutDashboard, CreditCard } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { api } from "@/lib/api";
 
@@ -114,6 +114,12 @@ export function Navbar() {
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   Dashboard
+                </Link>
+                <Link href="/account/billing"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <CreditCard className="h-3.5 w-3.5" />
+                  Billing
                 </Link>
                 <Link href="/dashboard"
                   onClick={() => api.markNotificationsRead().catch(() => {})}
