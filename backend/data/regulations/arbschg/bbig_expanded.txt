@@ -1,0 +1,48 @@
+Berufsbildungsgesetz (BBiG)
+Berufsbildungsgesetz vom 23. März 2005 (BGBl. I S. 931)
+Source: https://www.gesetze-im-internet.de/bbig_2005/
+
+---
+
+arbschg BBiG §1
+Title: Scope — vocational training obligations apply to all employers with apprentices
+Obligation: MUST
+Threshold: All employers who enter into vocational training contracts (Berufsausbildungsvertraege) with apprentices
+Text: The BBiG governs vocational training (Berufsausbildung), further training (berufliche Fortbildung), and retraining (berufliche Umschulung) in Germany. It applies to all employers who conclude vocational training contracts (Berufsausbildungsvertraege) with apprentices. Employers who engage apprentices are subject to comprehensive obligations regarding the content, quality, and conditions of training, the qualifications of trainers, remuneration, and the obligations of the apprentice. A vocational training relationship is an employment relationship subject to the BBiG in addition to general employment law. Employers must be recognized as suitable training companies by the competent chamber (Kammer — either IHK for commerce and industry or HwK for skilled trades).
+Keywords: BBiG, Berufsausbildung, vocational training, apprentice, Ausbildungsvertrag, training company, IHK, HwK, scope
+
+---
+
+arbschg BBiG §14
+Title: Trainer obligations — structured training, resources, school attendance, wellbeing
+Obligation: MUST
+Threshold: All employers with apprentices; obligation lies with the employer and any designated trainer
+Text: Employers who conduct vocational training must: (1) ensure that apprentices are given the skills and knowledge required to achieve the training objectives within the agreed time; (2) provide training in a planned and ordered manner that achieves the stated objectives; (3) provide free of charge all tools, materials, and instructional aids needed for training including digital equipment for mobile learning; (4) ensure that apprentices attend vocational school (Berufsschule) and release them for this purpose; (5) protect the physical and moral welfare of apprentices; (6) assign only tasks related to the training objectives and appropriate to the apprentice's level of development; and (7) allow apprentices to complete their training record during working hours. Employers may conduct training directly or assign a designated trainer, but responsibility remains with the employer. Trainers must have the personal and professional suitability (Eignung) required by the applicable training regulations.
+Keywords: Ausbilder, trainer, §14 BBiG, vocational training obligations, Berufsschule, school attendance, training resources, personal suitability, physical welfare
+
+---
+
+arbschg BBiG §17
+Title: Apprentice remuneration — minimum training pay with annual increases; minimum from EUR 620 per month
+Obligation: MUST
+Threshold: All employers with apprentices; minimum pay rules apply regardless of company size or collective agreement (unless collective agreement is more favourable)
+Text: Employers must pay apprentices an appropriate (angemessene) remuneration that increases annually throughout the training period. The BBiG establishes minimum training pay (Mindestverguetung) for the first year of training, which is indexed annually. From 2024, the minimum is EUR 649 per month for first-year apprentices (EUR 620 in 2023, EUR 585 in 2022). Annual increases are prescribed as percentages above the first-year rate: Year 2 must be at least 18% higher, Year 3 at least 35% higher, and Year 4 at least 40% higher than the first-year rate. Collective agreements may deviate downwards only if the agreed rate is at least 20% above the statutory minimum. Remuneration must be paid at the end of each month. Non-monetary benefits (accommodation, food) may be credited up to 75% of gross remuneration. Overtime must be compensated separately or with time off.
+Keywords: Ausbildungsverguetung, training pay, minimum remuneration, Mindestverguetung, EUR 649, annual increase, Year 2 18 percent, BBiG §17, collective agreement, overtime
+
+---
+
+arbschg BBiG §20
+Title: Trial period — mandatory trial period of 1 to 4 months at start of apprenticeship
+Obligation: MUST
+Threshold: All vocational training contracts
+Text: Every vocational training relationship must begin with a trial period (Probezeit) of at least one month and at most four months. The trial period may be extended up to four months if the apprentice is absent from training for more than one third of the trial period due to illness or other grounds. During the trial period, both parties may terminate the training relationship without notice and without giving reasons. After the trial period expires, the employer may only terminate the training for an important reason (wichtiger Grund) with immediate effect, or give four weeks notice if the apprentice is to give up vocational training entirely or change to a different occupation. Employees must be notified of the reasons for termination in writing.
+Keywords: Probezeit, trial period, 1 to 4 months, BBiG §20, notice period, important reason, termination, apprenticeship
+
+---
+
+arbschg BBiG §34
+Title: Training register — employer must register apprenticeship contracts with competent chamber
+Obligation: MUST
+Threshold: All employers with apprentices; competent chambers are IHK (Industrie- und Handelskammern) and HwK (Handwerkskammern)
+Text: Employers must have every vocational training contract (Berufsausbildungsvertrag) registered in the training register (Verzeichnis der Berufsausbildungsverhaeltnisse) maintained by the competent chamber (IHK or HwK). The registration must take place before training begins or immediately after the contract is concluded. The contract must contain specified mandatory content including: name and address of the parties; the type, organisation, and objective of training; the duration of training; the trial period; remuneration in each year; and working time. The chamber may refuse registration if the training contract violates the law. Employers who fail to register are subject to administrative fines and their training may not count towards the apprentice's qualification.
+Keywords: Berufsausbildungsvertrag, registration, training register, IHK, HwK, chamber, mandatory content, Verzeichnis, §34 BBiG

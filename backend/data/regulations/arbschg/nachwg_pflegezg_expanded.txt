@@ -1,0 +1,39 @@
+Nachweisgesetz (NachwG) und Pflegezeitgesetz (PflegeZG)
+NachwG vom 20. Juli 1995 (BGBl. I S. 946), geaendert 2022; PflegeZG vom 28. Mai 2008 (BGBl. I S. 874)
+Sources: https://www.gesetze-im-internet.de/nachwg/ and https://www.gesetze-im-internet.de/pflegezg/
+
+---
+
+arbschg NachwG §2
+Title: Employer must provide written statement of employment terms — Day 1, Day 7, Day 30 deadlines
+Obligation: MUST
+Threshold: All employers; applies to every employee from the first day of work; also applies to interns
+Text: Employers must provide every employee with a written statement of the essential employment terms (Nachweispflicht). The statement must be provided on three deadlines: (1) on the first day of work: the names and addresses of the parties, the start date, the agreed remuneration, and the agreed working hours; (2) by the 7th calendar day: the place of work, a job description, the duration of any probationary period, the amount of paid leave, the procedure for terminating the employment, and overtime arrangements; (3) by the 30th calendar day: all remaining mandatory information including applicable collective agreements and social insurance bodies. The written statement must contain at least 15 mandatory items specified by §2 NachwG. Electronic provision is permitted only if the document can be accessed, saved, and printed by the employee and the employee's receipt is confirmed. Failure to provide the written statement is an administrative offence subject to fines up to EUR 2,000 per instance. This reform was significantly strengthened in 2022 to implement the EU Transparent Working Conditions Directive.
+Keywords: Nachweispflicht, written employment terms, Day 1, Day 7, Day 30, mandatory information, 15 items, electronic provision, NachwG 2022, fine EUR 2000
+
+---
+
+arbschg NachwG §2 Mandatory content
+Title: 15 mandatory items in the employment terms statement
+Obligation: MUST
+Threshold: All employment relationships; applies from first day of work
+Text: The written statement of employment terms must contain at minimum: (1) names and addresses of employer and employee; (2) start date of the employment; (3) for fixed-term contracts, the end date or objective criterion for termination; (4) place of work or indication that work at various locations is possible; (5) a brief job description or job title; (6) in the case of normal employment relationships, the applicable collective agreement or works agreement; (7) duration and conditions of any probationary period; (8) amount and due date of remuneration including supplements, bonuses, special payments, and non-cash benefits; (9) agreed working hours, rest breaks, and shift arrangements; (10) for on-call work, the reference times and advance notice period; (11) any overtime obligation and its limits; (12) duration of annual paid leave; (13) procedure for termination including the formal requirements and deadlines for challenging dismissals; (14) the general qualification for employer-required training; and (15) the relevant social insurance institutions. Missing any mandatory item is an administrative offence.
+Keywords: 15 Pflichtangaben, mandatory employment terms, collective agreement, probationary period, remuneration, working hours, annual leave, termination, NachwG §2
+
+---
+
+arbschg PflegeZG §2
+Title: Short-term care leave — up to 10 working days to respond to acute care emergency for close relative
+Obligation: MUST
+Threshold: All employers regardless of size; employee must give immediate notice
+Text: Employees may absent themselves from work for up to ten working days to organise care for a close relative in an acutely arising care situation (akut aufgetretene Pflegesituation) or to ensure care provision during the acute phase. A close relative (naher Angehöriger) includes spouses, civil partners, parents, grandparents, children, grandchildren, siblings, and in-laws. Employees must notify the employer immediately of the absence and its anticipated duration. On request, the employee must provide a medical certificate confirming the relative's need for care and the necessity of the measures taken. Employers have no statutory obligation to continue paying wages during this period; the employee may be entitled to Pflegeunterstuetzungsgeld (care support benefit) from the statutory care insurance (Pflegekasse) equivalent to approximately 90% of net income for up to 10 working days.
+Keywords: Pflegezeitgesetz, short-term care leave, 10 working days, acute care emergency, close relative, naher Angehöriger, immediate notice, Pflegeunterstuetzungsgeld, §2 PflegeZG
+
+---
+
+arbschg PflegeZG §3
+Title: Care leave — up to 6 months unpaid leave to care for close relative at home; dismissal protection
+Obligation: MUST
+Threshold: Employers with more than 15 employees; dismissal protection applies to all employers
+Text: Employees are entitled to a leave of absence (fully or partially) from work for up to 6 months (Pflegezeit) to personally care for a close relative in need of care at home. The employer must be notified at least 10 working days before the desired start of care leave in text form, stating the duration and if applicable the desired reduction in working hours. The employer must agree to partial care leave unless urgent operational grounds (dringende betriebliche Gruende) prevent it. Dismissal protection (Kuendigungsschutz) applies from the time of notification until the end of care leave — the employer may not give notice of termination during this entire period, except with approval of the competent supervisory authority. Care leave may be followed by family care leave (Familienpflegezeit) under the FPfZG for up to a total of 24 months of reduced hours. The obligation to grant care leave applies only to employers with more than 15 employees, but the dismissal protection applies to all employers.
+Keywords: Pflegezeit, care leave, 6 months, 15 employees, dismissal protection, home care, partial leave, FPfZG, notification 10 days, §3 PflegeZG

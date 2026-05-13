@@ -1,0 +1,204 @@
+Arbeitsschutzgesetz (ArbSchG)
+Gesetz ueber die Durchfuehrung von Massnahmen des Arbeitsschutzes zur Verbesserung der Sicherheit und des Gesundheitsschutzes der Beschaeftigten bei der Arbeit
+in der Fassung der Bekanntmachung vom 7. August 1996 (BGBl. I S. 1246), zuletzt geaendert durch Artikel 4 des Gesetzes vom 22. Dezember 2020
+Expanded Article Reference for Compliance Screening
+
+---
+
+arbschg §3(1)
+Title: Basic obligation — employer must take all necessary occupational health and safety measures
+Obligation: MUST
+Threshold: All employers in Germany, regardless of size or sector; no employee threshold
+Text: The employer is obligated to take the necessary occupational health and safety measures, taking into account the circumstances that affect the safety and health of employees at work. The obligation is general and comprehensive, covering all aspects of the work environment and all types of hazards that employees may face. The employer must check the effectiveness of the measures taken and, if necessary, adapt them to changed circumstances. In doing so, the employer must aim for continuous improvement of safety and health protection for employees. This overarching obligation is the foundation of German occupational health and safety law and applies to all employers regardless of sector, size, or the nature of work performed.
+Keywords: employer obligation, occupational safety, health protection, all employers, effectiveness check, continuous improvement, Grundpflicht, Arbeitsschutz
+
+---
+
+arbschg §3(2)
+Title: Employer must organise safety measures and integrate them into all business activities
+Obligation: MUST
+Threshold: All employers, with measures scaled according to type of activity and number of employees
+Text: To plan and implement the measures required under §3(1), the employer must, taking into account the nature of the activities and the number of employees, ensure a suitable organisational structure and provide the necessary resources; and take precautions to ensure that the safety measures are observed, where necessary, in all activities and are integrated into the management and administrative structures of the business. This means that occupational health and safety must not be treated as a standalone function but must be embedded in business operations, procurement decisions, and management processes. Employers must allocate sufficient budget, personnel, and equipment to meet their occupational health and safety obligations, and must designate responsibility for safety measures at appropriate levels of management.
+Keywords: organisational obligation, safety organisation, resource allocation, management integration, safety management system, employer duty, operational integration
+
+---
+
+arbschg §4(1)
+Title: General principles — dangers must be combated at their source
+Obligation: MUST
+Threshold: All employers
+Text: In implementing occupational health and safety measures, the employer must follow the general principle that work must be designed so that risks to life as well as physical and mental health are kept as low as possible. Dangers must be combated at their source, meaning that the primary objective must always be to eliminate or reduce hazards through technical or organisational means, rather than relying primarily on personal protective equipment or behavioural instructions to employees. This hierarchy of controls — with elimination and technical controls taking precedence over personal protective equipment — is a fundamental principle of German occupational health and safety law. The employer must take into account the state of technology, occupational medicine, and hygiene, as well as other established occupational science knowledge, when selecting and implementing measures.
+Keywords: hierarchy of controls, source of danger, technical measures, personal protective equipment, health protection, occupational medicine, state of the art, prevention principle
+
+---
+
+arbschg §4(3)
+Title: Work must be designed to avoid dangers; unavoidable dangers must be counteracted
+Obligation: MUST
+Threshold: All employers
+Text: Work must be structured, organised, and designed in a way that avoids dangers as far as possible. Where dangers cannot be fully avoided through work design alone, they must be counteracted through appropriate supplementary measures. The principle requires employers to consider safety during work design and planning phases, not only reactively after accidents or health incidents occur. Factors relevant to work design include the layout of the workplace, the selection and use of work equipment, the organisation of work processes, working hours, and the social environment of work. Where residual dangers remain despite design measures, individual protective measures — such as appropriate personal protective equipment — must be provided, maintained, and used.
+Keywords: work design, avoidance of danger, residual risk, preventive measures, workplace design, ergonomics, work organisation, safety planning
+
+---
+
+arbschg §5(1)
+Title: Hazard assessment — employer must conduct Gefaehrdungsbeurteilung for all work activities
+Obligation: MUST
+Threshold: All employers, regardless of size or number of employees; no threshold
+Text: The employer must determine, by means of an assessment of the hazards associated with the work performed by employees, which occupational health and safety measures are required. This hazard assessment — known in German as the Gefaehrdungsbeurteilung — is the cornerstone of the German occupational health and safety system and is mandatory for all employers regardless of the number of employees. The hazard assessment must be carried out before new work activities commence and must be reviewed and updated whenever work processes, equipment, substances, or the working environment change significantly. The assessment must be systematic and must cover all work activities and all employees, including fixed-term workers, agency workers, apprentices, and workers in atypical employment relationships.
+Keywords: Gefaehrdungsbeurteilung, hazard assessment, risk assessment, employer obligation, all employers, systematic assessment, mandatory, work activities
+
+---
+
+arbschg §5(2)
+Title: Hazard assessment must be carried out for each type of work activity
+Obligation: MUST
+Threshold: All employers conducting a Gefaehrdungsbeurteilung
+Text: The employer must carry out the hazard assessment according to the type of work activities performed in the business. Where several employees perform work under identical conditions in identical workplaces, it is sufficient to carry out the assessment of one such workplace or activity as a representative sample, provided the findings are applicable to all affected employees. However, where differences exist between workplaces or activities — for example, due to different machinery, substances, or environmental conditions — a separate assessment must be carried out for each relevant type of workplace or activity. The employer must ensure that the level of granularity in the hazard assessment is sufficient to identify all relevant hazards and to determine appropriate preventive measures.
+Keywords: activity-specific assessment, representative sample, identical workplaces, granularity, Gefaehrdungsbeurteilung, type of activity, differentiated assessment
+
+---
+
+arbschg §5(3)
+Title: Sources of hazard — physical, chemical, biological, organisational, and psychological factors
+Obligation: MUST
+Threshold: All employers performing hazard assessments under §5(1)
+Text: Hazards within the meaning of the hazard assessment obligation may arise from: the design and equipment of the workplace and work premises; physical, chemical, and biological exposures and agents; the design, selection, and use of work equipment, machines, and tools; the design of work processes, workflows, and working hours and their interaction; insufficient qualification and instruction of employees; and psychological stress at work. The explicit inclusion of psychological stress — including factors such as work intensity, monotony, role ambiguity, social conflicts, and work-life balance issues — as a recognised source of occupational hazard means that employers must assess and address mental health risks as part of the Gefaehrdungsbeurteilung. Work-related psychological hazards are increasingly the subject of supervisory authority enforcement action in Germany.
+Keywords: sources of hazard, physical hazard, chemical hazard, biological hazard, psychological stress, psychische Belastung, work equipment, work design, qualification
+
+---
+
+arbschg §6(1)
+Title: Documentation — results of hazard assessment, measures, and verification must be recorded in writing
+Obligation: MUST
+Threshold: All employers; documentation is mandatory where required by the type of activities and number of employees
+Text: The employer must maintain documents from which the results of the hazard assessment, the occupational health and safety measures determined and implemented, and the results of the verification of their effectiveness are apparent. Where employees work under identical conditions, it is sufficient to summarise the documentation for those employees. While the ArbSchG does not prescribe a specific format for hazard assessment documentation, the document must be sufficiently detailed to demonstrate that a genuine and systematic assessment was carried out and that specific measures were identified and implemented. Documentation must be kept up to date when assessments are revised or when measures are changed. The documentation must be made available to the competent supervisory authority (Arbeitsschutzbehörde) on request.
+Keywords: documentation obligation, Gefaehrdungsbeurteilung documentation, written records, effectiveness verification, supervisory authority, record keeping, occupational safety documentation
+
+---
+
+arbschg §6(2)
+Title: Employer must record workplace accidents resulting in more than 3 days' incapacity
+Obligation: MUST
+Threshold: All employers
+Text: The employer must record workplace accidents in which an employee is killed or is injured in such a way that they are, or will be, wholly or partially unable to work for more than three days. These accident records must be kept and made available to the competent supervisory authority upon request. The purpose of accident recording is to enable the employer to analyse the causes of accidents, identify patterns, and implement preventive measures, as well as to enable supervisory authorities to monitor the occupational safety performance of employers. The obligation to record accidents is separate from and in addition to the statutory requirement to report certain serious accidents to the Unfallversicherungsträger (accident insurance institution) under social insurance law.
+Keywords: accident record, workplace accident, more than 3 days, injury record, Arbeitsunfall, supervisory authority, accident documentation, occupational safety statistics
+
+---
+
+arbschg §7
+Title: Delegation of safety tasks to competent employees — employer retains responsibility
+Obligation: MUST
+Threshold: All employers who delegate occupational health and safety tasks to employees
+Text: The employer may delegate tasks within the framework of occupational health and safety measures to employees who are competent for those tasks. However, the delegation of tasks does not relieve the employer of responsibility for ensuring that the occupational health and safety obligations under the ArbSchG are met. The employer must select employees to whom tasks are delegated on the basis of their qualifications, experience, and demonstrated competence to perform the relevant safety tasks, and must ensure that they have the authority, resources, and time required to fulfil the delegated tasks effectively. The employer must also supervise the performance of delegated safety tasks to verify compliance. Where delegated safety tasks are not performed properly, the employer remains personally liable.
+Keywords: delegation, task delegation, employer responsibility, competent employee, safety officer, delegation of duties, personal liability, supervision
+
+---
+
+arbschg §10(1)
+Title: First aid, fire-fighting, and evacuation measures must be established for all workplaces
+Obligation: MUST
+Threshold: All employers, with measures scaled according to type of workplace, activities, and number of employees
+Text: The employer must take the necessary measures for first aid, fire-fighting, and the evacuation of employees, appropriate to the type of workplace, the nature of the activities performed, and the number of employees present. The employer must also take account of other persons who may be present on the premises, such as visitors, customers, or contractors. The employer must ensure that the necessary connections to external services — in particular for first aid, medical emergency care, rescue, and fire-fighting — are established. This includes maintaining accurate emergency contact information, ensuring that emergency exits and escape routes are accessible and clearly marked, and providing adequate first aid equipment and fire-fighting equipment appropriate to the level of risk in the workplace.
+Keywords: first aid, fire-fighting, evacuation, emergency measures, emergency services, escape routes, workplace safety, emergency equipment, Notfallmassnahmen
+
+---
+
+arbschg §10(2)
+Title: Employer must designate and train first aid and fire-fighting persons in adequate numbers
+Obligation: MUST
+Threshold: All employers
+Text: The employer must designate from among the employees those who take on the tasks of first aid, fire-fighting, and evacuation of employees. The number, training, and equipment of these designated employees must bear a reasonable relationship to the number of employees and to the specific risks present in the workplace. First aid persons must hold a valid first aid certificate appropriate to the working environment; the specific requirements for the number of first aiders and the frequency of refresher training are set out in the detailed provisions of the Deutsche Gesetzliche Unfallversicherung (DGUV) and in sector-specific accident prevention regulations. Employers must ensure that sufficient first aid and fire safety competency is available at all times during working hours, including during shift work, part-time operations, and periods of high employee absence.
+Keywords: first aiders, Ersthelfer, fire safety, designated persons, training, refresher training, DGUV, evacuation wardens, workplace safety
+
+---
+
+arbschg §11
+Title: Employer must allow employees to undergo occupational health surveillance on request
+Obligation: MUST
+Threshold: All employers; applies to all employees based on the hazards identified in the Gefaehrdungsbeurteilung
+Text: The employer must allow employees, at their request, to undergo regular occupational health surveillance (arbeitsmedizinische Vorsorge) appropriate to the hazards they face in their work, unless, based on the assessment of working conditions and the protective measures taken, no health damage is to be expected. This provision operates alongside the statutory provisions of the Arbeitsmedizinische Vorsorgeverordnung (ArbMedVV), which requires employers to offer or arrange occupational health examinations in specified circumstances (compulsory surveillance) and permits employees to request surveillance in other risk-relevant circumstances (voluntary surveillance). The employer must bear the costs of occupational health surveillance, must not disadvantage employees who make use of it, and must ensure that the results of health surveillance are treated as strictly confidential by the occupational health physician.
+Keywords: occupational health surveillance, Vorsorgeuntersuchungen, ArbMedVV, compulsory surveillance, voluntary surveillance, health examination, occupational physician, employee request
+
+---
+
+arbschg §12(1)
+Title: Employer must provide adequate and appropriate safety instructions to employees
+Obligation: MUST
+Threshold: All employers; applies to all employees before commencing work and regularly thereafter
+Text: The employer must provide employees with adequate and appropriate instructions on occupational health and safety during working hours. The instruction (Unterweisung) must include guidance and explanations specifically tailored to the workplace and to the task or function of the individual employee. Instruction must take place before the employee commences a new activity and must be repeated when changes occur in the hazard situation, and at least once per year for ongoing activities. Instructions must relate specifically to the concrete risks associated with the employee's actual work and workplace; general safety briefings that are not tailored to the specific work activity do not satisfy this obligation. Records of instructions given — including the date, content, names of participants, and the name of the person giving the instruction — must be maintained by the employer.
+Keywords: Unterweisung, safety instruction, employee instruction, annual instruction, workplace-specific, task-specific, instruction records, hazard-specific training
+
+---
+
+arbschg §12(2)
+Title: Safety instructions must be given in a comprehensible form and in a language understood by the employee
+Obligation: MUST
+Threshold: All employers providing safety instructions under §12(1)
+Text: Safety instructions given to employees must be conducted in a form and language that the employee can understand. This requirement is particularly relevant for employees whose first language is not German, for employees with low literacy levels, and for employees with disabilities that affect their ability to receive or process information in standard formats. Employers must assess the communication needs of their workforce when planning instruction programmes and must adapt the format, language, and delivery method accordingly. Where necessary, instructions must be given in the employee's native language, with the use of visual aids, interpreters, or other means to ensure genuine understanding. The legal standard is actual comprehension by the employee, not merely the provision of information in a standard format.
+Keywords: comprehensible instruction, language requirement, foreign-language employees, accessibility, visual aids, interpreter, Sprachkenntnisse, Unterweisung, multilingual safety
+
+---
+
+arbschg §14
+Title: Employers with more than 20 employees must establish an occupational safety committee
+Obligation: MUST
+Threshold: Employers with more than 20 employees
+Text: In companies with more than 20 employees, the employer is obligated to establish an occupational safety committee (Arbeitsschutzausschuss — ASA). The ASA must meet at least once per quarter. The committee must comprise the employer or a representative of the employer, two members of the works council (Betriebsrat), the company physician (Betriebsarzt), the occupational safety specialist (Fachkraft fuer Arbeitssicherheit), and the company first aid officer (Sicherheitsbeauftragter). The purpose of the ASA is to advise on matters relating to occupational health and safety, to review the results of the hazard assessment, to consider workplace accidents and occupational diseases, and to make recommendations on safety measures and improvements. Employers must document ASA meetings and the decisions or recommendations made.
+Keywords: Arbeitsschutzausschuss, ASA, occupational safety committee, more than 20 employees, quarterly meeting, Betriebsarzt, Fachkraft fuer Arbeitssicherheit, works council
+
+---
+
+arbschg §15(1)
+Title: Employees have duties to take care of their own safety and not to endanger others
+Obligation: MUST
+Threshold: All employees; obligation runs alongside the employer's obligations
+Text: Employees are obligated, to the extent of their abilities and in accordance with the instructions and directions of the employer, to take care of their own safety and health at work. Correspondingly, employees must also take care of the safety and health of persons who are affected by their actions or omissions at work. Employees who observe deficiencies in occupational health and safety — including defective work equipment, hazardous conditions, or non-compliance with safety procedures — must report these to the employer or to the designated safety person as quickly as possible. Employee duties under §15 do not reduce the employer's own obligations under §§3–14 but operate as complementary obligations intended to support the overall safety management of the organisation.
+Keywords: employee duties, employee obligations, co-responsibility, hazard reporting, self-protection, mutual protection, Pflichten der Beschaeftigten, safety reporting
+
+---
+
+arbschg §22(1)
+Title: Supervisory authority powers — authority may order specific measures in individual cases
+Obligation: MUST
+Threshold: Competent state occupational health and safety authorities (Gewerbeaufsichtsaemter and Berufsgenossenschaften); employers subject to supervisory orders
+Text: The competent supervisory authorities — which in Germany are primarily the state Gewerbeaufsichtsaemter (trade supervisory offices) and the Berufsgenossenschaften (employers' liability insurance associations) — have the power to order, in individual cases, what specific occupational health and safety measures the employer or employees must take to fulfil the obligations arising from the ArbSchG and from the regulations issued under it. Supervisory orders may specify what measures must be taken, by when, and in what manner. Supervisory authorities may enter and inspect workplaces, examine documents, question employees, and take samples as part of their supervisory activities. Employers must cooperate with supervisory authorities and must not obstruct inspections or investigations.
+Keywords: supervisory authority, Gewerbeaufsichtsamt, Berufsgenossenschaft, enforcement order, workplace inspection, supervisory powers, compliance order, ArbSchG enforcement
+
+---
+
+arbschg §25
+Title: Administrative fines — up to €25,000 for wilful or negligent violation of core obligations
+Obligation: MUST
+Threshold: Employers and responsible persons who commit administrative offences under ArbSchG
+Text: An administrative offence under §25 of the ArbSchG is committed by any person who, as an employer or as a person responsible for safety, intentionally or negligently fails to take a required occupational health and safety measure under §3(1), fails to carry out a hazard assessment under §5(1), fails to maintain the required documentation of the hazard assessment under §6(1), or fails to provide required safety instructions to employees under §12(1). Administrative fines for these offences can reach up to €25,000 per offence. Where violations endanger health or life, the matter may be referred to criminal prosecution under §26 of the ArbSchG, which provides for custodial sentences of up to one year. Employers should be aware that administrative fines may be imposed cumulatively where multiple obligations are breached simultaneously.
+Keywords: administrative fine, Bußgeld, €25,000, criminal prosecution, enforcement, Gewerbeaufsicht, employer liability, ArbSchG violation, penalty
+
+---
+
+arbschg §4(6)
+Title: Individual protective measures are a last resort — collective protection takes precedence
+Obligation: MUST
+Threshold: All employers implementing measures following a hazard assessment
+Text: Individual protective measures — such as personal protective equipment (PPE) — are subsidiary to collective and technical protective measures and may only be relied upon where hazards cannot be adequately controlled through elimination, substitution, technical engineering controls, or organisational measures. This hierarchy of protective measures, sometimes described as the STOP principle (Substitution, Technical controls, Organisational measures, Personal protection), is a mandatory principle under §4 of the ArbSchG and must guide the selection and implementation of all protective measures identified through the hazard assessment. Employers must document why PPE was chosen over a higher-ranking measure where this is not self-evident, and must ensure that PPE provided is suitable for the specific hazard, properly maintained, and used correctly by employees.
+Keywords: STOP principle, hierarchy of measures, personal protective equipment, PPE, collective protection, technical controls, substitution, organisational measures, Schutzmassnamen
+
+---
+
+arbschg §3(1) Verification
+Title: Employer must verify effectiveness of implemented measures and adapt to changed circumstances
+Obligation: MUST
+Threshold: All employers; continuous obligation applicable throughout the employment relationship
+Text: The basic obligation under §3(1) of the ArbSchG includes not only the obligation to take occupational health and safety measures but also the ongoing obligation to verify the effectiveness of those measures and to adapt them if circumstances change. Changed circumstances that trigger a review and adaptation obligation include changes to work processes, introduction of new machinery or substances, changes to the physical environment of the workplace, changes in the workforce (e.g., employment of young workers or pregnant employees), results of accident investigations, new scientific or technical knowledge about occupational hazards, changes in applicable law or technical standards, and findings from occupational health surveillance. The obligation to continuously verify and adapt means that the Gefaehrdungsbeurteilung and associated measures must be treated as a living document and management process, not a one-off compliance exercise.
+Keywords: effectiveness verification, adaptation, continuous improvement, changed circumstances, iterative review, hazard assessment update, ongoing obligation, safety management
+
+---
+
+arbschg §12(1) New Employees
+Title: Safety instructions must be given before commencement of work — including for temporary and agency workers
+Obligation: MUST
+Threshold: All employers; applies to all new employees, agency workers, apprentices, and transferred employees
+Text: Safety instruction under §12(1) must take place before the employee commences a new work activity, not after. This requirement means that initial instruction must be completed as part of the onboarding process, before the employee is permitted to work unsupervised in their new role. The instruction obligation applies in full to agency workers (Leiharbeitnehmer), where under §12(2) of the ArbSchG the obligation to instruct falls on the hirer (Entleiher) rather than the temporary work agency. The instruction obligation also applies when an employee is transferred to a new task, when work methods or equipment change, and when the hazard assessment identifies a new or changed hazard. Employers must not permit employees to commence work before the instruction relevant to their specific workplace and task has been given and understood.
+Keywords: pre-commencement instruction, new employees, agency workers, Leiharbeitnehmer, Entleiher, apprentices, onboarding safety, task-specific instruction, before commencing work
+
+---

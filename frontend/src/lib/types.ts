@@ -37,6 +37,47 @@ export interface CompanyProfile {
   has_sustainability_report?: boolean;
   is_critical_infrastructure_sector?: boolean;
   uses_ai_systems?: boolean;
+  // GDPR / BDSG policies
+  has_privacy_policy?: boolean;
+  has_processor_agreements?: boolean;
+  has_data_breach_procedure?: boolean;
+  has_tom_documentation?: boolean;
+  has_data_retention_policy?: boolean;
+  has_data_protection_training?: boolean;
+  transfers_data_outside_eea?: boolean;
+  has_consent_management?: boolean;
+  // NIS2
+  has_information_security_policy?: boolean;
+  has_incident_response_plan?: boolean;
+  has_business_continuity_plan?: boolean;
+  has_vulnerability_management?: boolean;
+  has_mfa_implemented?: boolean;
+  has_supply_chain_security_assessment?: boolean;
+  has_security_awareness_training?: boolean;
+  // EU AI Act
+  ai_systems_are_high_risk?: boolean;
+  has_ai_risk_assessment?: boolean;
+  has_ai_usage_documentation?: boolean;
+  has_human_oversight_procedure?: boolean;
+  // HinSchG
+  has_whistleblower_channel?: boolean;
+  has_whistleblower_policy?: boolean;
+  // ArbSchG
+  has_gefaehrdungsbeurteilung?: boolean;
+  has_gefaehrdungsbeurteilung_documented?: boolean;
+  has_first_aid_measures?: boolean;
+  has_employee_safety_training?: boolean;
+  // AGG
+  has_anti_discrimination_policy?: boolean;
+  has_agc_complaints_procedure?: boolean;
+  // MiLoG
+  has_working_time_records?: boolean;
+  uses_subcontractors?: boolean;
+  // LkSG
+  has_lksg_policy_statement?: boolean;
+  has_supplier_code_of_conduct?: boolean;
+  has_supplier_risk_assessment?: boolean;
+  has_lksg_complaints_procedure?: boolean;
   existing_compliance_notes?: string;
 }
 
