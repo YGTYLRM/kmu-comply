@@ -178,12 +178,6 @@ function AnalyzeInner() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [prefilling, setPrefilling]   = useState(!!fromJobId);
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_STRIPE_ENABLED !== "true") return;
-    const token = localStorage.getItem("complio_access_token");
-    if (!token) router.replace("/#pricing");
-  }, [router]);
-
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
