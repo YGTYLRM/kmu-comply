@@ -10,7 +10,9 @@ import { Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
 function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/analyze";
+  const rawNext = searchParams.get("next") ?? "/analyze";
+  // Only allow relative paths to prevent open redirect attacks
+  const next = rawNext.startsWith("/") ? rawNext : "/analyze";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +28,8 @@ function LoginInner() {
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (authError) {
-      setError(authError.message);
+      // Generic message — don't reveal whether email or password was wrong
+      setError("Invalid email or password.");
       setLoading(false);
       return;
     }
