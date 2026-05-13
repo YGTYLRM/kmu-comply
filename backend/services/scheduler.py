@@ -101,18 +101,30 @@ async def daily_regulation_check() -> None:
 
 async def monthly_reassessment() -> None:
     """
-    Find all companies whose last report is older than 30 days
-    and queue a fresh analysis for each one.
+    Find all companies due for re-assessment based on their plan interval:
+      - Professional: every 7 days
+      - Starter / default: every 30 days
     """
-    logger.info("scheduler: running monthly re-assessment check")
+    logger.info("scheduler: running re-assessment check")
     try:
         from services.db_service import get_all_companies_due_for_reassessment
-        companies = await get_all_companies_due_for_reassessment(interval_days=30)
-        logger.info("scheduler: %d companies due for re-assessment", len(companies))
-        for c in companies:
-            asyncio.create_task(
-                _run_scheduled_analysis(c, triggered_by="scheduled", reason="monthly cycle")
-            )
+        from services.stripe_service import get_active_subscription, PLAN_CONFIG
+        from config import settings
+
+        for interval_days in sorted({7, 30}):
+            companies = await get_all_companies_due_for_reassessment(interval_days=interval_days)
+            for c in companies:
+                # Check the user's plan interval; skip if their plan uses a different interval
+                if settings.stripe_enabled:
+                    sub = await get_active_subscription(c["user_id"])
+                    plan_days = PLAN_CONFIG.get(sub["plan"], {}).get("reassessment_days", 30) if sub else 30
+                    if plan_days != interval_days:
+                        continue
+
+                logger.info("scheduler: queuing %s (interval=%dd)", c["company_name"], interval_days)
+                asyncio.create_task(
+                    _run_scheduled_analysis(c, triggered_by="scheduled", reason=f"{interval_days}d cycle")
+                )
     except Exception as exc:
         logger.error("scheduler: monthly re-assessment error: %s", exc)
 
