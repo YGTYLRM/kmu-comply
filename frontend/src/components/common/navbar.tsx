@@ -3,13 +3,35 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export function Navbar() {
   const [hidden,     setHidden]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userEmail,  setUserEmail]  = useState<string | null>(null);
   const lastY = useRef(0);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserEmail(session?.user?.email ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -72,12 +94,32 @@ export function Navbar() {
             <div className="flex-1" />
 
             {/* Desktop CTA */}
-            <Link
-              href="/contact"
-              className="hidden md:inline-flex rounded-xl bg-brand-600 px-5 py-2.5 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
-            >
-              Request a Demo
-            </Link>
+            {userEmail ? (
+              <div className="hidden md:flex items-center gap-2">
+                <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <User className="h-3 w-3" />{userEmail}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
+                  Sign in
+                </Link>
+                <Link
+                  href="/contact"
+                  className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
+                >
+                  Request a Demo
+                </Link>
+              </div>
+            )}
 
             {/* Mobile hamburger */}
             <button
@@ -109,9 +151,23 @@ export function Navbar() {
                 <Link href="/reports" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   Reports
                 </Link>
-                <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
-                  Request a Demo
-                </Link>
+                {userEmail ? (
+                  <button
+                    onClick={() => { setMobileOpen(false); handleLogout(); }}
+                    className="mt-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 font-semibold text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign out
+                  </button>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                      Sign in
+                    </Link>
+                    <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
+                      Request a Demo
+                    </Link>
+                  </>
+                )}
               </nav>
             </div>
           )}
