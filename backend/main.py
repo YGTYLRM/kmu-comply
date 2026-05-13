@@ -201,6 +201,16 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
     """Submit a company profile for compliance analysis. Returns a job_id."""
     _check_rate_limit(current_user["id"])
 
+    # Enforce subscription plan limits
+    if settings.stripe_enabled and settings.database_url:
+        from services.stripe_service import get_active_subscription, check_company_limit
+        sub = await get_active_subscription(current_user["id"])
+        if not sub:
+            raise HTTPException(status_code=402, detail="Active subscription required.")
+        allowed, reason = await check_company_limit(current_user["id"])
+        if not allowed:
+            raise HTTPException(status_code=402, detail=reason)
+
     # Upsert company in DB so it can be monitored going forward
     company_id: Optional[str] = None
     if settings.database_url:
@@ -550,24 +560,42 @@ async def create_checkout(req: CheckoutRequest, current_user: dict = Depends(get
         raise HTTPException(status_code=503, detail="Payments not configured.")
     _validate_redirect_url(req.success_url)
     _validate_redirect_url(req.cancel_url)
-    from services.stripe_service import create_checkout_session
+    from services.stripe_service import create_subscription_checkout
     try:
-        url = create_checkout_session(req.plan, req.success_url, req.cancel_url)
+        url = await create_subscription_checkout(
+            plan=req.plan,
+            user_id=current_user["id"],
+            user_email=current_user["email"],
+            success_url=req.success_url,
+            cancel_url=req.cancel_url,
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {"url": url}
 
 
-@app.get("/api/checkout/verify")
-async def verify_checkout(session_id: str, current_user: dict = Depends(get_current_user)):
-    """Success page calls this to exchange a Stripe session_id for an access token."""
+@app.get("/api/billing")
+async def get_billing(current_user: dict = Depends(get_current_user)):
+    """Return the current user's subscription status."""
+    if not settings.stripe_enabled:
+        return {"subscription": None, "stripe_enabled": False}
+    from services.stripe_service import get_active_subscription
+    sub = await get_active_subscription(current_user["id"])
+    return {"subscription": sub, "stripe_enabled": True}
+
+
+@app.post("/api/billing/portal")
+async def billing_portal(current_user: dict = Depends(get_current_user)):
+    """Return a Stripe Customer Portal URL for subscription management."""
     if not settings.stripe_secret_key:
         raise HTTPException(status_code=503, detail="Payments not configured.")
-    from services.stripe_service import verify_session
-    token = verify_session(session_id)
-    if not token:
-        raise HTTPException(status_code=402, detail="Payment not confirmed.")
-    return {"token": token}
+    from services.stripe_service import create_portal_session
+    base = _allowed_origins[0] if _allowed_origins else "http://localhost:3001"
+    try:
+        url = await create_portal_session(current_user["id"], return_url=f"{base}/account/billing")
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    return {"url": url}
 
 
 @app.post("/api/webhook/stripe")
@@ -577,7 +605,7 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
     payload = await request.body()
     from services.stripe_service import handle_webhook
     try:
-        handle_webhook(payload, stripe_signature or "")
+        await handle_webhook(payload, stripe_signature or "")
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid webhook signature.")
     return {"received": True}
