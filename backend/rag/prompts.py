@@ -1,4 +1,37 @@
 """All LLM prompt templates. No inline prompts anywhere else in the codebase."""
+import re
+
+
+import json as _json
+
+
+def _sanitize_profile_json(profile_json: str) -> str:
+    """Sanitize all free-text fields in the serialised profile before prompt embedding."""
+    try:
+        data = _json.loads(profile_json)
+        for field in ("existing_compliance_notes", "company_name", "industry"):
+            if data.get(field):
+                data[field] = _sanitize(str(data[field]), max_len=500 if field != "existing_compliance_notes" else 2000)
+        return _json.dumps(data)
+    except Exception:
+        return profile_json
+
+
+def _sanitize(text: str | None, max_len: int = 2000) -> str:
+    """Strip prompt-injection patterns from user-supplied free text."""
+    if not text:
+        return ""
+    # Truncate
+    text = text[:max_len]
+    # Remove XML/HTML tags that could break prompt structure
+    text = re.sub(r"<[^>]{0,100}>", "", text)
+    # Collapse injection keywords (case-insensitive)
+    _INJECTIONS = re.compile(
+        r"\b(ignore|disregard|forget|override|system\s*prompt|new\s*instruction|you\s+are\s+now)\b",
+        re.IGNORECASE,
+    )
+    text = _INJECTIONS.sub("[removed]", text)
+    return text.strip()
 
 SYSTEM_PERSONA = """You are a Senior Regulatory Compliance Consultant specializing in German SME law.
 
@@ -13,6 +46,7 @@ Your role:
 
 
 def profile_enrichment_prompt(profile_json: str) -> str:
+    profile_json = _sanitize_profile_json(profile_json)
     return f"""<task>
 Analyze this company profile and identify implicit compliance-relevant characteristics
 that are not explicitly stated but can be logically inferred.
@@ -51,6 +85,7 @@ Constraints:
 
 
 def gap_analysis_prompt(profile_json: str, chunks_json: str, company_docs_json: str = "") -> str:
+    profile_json = _sanitize_profile_json(profile_json)
     has_docs = bool(company_docs_json.strip())
 
     docs_section = f"""
@@ -191,6 +226,7 @@ Constraints:
 
 
 def action_plan_prompt(profile_json: str, gap_analysis_json: str) -> str:
+    profile_json = _sanitize_profile_json(profile_json)
     return f"""<task>
 Generate a prioritized action plan to address all compliance gaps below.
 Every NON_COMPLIANT and PARTIALLY_COMPLIANT gap must have at least one action item.
