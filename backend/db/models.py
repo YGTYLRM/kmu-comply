@@ -25,6 +25,7 @@ class Profile(Base):
 
     companies: Mapped[list["Company"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     notifications: Mapped[list["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    subscription: Mapped[Optional["Subscription"]] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
 
 
 class Company(Base):
@@ -156,6 +157,22 @@ class ActionItem(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     company: Mapped["Company"] = relationship(back_populates="action_items")
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, unique=True)
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, unique=True)
+    plan: Mapped[str] = mapped_column(String(30), nullable=False)          # starter | professional | enterprise
+    status: Mapped[str] = mapped_column(String(20), nullable=False)        # active | canceled | past_due | trialing
+    current_period_end: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
+
+    user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
 class Notification(Base):
