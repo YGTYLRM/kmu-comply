@@ -1,7 +1,10 @@
 import asyncio
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
@@ -10,11 +13,12 @@ from models.enums import AnalysisStep, JobStatus
 
 
 class _Job:
-    def __init__(self, job_id: str, profile: CompanyProfile, doc_session_id: Optional[str] = None, user_id: Optional[str] = None) -> None:
+    def __init__(self, job_id: str, profile: CompanyProfile, doc_session_id: Optional[str] = None, user_id: Optional[str] = None, company_id: Optional[str] = None) -> None:
         self.job_id = job_id
         self.profile = profile
         self.doc_session_id = doc_session_id
         self.user_id = user_id
+        self.company_id = company_id
         self.status = JobStatus.PENDING
         self.current_step: Optional[AnalysisStep] = None
         self.steps: list[StepProgress] = []
@@ -54,9 +58,9 @@ class JobManager:
             except asyncio.CancelledError:
                 pass
 
-    async def create_job(self, profile: CompanyProfile, doc_session_id: Optional[str] = None, user_id: Optional[str] = None) -> str:
+    async def create_job(self, profile: CompanyProfile, doc_session_id: Optional[str] = None, user_id: Optional[str] = None, company_id: Optional[str] = None) -> str:
         job_id = str(uuid.uuid4())
-        job = _Job(job_id=job_id, profile=profile, doc_session_id=doc_session_id, user_id=user_id)
+        job = _Job(job_id=job_id, profile=profile, doc_session_id=doc_session_id, user_id=user_id, company_id=company_id)
         self._jobs[job_id] = job
         from services.report_store import save_profile
         save_profile(job_id, profile.model_dump())
@@ -115,6 +119,14 @@ class JobManager:
             )
             from services.report_store import save as save_report
             save_report(report, user_id=job.user_id)
+
+            # Persist to DB if this job has a company_id
+            if job.company_id:
+                try:
+                    from services.db_service import save_report_to_db
+                    await save_report_to_db(job.company_id, report, triggered_by="manual")
+                except Exception as exc:
+                    logger.warning("job_manager: db save failed for %s: %s", job.job_id, exc)
 
         except Exception as exc:
             job.status = JobStatus.FAILED
