@@ -73,10 +73,10 @@ export function Navbar() {
 
             {/* Desktop CTA */}
             <Link
-              href="/analyze"
+              href="/contact"
               className="hidden md:inline-flex rounded-xl bg-brand-600 px-5 py-2.5 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
             >
-              Get started
+              Request a Demo
             </Link>
 
             {/* Mobile hamburger */}
@@ -109,8 +109,8 @@ export function Navbar() {
                 <Link href="/reports" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   Reports
                 </Link>
-                <Link href="/analyze" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
-                  Get started
+                <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
+                  Request a Demo
                 </Link>
               </nav>
             </div>
