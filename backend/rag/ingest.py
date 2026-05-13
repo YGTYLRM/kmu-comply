@@ -43,6 +43,7 @@ MAX_CHUNK_CHARS = 1_500 * 4
 
 REGULATION_COLLECTIONS: dict[str, str] = {
     "gdpr":             "gdpr_dsgvo",
+    "gdpr_dsgvo":       "gdpr_dsgvo",  # alias so Regulation enum value resolves correctly
     "bdsg":             "bdsg",
     "lksg":             "lksg",
     "enefg":            "enefg",
@@ -273,6 +274,30 @@ def _chunk_guidance(text: str, regulation: str, filename: str, url: str) -> list
     return chunks
 
 
+def _chunk_separator_blocks(text: str, regulation: str, filename: str, url: str) -> list[dict]:
+    """Chunk files structured as blocks separated by '---' markers.
+    Used for *_expanded.txt files where each block covers one article/provision."""
+    import re as _re
+    blocks = [b.strip() for b in text.split("---") if b.strip()]
+    chunks = []
+    for block in blocks:
+        if len(block) < 80:
+            continue
+        lines = block.splitlines()
+        first = lines[0].strip()
+        # Extract article reference (e.g. "hinschg §12(1)" → "§12(1)")
+        art_match = _re.search(r"§\s*(\S+)", first)
+        article_number = f"§ {art_match.group(1)}" if art_match else first[:40]
+        # Extract title from "Title: ..." line
+        title = article_number
+        for line in lines[1:6]:
+            if line.startswith("Title:"):
+                title = line.replace("Title:", "").strip()
+                break
+        chunks.append(_make_chunk(block, regulation, article_number, title, "law", filename, url))
+    return chunks
+
+
 def _chunk_fixed(text: str, regulation: str, filename: str, url: str) -> list[dict]:
     """Fixed-size word-based fallback for documents with no detectable structure."""
     words = text.split()
@@ -299,12 +324,24 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     text = _load(path)
     name = path.name
 
+    # Structured expanded files (any regulation) — split on '---' blocks
+    if "_expanded" in path.stem:
+        return _chunk_separator_blocks(text, regulation, name, url)
+
     if regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "agg", "milog") and path.suffix == ".txt":
         return _chunk_german_law(text, regulation, name, url)
 
     if regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
         chunks = _chunk_eu_law(text, regulation, name, url)
         return chunks if chunks else _chunk_guidance(text, regulation, name, url)
+
+    # For compliance_guides text files that look like German law (contain § sections),
+    # use the German law chunker so § N sections are properly split
+    if regulation == "compliance_guides" and path.suffix == ".txt":
+        if _RE_GERMAN_SECTION.search(text):
+            chunks = _chunk_german_law(text, regulation, name, url)
+            if chunks:
+                return chunks
 
     return _chunk_guidance(text, regulation, name, url)
 

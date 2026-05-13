@@ -57,18 +57,32 @@ class JobManager:
         job_id = str(uuid.uuid4())
         job = _Job(job_id=job_id, profile=profile, doc_session_id=doc_session_id)
         self._jobs[job_id] = job
+        from services.report_store import save_profile
+        save_profile(job_id, profile.model_dump())
         asyncio.create_task(self._run_pipeline(job))
         return job_id
 
     def get_status(self, job_id: str) -> Optional[StatusResponse]:
         job = self._jobs.get(job_id)
-        return job.to_status_response() if job else None
+        if job:
+            return job.to_status_response()
+        from services.report_store import exists
+        if exists(job_id):
+            return StatusResponse(
+                job_id=job_id,
+                status=JobStatus.COMPLETED,
+                current_step=None,
+                steps=[],
+                error=None,
+            )
+        return None
 
     def get_report(self, job_id: str) -> Optional[ComplianceReport]:
         job = self._jobs.get(job_id)
-        if job and job.status == JobStatus.COMPLETED:
+        if job and job.status in (JobStatus.COMPLETED, JobStatus.PARTIAL):
             return job.report
-        return None
+        from services.report_store import load
+        return load(job_id)
 
     async def _run_pipeline(self, job: _Job) -> None:
         from agent.compliance_agent import run_analysis
@@ -98,6 +112,8 @@ class JobManager:
             job.status = (
                 JobStatus.PARTIAL if report.requires_manual_review else JobStatus.COMPLETED
             )
+            from services.report_store import save as save_report
+            save_report(report)
 
         except Exception as exc:
             job.status = JobStatus.FAILED

@@ -62,10 +62,72 @@ Prioritise these as evidence. Quote specific passages in your evidence field.
 """ if has_docs else ""
 
     cannot_assess_note = (
-        "- CANNOT_ASSESS: only if both the profile AND the uploaded documents lack information needed"
+        "- CANNOT_ASSESS: ONLY if neither the profile, nor the uploaded documents, nor industry norms "
+        "provide ANY basis for assessment. This must be extremely rare — under 2% of items."
         if has_docs
-        else "- CANNOT_ASSESS: the profile lacks information needed to determine compliance"
+        else "- CANNOT_ASSESS: ABSOLUTE LAST RESORT only. Do NOT use because a policy document is missing. "
+        "Absence of a measure IS evidence of non-compliance. Use NON_COMPLIANT or PARTIALLY_COMPLIANT instead."
     )
+
+    profile_field_guidance = """
+Profile fields ARE your evidence — treat them as direct compliance indicators:
+
+GDPR / BDSG:
+- has_processing_records=false → NON_COMPLIANT on Art. 30 GDPR
+- has_dpo=false → assess DPO requirement against thresholds (employee count, data type)
+- has_privacy_policy=false → NON_COMPLIANT on Art. 13/14 GDPR
+- has_processor_agreements=false → NON_COMPLIANT on Art. 28 GDPR
+- has_data_breach_procedure=false → NON_COMPLIANT on Art. 33/34 GDPR
+- has_tom_documentation=false → NON_COMPLIANT on Art. 32 GDPR
+- has_data_retention_policy=false → NON_COMPLIANT on Art. 5(1)(e) GDPR
+- has_data_protection_training=false → NON_COMPLIANT on Art. 29/32(4) GDPR
+- transfers_data_outside_eea=true → assess Art. 44-49 GDPR transfer safeguards
+- has_consent_management=false → NON_COMPLIANT on Art. 6/7 GDPR where consent is the legal basis
+- processes_special_category_data=true → stricter GDPR Art. 9 obligations apply
+
+NIS2 (applies if is_critical_infrastructure_sector=true):
+- has_information_security_policy=false → NON_COMPLIANT on Art. 21(2)(a) NIS2
+- has_incident_response_plan=false → NON_COMPLIANT on Art. 21(2)(b) NIS2
+- has_business_continuity_plan=false → NON_COMPLIANT on Art. 21(2)(c) NIS2
+- has_vulnerability_management=false → NON_COMPLIANT on Art. 21(2)(e) NIS2
+- has_mfa_implemented=false → NON_COMPLIANT on Art. 21(2)(j) NIS2
+- has_supply_chain_security_assessment=false → NON_COMPLIANT on Art. 21(2)(d) NIS2
+- has_security_awareness_training=false → NON_COMPLIANT on Art. 21(2)(g) NIS2
+
+EU AI Act (applies if uses_ai_systems=true):
+- ai_systems_are_high_risk=true → full high-risk obligations apply (Arts. 9-17)
+- has_ai_risk_assessment=false → NON_COMPLIANT on Art. 9 EU AI Act
+- has_ai_usage_documentation=false → NON_COMPLIANT on Art. 13 EU AI Act
+- has_human_oversight_procedure=false → NON_COMPLIANT on Art. 14 EU AI Act
+
+HinSchG (applies if employee_count >= 50):
+- has_whistleblower_channel=false → NON_COMPLIANT on §12 HinSchG
+- has_whistleblower_policy=false → PARTIALLY_COMPLIANT at best on §13 HinSchG
+
+ArbSchG (applies to ALL employers):
+- has_gefaehrdungsbeurteilung=false → NON_COMPLIANT on §5 ArbSchG
+- has_gefaehrdungsbeurteilung_documented=false → NON_COMPLIANT on §6 ArbSchG
+- has_first_aid_measures=false → NON_COMPLIANT on §10 ArbSchG
+- has_employee_safety_training=false → NON_COMPLIANT on §12 ArbSchG
+
+AGG (applies to ALL employers):
+- has_anti_discrimination_policy=false → NON_COMPLIANT on §12 AGG
+- has_agc_complaints_procedure=false → NON_COMPLIANT on §13 AGG
+
+MiLoG (applies to ALL employers):
+- has_working_time_records=false → NON_COMPLIANT on §17 MiLoG for covered workers
+- uses_subcontractors=true → principal liability applies under §13 MiLoG
+
+LkSG (applies if has_supply_chain_abroad=true and thresholds met):
+- has_lksg_policy_statement=false → NON_COMPLIANT on §6 LkSG
+- has_supplier_code_of_conduct=false → NON_COMPLIANT on §6 LkSG
+- has_supplier_risk_assessment=false → NON_COMPLIANT on §5 LkSG
+- has_lksg_complaints_procedure=false → NON_COMPLIANT on §8 LkSG
+
+Absence of implementation = NON_COMPLIANT, not CANNOT_ASSESS.
+Partial information = PARTIALLY_COMPLIANT with explanation, not CANNOT_ASSESS.
+Only use CANNOT_ASSESS when the requirement depends on something genuinely unknowable from all available data.
+"""
 
     doc_instruction = """
 When company documents are provided, your evidence MUST cite specific passages.
@@ -75,8 +137,12 @@ When company documents are provided, your evidence MUST cite specific passages.
 
     return f"""<task>
 For each regulatory requirement provided, assess this company's compliance status.
-{"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile and retrieved regulation text."}
+{"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile fields and retrieved regulation text. The profile IS sufficient to assess the vast majority of requirements."}
 </task>
+
+<applicability_notice>
+IMPORTANT: Applicability determination has already been completed before this step using a separate deterministic rule engine. The regulations and articles you are receiving are confirmed to apply to this company. Do NOT use the retrieved legal text to re-determine whether a regulation applies or what size/revenue thresholds trigger obligations — that has already been decided. Your sole job is to assess HOW WELL the company currently meets each provided article requirement. Do not adjust compliance status based on size thresholds you read in the retrieved text.
+</applicability_notice>
 
 <company_profile>
 {profile_json}
@@ -88,10 +154,12 @@ For each regulatory requirement provided, assess this company's compliance statu
 
 <instructions>
 Assess each requirement chunk. Use exactly these status values:
-- COMPLIANT: evidence shows the company meets this requirement
-- PARTIALLY_COMPLIANT: the company partially meets it — specific gaps exist
-- NON_COMPLIANT: the company does not meet this requirement
+- COMPLIANT: profile fields or documents confirm the company meets this requirement
+- PARTIALLY_COMPLIANT: the company partially meets it — profile confirms some but not all aspects
+- NON_COMPLIANT: profile fields show the requirement is not met (missing measure, wrong threshold, absence of documented activity)
 {cannot_assess_note}
+
+{profile_field_guidance}
 {doc_instruction}
 Output ONLY a valid JSON array:
 [
@@ -100,16 +168,25 @@ Output ONLY a valid JSON array:
     "article_number": "Art. 30",
     "article_title": "Records of processing activities",
     "status": "NON_COMPLIANT",
-    "evidence": "Profile shows has_processing_records=false with 150 employees and non-occasional processing — Art. 30 records are mandatory.",
-    "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) maintained — required under Art. 30(1) GDPR."
+    "evidence": "The company does not maintain Records of Processing Activities. With non-occasional processing and over 20 staff regularly handling personal data, Art. 30(1) GDPR records are mandatory and the SME exception does not apply.",
+    "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) in place. Must document all processing operations including purpose, data categories, and retention periods."
   }}
 ]
 
+CRITICAL LANGUAGE RULES — apply to every evidence and deficiency_description field:
+- Write in plain English that any business owner with no legal background can understand.
+- Never write JSON field names (e.g. never write has_dpo, has_processing_records, employee_count=62, =true, =false, etc.)
+- Describe the compliance situation in human terms: "The company has no Data Protection Officer" not "has_dpo=false"
+- State what the requirement actually means in practice before saying whether it is met.
+- For deficiency_description: explain WHY this is a problem and what could go wrong if it stays unresolved.
+- Evidence should read like a short paragraph a consultant would write, not a log entry.
+
 Constraints:
-- Every assessment MUST have a non-empty evidence field
-- Only assess articles applicable to this company
+- Every assessment MUST have a non-empty evidence field in plain English
+- Only assess articles applicable to this company based on its profile
 - deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
-- Be consistent: same facts produce the same status
+- Be consistent: same profile facts produce the same status
+- Target: 98%+ of items should be COMPLIANT, PARTIALLY_COMPLIANT, or NON_COMPLIANT
 </instructions>"""
 
 

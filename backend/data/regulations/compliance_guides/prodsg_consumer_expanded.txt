@@ -1,0 +1,48 @@
+Produktsicherheitsgesetz (ProdSG), BGB AGB-Recht, Preisangabenverordnung (PAngV), VSBG
+Product safety, general terms, price display, consumer dispute resolution for German SMEs
+Sources: gesetze-im-internet.de/prodsg_2021, bgb, pangv_2022, vsbg
+
+---
+
+compliance_guides ProdSG §3
+Title: General product safety obligation — all products must not endanger health or safety of persons
+Obligation: MUST
+Threshold: All manufacturers, importers, distributors, and retailers placing products on the German market
+Text: The Produktsicherheitsgesetz (ProdSG) implements the EU General Product Safety Directive in Germany. §3 establishes the fundamental obligation: products subject to regulatory ordinances must meet the specified requirements and must not endanger the safety and health of persons during intended use or reasonably foreseeable misuse. For products not covered by specific regulations, the same safety obligation applies. When assessing safety, relevant factors include: product properties and composition; packaging; assembly and maintenance instructions; effects of the product when used with other products; labelling, warnings, and disposal information; and the specific vulnerability of user groups (children, elderly, disabled). German-language instructions must be provided when safety-relevant operation requires them. Products that do not comply with the safety obligation may not be placed on the market and existing products must be recalled. The market surveillance authorities (Marktüberwachungsbehörden) of the federal states monitor compliance.
+Keywords: Produktsicherheit, product safety, §3 ProdSG, general safety requirement, health and safety, intended use, reasonably foreseeable misuse, German instructions, market surveillance
+
+---
+
+compliance_guides ProdSG §6
+Title: Obligations of economic operators — manufacturers, importers, distributors have different responsibilities
+Obligation: MUST
+Threshold: All economic operators placing products on the German market — manufacturers, authorised representatives, importers, and distributors
+Text: The ProdSG assigns different obligations to different economic operators in the supply chain. Manufacturers (Hersteller) — including any party who places a product on the market under their own name or brand — must ensure products comply with all applicable requirements, must draw up the required technical documentation, must affix CE marking where required, and must have a responsible person established in the EU/EEA. Importers must verify that manufacturers have fulfilled their obligations, must not place non-compliant products on the market, and must include their name and contact address on the product. Distributors must check that required markings and documents are present and must not deliver products they know or should know are non-compliant. All economic operators must cooperate with market surveillance authorities and immediately take corrective action (recall, withdrawal) if they become aware that a product is unsafe.
+Keywords: Hersteller, Importeur, Haendler, manufacturer, importer, distributor, CE marking, technical documentation, responsible person, ProdSG §6, recall, market surveillance
+
+---
+
+compliance_guides BGB §307
+Title: General terms and conditions — unfair clauses that disadvantage contractual partners are void
+Obligation: MUST
+Threshold: All businesses using standard terms and conditions (AGB) in contracts with consumers or businesses
+Text: General terms and conditions (Allgemeine Geschäftsbedingungen, AGB) are clauses that one party pre-formulates for use in multiple contracts. Under §307 BGB, AGB clauses are void if they unreasonably disadvantage the other party contrary to the requirements of good faith (Treu und Glauben). A clause is presumed to unreasonably disadvantage if it: contradicts the essential principles of the statutory rule it deviates from; or restricts essential rights or duties arising from the nature of the contract to such an extent that achievement of the contract purpose is jeopardised. AGB clauses must be clear and comprehensible — lack of clarity itself constitutes unreasonable disadvantage. In B2C contracts, §§308 and 309 BGB provide additional specific prohibited clauses including: blanket price increase rights; disproportionate cancellation fees; exclusion of liability for intent and gross negligence; and unreasonably short warranty periods. Businesses must review their standard contract terms for compliance with AGB law and must ensure they are incorporated correctly (prior disclosure, opportunity to take note, agreement).
+Keywords: AGB, allgemeine Geschäftsbedingungen, general terms, §307 BGB, fairness test, unreasonable disadvantage, void clause, B2C, B2B, prohibited clauses
+
+---
+
+compliance_guides PAngV §1
+Title: Price display obligation — total prices including VAT must be shown clearly to consumers
+Obligation: MUST
+Threshold: All businesses offering goods or services to consumers (Verbraucher) in Germany; applies to physical and online shops
+Text: The Preisangabenverordnung (PAngV) requires all businesses offering goods or services to consumers to clearly display the total price including all taxes (including VAT), levies, and any mandatory charges. The displayed price must be the final price that the consumer must pay — no additional costs may be added at checkout. For goods sold by weight, volume, length, or area, the price per unit of measurement (Grundpreis) must also be shown alongside the total price, to enable price comparison. Price information must be clearly associated with the relevant product or service, easily recognisable, clearly legible, and presented honestly without misleading formatting. Violations of PAngV are unfair commercial practices under the UWG, giving competitors and consumer associations a right to seek injunctions. Online shops must display prices before the consumer initiates the order process. Strikethrough prices shown in advertising must reflect actually charged prices, not artificially inflated reference prices.
+Keywords: Preisangabenverordnung, PAngV, Gesamtpreis, total price including VAT, Grundpreis, unit price, consumer, online shop, strikethrough price, UWG violation
+
+---
+
+compliance_guides VSBG §36
+Title: Consumer dispute resolution information obligation — businesses must publish ADR information on their website
+Obligation: MUST
+Threshold: All businesses with websites that trade with consumers in Germany; regardless of company size
+Text: All businesses that operate a website and conclude or have concluded online sales or service contracts with consumers must provide the following information on their website and in their general terms: (1) a reference to the EU Online Dispute Resolution (ODR) platform at https://ec.europa.eu/consumers/odr; and (2) their own email address. If the business participates in an alternative dispute resolution (ADR) procedure, it must provide the name and web address of the competent dispute resolution body. If the business does not participate in voluntary dispute resolution procedures, this must also be stated clearly. The information obligation under the EU ODR Regulation applies to all EU-based traders selling online to EU consumers. Failure to provide this information violates the VSBG and constitutes an unfair commercial practice under UWG, exposing businesses to injunctions from competitors and consumer associations.
+Keywords: VSBG, Verbraucherstreitbeilegung, ODR platform, consumer dispute resolution, information obligation, website, §36 VSBG, email address, ADR body

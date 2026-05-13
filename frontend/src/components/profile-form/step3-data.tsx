@@ -50,7 +50,7 @@ export function Step3Data({ form }: Props) {
             render={({ field }) => (
               <BoolField
                 label="Is processing only occasional?"
-                hint="Not core business — infrequent, limited scope"
+                hint="Not core business. Infrequent, limited scope."
                 value={field.value}
                 onChange={field.onChange}
               />

@@ -45,7 +45,10 @@ export function ProcessingView() {
         setSteps(status.steps);
         if (status.status === "completed") {
           clearInterval(intervalRef.current!);
-          router.push(`/report/${jobId}`);
+          const prevJobId = sessionStorage.getItem("kmu_prev_job_id");
+          sessionStorage.removeItem("kmu_prev_job_id");
+          const dest = prevJobId ? `/report/${jobId}?prev=${prevJobId}` : `/report/${jobId}`;
+          router.push(dest);
         } else if (status.status === "failed") {
           clearInterval(intervalRef.current!);
           setError(status.error ?? "Analysis failed. Please try again.");
@@ -66,7 +69,7 @@ export function ProcessingView() {
   const runningStep    = STEP_ORDER.find((k) => steps.find((s) => s.step === k)?.status === "running");
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-dark-950 flex items-center justify-center px-6 py-16">
+    <div className="min-h-screen bg-dark-950 pt-24 flex items-center justify-center px-6 py-16">
       {/* Background orb */}
       <div className="pointer-events-none fixed inset-0 flex items-center justify-center overflow-hidden">
         <div className="h-[500px] w-[500px] rounded-full bg-brand-600/10 blur-[120px]" />
@@ -80,10 +83,20 @@ export function ProcessingView() {
       >
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/25 mb-4 shadow-glow-blue-sm">
-            <Loader2 className={cn("h-7 w-7 text-brand-400", !error && "animate-spin")} />
+          <div className={cn(
+            "inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4",
+            error
+              ? "bg-red-500/10 border border-red-500/25"
+              : "bg-brand-500/10 border border-brand-500/25 shadow-glow-blue-sm"
+          )}>
+            {error
+              ? <XCircle className="h-7 w-7 text-red-400" />
+              : <Loader2 className="h-7 w-7 text-brand-400 animate-spin" />
+            }
           </div>
-          <h1 className="text-xl font-bold text-white">Running your compliance screening</h1>
+          <h1 className="text-xl font-bold text-white">
+            {error ? "Something went wrong" : "Running your compliance screening"}
+          </h1>
           <AnimatePresence mode="wait">
             <motion.p
               key={runningStep ?? "idle"}
@@ -154,14 +167,23 @@ export function ProcessingView() {
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1   }}
-            className="w-full rounded-xl bg-red-500/10 border border-red-500/25 px-5 py-4 text-sm text-red-400"
+            className="w-full rounded-2xl bg-red-500/8 border border-red-500/20 p-6 flex flex-col items-center gap-4 text-center"
           >
-            {error}
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20">
+              <XCircle className="h-6 w-6 text-red-400" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-red-300 mb-1">Analysis failed</p>
+              <p className="text-xs text-red-400/70 leading-relaxed">{error}</p>
+              {error.toLowerCase().includes("connection") || error.toLowerCase().includes("fetch") ? (
+                <p className="text-xs text-slate-600 mt-2">Make sure the backend server is running on port 8000.</p>
+              ) : null}
+            </div>
             <button
-              className="block mt-2 text-red-400 underline text-xs font-medium hover:text-red-300 transition-colors"
               onClick={() => router.push("/analyze")}
+              className="rounded-xl bg-red-500/15 border border-red-500/25 px-5 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-500/25 transition-colors"
             >
-              Go back and try again
+              Start a new screening
             </button>
           </motion.div>
         )}
