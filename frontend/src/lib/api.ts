@@ -78,7 +78,60 @@ export const api = {
 
   getProfile: (jobId: string) =>
     request<CompanyProfile>(`/api/report/${jobId}/profile`),
+
+  listCompanies: () =>
+    request<{ companies: CompanySummary[] }>("/api/companies"),
+
+  getCompany: (companyId: string) =>
+    request<{ company: CompanyDetail; reports: CompanyReport[] }>(`/api/companies/${companyId}`),
+
+  listNotifications: () =>
+    request<{ notifications: NotificationItem[] }>("/api/notifications"),
+
+  getUnreadCount: () =>
+    request<{ count: number }>("/api/notifications/unread-count"),
+
+  markNotificationsRead: () =>
+    request<{ ok: boolean }>("/api/notifications/mark-read", { method: "POST" }),
 };
+
+export interface CompanySummary {
+  id: string;
+  name: string;
+  industry: string | null;
+  employee_count: number | null;
+  country: string;
+  latest_score: number | null;
+  last_report_at: string | null;
+  report_count: number;
+  created_at: string | null;
+}
+
+export interface CompanyDetail {
+  id: string;
+  name: string;
+  industry: string | null;
+  employee_count: number | null;
+  country: string;
+  created_at: string | null;
+}
+
+export interface CompanyReport {
+  id: string;
+  job_id: string | null;
+  score: number | null;
+  triggered_by: string;
+  created_at: string | null;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: string;
+  title: string | null;
+  message: string;
+  read: boolean;
+  created_at: string | null;
+}
 
 export interface ReportSummary {
   job_id: string;
