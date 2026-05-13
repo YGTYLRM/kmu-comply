@@ -32,7 +32,11 @@ export default function RegisterPage() {
     });
 
     if (authError) {
-      setError(authError.message);
+      // Map common errors to user-friendly messages without leaking internals
+      const msg = authError.message.toLowerCase();
+      if (msg.includes("already")) setError("An account with this email already exists. Please sign in.");
+      else if (msg.includes("password")) setError("Password must be at least 8 characters.");
+      else setError("Registration failed. Please try again.");
       setLoading(false);
       return;
     }

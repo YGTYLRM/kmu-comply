@@ -13,9 +13,12 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   try {
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    // getUser() validates the token server-side; getSession() only reads localStorage
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return {};
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return {};
+    return { Authorization: `Bearer ${session.access_token}` };
   } catch {
     return {};
   }
