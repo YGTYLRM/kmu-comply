@@ -1,6 +1,10 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
+
+
+def _now():
+    return datetime.now(timezone.utc)
 from sqlalchemy import String, Boolean, Float, Integer, DateTime, JSON, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,7 +21,7 @@ class Profile(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)  # = supabase auth user id
     name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     companies: Mapped[list["Company"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     notifications: Mapped[list["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
@@ -101,8 +105,8 @@ class Company(Base):
     has_lksg_complaints_procedure: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     existing_compliance_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=datetime.utcnow)
 
     user: Mapped["Profile"] = relationship(back_populates="companies")
     reports: Mapped[list["Report"]] = relationship(back_populates="company", cascade="all, delete-orphan")
@@ -118,7 +122,7 @@ class Report(Base):
     overall_score_percent: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     triggered_by: Mapped[str] = mapped_column(String(20), default="manual")
     raw_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     company: Mapped["Company"] = relationship(back_populates="reports")
     gap_items: Mapped[list["GapItem"]] = relationship(back_populates="report", cascade="all, delete-orphan")
@@ -149,7 +153,7 @@ class ActionItem(Base):
     effort: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     company: Mapped["Company"] = relationship(back_populates="action_items")
 
@@ -163,6 +167,6 @@ class Notification(Base):
     title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     message: Mapped[str] = mapped_column(Text)
     read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     user: Mapped["Profile"] = relationship(back_populates="notifications")
