@@ -1,0 +1,40 @@
+Verpackungsgesetz (VerpackG)
+Gesetz ueber das Inverkehrbringen, die Ruecknahme und die hochwertige Verwertung von Verpackungen
+vom 5. Juli 2017 (BGBl. I S. 2234), geaendert durch Gesetz vom 6. Mai 2023
+Source: https://www.gesetze-im-internet.de/verpackg/
+
+---
+
+compliance_guides VerpackG §1
+Title: Purpose — take-back and recycling obligations for all businesses placing packaged goods on the German market
+Obligation: MUST
+Threshold: All businesses (Hersteller) that place packaged goods onto the German market for the first time; applies regardless of company size
+Text: The Verpackungsgesetz (VerpackG) regulates the placing on the market, take-back, and recycling of packaging in Germany. It implements the principle of producer responsibility (Herstellerverantwortung): whoever first places packaged goods on the German market — whether manufacturer, importer, or online retailer — bears responsibility for the take-back and recycling of that packaging. The law applies to sales packaging (Verkaufsverpackungen) that are typically passed on to private end consumers, as well as certain service packaging and transport packaging. The definition of private end consumer is broad and includes not only households but also restaurants, hospitals, schools, and comparable facilities. The law applies to all businesses, including small and micro-enterprises, that sell products to consumers in Germany, including via online sales to German consumers.
+Keywords: VerpackG, packaging law, Herstellerverantwortung, producer responsibility, take-back, recycling, online retail, importer, scope
+
+---
+
+compliance_guides VerpackG §9
+Title: System participation obligation — registration with LUCID and participation in dual system mandatory
+Obligation: MUST
+Threshold: All businesses placing sales packaging (Verkaufsverpackungen) filled with goods on the German market for private end consumers
+Text: Businesses that place sales packaging — packaging typically passed on to private end consumers — on the German market are obligated to: (1) register in the national packaging register LUCID (operated by the Zentrale Stelle Verpackungsregister, ZSVR) before placing packaging on the market; and (2) participate in an approved dual system (duales System) — a licensed take-back and recycling scheme — and pay a corresponding license fee based on the type and weight of packaging placed on the market. The participation must cover all sales packaging before it is placed on the market. Participating in a dual system is the sole permissible method for fulfilling the take-back obligation for sales packaging directed at private end consumers. The dual system operators (such as Der Grüne Punkt, Reclay, Interseroh) manage collection and recycling and charge a license fee based on material type and weight.
+Keywords: LUCID, Zentrale Stelle Verpackungsregister, dual system, duales System, registration, license fee, Verkaufsverpackungen, take-back obligation, §9 VerpackG
+
+---
+
+compliance_guides VerpackG §10
+Title: Registration in LUCID — mandatory before first market placement; non-registration is a competition violation
+Obligation: MUST
+Threshold: All obligated businesses before placing any packaging on the German market
+Text: The registration in the LUCID packaging register must take place before any sales packaging is first placed on the German market. Registration is free of charge and is done online at lucid.verpackungsregister.org. The registration must state the company's name, address, and the dual systems in which it participates. Companies that fail to register and participate in a dual system are in violation of the VerpackG and this constitutes an act of unfair competition under §3a UWG. This means competitors can seek injunctions against non-compliant companies and marketplace operators (such as Amazon) are required to check that their sellers have registered. Administrative fines of up to EUR 200,000 apply. The obligation applies to all businesses that sell to German consumers, including non-German businesses selling via e-commerce platforms to German addresses.
+Keywords: LUCID registration, Verpackungsregister, lucid.verpackungsregister.org, mandatory, before market placement, administrative fine, e-commerce, non-German businesses, §10 VerpackG
+
+---
+
+compliance_guides VerpackG §21
+Title: Recycling targets — packaging must meet minimum recycled content and recycling rate targets
+Obligation: MUST
+Threshold: All businesses participating in dual systems; targets apply to the dual system operators but affect licensing fees
+Text: The VerpackG establishes minimum recycling rates for different types of packaging materials that dual system operators must achieve. For glass: 90%, for paper and cardboard: 85%, for steel: 80%, for aluminium: 80%, for beverage cartons (liquid cartons): 75%, for other composite materials: 55%, for plastics: 63% (rising to 70% from 2025). From 2025, plastics packaging must also meet a minimum recycled content target of 63% recycled material. These targets affect the license fees businesses pay to dual systems, as materials with higher recycling costs attract higher fees. Businesses choosing packaging materials should be aware that plastic packaging typically carries higher dual system fees than paper, glass, or metal alternatives.
+Keywords: Recyclingquoten, recycling targets, glass 90 percent, plastic 63 percent, minimum recycled content, dual system fees, §21 VerpackG, paper 85 percent

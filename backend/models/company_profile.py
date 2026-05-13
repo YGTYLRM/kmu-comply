@@ -68,6 +68,121 @@ class CompanyProfile(BaseModel):
         description="Does the company develop, deploy, or operate AI systems?",
     )
 
+    # ── GDPR / BDSG — policies & documentation ───────────────────────────────
+    has_privacy_policy: Optional[bool] = Field(
+        None, description="Does the company have a published privacy policy (Datenschutzerklärung)? — Art. 13/14 GDPR"
+    )
+    has_processor_agreements: Optional[bool] = Field(
+        None, description="Are data processing agreements (AVV) in place with all vendors who process personal data? — Art. 28 GDPR"
+    )
+    has_data_breach_procedure: Optional[bool] = Field(
+        None, description="Is there a documented data breach detection and notification procedure? — Art. 33/34 GDPR"
+    )
+    has_tom_documentation: Optional[bool] = Field(
+        None, description="Are technical and organisational security measures (TOMs) documented? — Art. 32 GDPR"
+    )
+    has_data_retention_policy: Optional[bool] = Field(
+        None, description="Is there a documented data retention and deletion policy? — Art. 5(1)(e) GDPR"
+    )
+    has_data_protection_training: Optional[bool] = Field(
+        None, description="Do employees who handle personal data receive regular data protection training? — Art. 29/32(4) GDPR"
+    )
+    transfers_data_outside_eea: Optional[bool] = Field(
+        None, description="Does the company transfer personal data to recipients outside the EEA? — Art. 44–49 GDPR"
+    )
+    has_consent_management: Optional[bool] = Field(
+        None, description="Is consent properly obtained and documented where required (e.g. cookie consent, marketing)? — Art. 6/7 GDPR"
+    )
+
+    # ── NIS2 — cybersecurity measures ────────────────────────────────────────
+    has_information_security_policy: Optional[bool] = Field(
+        None, description="Does the company have a written information security policy? — Art. 21(2)(a) NIS2"
+    )
+    has_incident_response_plan: Optional[bool] = Field(
+        None, description="Is there a documented incident response and handling plan? — Art. 21(2)(b) NIS2"
+    )
+    has_business_continuity_plan: Optional[bool] = Field(
+        None, description="Does the company have a business continuity and disaster recovery plan? — Art. 21(2)(c) NIS2"
+    )
+    has_vulnerability_management: Optional[bool] = Field(
+        None, description="Are regular vulnerability scans or penetration tests conducted? — Art. 21(2)(e) NIS2"
+    )
+    has_mfa_implemented: Optional[bool] = Field(
+        None, description="Is multi-factor authentication (MFA) implemented for critical systems and remote access? — Art. 21(2)(j) NIS2"
+    )
+    has_supply_chain_security_assessment: Optional[bool] = Field(
+        None, description="Are suppliers assessed for cybersecurity risks? — Art. 21(2)(d) NIS2"
+    )
+    has_security_awareness_training: Optional[bool] = Field(
+        None, description="Do employees receive regular cybersecurity awareness training? — Art. 21(2)(g) NIS2"
+    )
+
+    # ── EU AI Act ─────────────────────────────────────────────────────────────
+    ai_systems_are_high_risk: Optional[bool] = Field(
+        None, description="Do any AI systems fall into a high-risk category under Annex III of the EU AI Act (e.g. hiring decisions, credit scoring, safety-critical systems)?"
+    )
+    has_ai_risk_assessment: Optional[bool] = Field(
+        None, description="Has a risk assessment been conducted for AI systems in use? — Art. 9 EU AI Act"
+    )
+    has_ai_usage_documentation: Optional[bool] = Field(
+        None, description="Is use of AI systems documented (purpose, data inputs, decision logic)? — Art. 13 EU AI Act"
+    )
+    has_human_oversight_procedure: Optional[bool] = Field(
+        None, description="Are human oversight procedures documented and implemented for AI systems? — Art. 14 EU AI Act"
+    )
+
+    # ── HinSchG — whistleblower protection ───────────────────────────────────
+    has_whistleblower_channel: Optional[bool] = Field(
+        None, description="Does the company have an internal whistleblower reporting channel? — §12 HinSchG (mandatory ≥50 employees)"
+    )
+    has_whistleblower_policy: Optional[bool] = Field(
+        None, description="Is there a documented whistleblower protection policy? — §13 HinSchG"
+    )
+
+    # ── ArbSchG — occupational health & safety ────────────────────────────────
+    has_gefaehrdungsbeurteilung: Optional[bool] = Field(
+        None, description="Has a workplace hazard/risk assessment (Gefährdungsbeurteilung) been conducted? — §5 ArbSchG (mandatory for all employers)"
+    )
+    has_gefaehrdungsbeurteilung_documented: Optional[bool] = Field(
+        None, description="Is the hazard assessment documented in writing? — §6 ArbSchG"
+    )
+    has_first_aid_measures: Optional[bool] = Field(
+        None, description="Are first aid measures and designated first aiders in place? — §10 ArbSchG"
+    )
+    has_employee_safety_training: Optional[bool] = Field(
+        None, description="Do employees receive documented occupational safety instructions at onboarding and regularly thereafter? — §12 ArbSchG"
+    )
+
+    # ── AGG — anti-discrimination ─────────────────────────────────────────────
+    has_anti_discrimination_policy: Optional[bool] = Field(
+        None, description="Does the company have preventive anti-discrimination measures in place (policy, training)? — §12 AGG"
+    )
+    has_agc_complaints_procedure: Optional[bool] = Field(
+        None, description="Is there a formal complaints procedure for discrimination cases? — §13 AGG"
+    )
+
+    # ── MiLoG — minimum wage ──────────────────────────────────────────────────
+    has_working_time_records: Optional[bool] = Field(
+        None, description="Are working time records maintained for all employees in covered sectors? — §17 MiLoG"
+    )
+    uses_subcontractors: Optional[bool] = Field(
+        None, description="Does the company use subcontractors or service providers who provide labour? — §13 MiLoG (principal liability)"
+    )
+
+    # ── LkSG — supply chain due diligence ────────────────────────────────────
+    has_lksg_policy_statement: Optional[bool] = Field(
+        None, description="Has the company published an LkSG policy statement (Grundsatzerklärung)? — §6 LkSG"
+    )
+    has_supplier_code_of_conduct: Optional[bool] = Field(
+        None, description="Does the company have a supplier code of conduct covering human rights and environmental standards? — §6 LkSG"
+    )
+    has_supplier_risk_assessment: Optional[bool] = Field(
+        None, description="Is a formal risk assessment of direct suppliers conducted at least annually? — §5 LkSG"
+    )
+    has_lksg_complaints_procedure: Optional[bool] = Field(
+        None, description="Has an LkSG-compliant complaints mechanism been established? — §8 LkSG"
+    )
+
     # Existing compliance measures (free text, optional)
     existing_compliance_notes: Optional[str] = Field(
         None, max_length=2000, description="Any existing compliance measures the company has"

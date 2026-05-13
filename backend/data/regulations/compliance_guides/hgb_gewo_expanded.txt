@@ -1,0 +1,39 @@
+Handelsgesetzbuch (HGB) — Accounting Obligations and Gewerbeordnung (GewO) — Business Registration
+Key provisions for German SMEs
+Sources: gesetze-im-internet.de/hgb and gesetze-im-internet.de/gewo
+
+---
+
+compliance_guides HGB §238
+Title: Buchführungspflicht — every merchant must maintain proper accounts; accessible to qualified third parties
+Obligation: MUST
+Threshold: All merchants (Kaufleute) — any person or company operating a commercial enterprise (Handelsgewerbe) in Germany
+Text: Every merchant (Kaufmann) is obligated to maintain books of account and to record all business transactions and the status of their assets (Buchführungspflicht). The books must be kept in accordance with the principles of proper accounting (Grundsätze ordnungsmäßiger Buchführung, GoB). The records must be structured so that a qualified third party can obtain an overview of the business activities and financial position within a reasonable time. All business transactions must be traceable from their origin through to their conclusion. Copies of all outgoing business correspondence must be retained. The GoB principles include: completeness, correctness, timeliness, order, no entries without documentation, and no alteration making original entries unreadable. Violations of accounting obligations expose the management to civil and criminal liability and can result in estimates by tax authorities (Schätzung) of taxable income.
+Keywords: Buchführungspflicht, accounting, Kaufmann, merchant, GoB, Grundsätze ordnungsmäßiger Buchführung, HGB §238, records, business correspondence
+
+---
+
+compliance_guides HGB §241a
+Title: Exemption from double-entry bookkeeping — sole traders below EUR 800,000 revenue and EUR 80,000 profit
+Obligation: CONDITIONAL
+Threshold: Individual merchants (Einzelkaufleute) only — GmbH, AG, and partnerships do NOT qualify for exemption
+Text: Individual merchants (Einzelkaufleute) who do not exceed both of the following thresholds on two consecutive closing dates are exempt from the double-entry bookkeeping obligations of §§238-241 HGB: (1) annual revenue (Umsatzerlöse) of EUR 800,000; and (2) annual profit (Jahresüberschuss) of EUR 80,000. Instead, they may use simple income-excess accounting (Einnahmen-Überschuss-Rechnung, EÜR). For newly established businesses, the exemption applies immediately if the thresholds are not exceeded at the first closing date after formation. Companies formed as GmbH, UG, AG, or partnerships with a corporate partner are always obligated to keep double-entry books regardless of their size. Businesses that exceed either threshold in two consecutive years must switch to double-entry bookkeeping within four months. The tax authorities may also require double-entry bookkeeping independently of this provision.
+Keywords: Einzelkaufmann, sole trader, exemption, EUR 800000, EUR 80000, EÜR, Einnahmen-Überschuss-Rechnung, HGB §241a, small merchant, bookkeeping exemption
+
+---
+
+compliance_guides GewO §1
+Title: Freedom of trade — any person may operate a business without special permission in principle
+Obligation: CONDITIONAL
+Threshold: All businesses; exceptions apply for regulated professions and activities
+Text: The Gewerbeordnung (GewO) establishes the fundamental principle that anyone is permitted to operate a business (Gewerbe) in Germany (Grundsatz der Gewerbefreiheit). However, this freedom is subject to important exceptions: numerous business activities require special permissions, licenses, or qualifications. Regulated activities requiring specific permits include: food businesses (Gaststättenerlaubnis for alcohol-serving premises); security services; financial intermediaries; estate agents; insurance brokers; loan brokers; transport companies; waste disposal; firework producers; and many others. Regulated professions (Freie Berufe) such as doctors, lawyers, architects, pharmacists, and accountants are governed by their own professional laws rather than the GewO. Businesses that operate without required permits or licenses face administrative fines, orders to cease operations, and potentially criminal sanctions.
+Keywords: Gewerbefreiheit, freedom of trade, GewO §1, business permit, regulated activities, Gaststättenerlaubnis, security services, Zulassung
+
+---
+
+compliance_guides GewO §14
+Title: Business registration — all businesses must register with local authority before starting operations
+Obligation: MUST
+Threshold: All businesses (Gewerbetreibende) — sole traders, partnerships, companies — upon starting, relocating, or closing a business
+Text: Any person starting an independent business operation (stehende Gewerbe), a branch establishment, or an ancillary branch must notify (anzeigen) the competent local authority (Ordnungsamt or Gewerbeamt) simultaneously with commencing business. The same obligation applies when the business expands its scope, relocates, changes the owner's name, or ceases operations. The registration (Gewerbeanmeldung) is free of charge or carries a small fee depending on the municipality. The registration information is shared with tax authorities (which triggers the VAT registration process), trade office, and statistical offices. Online registration is available in most German municipalities. Failure to register constitutes an administrative offence (Ordnungswidrigkeit) subject to fines. The registration obligation applies to all businesses including online businesses, freelancer businesses (as a secondary activity), and businesses operated by foreign nationals.
+Keywords: Gewerbeanmeldung, business registration, GewO §14, Ordnungsamt, Gewerbeamt, commencement, relocation, closure, tax authority notification, all businesses
