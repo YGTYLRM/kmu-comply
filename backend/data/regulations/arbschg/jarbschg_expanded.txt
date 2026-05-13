@@ -1,0 +1,58 @@
+Jugendarbeitsschutzgesetz (JArbSchG)
+Gesetz zum Schutze der arbeitenden Jugend
+vom 12. April 1976 (BGBl. I S. 965)
+Source: https://www.gesetze-im-internet.de/jarbschg/
+
+---
+
+arbschg JArbSchG §1
+Title: Scope — protection of workers under 18 years of age
+Obligation: MUST
+Threshold: All employers who employ or train persons under 18 years of age
+Text: The Jugendarbeitsschutzgesetz applies to the employment, training, and comparable working arrangements of persons under 18 years of age in Germany. It applies to all employers regardless of size or sector who employ young persons (Jugendliche, aged 15-17) or adolescents in vocational training (Auszubildende). Employers who engage young workers in any capacity — including internships, work experience, vocational training, and employment relationships — must comply with the specific working time, rest, and health protection provisions of the JArbSchG in addition to the general protections under ArbSchG and ArbZG. The law does not apply to occasional minor assistance within families or during voluntary care activities.
+Keywords: JArbSchG, youth employment, Jugendarbeitsschutz, under 18, scope, vocational training, apprentices, employer obligation
+
+---
+
+arbschg JArbSchG §8
+Title: Daily and weekly working time limits — maximum 8 hours daily and 40 hours weekly
+Obligation: MUST
+Threshold: All employers; applies to all young persons (Jugendliche) aged 15-17
+Text: Young workers (Jugendliche) must not be employed for more than eight hours daily and not more than forty hours weekly. The working time limits are absolute and may not be exceeded even with the consent of the young person or their parents. In agriculture, young workers aged 16 and over may work up to nine hours daily and 85 hours per two-week period during harvest season only. If daily working time is reduced below eight hours on individual days, it may be extended to a maximum of 8.5 hours on other days in the same week, provided the weekly total does not exceed forty hours. These limits are stricter than those applicable to adult employees under ArbZG and may not be modified by collective agreement for young persons under 18.
+Keywords: Jugendarbeitszeit, working time youth, 8 hours, 40 hours weekly, Hoechtarbeitszeit, strict limit, no exceptions, agriculture
+
+---
+
+arbschg JArbSchG §15
+Title: Prohibition of work on Sundays and public holidays for young persons
+Obligation: MUST
+Threshold: All employers; applies to all young persons (Jugendliche)
+Text: Young workers must not be employed on Sundays or public holidays. Exceptions apply in hospitals and care facilities, the hospitality sector, agriculture, and certain other sectors where Sunday work is operationally necessary. Where young workers are required to work on Saturdays under an exception, they must receive a full compensatory day off during the same week on a day that is not a school day. Employers must ensure that at least two Saturdays per month remain free for young workers. Sunday and holiday rest is a fundamental health protection for young workers and cannot be waived.
+Keywords: Sonntagsruhe, Jugendliche, Sunday rest prohibition, public holiday, compensatory day off, Saturday work, health protection youth
+
+---
+
+arbschg JArbSchG §16
+Title: Saturday rest requirements — general prohibition and sector exceptions
+Obligation: MUST
+Threshold: All employers; applies to all young persons (Jugendliche) unless sector exception applies
+Text: Young workers must generally not be employed on Saturdays. Employment on Saturdays is permitted in hospitals and care facilities, bakeries, agriculture, hospitality, retail, transport, and certain other enumerated sectors. In retail, young workers may work on Saturdays until 1:00 PM only where this is specifically required. Where a young worker is employed on a Saturday under an applicable exception, the employer must grant a compensatory free day in the same week on a non-school day. Employers must document Saturday work by young persons and the compensatory arrangements made.
+Keywords: Samstagsruhe, Saturday prohibition, Jugendliche, compensatory day, retail, bakery, health protection, documentation
+
+---
+
+arbschg JArbSchG §32
+Title: Medical examination before commencement of employment — mandatory health check
+Obligation: MUST
+Threshold: All employers; applies before any young person commences work
+Text: Before commencing employment, every young worker must undergo a medical examination (aertztliche Untersuchung) and present the employer with a certificate confirming that the examination has taken place. The examination assesses whether the young person is physically and mentally fit for the proposed work. Employers must not permit young workers to commence work without a valid medical certificate. The first examination is followed by mandatory repeat examinations: after twelve months for those who started work before age 17, and once more after a further twelve months. Employers must notify parents or guardians of the examination results where the young person is still a minor. Medical examination costs must not be borne by the young person.
+Keywords: Erstuntersuchung, medical examination, health check, employment commencement, Aerztattest, repeat examination, mandatory, youth health
+
+---
+
+arbschg JArbSchG §43
+Title: Employer obligations on occupational safety — specific protections for young workers
+Obligation: MUST
+Threshold: All employers employing young persons
+Text: Employers must take specific additional occupational safety measures for young workers beyond those required by the ArbSchG for adult employees. Young workers must not be assigned activities that exceed their physical or mental capacity, that involve exposure to harmful chemical, biological, or physical agents beyond permitted limits for young persons, that require working with specific high-risk equipment without adequate supervision, or that involve unacceptable moral risks. The hazard assessment under §5 ArbSchG must be conducted specifically with regard to the particular vulnerability of young workers. Young workers must receive comprehensive safety instructions before commencing work and at regular intervals. Instructions must be given in a form and language comprehensible to the young worker.
+Keywords: Gefaehrdungsbeurteilung youth, occupational safety young workers, prohibited activities, supervision, safety instructions, physical capacity

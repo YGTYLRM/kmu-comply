@@ -76,7 +76,7 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
         try:
             response = _llm_client().messages.create(
                 model=settings.llm_model,
-                max_tokens=1024,
+                max_tokens=4096,
                 temperature=0,
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],

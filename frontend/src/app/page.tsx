@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileSearch, Zap, ShieldCheck,
   BarChart3, ListChecks, AlertTriangle, Check, Plus, Minus,
   Building2, Factory, Truck, Stethoscope, ShoppingBag, Briefcase,
+  FileText,
 } from "lucide-react";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
@@ -60,7 +61,7 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "GDPR/DSGVO, BDSG, LkSG, EnEfG, and CSRD screened in a single run." },
+  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "11 German and EU regulations screened in a single run — GDPR, NIS2, AI Act, LkSG, CSRD and more." },
   { icon: Zap,           color: "text-amber-400",   bg: "bg-amber-500/10",   title: "Results in minutes",       desc: "Automated screening. A solid starting point before engaging a legal consultant." },
   { icon: ListChecks,    color: "text-emerald-400", bg: "bg-emerald-500/10", title: "Concrete action plan",     desc: "Each gap comes with a prioritised action from CRITICAL to LOW, with effort and deadline." },
   { icon: BarChart3,     color: "text-purple-400",  bg: "bg-purple-500/10",  title: "Per-regulation scoring",   desc: "Compliance score per regulation so you know exactly where to focus first." },
@@ -78,7 +79,7 @@ const PLANS = [
     cta: "Get started",
     features: [
       "Single compliance screening",
-      "All 5 regulations covered",
+      "All 11 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -94,7 +95,7 @@ const PLANS = [
     cta: "Get started",
     features: [
       "Unlimited screenings",
-      "All 5 regulations covered",
+      "All 11 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -129,7 +130,7 @@ const FAQS = [
   },
   {
     q: "Which regulations does Complio cover?",
-    a: "Currently five: GDPR/DSGVO (data protection), BDSG (German federal data protection), LkSG (supply chain due diligence), EnEfG (energy efficiency), and CSRD (corporate sustainability reporting). Coverage expands as regulations evolve.",
+    a: "Currently 11: GDPR/DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU AI Act, HinSchG (whistleblower protection), ArbSchG (workplace safety), AGG (anti-discrimination), and MiLoG (minimum wage). Each regulation is applied only where your company meets the relevant thresholds. Coverage continues to expand.",
   },
   {
     q: "How accurate are the results?",
@@ -209,6 +210,68 @@ function MockReport() {
   );
 }
 
+function DocUploadVisual() {
+  return (
+    <div className="space-y-4">
+      <div
+        className="rounded-2xl border border-white/[0.08] p-5"
+        style={{ background: "rgba(10,22,40,0.75)" }}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-600 mb-4">Documents attached</p>
+        <div className="space-y-2.5">
+          {[
+            "privacy_policy.pdf",
+            "data_processing_agreement.pdf",
+            "it_security_policy.pdf",
+          ].map((name) => (
+            <div key={name} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
+              <FileText className="h-4 w-4 text-slate-500 flex-shrink-0" />
+              <span className="text-xs text-slate-400 flex-1 font-mono truncate">{name}</span>
+              <div className="flex items-center gap-1 text-emerald-400 flex-shrink-0">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span className="text-[10px] font-semibold">Indexed</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-center">
+        <div className="h-7 w-px bg-gradient-to-b from-brand-500/40 to-transparent" />
+      </div>
+
+      <div
+        className="rounded-2xl border border-brand-500/20 p-5 shadow-glow-blue-sm"
+        style={{ background: "rgba(10,22,40,0.88)" }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <span className="text-xs font-bold text-slate-300">GDPR · Art. 13 · Transparency</span>
+          </div>
+          <span className="rounded-full border border-amber-500/25 bg-amber-500/15 px-2.5 py-1 text-[10px] font-bold text-amber-400">PARTIAL</span>
+        </div>
+
+        <div className="rounded-xl border border-white/[0.06] bg-brand-500/5 px-4 py-3 mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-400/70 mb-1.5">
+            From privacy_policy.pdf
+          </p>
+          <p className="text-xs text-slate-400 italic leading-relaxed">
+            &ldquo;Section 3.1: We inform users of their rights under Articles 12 to 22 of the GDPR and the right to lodge a complaint...&rdquo;
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-red-400/70 mb-1.5">Gap identified</p>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            No retention period stated. Art. 13(2)(a) requires the period for which personal data will be stored.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -243,12 +306,55 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+function PricingCTA({ plan }: { plan: typeof PLANS[0] }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = useCallback(async () => {
+    if (plan.cta === "Contact us") {
+      window.location.href = "/contact";
+      return;
+    }
+    if (plan.name === "Enterprise") return;
+
+    setLoading(true);
+    const planKey = plan.name.toLowerCase(); // "starter" | "professional"
+    const base = window.location.origin;
+    try {
+      const res = await fetch("/api/backend/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: planKey,
+          success_url: `${base}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${base}/checkout/cancel`,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      setLoading(false);
+    }
+  }, [plan]);
+
+  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
+    plan.highlight
+      ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
+      : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+  }`;
+
+  return (
+    <button onClick={handleClick} disabled={loading} className={cls}>
+      {loading ? "Redirecting…" : plan.cta}
+    </button>
+  );
+}
+
 export default function HomePage() {
   return (
     <main className="bg-dark-950">
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-28 pb-16">
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 sm:pt-28 pb-12 sm:pb-16">
         <div className="pointer-events-none absolute inset-0">
           <div className="animate-orb-1 absolute -top-32 right-0 h-[700px] w-[700px] rounded-full bg-brand-600/15 blur-[140px]" />
           <div className="animate-orb-2 absolute bottom-0 -left-32 h-[500px] w-[500px] rounded-full bg-cyan-500/8 blur-[120px]" />
@@ -268,14 +374,14 @@ export default function HomePage() {
               </span>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.04]">
+            <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.04]">
               Know your{" "}
               <span className="shimmer-text">compliance gaps</span>
               <br />
               before they know you.
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="max-w-2xl text-lg text-slate-400 leading-relaxed">
+            <motion.p variants={fadeUp} className="max-w-2xl text-base sm:text-lg text-slate-400 leading-relaxed px-2 sm:px-0">
               Submit your company profile and receive a detailed compliance screening across German and EU law in minutes. A solid foundation before any legal consultation.
             </motion.p>
 
@@ -290,7 +396,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-              {["No account required", "Results in minutes", "5 regulations in one report"].map((t) => (
+              {["No account required", "Results in minutes", "11 regulations in one report"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   {t}
@@ -353,10 +459,10 @@ export default function HomePage() {
       </motion.section>
 
       {/* ── Who it's for ──────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-16 text-center">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-28">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Who it is for</p>
-          <h2 className="text-4xl font-black text-white tracking-tight mb-4">Built for German SMEs across every sector</h2>
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Built for German SMEs across every sector</h2>
           <p className="text-slate-500 max-w-xl mx-auto">Any company operating in Germany or the EU faces a web of overlapping regulations. Complio cuts through the complexity in minutes.</p>
         </motion.div>
 
@@ -386,11 +492,11 @@ export default function HomePage() {
       </section>
 
       {/* ── How it works ──────────────────────────────────────── */}
-      <section id="how-it-works" className="border-t border-white/[0.05] bg-dark-900/40 py-28">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-16 text-center">
+      <section id="how-it-works" className="border-t border-white/[0.05] bg-dark-900/40 py-16 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">How it works</p>
-            <h2 className="text-4xl font-black text-white tracking-tight">From profile to report in five steps</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">From profile to report in five steps</h2>
           </motion.div>
 
           <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-0">
@@ -410,12 +516,68 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Document upload explainer ─────────────────────────── */}
+      <section className="border-t border-white/[0.05] py-16 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease }}
+            >
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Document upload</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight mb-6">
+                Upload your documents.<br />Get real verdicts.
+              </h2>
+              <p className="text-slate-400 leading-relaxed mb-8">
+                Profile answers give a solid baseline. Attach your actual company documents and Complio reads them directly, citing specific passages as evidence. Items that would otherwise be uncertain become concrete findings.
+              </p>
+
+              <div className="space-y-3 mb-10">
+                {[
+                  "Privacy policy and cookie notice",
+                  "Data processing agreements",
+                  "IT and information security policy",
+                  "HR handbook and employment contracts",
+                  "Energy audit or environmental reports",
+                ].map((doc) => (
+                  <div key={doc} className="flex items-center gap-3 text-sm text-slate-400">
+                    <FileText className="h-4 w-4 flex-shrink-0 text-brand-400" />
+                    {doc}
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href="/analyze"
+                className="group inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300"
+              >
+                Try it now
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease, delay: 0.12 }}
+            >
+              <DocUploadVisual />
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── Features ──────────────────────────────────────────── */}
-      <section id="features" className="border-t border-white/[0.05] py-28">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-16 text-center">
+      <section id="features" className="border-t border-white/[0.05] py-16 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">What you get</p>
-            <h2 className="text-4xl font-black text-white tracking-tight">Everything in one report</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Everything in one report</h2>
           </motion.div>
 
           <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -439,11 +601,11 @@ export default function HomePage() {
       </section>
 
       {/* ── Pricing ───────────────────────────────────────────── */}
-      <section id="pricing" className="border-t border-white/[0.05] bg-dark-900/40 py-28">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-16 text-center">
+      <section id="pricing" className="border-t border-white/[0.05] bg-dark-900/40 py-16 sm:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Pricing</p>
-            <h2 className="text-4xl font-black text-white tracking-tight mb-4">Simple, transparent pricing</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Simple, transparent pricing</h2>
             <p className="text-slate-500 max-w-lg mx-auto">Pay per screening or subscribe for ongoing monitoring. No hidden fees, no long-term lock-in.</p>
           </motion.div>
 
@@ -491,16 +653,7 @@ export default function HomePage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.cta === "Contact us" ? "mailto:hello@complio.io" : "/analyze"}
-                  className={`w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 ${
-                    plan.highlight
-                      ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
-                      : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
+                <PricingCTA plan={plan} />
               </motion.div>
             ))}
           </motion.div>
@@ -508,11 +661,11 @@ export default function HomePage() {
       </section>
 
       {/* ── FAQ ───────────────────────────────────────────────── */}
-      <section className="border-t border-white/[0.05] py-28">
-        <div className="mx-auto max-w-3xl px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-14 text-center">
+      <section className="border-t border-white/[0.05] py-16 sm:py-28">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-10 sm:mb-14 text-center">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">FAQ</p>
-            <h2 className="text-4xl font-black text-white tracking-tight">Common questions</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Common questions</h2>
           </motion.div>
 
           <motion.div
@@ -520,7 +673,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl border border-white/[0.07] px-8"
+            className="rounded-2xl border border-white/[0.07] px-4 sm:px-8"
             style={{ background: "rgba(10,22,40,0.65)" }}
           >
             {FAQS.map(({ q, a }) => (
@@ -535,15 +688,15 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-[500px] w-[900px] rounded-full bg-brand-600/10 blur-[120px]" />
         </div>
-        <div className="relative mx-auto max-w-4xl px-6 py-32 flex flex-col items-center text-center gap-8">
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 py-20 sm:py-32 flex flex-col items-center text-center gap-8">
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }} className="flex flex-col items-center gap-6">
-            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
               Ready to find your
               <br />
               compliance gaps?
             </h2>
-            <p className="text-lg text-slate-500 max-w-lg">
-              Get a detailed compliance screening across 5 German and EU regulations. Not a substitute for legal advice.
+            <p className="text-base sm:text-lg text-slate-500 max-w-lg">
+              Get a detailed compliance screening across 11 German and EU regulations. Not a substitute for legal advice.
             </p>
             <Link href="/analyze" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
               Get started
@@ -555,14 +708,14 @@ export default function HomePage() {
 
       {/* ── Footer ────────────────────────────────────────────── */}
       <footer className="border-t border-white/[0.05] py-10">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <img src="/logo-dark-bg.png" alt="Complio" className="h-10 w-auto" />
             <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-600">
               <a href="#how-it-works" className="hover:text-slate-400 transition-colors">How it works</a>
               <a href="#features"     className="hover:text-slate-400 transition-colors">Features</a>
               <a href="#pricing"      className="hover:text-slate-400 transition-colors">Pricing</a>
-              <a href="#faq" onClick={(e) => { e.preventDefault(); document.querySelector('.faq-section')?.scrollIntoView(); }} className="hover:text-slate-400 transition-colors">FAQ</a>
+              <Link href="/contact"   className="hover:text-slate-400 transition-colors">Contact</Link>
             </div>
             <p className="text-xs text-slate-600">Not legal advice. For informational purposes only.</p>
           </div>

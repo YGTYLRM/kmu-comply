@@ -1,0 +1,48 @@
+Bundesdatenschutzgesetz 2018 (BDSG) — Additional Key Sections
+Bundesdatenschutzgesetz vom 30. Juni 2017 (BGBl. I S. 2097)
+Source: https://www.gesetze-im-internet.de/bdsg_2018/
+
+---
+
+bdsg BDSG §1
+Title: Scope — BDSG supplements GDPR for public and non-public bodies in Germany
+Obligation: MUST
+Threshold: All non-public bodies processing personal data by automated means or in filing systems; all federal public bodies
+Text: The Bundesdatenschutzgesetz 2018 (BDSG) supplements the GDPR and implements its opening clauses for Germany. It applies to non-public bodies (private companies, associations, sole traders) that process personal data in Germany using automated or systematically structured filing systems. It also applies to federal public authorities. The BDSG does not replace the GDPR but specifies how GDPR obligations apply in Germany where the GDPR leaves choices to member states — particularly regarding employee data (§26), special categories of data (§22), data subject rights (§§34-37), and DPO requirements (§38). Companies must therefore comply with both the GDPR directly and with the BDSG where the latter applies stricter or more specific rules.
+Keywords: BDSG, scope, GDPR supplement, opening clause, non-public bodies, automated processing, Germany, federal authorities, private sector
+
+---
+
+bdsg BDSG §22
+Title: Processing special category data — additional German safeguards for sensitive data
+Obligation: MUST
+Threshold: All controllers processing special category data (health, biometric, genetic, racial/ethnic origin, political, religious, sexual orientation) in Germany
+Text: The BDSG §22 permits processing of special category data (Art. 9 GDPR) under specific German conditions beyond the GDPR exceptions. Special category data may be processed in Germany where: necessary for occupational medicine, the assessment of working capacity, preventive health care, or the provision of health or social care; necessary for reasons of substantial public interest; or where required for the establishment, exercise, or defence of legal claims. In all cases, appropriate specific technical and organisational measures must be implemented to protect the fundamental rights of data subjects. Required measures include pseudonymisation, encryption, access restrictions, and documentation. Processing employee health data is subject to additional restrictions under §26(3) BDSG — only permitted where necessary under labour law or social law, or where the employee has explicitly consented.
+Keywords: besondere Kategorien, special category data, BDSG §22, health data, biometric data, German safeguards, appropriate measures, pseudonymisation
+
+---
+
+bdsg BDSG §26
+Title: Employee data — processing permissible only for specific employment-related purposes
+Obligation: MUST
+Threshold: All employers processing personal data of employees, job applicants, or former employees in Germany
+Text: Personal data of employees may be processed if this is necessary for the establishment, performance, or termination of the employment relationship (§26(1) BDSG). Data may also be processed to detect criminal offences committed in the employment context, if there is documented factual suspicion and the processing is proportionate. Employee consent to data processing is only valid if it is genuinely voluntary — due to the dependency relationship in employment, voluntariness must be specifically assessed. Written consent is required for data processing based on consent in employment contexts, including consent to publication in company directories, use of photographs, and data processing for employee benefit programmes. Special category employee data (e.g. health data, union membership) may only be processed where necessary under labour or social security law (§26(3)). Employers must inform employees about the processing of their data in accordance with Arts. 13/14 GDPR.
+Keywords: Beschaeftigtendatenschutz, employee data, §26 BDSG, employment purpose, criminal offence detection, consent voluntariness, special category employee data, transparency
+
+---
+
+bdsg BDSG §38
+Title: German DPO threshold — 20 persons engaged in automated processing
+Obligation: MUST
+Threshold: Non-public bodies where 20 or more persons are permanently engaged in automated personal data processing; also mandatory for DPIA-required processing and commercial data brokerage
+Text: Under §38 BDSG, non-public bodies must appoint a Data Protection Officer (Datenschutzbeauftragter) when at least 20 persons are permanently engaged in the automated processing of personal data. This German threshold (20 persons) is lower than the GDPR's requirement for a DPO where core activities involve large-scale processing — meaning many German companies must appoint a DPO even if they would not be required to do so under the GDPR alone. The DPO must also be appointed where processing is subject to a mandatory DPIA under Art. 35 GDPR, or where personal data is processed commercially for transmission, anonymous market research, or opinion polling purposes. The DPO must have expert knowledge of data protection law, may be an employee or external contractor, must be protected from dismissal or disadvantage related to their role, and must report directly to the highest management level.
+Keywords: Datenschutzbeauftragter, DPO, Data Protection Officer, 20 persons, German threshold, BDSG §38, appointment obligation, automated processing, DPIA
+
+---
+
+bdsg BDSG §42
+Title: Criminal penalties for data protection violations — up to 3 years imprisonment
+Obligation: MUST
+Threshold: All controllers and processors; individual responsible persons within organisations
+Text: The BDSG provides criminal penalties in addition to GDPR administrative fines. Under §42(1) BDSG, deliberately disclosing personal data of many persons that is not publicly known to third parties without authorisation for commercial gain is punishable by up to three years imprisonment or a fine. Under §42(2), deliberately unlawfully processing non-publicly available personal data for financial gain or to harm others is punishable by up to two years imprisonment or a fine. Criminal prosecution requires a complaint by the affected data subject, the controller, or the competent supervisory authority (Aufsichtsbehoerde) in most cases. These criminal provisions apply in addition to the GDPR administrative fine regime — meaning a serious data protection violation could give rise to both a large administrative fine and criminal prosecution of responsible individuals.
+Keywords: Strafvorschriften, criminal penalties, BDSG §42, imprisonment, data protection crime, responsible individuals, prosecution, commercial gain

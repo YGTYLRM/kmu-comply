@@ -1,0 +1,195 @@
+Hinweisgeberschutzgesetz (HinSchG)
+Gesetz fuer einen besseren Schutz hinweisgebender Personen
+vom 31. Mai 2023 (BGBl. 2023 I Nr. 140), in Kraft ab 2. Juli 2023
+Expanded Article Reference for Compliance Screening
+
+---
+
+hinschg §1
+Title: Purpose and scope — protection of persons reporting violations in a professional context
+Obligation: MUST
+Threshold: All private sector employers with 50 or more employees; all public sector employment bodies
+Text: The Hinweisgeberschutzgesetz (HinSchG) governs the protection of natural persons who, in connection with their professional activity or in the run-up to a professional activity, have obtained information about violations and report or disclose them. The law implements Directive (EU) 2019/1937 on the protection of persons who report breaches of Union law. It applies to reporting channels established in employment bodies in both the private and public sectors, and to external reporting channels. Private sector employment bodies with fewer than 50 employees are exempt from the obligation to establish an internal reporting channel under §12, but must still not subject reporting persons to reprisals. The HinSchG covers reports about criminal offences, administrative offences punishable by fine where the offended rule protects employees' rights, and violations of specific areas of Union law enumerated in §2.
+Keywords: whistleblower protection, Hinweisgeberschutz, scope, professional context, reporting channel, private sector, public sector, HinSchG, Directive 2019/1937
+
+---
+
+hinschg §2
+Title: Material scope — violations covered by the reporting protection
+Obligation: MUST
+Threshold: All reporting channels operated under HinSchG; all employers obligated under §12
+Text: Reports and disclosures are protected under the HinSchG where they concern violations in specific areas of Union law — including public procurement, financial services, product safety, transport safety, environmental protection, nuclear safety, food and feed safety, animal health and welfare, public health, consumer protection, privacy and data protection, and the security of network and information systems — as well as violations of national law implementing these areas of Union law. The HinSchG also covers criminal offences and administrative offences where the violated provision serves to protect the life, physical integrity, health, or the rights of employees or their representative bodies. Operators of reporting channels must inform potential reporting persons about the scope of violations that can be reported through the channel, to set accurate expectations about what is covered.
+Keywords: material scope, violations covered, Union law, criminal offence, administrative offence, employee rights, data protection, environmental law, financial services
+
+---
+
+hinschg §12(1)
+Title: Obligation to establish internal reporting channels — private sector employers with 50+ employees
+Obligation: MUST
+Threshold: Private sector employers with 50 or more employees (regular headcount)
+Text: Private sector employment bodies that regularly employ 50 or more employees are obligated to establish and operate internal reporting channels. The obligation to establish an internal reporting channel must be met regardless of the legal form of the employer, meaning it applies to corporations, partnerships, sole traders, foundations, and associations that meet the employee threshold. The headcount of 50 employees is calculated on the basis of the regular number of employees, meaning that the threshold must be assessed by reference to the employer's typical staffing level throughout the year rather than the exact count on a particular date. Part-time employees are generally counted proportionally. The internal reporting channel must be in place and operational before the deadline specified by the law.
+Keywords: internal reporting channel, 50 employees, private sector, mandatory, Meldestelle, employer obligation, employee threshold, establishment deadline
+
+---
+
+hinschg §12(2)
+Title: Smaller employers (50–249 employees) may share internal reporting channel resources
+Obligation: MAY
+Threshold: Private sector employers with 50 to 249 employees
+Text: Private sector employment bodies with between 50 and 249 employees are permitted to share internal reporting channel resources with other similarly sized employers, including by jointly operating or commissioning a shared reporting channel. This provision is intended to ease the compliance burden for smaller and medium-sized enterprises, which may lack the resources to independently establish and operate a fully dedicated internal reporting function. However, the arrangement must still ensure that all substantive requirements of the HinSchG are met, including confidentiality of the reporting person's identity, timely acknowledgement of receipt, and provision of feedback. Each employer participating in a shared arrangement remains individually responsible for compliance with the HinSchG and may not use the shared arrangement as a reason to delay establishing or operating a compliant channel.
+Keywords: shared reporting channel, 50-249 employees, joint operation, SME, resource sharing, compliance obligation, Mittelstand, alternative arrangement
+
+---
+
+hinschg §13(1)
+Title: Internal reporting channels must accept reports in written and oral form
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: Internal reporting channels operated under the HinSchG must be capable of receiving reports in both written and oral form. Written reporting includes electronic forms, email, and post; oral reporting must be possible by telephone or other voice messaging systems. Operators must also be prepared to receive reports by physical meeting within a reasonable timeframe at the request of the reporting person. The channel must be designed so that the reporting person can communicate clearly and confidentially in their chosen format without being required to use a format that is less accessible or familiar to them. Operators who impose restrictions on the format of reports — for example, by only accepting written submissions — will not be compliant with §13(1).
+Keywords: reporting format, oral reporting, written reporting, telephone reporting, physical meeting, channel requirements, accessible reporting, voice message
+
+---
+
+hinschg §13(2)
+Title: Oral reporting by telephone or voice messaging; physical meeting on request
+Obligation: MUST
+Threshold: All operators of internal reporting channels
+Text: Where oral reporting is offered — which is mandatory under §13(1) — it must be possible by telephone or by other voice messaging systems that allow asynchronous communication, such as voicemail or voice message platforms. In addition, upon the explicit request of the reporting person, the operator of the reporting channel must offer to receive the report through a physical meeting within a reasonable timeframe. The operator must inform potential reporting persons about the availability of these oral and in-person reporting options. The identity of the reporting person must be protected during oral and in-person communications to the same extent as during written reporting.
+Keywords: oral reporting, telephone hotline, voice messaging, physical meeting, on request, channel accessibility, reporting options, identity protection
+
+---
+
+hinschg §13(3)
+Title: Reporting channels must be designed to protect the confidentiality of the reporting person's identity
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: Internal reporting channels must be designed, established, and operated in a manner that ensures the confidentiality of the identity of the reporting person and of any third parties mentioned in the report, to the extent that such persons' identities have not already been made public. The operator must take technical and organisational measures to prevent unauthorised access to the reporting channel and to the information submitted through it. This includes access controls limiting who within the organisation can see the content of reports and the identity of reporting persons, as well as technical security measures appropriate to the sensitivity of the information involved. Anonymisation or pseudonymisation of reports for internal investigation purposes is a recommended practice where technically feasible.
+Keywords: confidentiality, identity protection, channel security, technical measures, organisational measures, access control, anonymisation, pseudonymisation, reporting person
+
+---
+
+hinschg §14(1)
+Title: Identity of reporting person must be kept confidential and disclosed only in exceptional circumstances
+Obligation: MUST
+Threshold: All operators of internal reporting channels and external reporting channels
+Text: The identity of the reporting person must be kept strictly confidential by the operator of the reporting channel. The identity of the reporting person and any information from which their identity could be directly or indirectly deduced must not be disclosed to persons other than the authorised staff responsible for receiving and following up on reports, without the explicit consent of the reporting person. The identity of the reporting person may only be disclosed to competent authorities — for example, to law enforcement or administrative authorities — in the context of criminal or administrative proceedings where such disclosure is a necessary and proportionate measure in accordance with Union or national law. Operators must inform reporting persons in advance if their identity is to be disclosed for this reason, unless doing so would jeopardise the relevant investigation or proceedings.
+Keywords: confidentiality, identity disclosure, reporting person protection, authorised access, competent authority, criminal proceedings, data protection, HinSchG
+
+---
+
+hinschg §15
+Title: Confidentiality obligation extends to third parties mentioned in a report
+Obligation: MUST
+Threshold: All operators of internal reporting channels
+Text: The obligation to maintain confidentiality under the HinSchG extends not only to the identity of the reporting person but also to the identity of third parties mentioned in a report, including persons who are implicated in the reported violation, witnesses, and other individuals referred to in the report. The identity of these third parties must be protected to the same extent as the identity of the reporting person, unless they have consented to disclosure or unless disclosure is required by law or by competent authorities in the context of formal proceedings. Operators must ensure that internal investigation processes do not inadvertently disclose the identity of third parties to persons not authorised to receive that information. This obligation continues to apply after the conclusion of the internal investigation.
+Keywords: third-party confidentiality, identity protection, implicated persons, witnesses, internal investigation, confidentiality obligation, data minimisation
+
+---
+
+hinschg §17(1)
+Title: Operators of reporting channels must be able to receive anonymous reports
+Obligation: SHOULD
+Threshold: All operators of internal and external reporting channels
+Text: Operators of reporting channels must be capable of receiving anonymous reports — that is, reports in which the reporting person does not reveal their identity. Operators should process anonymous reports they receive, even though they are not legally required to establish channels specifically designed for anonymous reporting. The practical implication is that if a reporting person submits a report without identifying themselves, the operator should not reject the report solely on the grounds that it is anonymous. Operators are encouraged to implement technical measures, such as secure anonymous web-based reporting platforms, that facilitate anonymous reporting while still enabling follow-up communication with the reporting person if the reporting person chooses to engage further without revealing their identity.
+Keywords: anonymous reporting, anonymity, reporting channel, operator obligation, should process, anonymous submissions, anonymous platform, identity-free reporting
+
+---
+
+hinschg §19(1)
+Title: Operator must confirm receipt of report to reporting person within 7 days
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: The operator of an internal reporting channel must confirm receipt of a report to the reporting person within seven days of receiving the report. The confirmation of receipt must be communicated through the same channel or by other means agreed with the reporting person, and must be done in a manner that does not compromise the confidentiality of the reporting person's identity. Where the report has been received anonymously and the reporting person has not provided a contact method, the operator is not required to issue a receipt confirmation but should acknowledge receipt through the channel if the system permits it. The seven-day clock begins from the moment the report is received, not from the date the operator first reviews the report.
+Keywords: receipt confirmation, 7-day deadline, acknowledgement, reporting channel, operator obligation, notification, channel response, seven days
+
+---
+
+hinschg §19(2)
+Title: Operator must provide feedback to reporting person within 3 months on follow-up measures
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: The operator of an internal reporting channel must, no later than three months after confirming receipt of the report, provide the reporting person with feedback on the planned or already taken follow-up measures and the reasons for those measures. Follow-up measures include internal investigations and enquiries, referral of the matter to a competent authority, closure of the procedure due to insufficient information or because the report is manifestly unfounded, and any corrective actions taken as a result of the report. The feedback obligation must be met even where the operator has concluded that no action is warranted, in which case the operator must inform the reporting person of this conclusion and the reasons for it. Where an investigation is ongoing at the three-month mark, the operator must still provide an update indicating that the procedure is continuing.
+Keywords: feedback obligation, 3-month deadline, follow-up measures, reporting person, investigation update, closure notification, three months, operator obligation
+
+---
+
+hinschg §21(1)
+Title: Prohibition of reprisals against reporting persons — dismissal, demotion, discrimination
+Obligation: MUST
+Threshold: All employers and other persons subject to HinSchG; applies to all reporting persons within scope
+Text: Reprisals against reporting persons and against persons assisting or associated with them are prohibited. Reprisals within the meaning of the HinSchG include in particular: suspension, dismissal, or equivalent measures; demotion or refusal of promotion; reassignment of duties, change of place of work, reduction of pay, or change of working hours; refusal to allow participation in further training and development; negative performance assessment or issuance of a poor reference; any form of discrimination or disadvantage, including disadvantage not related to the employment relationship; premature termination or cancellation of contracts for goods or services; cancellation of licences or permits; and psychiatric or medical referrals. The prohibition applies from the moment a report has been made and throughout the period during which the reporting person may reasonably expect that their protected status continues.
+Keywords: reprisal prohibition, retaliation ban, dismissal, demotion, discrimination, harassment, reporting person protection, whistleblower, anti-retaliation
+
+---
+
+hinschg §21(2)
+Title: Reversal of burden of proof in reprisal claims
+Obligation: MUST
+Threshold: Employers defending reprisal claims brought by reporting persons
+Text: Where a reporting person suffers a disadvantage in connection with their professional activity and asserts that this disadvantage is a reprisal for having made a report, the burden of proof is reversed. In such cases, the employer or other person who caused the disadvantage must prove that the disadvantage was based on duly justified grounds other than the act of reporting. This reversal of the burden of proof is a significant procedural protection for reporting persons, meaning that once the reporting person establishes a causal connection between their report and the disadvantage they suffered, the employer must affirmatively demonstrate an independent lawful justification. Employers must maintain contemporaneous documentation of performance assessments, disciplinary decisions, and organisational changes that might otherwise be perceived as retaliatory.
+Keywords: burden of proof reversal, reprisal claim, causation, employer defence, procedural protection, documentation, performance assessment, disciplinary action
+
+---
+
+hinschg §27
+Title: Right to claim damages suffered as a result of reprisals
+Obligation: MUST
+Threshold: Employers who have subjected reporting persons to unlawful reprisals
+Text: Reporting persons who suffer reprisals in violation of the prohibition in §21(1) of the HinSchG have the right to claim compensation for the damage suffered as a result. The right to claim damages covers both material damage — such as loss of earnings, costs incurred in responding to the reprisal, and costs of legal proceedings — and immaterial damage, meaning damage to the reporting person's professional standing, health, or personal circumstances caused by the reprisal. The claim for damages is to be brought against the employer or other person responsible for the reprisal. Employers must be aware that the prohibition on reprisals creates potential financial liability in addition to the administrative fines provided for under §40.
+Keywords: damages, reprisal damages, compensation, material damage, immaterial damage, whistleblower claim, employer liability, civil claim
+
+---
+
+hinschg §28
+Title: Reporting persons remain liable for violations they themselves commit or disclose
+Obligation: MUST
+Threshold: Reporting persons; does not limit employer liability or competent authority proceedings
+Text: The protections afforded to reporting persons under the HinSchG do not exempt the reporting person from liability for offences they themselves have committed and which they report or disclose. The protection under the HinSchG is limited to preventing reprisals against the act of reporting; it does not constitute immunity from prosecution or civil liability for underlying violations in which the reporting person was involved. Reporting persons may, however, benefit from reduced penalties or mitigating treatment by competent authorities in proceedings concerning their own conduct, where they have cooperated by making a report. Employers and operators of reporting channels must not use this provision as a basis to discourage reports or to threaten reporting persons with consequences for having been involved in the reported matter.
+Keywords: reporting person liability, no immunity, co-offender, mitigation, prosecution, criminal liability, disclosure protection scope
+
+---
+
+hinschg §36
+Title: Competent supervisory authority is the Bundesamt fuer Justiz (Federal Office of Justice)
+Obligation: MUST
+Threshold: All employers and operators of reporting channels subject to HinSchG; Bundesamt fuer Justiz as authority
+Text: The competent authority for supervising compliance with the HinSchG obligations of private sector employers is the Bundesamt fuer Justiz (Federal Office of Justice). The Bundesamt fuer Justiz acts as the external reporting channel for the federal level and is responsible for receiving, assessing, and following up on reports directed to it. It is also the supervisory authority empowered to investigate and sanction violations of the HinSchG by private sector employers, including failures to establish or properly operate internal reporting channels and violations of the prohibition on reprisals. Employers must cooperate with the Bundesamt fuer Justiz in the exercise of its supervisory functions and must provide information and documentation requested in the context of supervisory enquiries.
+Keywords: Bundesamt fuer Justiz, Federal Office of Justice, supervisory authority, external reporting channel, enforcement, supervision, private sector, HinSchG
+
+---
+
+hinschg §40
+Title: Administrative fines for failure to establish internal reporting channel and for reprisals
+Obligation: MUST
+Threshold: Private sector employers obligated under §12 who fail to comply; persons who impose reprisals
+Text: Under §40 of the HinSchG, an administrative offence is committed by any person who intentionally or negligently fails to establish an internal reporting channel as required by §12(1), fails to meet the requirements for internal reporting channels as required by §13, or imposes a reprisal against a reporting person in violation of §21(1). The administrative fine for failing to establish an internal reporting channel can reach up to €20,000. The administrative fine for committing a reprisal against a reporting person can reach up to €50,000. These fines apply per violation, meaning repeated or ongoing failures to comply may result in multiple fines being imposed. The imposition of an administrative fine does not exclude civil liability under §27 for damages caused to the reporting person.
+Keywords: administrative fine, Bußgeld, €20,000, €50,000, penalty, reprisal fine, reporting channel failure, enforcement, HinSchG, Bundesamt fuer Justiz
+
+---
+
+hinschg §36 Documentation
+Title: Documentation of reports — minimum 3-year retention period
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: Internal reporting channels must document all incoming reports in accordance with applicable data protection regulations. Documentation must record the content of the report, the date of receipt, the acknowledgement sent to the reporting person, the follow-up measures taken, and the outcome of the procedure. Where documentation is kept in electronic form, appropriate technical and organisational security measures must be applied to protect the integrity and confidentiality of the records. Documentation must be retained for a minimum of three years following the conclusion of the reporting procedure, after which it must be deleted unless another applicable law requires a longer retention period. Access to documentation must be restricted to persons authorised to handle reports.
+Keywords: documentation obligation, report records, 3-year retention, data protection, GDPR, record keeping, access restriction, deletion, reporting channel
+
+---
+
+hinschg §13(4)
+Title: Internal reporting channel must be operated by an independent and competent person or unit
+Obligation: MUST
+Threshold: All operators of internal reporting channels under §12
+Text: The tasks of the internal reporting channel must be entrusted to an independent person or unit within the organisation that has the necessary professional expertise to fulfil those tasks. The designated person or unit must be able to act impartially and free from conflicts of interest in their handling of reports. In particular, the person or unit responsible for the internal reporting channel must not be hierarchically subordinate to the persons or departments whose conduct may be the subject of a report, and must have direct access to senior management or the management body to escalate serious matters if necessary. Employers may also entrust the operation of the internal reporting channel to a qualified third party — such as an external ombudsperson or a law firm — provided that the requirements of confidentiality, independence, and expertise are met.
+Keywords: independence, competence, impartiality, conflict of interest, internal reporting channel operator, ombudsperson, third party, channel management
+
+---
+
+hinschg §12(3)
+Title: Employers with 250+ employees required to have had internal reporting channel since 2 July 2023
+Obligation: MUST
+Threshold: Private sector employers with 250 or more employees
+Text: Private sector employment bodies that regularly employ 250 or more employees were required to have established an operational internal reporting channel by 2 July 2023, the date on which the HinSchG entered into force. Employers in this size category had no transition period and were expected to be compliant from the law's effective date. Employers with 50 to 249 employees benefited from a transition period and were required to have established their internal reporting channels by 17 December 2023. Employers that were required to comply from 2 July 2023 and had not done so are in ongoing breach of §12(1) and are subject to the administrative fines under §40. Competent authorities may take enforcement action at any time against non-compliant employers in this category.
+Keywords: 250 employees, compliance deadline, July 2023, December 2023, implementation deadline, reporting channel, private sector, large employer, SME transition
+
+---

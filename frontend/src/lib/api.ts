@@ -4,12 +4,19 @@ import type {
   StatusResponse,
   ComplianceReport,
 } from "./types";
+export type { CompanyProfile };
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+function accessHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("complio_access_token");
+  return token ? { "X-Access-Token": token } : {};
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...accessHeaders() },
     ...init,
   });
   if (!res.ok) {
@@ -53,4 +60,18 @@ export const api = {
 
   downloadPdf: (jobId: string) =>
     request<Blob>(`/api/report/${jobId}/pdf`, { method: "POST" }),
+
+  listReports: () =>
+    request<{ reports: ReportSummary[] }>("/api/reports"),
+
+  getProfile: (jobId: string) =>
+    request<CompanyProfile>(`/api/report/${jobId}/profile`),
 };
+
+export interface ReportSummary {
+  job_id: string;
+  company_name: string;
+  generated_at: string;
+  overall_score_percent: number;
+  applicable_regulation_count: number;
+}

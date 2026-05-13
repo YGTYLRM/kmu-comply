@@ -1,0 +1,159 @@
+Mindestlohngesetz (MiLoG)
+Gesetz zur Regelung eines allgemeinen Mindestlohns
+vom 11. August 2014 (BGBl. I S. 1348), zuletzt geaendert durch Artikel 1 des Gesetzes vom 28. Juni 2023
+Expanded Article Reference for Compliance Screening
+
+---
+
+milog §1(1)
+Title: Every employee is entitled to payment of minimum wage by the employer
+Obligation: MUST
+Threshold: All employers in Germany; applies to all employees (Arbeitnehmer) without exception
+Text: Every female and male employee (Arbeitnehmerin und Arbeitnehmer) is entitled to be paid wages at least equal to the statutory minimum wage by the employer. This entitlement is universal and applies to all employees in Germany regardless of their nationality, residence status, sector of employment, or type of employment contract. Part-time employees, workers on fixed-term contracts, apprentices in certain circumstances, and employees in marginal employment (geringfuegige Beschaeftigung, or mini-jobs) are generally covered by the minimum wage entitlement. The minimum wage is payable for all hours actually worked; employers may not average minimum wage compliance across multiple pay periods, and they may not count amounts accrued in working time accounts toward minimum wage entitlement for a given pay period unless specific conditions are met.
+Keywords: minimum wage entitlement, Arbeitnehmer, universal entitlement, all employees, MiLoG, employer obligation, part-time, mini-job, pay period
+
+---
+
+milog §1(2)
+Title: Minimum wage is €12.82 gross per hour from 1 January 2025 — adjusted periodically by Mindestlohnkommission
+Obligation: MUST
+Threshold: All employers; applies to all covered employees
+Text: The statutory minimum wage amounts to €12.82 gross per hour with effect from 1 January 2025. This rate was set by the Mindestlohnkommission (Minimum Wage Commission) and enacted by regulation under §11 of the MiLoG. The Mindestlohnkommission is required to review the minimum wage level at regular intervals of no more than two years, taking into account collective bargaining developments in Germany and the need to maintain adequate social protection for employees while ensuring fair and functioning competition. Where the Commission proposes an adjustment, this is implemented by federal regulation without further legislative action. Employers must monitor published announcements of minimum wage adjustments and ensure that their payroll is updated promptly when a new rate enters into force.
+Keywords: €12.82, minimum wage rate, 2025 rate, Mindestlohnkommission, adjustment, gross per hour, statutory rate, MiLoG, payroll compliance
+
+---
+
+milog §2(1)
+Title: Minimum wage must be paid by the agreed date or at the latest by the last working day of the following month
+Obligation: MUST
+Threshold: All employers covered by MiLoG
+Text: The employer is obligated to pay the minimum wage to the employee at the agreed time of payment. Where no payment date has been agreed, the minimum wage for work performed in a given month must be paid no later than the last banking working day (Bankarbeitstag in Frankfurt am Main) of the month following the month in which the work was performed. This deadline means that work performed in January must be paid no later than the last banking working day of February. The payment timing rule ensures that employees are not required to wait more than approximately two months to receive the minimum wage for their work. Where an employer uses working time accounts, specific rules apply to the crediting and debiting of hours and to the payment of amounts in working time accounts.
+Keywords: payment deadline, Faelligkeit, agreed payment date, last banking working day, monthly payment, payment timing, MiLoG, working time account, payroll
+
+---
+
+milog §3
+Title: Agreements that undercut the minimum wage are void — the minimum wage entitlement cannot be waived
+Obligation: MUST
+Threshold: All employers and employees; applies to all employment contracts and collective agreements
+Text: Agreements, including individual employment contracts and collective agreements, that undercut the statutory minimum wage entitlement or restrict or exclude the right to assert the minimum wage entitlement are ineffective to that extent. The invalidity is automatic and does not require any action by the employee or a court to declare the agreement void; the minimum wage entitlement replaces the lower agreed wage by operation of law. The employee may not waive the minimum wage entitlement except in very limited circumstances: once the entitlement has fallen due (nach Faelligkeit), the employee may waive the entitlement by written agreement, but only to the extent that the waiver does not undercut the minimum wage for hours already worked. Attempts by employers to agree to rates below the minimum wage in employment contracts are therefore legally ineffective from the outset.
+Keywords: Unabdingbarkeit, waiver prohibition, contractual exclusion, void agreement, minimum wage entitlement, invalid terms, employment contract, collective agreement, MiLoG
+
+---
+
+milog §13
+Title: Principal contractor liability — joint and several liability for minimum wage obligations of subcontractors
+Obligation: MUST
+Threshold: All undertakings that award contracts to subcontractors or downstream subcontractors
+Text: Where a contractor awards a contract for the provision of work or services to a subcontractor, the contractor is liable as a joint and several guarantor (selbstschuldnerischer Buerge) for the minimum wage obligations of the subcontractor and of any further subcontractors engaged by that subcontractor. This liability arises where the contractor knew, or negligently did not know, that the subcontractor or a downstream subcontractor was not paying or had not paid the statutory minimum wage to workers employed or posted in the performance of the contract. The joint and several liability means that the employees of the subcontractor can bring their minimum wage claims directly against the principal contractor without first exhausting their claims against the subcontractor. Contractors should take contractual and due diligence measures to verify that their subcontractors comply with the minimum wage requirements.
+Keywords: Generalunternehmerhaftung, principal contractor liability, subcontractor, joint and several liability, Buergschaft, supply chain, minimum wage compliance, due diligence, §13 MiLoG
+
+---
+
+milog §17(1)
+Title: Employers must record beginning, end, and duration of daily working hours for specified categories of employee within 7 days
+Obligation: MUST
+Threshold: Employers of mini-jobbers and employers in sectors listed in §2a AEntG (Schwarzarbeitsbekaempfungsgesetz) — construction, cleaning, logistics, hospitality, transport, forestry, meat industry, postal services, temporary workers
+Text: Employers who employ persons in marginal employment (mini-jobbers under §8(1) of the Fourth Book of the Social Code — SGB IV) or persons in the industries listed in §2a of the Schwarzarbeitsbekaempfungsgesetz (Act to Combat Undeclared Work) are obligated to record the beginning, end, and duration of the daily working hours of those employees. The recording must be made no later than by the end of the seventh calendar day following the day on which the work was performed. The industries subject to the recording obligation under §2a AEntG include: construction, building cleaning services, passenger transport, forwarding and logistics, garbage disposal, security services, the meat industry, hairdressing, temporary agency work, forestry, postal and parcel services, and the hospitality sector. The records must be kept for a minimum period of two years from the date on which the record was created.
+Keywords: working time records, Aufzeichnungspflicht, §17 MiLoG, 7-day deadline, mini-jobber, construction, cleaning, logistics, hospitality, 2-year retention, daily records
+
+---
+
+milog §17(2)
+Title: Working time records must be made available to Finanzkontrolle Schwarzarbeit on request
+Obligation: MUST
+Threshold: All employers subject to recording obligation under §17(1) MiLoG
+Text: Working time records maintained under §17(1) MiLoG must be kept available for inspection by the competent authority — the Finanzkontrolle Schwarzarbeit (FKS), a division of the German customs authority — on request. The records must be produced at the location where the employee is working or, if requested, at a place designated by the competent authority, in a timely manner and in a readable format. Employers must not delete, alter, or otherwise make the records unavailable during the mandatory two-year retention period. Records may be kept in paper or electronic form, but electronic records must be immediately accessible and printable on request by the competent authority. Failure to produce records on request, or production of inadequate records, may constitute an independent administrative offence.
+Keywords: FKS, Finanzkontrolle Schwarzarbeit, customs authority, document production, inspection, records availability, Schwarzarbeitsbekaempfungsgesetz, employer duty, electronic records
+
+---
+
+milog §19
+Title: Compliance with minimum wage obligations is monitored by the customs authority (Finanzkontrolle Schwarzarbeit)
+Obligation: MUST
+Threshold: All employers subject to MiLoG; competent enforcement authority is FKS
+Text: The authorities of the customs administration — in particular the Finanzkontrolle Schwarzarbeit (FKS) — are responsible for monitoring and enforcing compliance with the minimum wage obligations under the MiLoG. The FKS is empowered to carry out inspections of employers' premises and records, to question employers and employees, to review payroll records, time records, and social security documentation, and to investigate suspected violations of the MiLoG. Employers must permit access to their premises and records and must cooperate with FKS investigations. The FKS cooperates with other authorities, including the Rentenversicherung (pension insurance) and the Bundesagentur fuer Arbeit (Federal Employment Agency), in detecting minimum wage violations, undeclared work, and social insurance fraud.
+Keywords: Finanzkontrolle Schwarzarbeit, FKS, customs authority, enforcement, workplace inspection, payroll records, social security, Schwarzarbeit, minimum wage monitoring
+
+---
+
+milog §20
+Title: Employers posting workers to Germany must comply with German minimum wage requirements
+Obligation: MUST
+Threshold: All employers — regardless of the country in which they are established — who post workers to Germany to perform work
+Text: Employers established in Germany or abroad who employ workers in Germany are obligated to pay those workers the statutory German minimum wage, regardless of the nationality of the workers and regardless of the law otherwise applicable to the employment contract. This provision gives the MiLoG extraterritorial effect in the sense that employers posting workers to Germany from abroad — for example, transport companies, construction firms, or service providers based in other EU Member States — are subject to the German minimum wage in respect of work performed on German territory. The application of the MiLoG to posted workers operates alongside the obligations of the Arbeitnehmer-Entsendegesetz (AEntG) and EU Directive 96/71/EC on the posting of workers. Employers posting workers must also comply with notification and documentation obligations that may apply under applicable German law.
+Keywords: posted workers, Entsendegesetz, extraterritorial application, foreign employer, EU posting, minimum wage compliance, Germany, §20 MiLoG, cross-border
+
+---
+
+milog §21(1)
+Title: Administrative fine up to €500,000 for wilful or negligent failure to pay minimum wage
+Obligation: MUST
+Threshold: Employers and responsible persons who fail to pay minimum wage in violation of §20 MiLoG
+Text: An administrative offence is committed by any person who intentionally or negligently, in violation of §20 of the MiLoG, fails to pay the minimum wage or fails to pay it in time. This administrative offence is punishable by a fine of up to €500,000. The high maximum fine is intended to ensure that the administrative fine exceeds any financial benefit that an employer might obtain by not paying the minimum wage, including in cases of large-scale or systematic non-compliance. When setting the amount of the fine, the competent authority (FKS) will take into account the duration and scale of the non-compliance, the number of employees affected, whether the non-compliance was intentional or negligent, and whether the employer has previously committed similar offences. Repeated violations may result in exclusion from public procurement contracts under separate legislation.
+Keywords: administrative fine, Bußgeld, €500,000, minimum wage violation, wilful, negligent, enforcement, FKS, financial penalty, §21 MiLoG
+
+---
+
+milog §21(3)
+Title: Administrative fine up to €30,000 for failure to maintain or retain working time records
+Obligation: MUST
+Threshold: Employers obligated to maintain working time records under §17(1) MiLoG
+Text: An administrative offence is committed by any employer who intentionally or negligently fails to maintain the working time records required by §17(1) of the MiLoG, fails to retain those records for the required two-year period, or fails to produce them on request to the Finanzkontrolle Schwarzarbeit. This administrative offence is punishable by a fine of up to €30,000. The obligation to maintain records applies separately to each employee for whom records are required, meaning that systematic failure to record working time for a significant number of employees could result in cumulatively very high fines. Employers should ensure that their time recording systems are reliable and auditable, and that records are stored securely and in a format accessible to the FKS on request.
+Keywords: working time records fine, Bußgeld, €30,000, documentation violation, §21(3) MiLoG, FKS, retention period, time recording, administrative offence
+
+---
+
+milog §1(3) Exceptions
+Title: Certain categories of persons are excluded from the minimum wage entitlement
+Obligation: MUST
+Threshold: All employers assessing whether a particular worker is covered by MiLoG
+Text: Certain categories of persons are excluded from the statutory minimum wage entitlement under §22 MiLoG. These include: compulsory interns as part of a school, vocational training, or university degree programme (Pflichtpraktikum) where the duration is prescribed by law or an examination regulation; voluntary interns undertaking internships of up to three months in duration where no prior employment relationship has existed; young people under the age of 18 who have not completed vocational training; and persons serving as volunteers in certain recognised volunteer schemes. Apprentices in formal vocational training are subject to a separate minimum training allowance (Mindestausbildungsverguetung) under the Berufsbildungsgesetz (BBiG). Employers must correctly classify workers to avoid inadvertent breach of the minimum wage obligation through misclassification of employed persons as falling within an exclusion category.
+Keywords: exclusion, exceptions, Pflichtpraktikum, intern, apprentice, under 18, volunteer, §22 MiLoG, classification, misclassification
+
+---
+
+milog §2(2)
+Title: Special payments (bonus, holiday pay) may be counted toward minimum wage only if paid in the same month
+Obligation: MUST
+Threshold: All employers paying special bonuses, holiday pay, or Christmas allowances
+Text: Where a collective agreement or individual employment contract provides for special payments such as holiday pay (Urlaubsgeld) or Christmas allowance (Weihnachtsgeld), these payments may be counted toward the minimum wage entitlement for the month in which they are actually paid, provided that they are paid unconditionally and irrevocably in the relevant month and that they bring the total gross hourly payment in that month up to at least the statutory minimum wage. Payments that are conditional — for example, a bonus payable only if the employee is still employed at the year end — or that are deferred to a later period may not be credited toward minimum wage compliance in an earlier month. Employers must carefully review the terms and conditions of any bonus or special payment arrangements to assess whether they can be lawfully counted toward minimum wage compliance.
+Keywords: special payments, bonus, holiday pay, Weihnachtsgeld, minimum wage crediting, conditional payment, unconditional, same month, pay calculation, collective agreement
+
+---
+
+milog §13 Due Diligence
+Title: Contractors should take contractual and due diligence measures to verify subcontractor minimum wage compliance
+Obligation: SHOULD
+Threshold: All undertakings that engage subcontractors in supply chains involving German workers
+Text: Given the joint and several liability established by §13 MiLoG, principal contractors should take proactive contractual and due diligence measures to verify and ensure that their subcontractors and downstream subcontractors are complying with the minimum wage obligations under the MiLoG. Recommended measures include incorporating minimum wage compliance warranties and audit rights into subcontractor agreements, carrying out pre-contract due diligence on the financial viability and employment practices of potential subcontractors, requiring subcontractors to provide documentation of compliance (payroll records, time records, social security registration) on a periodic basis, and monitoring subcontractor compliance during contract performance. Contractual provisions that allow the principal contractor to terminate a subcontract on grounds of minimum wage non-compliance and to step in to pay affected workers directly can reduce both reputational and legal exposure.
+Keywords: due diligence, subcontractor compliance, contractual warranty, audit rights, supply chain, risk management, Generalunternehmerhaftung, compliance monitoring, §13 MiLoG
+
+---
+
+milog §14
+Title: Administrative fine up to €500,000 for wilful or negligent failure to pay minimum wage in cross-border context
+Obligation: MUST
+Threshold: Employers — including foreign-based employers — who post workers to Germany and fail to pay minimum wage
+Text: The administrative fine provisions of §21 MiLoG, including the maximum fine of €500,000 for failure to pay the minimum wage, apply equally to employers based outside Germany who post workers to perform work in Germany. The Finanzkontrolle Schwarzarbeit is empowered to investigate posted worker situations and to impose administrative fines on foreign employers where evidence of minimum wage violations is found. The FKS cooperates with customs and labour authorities in other EU Member States through established enforcement cooperation mechanisms to pursue non-compliant foreign employers. German recipients of services provided through posted workers may themselves face liability under §13 MiLoG if they knew or negligently did not know that the service provider was not paying the minimum wage to posted workers performing work in Germany.
+Keywords: posted workers, foreign employer, €500,000 fine, FKS, cross-border enforcement, minimum wage violation, EU enforcement cooperation, recipient liability, §14 MiLoG
+
+---
+
+milog §17 Expanded
+Title: Working time records must be retained for 2 years — accessible format required
+Obligation: MUST
+Threshold: All employers subject to recording obligation under §17(1) MiLoG
+Text: Working time records required under §17(1) MiLoG must be retained in a readable format for a period of at least two years, calculated from the date on which the individual record was created. The retention period does not restart when a new employment relationship begins with a different employee; each record must be retained for two years from its own creation date. Records may be maintained in paper or electronic form. Electronic records must be immediately accessible and must be capable of being printed and produced to the Finanzkontrolle Schwarzarbeit on demand without delay. Where records are maintained in a cloud-based or off-site system, employers must ensure that access to those records from the workplace is reliable and that access cannot be blocked by system outages or termination of software subscriptions. Employers should establish clear internal procedures for record retention and deletion to ensure compliance.
+Keywords: 2-year retention, record retention, readable format, paper records, electronic records, cloud storage, FKS, accessibility, two years, Aufbewahrungspflicht
+
+---
+
+milog §16 Posting Notification
+Title: Foreign employers posting workers to Germany may be subject to notification obligations
+Obligation: MUST
+Threshold: Employers based outside Germany posting workers to perform work in Germany in sectors covered by AEntG
+Text: Employers based outside Germany who post workers to perform work in Germany in sectors covered by the Arbeitnehmer-Entsendegesetz (AEntG) — including construction, building cleaning, postal services, and other sectors specified by federal regulation — are required to notify the Finanzkontrolle Schwarzarbeit prior to the commencement of the work. The notification must include specified information about the employer, the workers being posted, the nature and duration of the work, and the location where the work will be performed. Failure to comply with the notification obligation is an independent administrative offence under the AEntG and may result in fines. German client companies engaging the services of foreign service providers should request confirmation that notification has been given before work begins, both to protect themselves from liability and to facilitate enforcement by the FKS.
+Keywords: posting notification, AEntG, foreign employer, FKS notification, prior notification, posted worker, administrative offence, client company, EU posting, compliance
+
+---
