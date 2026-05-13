@@ -1184,4 +1184,115 @@ Full checkout flow built end-to-end:
 1. **Push** — push 6 new commits on `feat/polish`, then push `dev` and `main` (space out from today)
 2. **Stripe account** — create Stripe account, get API keys, activate paywall
 3. **Full test screening** — profiling fix needs verification. Re-run with same 75-employee IT profile and confirm no CANNOT_ASSESS warning and all 8 applicable regulations appear
+
+---
+
+## Session 14 — 2026-05-10 — Correctness fix, persistence, legal disclaimer
+
+**Branch:** `feat/polish`
+
+### Changes
+
+#### RAG threshold inference bug fixed
+- Added `<applicability_notice>` block to `gap_analysis_prompt` in `backend/rag/prompts.py`
+- Instructs the LLM explicitly: applicability has already been determined by the deterministic registry. Do not re-derive thresholds from retrieved legal text. Job is evidence assessment only.
+- Prevents stale or misread RAG chunks from causing wrong compliance verdicts.
+
+#### File-based report persistence
+- Created `backend/services/report_store.py`
+- Saves completed reports as JSON to `backend/data/reports/{job_id}.json` on job completion
+- `job_manager.get_report()` falls back to disk load if job is not in memory
+- `job_manager.get_status()` returns synthetic COMPLETED status if report exists on disk but job was evicted
+- Reports now survive backend restarts and the 1-hour in-memory TTL
+- Report links (e.g. `/report/{job_id}`) are now permanent — shareable with lawyers, board, team
+
+#### Legal disclaimer strengthened
+- `backend/models/compliance_report.py`: expanded disclaimer to explicitly state no attorney-client relationship, cites need to verify with Rechtsanwalt/Steuerberater, notes data ingestion timing limitation, clarifies Complio accepts no liability
+- `frontend/src/app/report/[id]/page.tsx`: added amber disclaimer banner at bottom of every report. Fixed error message that said "reports available for 1 hour" (no longer true).
+- `frontend/src/components/profile-form/step1-company.tsx`: added "not legal advice" notice at top of step 1 so users see it before they fill anything out
+
+### Decisions
+- Chose file-based JSON persistence over SQLite/PostgreSQL to avoid adding a database dependency at this stage. Easy to migrate later — each report is a self-contained JSON file.
+- Disclaimer placed at form entry (step 1) AND at report bottom — both touch points where users form expectations about what the output means.
+
+### Next session priorities
+1. **Push** — push feat/polish commits, then dev + main
+2. **Stripe activation** — keys from Yigit
+3. **Remaining open problems** — user accounts, re-assessment flow
 4. **Deployment** — consider deploying to a real domain so Stripe webhooks can be registered
+
+---
+
+## Session 14b — 2026-05-10 — Copy link, recent reports, task tracking, ChromaDB update pipeline
+
+**Branch:** `feat/polish`
+
+### Changes
+
+#### Copy link button
+- `frontend/src/app/report/[id]/page.tsx`: added "Copy link" button next to "Download PDF" in the report header
+- Uses `navigator.clipboard.writeText(window.location.href)`. Button swaps to a green checkmark + "Copied!" for 2 seconds then resets.
+- Imports: added `Link2`, `Check` from lucide-react
+
+#### Recent reports page (`/reports`)
+- `backend/services/report_store.py`: added `list_recent(limit=50)` — scans `data/reports/`, parses each JSON for summary fields, returns sorted by mtime newest-first
+- `backend/main.py`: added `GET /api/reports` endpoint
+- `frontend/src/lib/api.ts`: added `api.listReports()` and exported `ReportSummary` interface
+- `frontend/src/app/reports/page.tsx`: new page — fetches and lists all persisted reports with company name, date, regulation count, score badge, and click-through to the full report
+- `frontend/src/components/common/navbar.tsx`: added "Reports" link to desktop nav and mobile menu
+
+#### Action plan task tracking
+- `frontend/src/components/report/action-plan.tsx`: converted to client component ("use client")
+- Uses `useParams()` to get jobId from URL — no prop drilling needed
+- Each action item has a circle/checkmark toggle button
+- State stored in localStorage: key = `complio_done_{jobId}_{regulation}_{article_number}`
+- Done items show with strikethrough text, faded opacity, green checkmark
+- Header shows "X/Y done" counter when any items are marked complete
+- Survives page refresh — reads localStorage on mount
+
+#### ChromaDB re-ingestion pipeline
+- `scripts/check_regulation_updates.py`: computes SHA-256 of every source file per regulation
+- Compares against `backend/data/reg_checksums.json`
+- If any files changed: re-ingests with `reset=True` for that regulation only, updates checksum file
+- Flags: `--dry-run` (report only), `--force` (re-ingest all)
+- Run after updating any regulation PDF/TXT source to keep the vector store in sync
+
+### Remaining open problems
+- User accounts / login (largest remaining item — enables history per user, alerts)
+- Re-assessment / delta flow (compare two reports for same company)
+- Stripe activation (waiting on Yigit's keys)
+- Deployment (needed for Stripe webhooks)
+
+---
+
+## Session 14c — 2026-05-10 — Re-assessment / delta flow
+
+**Branch:** `feat/polish`
+
+### Changes
+
+#### Profile persistence
+- `backend/services/report_store.py`: added `save_profile(job_id, profile_dict)` and `load_profile(job_id)` — saves to `data/reports/{job_id}_profile.json`
+- `backend/services/job_manager.py`: in `create_job()`, persists the profile to disk immediately when a job is created (before the pipeline runs)
+- `backend/main.py`: added `GET /api/report/{job_id}/profile` endpoint
+- `frontend/src/lib/api.ts`: added `api.getProfile(jobId)` method
+
+#### Re-run button
+- Report header now has a "Re-run" button that navigates to `/analyze?from={job_id}`
+
+#### Form pre-fill
+- `frontend/src/app/analyze/page.tsx`: reads `?from={jobId}` param via `useSearchParams()`
+- Fetches the original profile from the backend and calls `form.reset()` to populate all 50+ fields including the supply_chain_countries array (joined as comma string for the raw field)
+- Page title changes to "Re-run Screening" when `?from` is present
+- Wraps inner component in `Suspense` for `useSearchParams()` compatibility
+- On submit, stores `fromJobId` in sessionStorage as `kmu_prev_job_id`
+
+#### Delta tracking through processing
+- `frontend/src/app/analyze/processing/processing-view.tsx`: on job completion, reads `kmu_prev_job_id` from sessionStorage and appends `?prev={prevJobId}` to the redirect URL
+
+#### Delta banner on report page
+- `frontend/src/app/report/[id]/page.tsx`: reads `?prev` query param, fetches previous report via `api.getReport()`
+- Renders `DeltaBanner` component at the top of the report content area when a previous report is available
+- Delta shows: overall score change (+X% / -X%), count of gaps that improved, count that regressed
+- Color coded: green for improvement, red for decline, neutral for no change
+- "View previous report" link back to the old report URL
