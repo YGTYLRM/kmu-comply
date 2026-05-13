@@ -64,6 +64,9 @@ export function Navbar() {
               <Link href="/contact" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
                 Contact
               </Link>
+              <Link href="/reports" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
+                Reports
+              </Link>
             </nav>
 
             <div className="flex-1" />
@@ -102,6 +105,9 @@ export function Navbar() {
                 </a>
                 <Link href="/contact" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
                   Contact
+                </Link>
+                <Link href="/reports" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                  Reports
                 </Link>
                 <Link href="/analyze" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
                   Get started
