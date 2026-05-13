@@ -4,6 +4,113 @@ This file is appended after every working session. It documents what was built, 
 
 ---
 
+## Session 15 — 2026-05-13 — Security hardening + Phases 7–12
+
+**Branch:** `feat/polish`
+**All commits local only — nothing pushed this session.**
+
+---
+
+### What was built
+
+#### Phase 7 — Auth + Database
+- Supabase project connected (`zxfrlfqhxlnpxivnazbk.supabase.co`)
+- `backend/db/models.py` — SQLAlchemy models: Profile, Company, Report, GapItem, ActionItem, Notification, Subscription
+- `backend/db/database.py` — async PostgreSQL engine, `init_db()` called on startup
+- `backend/services/auth_service.py` — Supabase JWT validation via `get_current_user` FastAPI dependency
+- `frontend/src/lib/supabase/client.ts` + `server.ts` — browser and server Supabase clients
+- `frontend/src/middleware.ts` — route protection for `/analyze`, `/reports`, `/report`, `/dashboard`
+- `frontend/src/app/login/page.tsx` + `register/page.tsx` — auth pages matching dark design
+- Navbar shows user email, sign out, dashboard link, notification bell
+
+#### Security hardening (full audit run, multiple CVEs fixed)
+- CRIT-2: Reports now scoped to owner via `_user_id` field in JSON + `list_recent(user_id=)` filter
+- CRIT-3: Job ownership persisted to disk, rebuilt from report files on startup via `load_all_owners()`
+- HIGH-1: Checkout endpoint requires auth + validates redirect URLs against allowed origins
+- HIGH-3: Prompt injection sanitizer in `rag/prompts.py` — strips XML tags and injection keywords from all user text before LLM embedding
+- HIGH-4: All contact email fields escaped with `html.escape()` before HTML template insertion
+- HIGH-5: `/api/profile/validate` now requires auth
+- MED-3: `api.ts` uses `getUser()` (server-validated) not `getSession()` (localStorage-only) for auth header
+- MED-4: Login page validates `?next=` param — only relative paths allowed
+- MED-8: Security headers on both frontend (next.config.js) and backend (SecurityHeadersMiddleware)
+- LOW-1: `datetime.utcnow()` → `datetime.now(timezone.utc)` throughout db/models.py
+- LOW-2: Generic error messages on login/register (no email/password distinction leaked)
+- LOW-5: `weasyprint` removed from requirements.txt, `playwright` added (was missing despite being the actual renderer)
+- LOW-6: `supabase_secret_key` renamed to `supabase_service_role_key` in config
+
+#### Phase 9 — Monitoring engine
+- `backend/services/db_service.py` — `upsert_company()`, `save_report_to_db()`, `get_all_companies_due_for_reassessment()`, `get_companies_for_regulation()`
+- `backend/services/scheduler.py` — APScheduler with two jobs:
+  - 03:00 UTC daily: regulation change detection (hash comparison of all text files)
+  - 04:00 UTC daily: re-assess all companies due (30 days for Starter, 7 days for Professional)
+- Analyze endpoint now upserts Company to DB and passes company_id to job_manager
+- Job completion saves Report + GapItems to DB
+
+#### Phase 10 — Email alerts
+- `backend/services/notification_service.py` — full HTML email with score ring, delta vs previous, gap summary, regression list, CTA button
+- Notification records saved to DB + email sent immediately after each scheduled analysis
+- Three new endpoints: `GET /api/notifications`, `GET /api/notifications/unread-count`, `POST /api/notifications/mark-read`
+
+#### Phase 11 — Company dashboard
+- `GET /api/companies` and `GET /api/companies/{id}` endpoints
+- `frontend/src/app/dashboard/page.tsx` — company grid with score rings
+- `frontend/src/app/dashboard/[companyId]/page.tsx` — 3-tab view: Overview (SVG trend chart), History (all reports with delta), Alerts
+- Notification bell in navbar with unread count badge, polls every 60s
+
+#### Phase 12 — Stripe subscriptions
+- `backend/db/models.py` — `Subscription` table added
+- `backend/services/stripe_service.py` — fully rewritten for subscription mode: `create_subscription_checkout()`, `create_portal_session()`, `get_active_subscription()`, `check_company_limit()`, full webhook handler for subscription lifecycle
+- Plan limits enforced on `/api/analyze` when `STRIPE_ENABLED=true`
+- Scheduler respects plan reassessment intervals (7d Professional, 30d Starter)
+- `frontend/src/app/account/billing/page.tsx` — shows current plan, status, renewal date, Stripe portal button, upgrade nudge
+- Pricing CTAs activate Stripe checkout when `NEXT_PUBLIC_STRIPE_ENABLED=true`, otherwise stay as `/contact`
+- Navbar shows Billing link when logged in
+
+---
+
+### Open problems / blockers for next session
+
+#### 1. Regulation content — CRITICAL
+ChromaDB chunk counts after audit:
+
+| Regulation | Chunks | Problem |
+|---|---|---|
+| LkSG | 0 | Text downloaded (48KB) but §-regex fails — gesetze-im-internet.de uses `§ N\xa0Title` (non-breaking space) not `§ N\nTitle`. One-line fix needed: `re.sub(r'(^§\s*\d+[a-z]?)\xa0', r'\1\n', text, flags=re.MULTILINE)` |
+| EnEfG | 0 | Same `\xa0` issue. Same fix. |
+| CSRD | 1 | EUR-Lex blocked by AWS WAF (202, empty body, `x-amzn-waf-action: challenge`). Cannot download programmatically. Need manual PDF download from browser. |
+| NIS2 | 37 | Full directive is ~400KB / 46 articles. Current content is a 28KB curated summary from earlier sessions. NOT the full official text. Need full directive. |
+| EU AI Act | 37 | Full regulation is ~1MB / 113 articles. Current content is a 28KB summary. NOT the full official text. |
+
+**Fix for LkSG/EnEfG:** Normalize text, then re-run ingest. Script exists at `backend/scripts/fetch_missing_regulations.py` — just needs to normalize before saving.
+
+**Fix for NIS2/CSRD/EU AI Act:** Download PDFs manually from browser at:
+- NIS2: https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32022L2555
+- CSRD: https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32022L2464
+- EU AI Act: https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32024R1689
+
+Save PDFs to:
+- `backend/data/regulations/nis2/nis2_full.pdf`
+- `backend/data/regulations/csrd/csrd_full.pdf`
+- `backend/data/regulations/eu_ai_act/eu_ai_act_full.pdf`
+
+Then run:
+```python
+from rag.ingest import ingest_regulation
+for r in ['nis2', 'csrd', 'eu_ai_act']:
+    ingest_regulation(r, reset=True)
+```
+
+#### 2. Nothing pushed
+All Phase 7–12 work is committed locally on `feat/polish`. Not pushed to remote. Need PAT to push when ready.
+
+#### 3. Stripe not activated
+Set `STRIPE_ENABLED=true`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` in `backend/.env` and `NEXT_PUBLIC_STRIPE_ENABLED=true` in `frontend/.env.local` once Stripe account is created.
+
+#### 4. Deployment still pending
+Product is feature-complete. Needs Vercel (frontend) + hosting (backend) + domain before it can serve real users.
+
+---
+
 ## Session 2 — 2026-05-03 — Phase 2 completion
 
 **Branch:** `feat/document-retrieval`
