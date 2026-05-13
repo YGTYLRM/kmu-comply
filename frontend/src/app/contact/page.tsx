@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Mail, Building2, MessageSquare, User, CheckCircle2,
@@ -10,6 +11,8 @@ import {
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const TOPICS = [
+  "Request a Demo — Starter",
+  "Request a Demo — Professional",
   "Enterprise pricing",
   "API access",
   "Custom regulation scope",
@@ -17,6 +20,12 @@ const TOPICS = [
   "Technical support",
   "Other",
 ];
+
+const PLAN_TOPIC: Record<string, string> = {
+  starter:      "Request a Demo — Starter",
+  professional: "Request a Demo — Professional",
+  enterprise:   "Enterprise pricing",
+};
 
 const NEXT_STEPS = [
   { n: "01", text: "We read your message and route it to the right person." },
@@ -45,7 +54,11 @@ function Field({
   );
 }
 
-export default function ContactPage() {
+function ContactInner() {
+  const searchParams = useSearchParams();
+  const planParam    = searchParams.get("plan") ?? "";
+  const preTopic     = PLAN_TOPIC[planParam] ?? "";
+
   const [sent,    setSent]    = useState(false);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
@@ -195,7 +208,7 @@ export default function ContactPage() {
                   </label>
                   <select
                     name="topic"
-                    defaultValue=""
+                    defaultValue={preTopic}
                     className="w-full rounded-xl border border-white/[0.08] bg-dark-900 px-4 py-3 text-sm text-slate-300 outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/15 transition-all duration-200 appearance-none cursor-pointer"
                   >
                     <option value="" disabled className="text-slate-600">Select a topic...</option>
@@ -244,5 +257,13 @@ export default function ContactPage() {
         </motion.div>
       </div>
     </main>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<main className="bg-dark-950 min-h-screen pt-24" />}>
+      <ContactInner />
+    </Suspense>
   );
 }
