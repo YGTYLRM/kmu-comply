@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header, Depends
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,12 +18,16 @@ from models import (
 )
 from services.job_manager import JobManager
 from services.threshold_engine import determine_applicable_regulations
+from services.auth_service import get_current_user, get_optional_user
 
 job_manager = JobManager(ttl_seconds=settings.job_ttl_seconds)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if settings.database_url:
+        from db.database import init_db
+        await init_db()
     await job_manager.start()
     yield
     await job_manager.stop()
@@ -52,6 +56,24 @@ async def health():
         chromadb="not_connected",
         embedding_model=settings.embedding_model,
     )
+
+
+@app.post("/api/auth/sync-profile")
+async def sync_profile(current_user: dict = Depends(get_current_user)):
+    """Called after login/register to ensure the user has a profile row in our DB."""
+    if not settings.database_url:
+        return {"ok": True}
+    from db.database import AsyncSessionLocal
+    from db.models import Profile
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(select(Profile).where(Profile.id == current_user["id"]))
+        profile = result.scalar_one_or_none()
+        if not profile:
+            profile = Profile(id=current_user["id"], email=current_user["email"])
+            db.add(profile)
+            await db.commit()
+    return {"ok": True}
 
 
 @app.post("/api/profile/validate", response_model=ProfileValidationResponse)
