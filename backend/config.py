@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     stripe_enabled: bool = False
 
+    # Supabase / Database
+    supabase_url: str = ""
+    supabase_secret_key: str = ""
+    database_url: str = ""
+
     # LLM
     llm_temperature: float = 0.0
     llm_timeout_seconds: int = 120
