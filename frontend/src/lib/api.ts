@@ -8,15 +8,23 @@ export type { CompanyProfile };
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-function accessHeaders(): Record<string, string> {
+async function getAuthHeader(): Promise<Record<string, string>> {
   if (typeof window === "undefined") return {};
-  const token = localStorage.getItem("complio_access_token");
-  return token ? { "X-Access-Token": token } : {};
+  try {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const authHeader = await getAuthHeader();
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...accessHeaders() },
+    headers: { "Content-Type": "application/json", ...authHeader },
     ...init,
   });
   if (!res.ok) {
@@ -38,7 +46,8 @@ export const api = {
   uploadDocuments: async (files: File[]): Promise<{ doc_session_id: string; files_saved: string[] }> => {
     const form = new FormData();
     files.forEach((f) => form.append("files", f));
-    const res = await fetch(`${BASE}/api/documents`, { method: "POST", body: form });
+    const authHeader = await getAuthHeader();
+    const res = await fetch(`${BASE}/api/documents`, { method: "POST", body: form, headers: authHeader });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.detail ?? `HTTP ${res.status}`);
