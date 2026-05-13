@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileSearch, Zap, ShieldCheck,
@@ -76,7 +76,7 @@ const PLANS = [
     period: "per report",
     desc: "One-off screening for companies that need an occasional compliance check.",
     highlight: false,
-    cta: "Get started",
+    cta: "Request a Demo",
     features: [
       "Single compliance screening",
       "All 11 regulations covered",
@@ -92,7 +92,7 @@ const PLANS = [
     period: "per month",
     desc: "Unlimited screenings for teams that need to track compliance over time.",
     highlight: true,
-    cta: "Get started",
+    cta: "Request a Demo",
     features: [
       "Unlimited screenings",
       "All 11 regulations covered",
@@ -307,45 +307,16 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 function PricingCTA({ plan }: { plan: typeof PLANS[0] }) {
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = useCallback(async () => {
-    if (plan.cta === "Contact us") {
-      window.location.href = "/contact";
-      return;
-    }
-    if (plan.name === "Enterprise") return;
-
-    setLoading(true);
-    const planKey = plan.name.toLowerCase(); // "starter" | "professional"
-    const base = window.location.origin;
-    try {
-      const res = await fetch("/api/backend/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: planKey,
-          success_url: `${base}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${base}/checkout/cancel`,
-        }),
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch {
-      setLoading(false);
-    }
-  }, [plan]);
-
-  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
+  const planParam = plan.name.toLowerCase(); // "starter" | "professional" | "enterprise"
+  const cls = `w-full text-center rounded-xl py-3 text-sm font-semibold transition-all duration-200 ${
     plan.highlight
       ? "bg-brand-600 text-white hover:bg-brand-500 shadow-glow-blue-sm hover:shadow-glow-blue"
       : "border border-white/12 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
   }`;
-
   return (
-    <button onClick={handleClick} disabled={loading} className={cls}>
-      {loading ? "Redirecting…" : plan.cta}
-    </button>
+    <Link href={`/contact?plan=${planParam}`} className={cls}>
+      {plan.cta}
+    </Link>
   );
 }
 
@@ -386,8 +357,8 @@ export default function HomePage() {
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3">
-              <Link href="/analyze" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
-                Get started
+              <Link href="/contact" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
+                Request a Demo
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
               </Link>
               <a href="#pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-7 py-4 text-base font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-200">
@@ -396,7 +367,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-              {["No account required", "Results in minutes", "11 regulations in one report"].map((t) => (
+              {["Reply within 1 business day", "Results in minutes", "11 regulations in one report"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   {t}
@@ -551,10 +522,10 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/analyze"
+                href="/contact"
                 className="group inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300"
               >
-                Try it now
+                Request a Demo
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
               </Link>
             </motion.div>
@@ -698,8 +669,8 @@ export default function HomePage() {
             <p className="text-base sm:text-lg text-slate-500 max-w-lg">
               Get a detailed compliance screening across 11 German and EU regulations. Not a substitute for legal advice.
             </p>
-            <Link href="/analyze" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
-              Get started
+            <Link href="/contact" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
+              Request a Demo
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
             </Link>
           </motion.div>
