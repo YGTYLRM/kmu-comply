@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessInner() {
   const params = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ok" | "error">("loading");
@@ -61,5 +61,13 @@ export default function CheckoutSuccessPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-dark-950" />}>
+      <CheckoutSuccessInner />
+    </Suspense>
   );
 }
