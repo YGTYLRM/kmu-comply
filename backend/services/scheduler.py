@@ -155,8 +155,29 @@ async def _run_scheduled_analysis(company: dict, triggered_by: str, reason: str)
         logger.info("scheduler: completed %s analysis for %s — score %.1f%%",
                     triggered_by, company_name, report.overall_score_percent)
 
-        # Queue notification (Phase 10 will send the actual email)
-        await _queue_notification(user_id, company["user_email"], company_name, report, triggered_by)
+        # Fetch previous report for delta comparison
+        prev_report = None
+        try:
+            from db.database import AsyncSessionLocal
+            from db.models import Report as ReportRow
+            from sqlalchemy import select
+            async with AsyncSessionLocal() as db:
+                rows = (await db.execute(
+                    select(ReportRow)
+                    .where(ReportRow.company_id == company_id)
+                    .order_by(ReportRow.created_at.desc())
+                    .limit(2)
+                )).scalars().all()
+                if len(rows) >= 2:
+                    import json
+                    from models.compliance_report import ComplianceReport as CR
+                    raw = rows[1].raw_json
+                    if raw:
+                        prev_report = CR.model_validate(raw)
+        except Exception:
+            pass
+
+        await _queue_notification(user_id, company["user_email"], company_name, report, triggered_by, prev_report=prev_report)
 
     except Exception as exc:
         logger.error("scheduler: analysis failed for %s: %s", company_name, exc)
@@ -168,8 +189,9 @@ async def _queue_notification(
     company_name: str,
     report,
     triggered_by: str,
+    prev_report=None,
 ) -> None:
-    """Save a notification record to the DB. Phase 10 will handle email delivery."""
+    """Save a notification to the DB and send the email immediately."""
     try:
         from db.database import AsyncSessionLocal
         from db.models import Notification
@@ -189,14 +211,28 @@ async def _queue_notification(
             )
 
         async with AsyncSessionLocal() as db:
-            db.add(Notification(
+            notif = Notification(
                 user_id=user_id,
                 type=triggered_by,
                 title=title,
                 message=message,
-            ))
+            )
+            db.add(notif)
             await db.commit()
-        logger.info("scheduler: notification queued for %s", user_email)
+            await db.refresh(notif)
+            notif_id = notif.id
+
+        # Send email immediately
+        from services.notification_service import send_notification_email
+        await send_notification_email(
+            notification_id=notif_id,
+            user_email=user_email,
+            company_name=company_name,
+            report=report,
+            triggered_by=triggered_by,
+            prev_report=prev_report,
+        )
+
     except Exception as exc:
         logger.error("scheduler: notification error: %s", exc)
 
