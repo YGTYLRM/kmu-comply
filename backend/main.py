@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
@@ -119,8 +119,12 @@ async def upload_documents(files: list[UploadFile] = File(...)):
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(body: AnalyzeRequest):
+async def analyze(body: AnalyzeRequest, x_access_token: Optional[str] = Header(None)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
+    if settings.stripe_enabled:
+        from services.stripe_service import validate_token
+        if not x_access_token or not validate_token(x_access_token):
+            raise HTTPException(status_code=402, detail="Valid payment required to run a screening.")
     job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
     return AnalyzeResponse(
         job_id=job_id,
@@ -151,8 +155,19 @@ async def get_report(job_id: str):
     return report
 
 
+@app.get("/api/report/{job_id}/profile")
+async def get_profile(job_id: str):
+    """Return the original company profile submitted for this job (for re-assessment pre-fill)."""
+    from services.report_store import load_profile
+    profile = load_profile(job_id)
+    if profile is None:
+        raise HTTPException(status_code=404, detail="Profile not found for this job.")
+    return profile
+
+
 @app.post("/api/report/{job_id}/pdf")
-async def generate_pdf(job_id: str):
+async def generate_pdf_endpoint(job_id: str):
+    import asyncio
     from fastapi.responses import Response
     from services.pdf_generator import generate_pdf as _gen_pdf
 
@@ -160,13 +175,21 @@ async def generate_pdf(job_id: str):
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found or not completed.")
 
-    pdf_bytes = _gen_pdf(report)
-    filename  = f"complio-screening-{report.company_name.replace(' ', '-')[:40]}.pdf"
+    loop = asyncio.get_running_loop()
+    pdf_bytes = await loop.run_in_executor(None, _gen_pdf, report)
+    filename  = f"complio-{report.company_name.replace(' ', '-')[:40]}.pdf"
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@app.get("/api/reports")
+async def list_reports():
+    """List all persisted reports, newest first. Returns summary metadata only."""
+    from services.report_store import list_recent
+    return {"reports": list_recent()}
 
 
 @app.get("/api/regulations", response_model=RegulationsListResponse)
@@ -206,3 +229,117 @@ async def list_regulations():
         ),
     ]
     return RegulationsListResponse(regulations=regs)
+
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    company: Optional[str] = None
+    phone: Optional[str] = None
+    topic: Optional[str] = None
+    message: str
+
+
+@app.post("/api/contact")
+async def contact(req: ContactRequest):
+    if not settings.resend_api_key or not settings.contact_email:
+        raise HTTPException(status_code=503, detail="Contact not configured.")
+
+    import resend
+    resend.api_key = settings.resend_api_key
+
+    subject = f"Contact: {req.name}"
+    if req.topic:
+        subject += f" — {req.topic}"
+    if req.company:
+        subject += f" ({req.company})"
+
+    rows = [
+        ("Name",    req.name),
+        ("Email",   req.email),
+        ("Company", req.company or "Not provided"),
+        ("Phone",   req.phone   or "Not provided"),
+        ("Topic",   req.topic   or "Not specified"),
+    ]
+
+    rows_html = "".join(
+        f'<tr><td style="padding:8px 12px 8px 0;color:#64748b;font-size:13px;white-space:nowrap;vertical-align:top">{k}</td>'
+        f'<td style="padding:8px 0;font-size:14px;color:#0f172a">{v}</td></tr>'
+        for k, v in rows
+    )
+
+    html = f"""
+    <div style="font-family:sans-serif;max-width:580px;margin:0 auto;padding:32px 24px">
+      <div style="margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;margin-bottom:8px">
+          Complio — New Contact
+        </div>
+        <h2 style="margin:0;font-size:20px;color:#0f172a">{req.name} got in touch</h2>
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+        {rows_html}
+      </table>
+
+      <div style="background:#f8fafc;border-radius:10px;padding:16px 20px">
+        <p style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px">Message</p>
+        <p style="font-size:14px;color:#1e293b;line-height:1.7;white-space:pre-wrap;margin:0">{req.message}</p>
+      </div>
+
+      <p style="margin-top:24px;font-size:12px;color:#94a3b8">
+        Reply directly to this email to respond to {req.name}.
+      </p>
+    </div>
+    """
+
+    resend.Emails.send({
+        "from": "Complio <onboarding@resend.dev>",
+        "to": [settings.contact_email],
+        "reply_to": req.email,
+        "subject": subject,
+        "html": html,
+    })
+
+    return {"ok": True}
+
+
+# ── Stripe ────────────────────────────────────────────────────────────────────
+
+class CheckoutRequest(BaseModel):
+    plan: str                   # "starter" | "professional"
+    success_url: str
+    cancel_url: str
+
+
+@app.post("/api/checkout")
+async def create_checkout(req: CheckoutRequest):
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=503, detail="Payments not configured.")
+    from services.stripe_service import create_checkout_session
+    try:
+        url = create_checkout_session(req.plan, req.success_url, req.cancel_url)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"url": url}
+
+
+@app.get("/api/checkout/verify")
+async def verify_checkout(session_id: str):
+    """Success page calls this to exchange a Stripe session_id for an access token."""
+    if not settings.stripe_secret_key:
+        raise HTTPException(status_code=503, detail="Payments not configured.")
+    from services.stripe_service import verify_session
+    token = verify_session(session_id)
+    if not token:
+        raise HTTPException(status_code=402, detail="Payment not confirmed.")
+    return {"token": token}
+
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+    if not settings.stripe_webhook_secret:
+        raise HTTPException(status_code=503, detail="Webhook not configured.")
+    payload = await request.body()
+    from services.stripe_service import handle_webhook
+    token = handle_webhook(payload, stripe_signature or "")
+    return {"received": True}

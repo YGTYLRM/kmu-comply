@@ -1,0 +1,40 @@
+Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz (TDDDG, formerly TTDSG)
+Gesetz ueber den Datenschutz und den Schutz der Privatsphaere in der Telekommunikation und bei digitalen Diensten
+vom 23. Juni 2021 (BGBl. I S. 1982), zuletzt geaendert durch Artikel 3 des Gesetzes vom 14. Oktober 2024
+Source: https://www.gesetze-im-internet.de/ttdsg/
+
+---
+
+gdpr_dsgvo TDDDG §1
+Title: Scope — telecommunications and digital services data protection in Germany
+Obligation: MUST
+Threshold: All companies and persons providing telecommunications or digital services to users in Germany
+Text: The TDDDG (formerly TTDSG) establishes data protection rules specifically for telecommunications and digital services operating in Germany. It applies to all companies providing such services, whether established in Germany or abroad. The law covers: communications secrecy and wiretap prohibitions; personal data protection when using telecom and digital services; caller identification rules; directory listings; technical security obligations for digital service operators; terminal device privacy rules (§25 — cookies and tracking); and regulatory oversight by the Bundesnetzagentur and data protection authorities. Legal entities with contractual capacity receive the same protection as natural persons under this law. The TDDDG implements the ePrivacy aspects of European telecommunications law within the German legal framework.
+Keywords: TDDDG, TTDSG, telecommunications, digital services, ePrivacy, cookies, tracking, Germany, scope, data protection
+
+---
+
+gdpr_dsgvo TDDDG §25
+Title: Cookie consent — storing or accessing information on terminal equipment requires prior informed consent
+Obligation: MUST
+Threshold: All operators of websites, apps, and digital services who use cookies, tracking pixels, analytics tools, or any technology that stores or accesses information on user devices
+Text: The storing of information in the terminal equipment of end users, and access to information already stored there, is only permitted if the end user has given their prior consent based on clear and comprehensive information, following the consent requirements of the GDPR. This applies to all cookies, tracking pixels, fingerprinting, local storage, session storage, and any other technology that stores or reads data from a user's device. Two narrow exceptions exist where consent is not required: (1) where the sole purpose is transmitting a message over a public telecommunications network; and (2) where storage or access is strictly necessary to provide a digital service explicitly requested by the user. Analytics cookies, advertising cookies, personalisation cookies, and social media plugins do not fall within these exceptions and require prior informed consent. The consent must meet all GDPR requirements including granularity, freely given, specific, informed, and unambiguous. Pre-ticked boxes and implied consent are not valid.
+Keywords: cookie consent, §25 TDDDG, tracking, cookies, terminal equipment, ePrivacy, analytics, advertising cookies, prior consent, strictly necessary
+
+---
+
+gdpr_dsgvo TDDDG §25 Exceptions
+Title: Strictly necessary exception — no consent required for technically essential cookies only
+Obligation: MAY
+Threshold: Digital service operators using only technically essential cookies or transmission-enabling technology
+Text: Consent is not required under §25 TDDDG only in two strictly defined circumstances. First, where the sole purpose is enabling transmission of a communication over a public electronic communications network — this covers basic network routing and protocol functions, not analytics. Second, where storage or access is strictly necessary to provide a service that the user has explicitly requested — this covers session cookies needed for shopping carts, login persistence, and security tokens. The term strictly necessary is interpreted narrowly: the functionality must be technically impossible to deliver without the cookie or storage mechanism. Analytical, marketing, and preference cookies that could technically be replaced by server-side alternatives do not qualify. Operators must be able to document the technical necessity of each category of non-consent cookies.
+Keywords: strictly necessary, consent exception, session cookies, login cookies, security token, technical necessity, no analytics, TDDDG exception
+
+---
+
+gdpr_dsgvo TDDDG §26
+Title: Enforcement and supervisory authority — Federal Network Agency and data protection authorities
+Obligation: MUST
+Threshold: All entities subject to TDDDG obligations
+Text: Compliance with §25 TDDDG (cookie consent requirements) is supervised by the competent data protection supervisory authority of the federal state in which the operator is established. For operators without an establishment in Germany, the Federal Commissioner for Data Protection and Freedom of Information (BfDI) has jurisdiction. Violations of §25 TDDDG are also violations of the GDPR consent requirements under Article 6 and 7, making them subject to GDPR administrative fines of up to EUR 20 million or 4% of global annual turnover. The Bundesnetzagentur (Federal Network Agency) supervises telecommunications-specific provisions including communications secrecy. Operators should note that cookie banners lacking a real option to refuse are increasingly subject to enforcement action by German supervisory authorities.
+Keywords: enforcement, supervisory authority, Bundesnetzagentur, BfDI, data protection authority, GDPR fines, cookie banner, compliance

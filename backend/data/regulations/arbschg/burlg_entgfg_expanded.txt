@@ -1,0 +1,66 @@
+Bundesurlaubsgesetz (BUrlG) und Entgeltfortzahlungsgesetz (EntgFG)
+BUrlG vom 8. Januar 1963 (BGBl. I S. 2), EntgFG vom 26. Mai 1994 (BGBl. I S. 1014)
+Sources: https://www.gesetze-im-internet.de/burlg/ and https://www.gesetze-im-internet.de/entgfg/
+
+---
+
+arbschg BUrlG §1
+Title: General annual leave entitlement — every employee has a right to paid recreational leave
+Obligation: MUST
+Threshold: All employers; applies to every employee in an employment relationship
+Text: Every employee is entitled to paid recreational leave (bezahlter Erholungsurlaub) in every calendar year. This is a minimum standard that applies to all employment relationships regardless of industry, company size, employment type, or nationality of the parties. The entitlement cannot be waived by contract — any contractual provision that excludes or restricts the annual leave entitlement is void. The BUrlG sets the minimum standard; collective agreements and employment contracts may provide for more leave but never less. Employers must grant leave in accordance with the employee's wishes unless urgent operational needs or legitimate priority claims of other employees prevent this.
+Keywords: Urlaubsanspruch, annual leave entitlement, paid leave, every employee, minimum standard, non-waivable, BUrlG
+
+---
+
+arbschg BUrlG §3
+Title: Minimum annual leave — 24 working days per calendar year (equivalent to 20 working days for 5-day week)
+Obligation: MUST
+Threshold: All employers; applies to all employees
+Text: The annual leave entitlement amounts to at least 24 working days per calendar year. Working days (Werktage) are all calendar days that are not Sundays or statutory public holidays — meaning Monday to Saturday. For employees working a standard five-day week, 24 Werktage corresponds to approximately four weeks (20 working days). Employers must note that the law counts in Werktage (including Saturday), not in Arbeitstage (working days only). An employee working Monday to Friday therefore has a minimum entitlement of 20 Arbeitstage (four working weeks). Any collective agreement or employment contract providing less than 24 Werktage is void in this respect. Proportional leave applies where employment does not cover the full calendar year.
+Keywords: Mindesturlaub, minimum leave, 24 Werktage, 20 working days, four weeks, Werktag, public holiday, BUrlG minimum
+
+---
+
+arbschg BUrlG §7
+Title: Leave scheduling — employer must give preference to employee's wishes unless overriding operational grounds exist
+Obligation: MUST
+Threshold: All employers
+Text: When granting and scheduling leave, the employer must give preference to the employee's wishes unless urgent operational needs (dringende betriebliche Belange) or priority claims of other employees with overriding social justification prevent this. The employer may not unilaterally override the employee's leave preferences without legitimate justification. Leave must generally be taken as a continuous period; only where urgent operational necessity or a wish of the employee requires it may leave be divided, with at least 12 consecutive Werktage taken together. Leave not taken in the calendar year generally lapses at the end of the year, but must be carried over to 31 March of the following year if urgent operational needs or reasons related to the employee prevented the leave from being taken. Monetary compensation for leave instead of actual time off is permissible only upon termination of the employment relationship.
+Keywords: Urlaubsplanung, leave scheduling, employee wishes, urgent operational, carryover, 31 March, Verfall, forfeit, leave compensation, BUrlG §7
+
+---
+
+arbschg BUrlG §11
+Title: Leave pay — employee receives average remuneration during leave
+Obligation: MUST
+Threshold: All employers
+Text: During annual leave, the employee is entitled to continued payment of remuneration based on their average earnings over the 13 weeks preceding the start of leave (Urlaubsentgelt). Overtime pay earned during the reference period is included in the calculation. Reductions in earnings that occurred during the reference period due to short-time work, temporary incapacity, or unpaid leave are excluded from the calculation so that they do not reduce the leave pay. The leave pay must be paid before the start of the leave. Employers must not offset leave pay against other payments or require it to be paid back in the event of termination during a leave period.
+Keywords: Urlaubsentgelt, leave pay, average remuneration, 13 weeks, reference period, continued payment, overtime, BUrlG §11
+
+---
+
+arbschg EntgFG §1
+Title: Scope — public holiday pay and sick pay continuation obligations apply to all employers
+Obligation: MUST
+Threshold: All employers regardless of size; applies from commencement of the employment relationship
+Text: The Entgeltfortzahlungsgesetz governs two distinct obligations: (1) the payment of remuneration on statutory public holidays (Feiertagsbezahlung) under §2; and (2) continued payment of remuneration during illness (Entgeltfortzahlung im Krankheitsfall) under §3. Both obligations apply to all employers in Germany without a minimum size threshold. Employees, trainees, and home workers are covered. The EntgFG is a minimum standard law — collective agreements may improve the employee's position (e.g. extending the six-week sick pay period) but may not reduce the statutory minimums. Fixed-term employees, part-time employees, and employees on probation are fully covered once they have been employed for four continuous weeks.
+Keywords: EntgFG, scope, sick pay, public holiday pay, all employers, minimum standard, Entgeltfortzahlung, Feiertagsbezahlung
+
+---
+
+arbschg EntgFG §2
+Title: Public holiday pay — employees may not be required to work on statutory public holidays and must be paid
+Obligation: MUST
+Threshold: All employers; applies to all employees
+Text: Employees who would otherwise have been required to work on a statutory public holiday but are excused from working due to the public holiday must receive their regular remuneration for the hours they would have worked. This obligation applies regardless of whether the public holiday falls on a day the employee would normally work. Employees who are required to work on a public holiday under the exceptions in §10 ArbZG must receive the remuneration for the actual time worked plus compensatory leave under §11 ArbZG. Employers may not contract out of the public holiday pay obligation. The number of statutory public holidays varies by federal state (between 9 and 13 days per year).
+Keywords: Feiertagsbezahlung, public holiday pay, statutory holiday, continued remuneration, EntgFG §2, normal remuneration, state variation
+
+---
+
+arbschg EntgFG §3
+Title: Sick pay continuation — employer must continue paying for up to 6 weeks per illness episode
+Obligation: MUST
+Threshold: All employers; applies after 4 weeks continuous employment
+Text: When an employee is unable to work due to illness without personal fault (ohne eigenes Verschulden), the employer must continue paying full remuneration for up to six weeks. This obligation arises only after the employee has been continuously employed for at least four weeks. For the same illness recurring within six months after the employee's return to work, the six-week entitlement does not reset — the employee is only entitled to continued pay until the six-week total is exhausted. However, if a different illness causes the new incapacity, the six-week entitlement applies fresh. After six weeks, responsibility for income replacement shifts to the statutory health insurer (Krankenkasse), which pays Krankengeld at approximately 70% of gross pay for up to 78 weeks. Employees must immediately notify the employer of their incapacity and its likely duration, and must provide a doctor's certificate (Arbeitsunfaehigkeitsbescheinigung) from the first day of illness if required or from the fourth day as a default.
+Keywords: Entgeltfortzahlung, sick pay, 6 weeks, Krankheit, illness, employer obligation, Krankenkasse, Arbeitsunfaehigkeitsbescheinigung, four weeks, recurrence rule

@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     job_ttl_seconds: int = 3600
     max_concurrent_jobs: int = 5
 
+    # Email (Resend)
+    resend_api_key: str = ""
+    contact_email: str = ""
+
+    # Stripe
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_enabled: bool = False
+
     # LLM
     llm_temperature: float = 0.0
     llm_timeout_seconds: int = 120

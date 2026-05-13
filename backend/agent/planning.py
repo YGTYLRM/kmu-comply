@@ -23,7 +23,7 @@ from models.compliance_report import (
 from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
 from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
-from rag.retrieval import deduplicate, rerank, retrieve
+from rag.retrieval import deduplicate, retrieve
 from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
@@ -56,35 +56,37 @@ def retrieve_regulatory_context(
     profile: EnrichedCompanyProfile,
     applicability: list[RegulationApplicability],
 ) -> list[RegulatoryChunk]:
-    """RAG retrieval for each applicable regulation, deduplicated and reranked."""
+    """RAG retrieval for each applicable regulation, deduplicated and capped per-regulation.
+
+    Each applicable regulation is retrieved and capped independently so that
+    no single regulation can crowd out others during a global rerank step.
+    """
     applicable = [a for a in applicability if a.applies]
     if not applicable:
         return []
 
-    all_raw: list[dict] = []
+    all_chunks: list[RegulatoryChunk] = []
 
     for reg_app in applicable:
         reg_key = reg_app.regulation.value
         query = _build_query(profile, reg_app.regulation)
-        chunks = retrieve(query, [reg_key], top_k=15)
+        raw = retrieve(query, [reg_key], top_k=15)
 
-        if len(chunks) < 5:
+        if len(raw) < 5:
             broader = f"{reg_key} compliance obligations requirements Germany SME"
-            chunks = retrieve(broader, [reg_key], top_k=15)
-            if len(chunks) < 5:
+            raw = retrieve(broader, [reg_key], top_k=15)
+            if len(raw) < 5:
                 logger.warning(
                     "step 3: only %d chunks for %s after retry (expected >= 5)",
-                    len(chunks), reg_key,
+                    len(raw), reg_key,
                 )
 
-        all_raw.extend(chunks)
+        deduped = deduplicate(raw)
+        top = deduped[:5]
+        all_chunks.extend(_to_models(top))
+        logger.debug("step 3: %s — %d chunks selected", reg_key, len(top))
 
-    deduped = deduplicate(all_raw)
-    combined_query = " ".join(
-        f"{a.regulation.value} {profile.industry}" for a in applicable
-    )
-    reranked = rerank(combined_query, deduped, top_n=20)
-    return _to_models(reranked)
+    return all_chunks
 
 
 # ── Step 4 ────────────────────────────────────────────────────────────────────
@@ -139,7 +141,7 @@ def generate_action_plan(
     profile_json = profile.model_dump_json(indent=2)
     gaps_json = json.dumps([g.model_dump() for g in actionable], indent=2, default=str)
     prompt = action_plan_prompt(profile_json, gaps_json)
-    actions = _llm_call(prompt, _parse_actions, "action_plan", failures)
+    actions = _llm_call(prompt, _parse_actions, "action_plan", failures, max_tokens=8192)
 
     return sorted(actions, key=lambda a: _PRIORITY_ORDER.get(a.priority, 4))
 
@@ -191,6 +193,11 @@ def _build_query(profile: EnrichedCompanyProfile, regulation: Regulation) -> str
     return f"{regulation.value} compliance obligations {base}"
 
 
+_REG_ALIASES: dict[str, str] = {
+    "gdpr": "gdpr_dsgvo",  # ChromaDB metadata uses short key; enum uses full key
+}
+
+
 def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
     result = []
     for c in chunks:
@@ -202,14 +209,22 @@ def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
                 except json.JSONDecodeError:
                     raw_applicable = [raw_applicable] if raw_applicable else []
 
+            reg_val = c.get("regulation", "")
+            reg_val = _REG_ALIASES.get(reg_val, reg_val)
+
+            # Normalise ObligationType: fall back to MUST for unknown values
+            ob_raw = c.get("obligation_type", ObligationType.MUST.value)
+            try:
+                ob_type = ObligationType(ob_raw)
+            except ValueError:
+                ob_type = ObligationType.MUST
+
             result.append(RegulatoryChunk(
-                regulation=Regulation(c.get("regulation", "")),
+                regulation=Regulation(reg_val),
                 article_number=c.get("article_number", ""),
                 title=c.get("title", ""),
                 text=c.get("text", ""),
-                obligation_type=ObligationType(
-                    c.get("obligation_type", ObligationType.MUST.value)
-                ),
+                obligation_type=ob_type,
                 applicable_to=raw_applicable,
                 threshold=c.get("threshold"),
                 source_url=c.get("source_url"),
@@ -270,6 +285,7 @@ def _llm_call(
     parse_fn,
     step_name: str,
     failures: list[str],
+    max_tokens: int = 4096,
 ) -> list:
     if not settings.llm_api_key:
         logger.warning("%s: no LLM API key configured, skipping", step_name)
@@ -281,7 +297,7 @@ def _llm_call(
         try:
             response = _llm_client().messages.create(
                 model=settings.llm_model,
-                max_tokens=4096,
+                max_tokens=max_tokens,
                 temperature=0,
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
