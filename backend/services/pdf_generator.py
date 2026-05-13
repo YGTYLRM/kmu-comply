@@ -1,814 +1,568 @@
 """
-PDF Report Generator for KMU-Comply compliance reports.
-Uses fpdf (not fpdf2). Public entry point: generate_pdf(report) -> bytes.
+PDF Report Generator — Complio
+Playwright/Chromium renderer. Zero external margin — all spacing in HTML.
 """
-
 from __future__ import annotations
-
-import io
+import base64, re
 from pathlib import Path
-from typing import Optional
-
-from fpdf import FPDF, XPos, YPos
-
+from playwright.sync_api import sync_playwright
 from models.compliance_report import ComplianceReport
 from models.enums import ComplianceStatus, Priority
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-
 LOGO_PATH = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
 
-REG_LABELS: dict[str, str] = {
-    "gdpr_dsgvo": "GDPR / DSGVO",
-    "bdsg":       "BDSG",
-    "lksg":       "LkSG",
-    "enefg":      "EnEfG",
-    "csrd":       "CSRD",
-    "nis2":       "NIS2",
-    "eu_ai_act":  "EU AI Act",
-    "hinschg":    "HinSchG",
-    "arbschg":    "ArbSchG",
-    "agg":        "AGG",
-    "milog":      "MiLoG",
+REG_LABELS = {
+    "gdpr_dsgvo":"GDPR / DSGVO","bdsg":"BDSG","lksg":"LkSG","enefg":"EnEfG",
+    "csrd":"CSRD","nis2":"NIS2","eu_ai_act":"EU AI Act","hinschg":"HinSchG",
+    "arbschg":"ArbSchG","agg":"AGG","milog":"MiLoG",
+}
+S = {
+    ComplianceStatus.COMPLIANT:           {"c":"#16a34a","bg":"#f0fdf4","br":"#bbf7d0","label":"Compliant"},
+    ComplianceStatus.PARTIALLY_COMPLIANT: {"c":"#b45309","bg":"#fffbeb","br":"#fde68a","label":"Partial"},
+    ComplianceStatus.NON_COMPLIANT:       {"c":"#dc2626","bg":"#fef2f2","br":"#fecaca","label":"Non-Compliant"},
+    ComplianceStatus.CANNOT_ASSESS:       {"c":"#64748b","bg":"#f8fafc","br":"#e2e8f0","label":"Cannot Assess"},
+}
+P = {
+    Priority.CRITICAL:{"c":"#dc2626","bg":"#fef2f2","br":"#fecaca","label":"Critical"},
+    Priority.HIGH:    {"c":"#ea580c","bg":"#fff7ed","br":"#fed7aa","label":"High"},
+    Priority.MEDIUM:  {"c":"#b45309","bg":"#fffbeb","br":"#fde68a","label":"Medium"},
+    Priority.LOW:     {"c":"#16a34a","bg":"#f0fdf4","br":"#bbf7d0","label":"Low"},
 }
 
-# Colour palette
-NAVY        = (15,  33,  69)
-NAVY_LIGHT  = (25,  55, 110)
-WHITE       = (255, 255, 255)
-LIGHT_GREY  = (245, 246, 248)
-MID_GREY    = (180, 185, 195)
-DARK_GREY   = (80,  90, 105)
-BLACK       = (30,  30,  30)
+def _reg(k): return REG_LABELS.get(k, k.upper())
+def _sc(v):
+    if v>=75: return "#16a34a"
+    if v>=40: return "#b45309"
+    return "#dc2626"
+def _sbg(v):
+    if v>=75: return "#f0fdf4"
+    if v>=40: return "#fffbeb"
+    return "#fef2f2"
+def _sbr(v):
+    if v>=75: return "#bbf7d0"
+    if v>=40: return "#fde68a"
+    return "#fecaca"
 
-# Status colours (R, G, B)
-STATUS_COLOURS: dict[ComplianceStatus, tuple[int, int, int]] = {
-    ComplianceStatus.COMPLIANT:           (39,  174,  96),   # green
-    ComplianceStatus.PARTIALLY_COMPLIANT: (230, 162,   0),   # amber
-    ComplianceStatus.NON_COMPLIANT:       (192,  57,  43),   # red
-    ComplianceStatus.CANNOT_ASSESS:       (127, 140, 148),   # grey
-}
+def _h(t):
+    if not t: return ""
+    return str(t).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace('"',"&quot;")
 
-STATUS_LABELS: dict[ComplianceStatus, str] = {
-    ComplianceStatus.COMPLIANT:           "Compliant",
-    ComplianceStatus.PARTIALLY_COMPLIANT: "Partial",
-    ComplianceStatus.NON_COMPLIANT:       "Non-Compliant",
-    ComplianceStatus.CANNOT_ASSESS:       "Cannot Assess",
-}
+def _c(t):
+    """Clean LLM artefacts: field=value patterns and dashes."""
+    if not t: return ""
+    t = re.sub(r'\b\w+=(?:true|false|null|\d+(?:\.\d+)?)\b', '', t)
+    t = t.replace('—',' ').replace('–',' ').replace('--',' ')
+    return re.sub(r'  +', ' ', t).strip().lstrip('.,;')
 
-PRIORITY_COLOURS: dict[Priority, tuple[int, int, int]] = {
-    Priority.CRITICAL: (192,  57,  43),  # red
-    Priority.HIGH:     (211, 105,  26),  # orange
-    Priority.MEDIUM:   (230, 162,   0),  # amber
-    Priority.LOW:      (39,  174,  96),  # green
-}
-
-PAGE_W    = 210   # A4 mm
-PAGE_H    = 297
-MARGIN    = 18
-CONTENT_W = PAGE_W - 2 * MARGIN
-
-
-# ---------------------------------------------------------------------------
-# Text sanitiser
-# ---------------------------------------------------------------------------
-
-def _s(text: Optional[str]) -> str:
-    """Sanitise arbitrary text for safe output in latin-1 fpdf cells."""
-    if text is None:
-        return ""
-    text = str(text)
-    # Unicode dashes -> hyphen
-    text = text.replace("—", "-")   # em dash
-    text = text.replace("–", "-")   # en dash
-    # Curly / smart quotes -> straight
-    text = text.replace("‘", "'").replace("’", "'")
-    text = text.replace("“", '"').replace("”", '"')
-    # Ellipsis character
-    text = text.replace("…", "...")
-    # German umlauts -> ASCII digraphs
-    text = (text
-            .replace("\xe4", "ae").replace("\xc4", "Ae")
-            .replace("\xf6", "oe").replace("\xd6", "Oe")
-            .replace("\xfc", "ue").replace("\xdc", "Ue")
-            .replace("\xdf", "ss"))
-    # Encode to latin-1, replacing anything still unrepresentable
-    return text.encode("latin-1", errors="replace").decode("latin-1")
-
-
-def _reg_label(reg_value: str) -> str:
-    return REG_LABELS.get(reg_value, reg_value.upper())
-
-
-def _score_colour(score: float) -> tuple[int, int, int]:
-    if score >= 75:
-        return (39, 174, 96)    # green
-    if score >= 40:
-        return (230, 162, 0)    # amber
-    return (192, 57, 43)        # red
-
-
-# ---------------------------------------------------------------------------
-# PDF class
-# ---------------------------------------------------------------------------
-
-class KMUPdf(FPDF):
-    """Custom FPDF subclass with branded header/footer and shared layout helpers."""
-
-    def __init__(self, company_name: str):
-        super().__init__(orientation="P", unit="mm", format="A4")
-        self.company_name = company_name
-        self.set_auto_page_break(auto=True, margin=20)
-        self.set_margins(MARGIN, MARGIN, MARGIN)
-        self._is_cover = False
-
-    # ------------------------------------------------------------------
-    # Header / footer overrides
-    # ------------------------------------------------------------------
-
-    def header(self):
-        if self._is_cover:
-            return
-        # Thin navy running header bar
-        self.set_fill_color(*NAVY)
-        self.rect(0, 0, PAGE_W, 14, style="F")
-        # Logo (small, ~7 mm height)
-        if LOGO_PATH.exists():
-            try:
-                self.image(str(LOGO_PATH), x=MARGIN, y=3.5, h=7)
-            except Exception:
-                pass
-        # Company name right-aligned in header
-        self.set_xy(0, 3)
-        self.set_font("Helvetica", "B", 8)
-        self.set_text_color(*WHITE)
-        self.cell(PAGE_W - MARGIN, 8, _s(self.company_name), align="R")
-        self.set_text_color(*BLACK)
-        # Push content below the header bar
-        self.set_y(16)
-
-    def footer(self):
-        if self._is_cover:
-            return
-        self.set_y(-12)
-        self.set_font("Helvetica", "", 7)
-        self.set_text_color(*MID_GREY)
-        self.cell(0, 5, f"Page {self.page_no()}", align="C")
-        self.set_text_color(*BLACK)
-
-    # ------------------------------------------------------------------
-    # Reusable layout helpers
-    # ------------------------------------------------------------------
-
-    def section_title(self, title: str):
-        """Bold navy section heading with underline rule."""
-        self.ln(4)
-        self.set_font("Helvetica", "B", 13)
-        self.set_text_color(*NAVY)
-        self.cell(CONTENT_W, 8, _s(title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        # Underline rule
-        self.set_draw_color(*NAVY_LIGHT)
-        self.set_line_width(0.5)
-        self.line(MARGIN, self.get_y(), PAGE_W - MARGIN, self.get_y())
-        self.set_draw_color(0, 0, 0)
-        self.set_line_width(0.2)
-        self.set_text_color(*BLACK)
-        self.ln(3)
-
-    def sub_title(self, title: str):
-        self.set_font("Helvetica", "B", 10)
-        self.set_text_color(*NAVY_LIGHT)
-        self.cell(CONTENT_W, 6, _s(title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        self.set_text_color(*BLACK)
-        self.ln(1)
-
-    def body_text(self, text: str, indent: float = 0):
-        self.set_font("Helvetica", "", 9)
-        self.set_text_color(*DARK_GREY)
-        self.set_x(MARGIN + indent)
-        self.multi_cell(CONTENT_W - indent, 5, _s(text))
-        self.set_text_color(*BLACK)
-
-    def label_value_row(self, label: str, value: str, label_w: float = 42, indent: float = 0):
-        """Print a bold label followed by wrapped value text."""
-        x0 = MARGIN + indent
-        y0 = self.get_y()
-        self.set_x(x0)
-        self.set_font("Helvetica", "B", 9)
-        self.set_text_color(*DARK_GREY)
-        self.cell(label_w, 5, _s(label + ":"))
-        self.set_font("Helvetica", "", 9)
-        self.set_text_color(*BLACK)
-        self.set_xy(x0 + label_w, y0)
-        self.multi_cell(CONTENT_W - indent - label_w, 5, _s(value))
-
-    def reg_subheading(self, reg_key: str):
-        """Full-width navy sub-heading bar for a regulation section."""
-        self.ln(3)
-        self.set_fill_color(*NAVY_LIGHT)
-        self.set_text_color(*WHITE)
-        self.set_font("Helvetica", "B", 10)
-        self.set_x(MARGIN)
-        self.cell(CONTENT_W, 8, _s(_reg_label(reg_key)), fill=True,
-                  new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        self.set_text_color(*BLACK)
-        self.ln(2)
-
-    def separator_line(self):
-        self.set_draw_color(*MID_GREY)
-        self.set_line_width(0.2)
-        self.line(MARGIN, self.get_y(), PAGE_W - MARGIN, self.get_y())
-        self.set_draw_color(0, 0, 0)
-        self.ln(2)
-
-    def ensure_space(self, mm: float = 40):
-        """Add a new page if less than mm space remains."""
-        if self.get_y() > PAGE_H - mm:
-            self.add_page()
-            self.ln(2)
-
-
-# ---------------------------------------------------------------------------
-# Section builders
-# ---------------------------------------------------------------------------
-
-def _build_cover(pdf: KMUPdf, report: ComplianceReport):
-    """
-    Cover page: dark navy top block (~120 mm) with logo placed directly
-    on the dark background (no white box). White lower area with stats.
-    """
-    pdf._is_cover = True
-    pdf.add_page()
-
-    COVER_TOP = 122  # height of dark block in mm
-
-    # --- Dark navy top block ---
-    pdf.set_fill_color(*NAVY)
-    pdf.rect(0, 0, PAGE_W, COVER_TOP, style="F")
-
-    # Logo directly on dark background
+def _logo():
     if LOGO_PATH.exists():
         try:
-            pdf.image(str(LOGO_PATH), x=MARGIN, y=10, h=18)
-        except Exception:
-            pass
+            return "data:image/png;base64," + base64.b64encode(LOGO_PATH.read_bytes()).decode()
+        except: pass
+    return ""
 
-    # "KMU-Comply" text (shown regardless of logo, acts as fallback label)
-    pdf.set_xy(MARGIN, 11)
-    pdf.set_font("Helvetica", "B", 11)
-    pdf.set_text_color(*WHITE)
-    pdf.cell(80, 8, "KMU-Comply")
+FONT  = "font-family:'Inter',Arial,sans-serif;"
+NAVY  = "#0f172a"
+BLUE  = "#2563eb"
+M     = "20mm"
 
-    # Report type label
-    pdf.set_xy(MARGIN, 34)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(160, 185, 220)
-    pdf.cell(CONTENT_W, 6, "COMPLIANCE ASSESSMENT REPORT")
+# ─────────────────────────────────────────────────────────────────────────────
+# Page header bar — dark bar + blue accent line underneath
+# ─────────────────────────────────────────────────────────────────────────────
 
-    # Company name (large)
-    pdf.set_xy(MARGIN, 44)
-    pdf.set_font("Helvetica", "B", 22)
-    pdf.set_text_color(*WHITE)
-    pdf.multi_cell(CONTENT_W - 42, 11, _s(report.company_name))
-
-    # Generated date
-    date_str = report.generated_at[:10] if report.generated_at else ""
-    pdf.set_xy(MARGIN, 72)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(160, 185, 220)
-    pdf.cell(CONTENT_W, 5, _s(f"Generated: {date_str}"))
-
-    # --- Score badge (top-right of dark block) ---
-    score    = report.overall_score_percent
-    sc       = _score_colour(score)
-    badge_x  = PAGE_W - MARGIN - 38
-    badge_y  = 42
-    badge_w  = 38
-    badge_h  = 28
-
-    pdf.set_fill_color(*sc)
-    pdf.rect(badge_x, badge_y, badge_w, badge_h, style="F")
-    pdf.set_text_color(*WHITE)
-    pdf.set_font("Helvetica", "B", 22)
-    pdf.set_xy(badge_x, badge_y + 4)
-    pdf.cell(badge_w, 12, f"{score:.0f}%", align="C")
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_xy(badge_x, badge_y + 17)
-    pdf.cell(badge_w, 6, "Overall Score", align="C")
-
-    # --- Stats row (bottom of dark block) ---
-    n_applicable = sum(1 for r in report.applicable_regulations if r.applies)
-    n_gaps       = len(report.gap_analysis)
-    n_actions    = len(report.action_plan)
-    n_critical   = sum(1 for a in report.action_plan if a.priority == Priority.CRITICAL)
-
-    stats = [
-        (str(n_applicable), "Regulations"),
-        (str(n_gaps),        "Gaps Found"),
-        (str(n_actions),     "Actions"),
-        (str(n_critical),    "Critical"),
-    ]
-    stat_w = CONTENT_W / len(stats)
-    stat_y = 82
-
-    for i, (val, lbl) in enumerate(stats):
-        sx = MARGIN + i * stat_w
-        pdf.set_fill_color(*NAVY_LIGHT)
-        pdf.rect(sx, stat_y, stat_w - 2, 16, style="F")
-        pdf.set_xy(sx, stat_y + 1)
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.set_text_color(*WHITE)
-        pdf.cell(stat_w - 2, 8, val, align="C")
-        pdf.set_xy(sx, stat_y + 9)
-        pdf.set_font("Helvetica", "", 7)
-        pdf.set_text_color(160, 185, 220)
-        pdf.cell(stat_w - 2, 5, lbl, align="C")
-
-    pdf.set_text_color(*BLACK)
-
-    # --- White lower area ---
-
-    # "Applicable Regulations" label
-    pdf.set_xy(MARGIN, COVER_TOP + 8)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_text_color(*NAVY)
-    pdf.cell(CONTENT_W, 6, "Applicable Regulations")
-    pdf.ln(8)
-
-    applicable = [r for r in report.applicable_regulations if r.applies]
-    col_w = CONTENT_W / 3
-
-    for i, reg_app in enumerate(applicable):
-        col = i % 3
-        row = i // 3
-        rx = MARGIN + col * col_w
-        ry = COVER_TOP + 18 + row * 8
-        label = _reg_label(reg_app.regulation.value)
-        pdf.set_fill_color(*LIGHT_GREY)
-        pdf.rect(rx, ry, col_w - 2, 6, style="F")
-        pdf.set_xy(rx, ry)
-        pdf.set_font("Helvetica", "B", 8)
-        pdf.set_text_color(*NAVY_LIGHT)
-        pdf.cell(col_w - 2, 6, _s(label), align="C")
-
-    # --- Disclaimer at bottom of cover ---
-    pdf.set_xy(MARGIN, PAGE_H - 22)
-    pdf.set_font("Helvetica", "I", 7)
-    pdf.set_text_color(*MID_GREY)
-    pdf.multi_cell(
-        CONTENT_W, 4,
-        "This report is generated by an AI system and does not constitute legal advice. "
-        "Consult a qualified legal professional before making compliance decisions."
+def _hbar(company, section, logo):
+    return (
+        f'<div>'
+        f'<div style="{FONT}background:{NAVY};padding:5mm {M};display:flex;align-items:center;justify-content:space-between;">'
+        f'<div style="font-size:9.5pt;font-weight:700;color:#fff;letter-spacing:.1pt;">{_h(section)}</div>'
+        f'<div style="font-size:7pt;color:#475569;font-weight:500;">{_h(company)}</div>'
+        f'</div>'
+        f'<div style="height:2.5pt;background:linear-gradient(90deg,{BLUE} 0%,{BLUE} 55%,rgba(37,99,235,0) 100%);"></div>'
+        f'</div>'
     )
 
-    pdf._is_cover = False
+
+def _body_open():
+    return f'<div style="padding:10mm {M} 12mm;">'
+
+def _body_close():
+    return '</div>'
 
 
-def _build_executive_summary(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("1. Executive Summary")
+def _sec_title(num, title):
+    return (
+        f'<div style="display:flex;align-items:center;gap:6pt;margin-bottom:3mm;">'
+        f'<span style="display:inline-block;width:18pt;height:2pt;background:{BLUE};border-radius:1pt;flex-shrink:0;"></span>'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;color:{BLUE};">{num}</div>'
+        f'</div>'
+        f'<div style="{FONT}font-size:17pt;font-weight:800;color:{NAVY};letter-spacing:-.3pt;'
+        f'line-height:1.1;margin-bottom:2mm;padding-bottom:3mm;border-bottom:2pt solid #f1f5f9;">{title}</div>'
+    )
 
-    if report.executive_summary:
-        pdf.body_text(report.executive_summary)
-    else:
-        pdf.body_text("No executive summary available.")
 
-    if report.inferred_characteristics:
-        pdf.ln(4)
-        pdf.sub_title("Inferred Company Characteristics")
-        pdf.set_font("Helvetica", "", 9)
-        pdf.set_text_color(*DARK_GREY)
-        for ch in report.inferred_characteristics:
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("- " + ch))
-        pdf.set_text_color(*BLACK)
+def _sec_sub(text):
+    return f'<p style="{FONT}font-size:9pt;color:#64748b;line-height:1.65;margin-bottom:6mm;max-width:170mm;">{text}</p>'
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cover
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _cover(report: ComplianceReport, logo: str) -> str:
+    sc   = _sc(report.overall_score_percent)
+    sbg  = _sbg(report.overall_score_percent)
+    date = report.generated_at[:10] if report.generated_at else ""
+
+    n_app  = sum(1 for r in report.applicable_regulations if r.applies)
+    n_gaps = len(report.gap_analysis)
+    n_act  = len(report.action_plan)
+    n_crit = sum(1 for a in report.action_plan if a.priority == Priority.CRITICAL)
+
+    logo_el = (f'<img src="{logo}" style="height:32pt;" alt="Complio">'
+               if logo else
+               f'<span style="{FONT}font-size:22pt;font-weight:800;color:#fff;">Complio</span>')
+
+    chips = "".join(
+        f'<span style="{FONT}font-size:7pt;font-weight:600;color:#93c5fd;'
+        f'background:rgba(59,130,246,.12);border:1pt solid rgba(147,197,253,.25);'
+        f'border-radius:20pt;padding:2.5pt 10pt;margin:0 2mm 2.5mm 0;display:inline-block;">'
+        f'{_h(_reg(r.regulation.value))}</span>'
+        for r in report.applicable_regulations if r.applies
+    )
+
+    def stat(n, lbl, color="#e2e8f0"):
+        return (
+            f'<div style="text-align:center;padding:0 7mm;">'
+            f'<div style="{FONT}font-size:24pt;font-weight:800;color:{color};line-height:1;letter-spacing:-.5pt;">{n}</div>'
+            f'<div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;'
+            f'letter-spacing:.9pt;color:#475569;margin-top:2mm;">{lbl}</div>'
+            f'</div>'
+        )
+
+    divider = '<div style="width:1pt;height:12mm;background:rgba(255,255,255,0.08);margin:0 1mm;align-self:center;"></div>'
+
+    return (
+        f'<div style="width:100%;height:297mm;'
+        f'background:linear-gradient(150deg,#020817 0%,#061230 35%,#0c1a45 65%,#0a1540 100%);'
+        f'display:flex;flex-direction:column;page-break-after:always;overflow:hidden;position:relative;">'
+
+        f'<div style="position:absolute;left:0;top:38%;width:100mm;height:100mm;border-radius:50%;'
+        f'background:radial-gradient(circle,rgba(37,99,235,0.18) 0%,transparent 65%);pointer-events:none;"></div>'
+        f'<div style="position:absolute;right:0;top:0;bottom:0;width:1pt;'
+        f'background:linear-gradient(180deg,transparent 0%,rgba(37,99,235,0.4) 40%,rgba(37,99,235,0.4) 60%,transparent 100%);"></div>'
+
+        f'<div style="padding:9mm {M} 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">'
+        f'{logo_el}'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:600;letter-spacing:1.8pt;text-transform:uppercase;'
+        f'color:#93c5fd;border:1pt solid rgba(147,197,253,.25);padding:3.5pt 10pt;border-radius:20pt;">'
+        f'Regulatory Compliance Assessment</div></div>'
+
+        f'<div style="flex:1;padding:10mm {M} 5mm;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">'
+        f'<div style="{FONT}font-size:7pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;color:{BLUE};margin-bottom:4mm;">Autonomous AI Compliance Agent</div>'
+        f'<div style="{FONT}font-size:34pt;font-weight:800;color:#f8fafc;line-height:1.08;'
+        f'letter-spacing:-.8pt;margin-bottom:3mm;max-width:155mm;">{_h(report.company_name)}</div>'
+        f'<div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Report issued {_h(date)}</div>'
+
+        f'<div style="display:flex;align-items:center;gap:0;">'
+        f'<div style="position:relative;margin-right:7mm;flex-shrink:0;">'
+        f'<div style="width:36mm;height:36mm;border-radius:50%;border:3pt solid {sc};'
+        f'background:rgba(15,23,42,0.6);box-shadow:0 0 22pt {sc}55,0 0 6pt {sc}33;'
+        f'display:flex;flex-direction:column;align-items:center;justify-content:center;">'
+        f'<div style="{FONT}font-size:17pt;font-weight:800;color:{sc};line-height:1;letter-spacing:-.5pt;">'
+        f'{report.overall_score_percent:.0f}%</div>'
+        f'<div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>'
+        f'</div></div>'
+        f'{divider}{stat(n_app,"Regulations")}{divider}{stat(n_gaps,"Gaps")}'
+        f'{divider}{stat(n_act,"Actions")}{divider}{stat(n_crit,"Critical","#f87171")}'
+        f'</div></div>'
+
+        f'<div style="padding:0 {M} 9mm;position:relative;z-index:1;">'
+        f'<div style="height:1pt;background:linear-gradient(90deg,rgba(255,255,255,0.1) 0%,transparent 100%);margin-bottom:5mm;"></div>'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;color:#475569;margin-bottom:3.5mm;">Applicable Regulations</div>'
+        f'<div style="line-height:1;">{chips}</div>'
+        f'<div style="{FONT}font-size:7pt;color:#334155;line-height:1.65;margin-top:5mm;">'
+        f'Complio checks your company against German and EU regulations using an autonomous AI agent. '
+        f'This report shows where gaps likely exist. It is not a legal audit and does not replace a lawyer.'
+        f'</div></div></div>'
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Section 1+2 — Summary and Applicability
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
+    summary = _h(_c(report.executive_summary)) or "No executive summary available."
+
+    warns = ""
     if report.validation_warnings:
-        pdf.ln(4)
-        pdf.sub_title("Validation Warnings")
-        pdf.set_font("Helvetica", "", 9)
-        for w in report.validation_warnings:
-            pdf.set_text_color(192, 57, 43)
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("! " + w))
-        pdf.set_text_color(*BLACK)
+        items = "".join(f'<li style="margin-bottom:3pt;">{_h(w)}</li>'
+                        for w in report.validation_warnings)
+        warns = (
+            f'<div style="margin-top:5mm;">'
+            f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2mm;">Warnings</div>'
+            f'<ul style="padding-left:14pt;">{items}</ul></div>'
+        )
 
-    if report.requires_manual_review:
-        pdf.ln(4)
-        pdf.sub_title("Sections Requiring Manual Review")
-        pdf.set_font("Helvetica", "", 9)
-        for item in report.requires_manual_review:
-            pdf.set_text_color(211, 105, 26)
-            pdf.set_x(MARGIN + 4)
-            pdf.multi_cell(CONTENT_W - 4, 5, _s("- " + item))
-        pdf.set_text_color(*BLACK)
+    rows = ""
+    for i, r in enumerate(report.applicable_regulations):
+        bg = "#fafafa" if i % 2 == 1 else "#fff"
+        badge = ("background:#f0fdf4;color:#16a34a;border:1pt solid #bbf7d0;" if r.applies
+                 else "background:#f8fafc;color:#64748b;border:1pt solid #e2e8f0;")
+        rows += (
+            f'<tr style="background:{bg};">'
+            f'<td style="{FONT}padding:6pt 9pt;font-weight:600;font-size:8.5pt;width:22%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;">{_h(_reg(r.regulation.value))}</td>'
+            f'<td style="padding:6pt 9pt;text-align:center;width:12%;border-bottom:1pt solid #f1f5f9;">'
+            f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;padding:2pt 8pt;border-radius:20pt;{badge}">{"Yes" if r.applies else "No"}</span>'
+            f'</td>'
+            f'<td style="{FONT}padding:6pt 9pt;font-size:8.5pt;color:#334155;line-height:1.55;width:66%;border-bottom:1pt solid #f1f5f9;">{_h(_c(r.reason))}</td>'
+            f'</tr>'
+        )
 
-
-def _build_regulation_applicability(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("2. Regulation Applicability")
-
-    pdf.body_text(
-        "The table below summarises which regulations apply to your organisation "
-        "based on the submitted company profile."
-    )
-    pdf.ln(4)
-
-    # Column widths
-    col_reg    = 48
-    col_app    = 22
-    col_reason = CONTENT_W - col_reg - col_app
-
-    # Header row
-    pdf.set_fill_color(*NAVY)
-    pdf.set_text_color(*WHITE)
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.set_x(MARGIN)
-    pdf.cell(col_reg,    7, "Regulation", fill=True)
-    pdf.cell(col_app,    7, "Applies",    fill=True, align="C")
-    pdf.cell(col_reason, 7, "Reason",     fill=True)
-    pdf.ln()
-
-    pdf.set_font("Helvetica", "", 8.5)
-    for idx, reg_app in enumerate(report.applicable_regulations):
-        fill = LIGHT_GREY if idx % 2 == 0 else WHITE
-        label        = _reg_label(reg_app.regulation.value)
-        applies_str  = "Yes" if reg_app.applies else "No"
-        applies_col  = (39, 174, 96) if reg_app.applies else MID_GREY
-        reason_text  = _s(reg_app.reason)
-
-        row_y = pdf.get_y()
-
-        # Regulation name
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_x(MARGIN)
-        pdf.cell(col_reg, 6, _s(label), fill=True)
-
-        # Applies badge
-        pdf.set_fill_color(*applies_col)
-        pdf.set_text_color(*WHITE)
-        pdf.set_font("Helvetica", "B", 8)
-        pdf.cell(col_app, 6, applies_str, fill=True, align="C")
-
-        # Reason - multi_cell resets x; use set_xy after
-        reason_x = MARGIN + col_reg + col_app
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_xy(reason_x, row_y)
-        pdf.multi_cell(col_reason, 6, reason_text, fill=True)
-
-        # Ensure cursor is below the tallest cell in this row
-        new_y = max(pdf.get_y(), row_y + 6)
-        pdf.set_xy(MARGIN, new_y)
-        pdf.set_font("Helvetica", "", 8.5)
-
-    pdf.set_text_color(*BLACK)
-
-
-def _build_score_breakdown(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("3. Score Breakdown")
-
-    # --- Overall score ---
-    score = report.overall_score_percent
-    sc    = _score_colour(score)
-
-    pdf.set_font("Helvetica", "B", 32)
-    pdf.set_text_color(*sc)
-    pdf.cell(CONTENT_W, 16, f"{score:.1f}%", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(*DARK_GREY)
-    pdf.cell(CONTENT_W, 5, "Overall Compliance Score", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_text_color(*BLACK)
-    pdf.ln(5)
-
-    if not report.regulation_scores:
-        pdf.body_text("No regulation scores available.")
-        return
-
-    # Column widths
-    col_reg  = 40
-    col_pct  = 18
-    col_bar  = 52
-    col_stat = 12
-    col_tot  = 16
-
-    # Header
-    pdf.set_fill_color(*NAVY)
-    pdf.set_text_color(*WHITE)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.set_x(MARGIN)
-    pdf.cell(col_reg,  6, "Regulation",  fill=True)
-    pdf.cell(col_pct,  6, "Score",       fill=True, align="C")
-    pdf.cell(col_bar,  6, "Progress",    fill=True)
-    pdf.cell(col_stat, 6, "C",           fill=True, align="C")
-    pdf.cell(col_stat, 6, "Part.",       fill=True, align="C")
-    pdf.cell(col_stat, 6, "NC",          fill=True, align="C")
-    pdf.cell(col_stat, 6, "N/A",         fill=True, align="C")
-    pdf.cell(col_tot,  6, "Total",       fill=True, align="C")
-    pdf.ln()
-
-    row_h = 7
-
-    for idx, rs in enumerate(report.regulation_scores):
-        fill       = LIGHT_GREY if idx % 2 == 0 else WHITE
-        bar_colour = _score_colour(rs.score_percent)
-        label      = _reg_label(rs.regulation.value)
-        row_y      = pdf.get_y()
-
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_x(MARGIN)
-        pdf.cell(col_reg, row_h, _s(label), fill=True)
-
-        # Score % in bar colour
-        pdf.set_text_color(*bar_colour)
-        pdf.set_font("Helvetica", "B", 8)
-        pdf.cell(col_pct, row_h, f"{rs.score_percent:.0f}%", fill=True, align="C")
-
-        # Progress bar drawn at absolute coordinates
-        bar_x = MARGIN + col_reg + col_pct
-        bar_y = row_y + 1.5
-        bar_h = 4.0
-        # Track
-        pdf.set_fill_color(*LIGHT_GREY)
-        pdf.rect(bar_x, bar_y, col_bar, bar_h, style="F")
-        # Fill
-        filled_w = col_bar * (max(0.0, min(100.0, rs.score_percent)) / 100.0)
-        if filled_w > 0:
-            pdf.set_fill_color(*bar_colour)
-            pdf.rect(bar_x, bar_y, filled_w, bar_h, style="F")
-
-        # Restore fill & continue cells after bar
-        pdf.set_fill_color(*fill)
-        pdf.set_text_color(*DARK_GREY)
-        pdf.set_font("Helvetica", "", 8)
-        pdf.set_xy(bar_x + col_bar, row_y)
-        pdf.cell(col_stat, row_h, str(rs.compliant),           fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.partially_compliant), fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.non_compliant),        fill=True, align="C")
-        pdf.cell(col_stat, row_h, str(rs.cannot_assess),        fill=True, align="C")
-        pdf.cell(col_tot,  row_h, str(rs.total_requirements),   fill=True, align="C")
-        pdf.ln()
-
-    pdf.set_text_color(*BLACK)
-    pdf.ln(3)
-
-    # Legend
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_text_color(*DARK_GREY)
-    pdf.set_x(MARGIN)
-    pdf.cell(CONTENT_W, 5,
-             "C = Compliant   Part. = Partially Compliant   NC = Non-Compliant   N/A = Cannot Assess")
-    pdf.ln()
-    pdf.set_text_color(*BLACK)
-
-
-def _build_gap_analysis(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("4. Gap Analysis")
-
-    pdf.body_text(
-        "This section details every assessed requirement. Full evidence and deficiency "
-        "descriptions are provided for each finding. No text is truncated."
+    return (
+        f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+        f'{_hbar(report.company_name, "Executive Summary", logo)}'
+        f'{_body_open()}'
+        f'{_sec_title("Section 01", "Executive Summary")}'
+        f'{_sec_sub(summary)}'
+        f'{warns}'
+        f'<div style="margin-top:8mm;">'
+        f'{_sec_title("Section 02", "Regulation Applicability")}'
+        f'{_sec_sub("Which regulations apply to your company, based on your size, industry, and how you operate.")}'
+        f'<div style="border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">'
+        f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">'
+        f'<thead><tr>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:22%;border-bottom:2pt solid #bfdbfe;">Regulation</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:center;width:12%;border-bottom:2pt solid #bfdbfe;">Applies</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:66%;border-bottom:2pt solid #bfdbfe;">Reason</th>'
+        f'</tr></thead>'
+        f'<tbody>{rows}</tbody></table></div>'
+        f'</div>'
+        f'{_body_close()}</div>'
     )
 
-    # Group gaps by regulation
-    gaps_by_reg: dict[str, list] = {}
-    for gap in report.gap_analysis:
-        gaps_by_reg.setdefault(gap.regulation.value, []).append(gap)
 
-    for reg_key, gaps in gaps_by_reg.items():
-        pdf.reg_subheading(reg_key)
+# ─────────────────────────────────────────────────────────────────────────────
+# Section 3 — Scores
+# ─────────────────────────────────────────────────────────────────────────────
 
-        for gap in gaps:
-            pdf.ensure_space(42)
+def _scores(report: ComplianceReport, logo: str) -> str:
+    sc  = _sc(report.overall_score_percent)
+    sbg = _sbg(report.overall_score_percent)
+    sbr = _sbr(report.overall_score_percent)
+    n_c = sum(rs.compliant for rs in report.regulation_scores)
+    n_p = sum(rs.partially_compliant for rs in report.regulation_scores)
+    n_n = sum(rs.non_compliant for rs in report.regulation_scores)
+    n_t = sum(rs.total_requirements for rs in report.regulation_scores)
 
-            status_colour = STATUS_COLOURS.get(gap.status, MID_GREY)
-            status_label  = STATUS_LABELS.get(gap.status, str(gap.status))
+    def sbox(n, lbl, c):
+        return (
+            f'<td style="width:25%;padding:0 2mm;">'
+            f'<div style="{FONT}border:1pt solid #e2e8f0;border-radius:8pt;padding:4.5mm;text-align:center;'
+            f'background:#fafafa;box-shadow:0 1pt 4pt rgba(0,0,0,0.05);">'
+            f'<div style="font-size:20pt;font-weight:800;color:{c};line-height:1;margin-bottom:1.5mm;">{n}</div>'
+            f'<div style="font-size:6.5pt;font-weight:600;text-transform:uppercase;letter-spacing:.8pt;color:#94a3b8;">{lbl}</div>'
+            f'</div></td>'
+        )
 
-            # --- Article heading row ---
-            row_y   = pdf.get_y()
-            art_str = f"Art. {_s(gap.article_number)} - {_s(gap.article_title)}"
+    rows = ""
+    for i, rs in enumerate(report.regulation_scores):
+        bc  = _sc(rs.score_percent)
+        bw  = min(100.0, max(0.0, rs.score_percent))
+        bg  = "#fafafa" if i % 2 == 1 else "#fff"
+        rows += (
+            f'<tr style="background:{bg};">'
+            f'<td style="{FONT}padding:6pt 8pt;font-weight:600;font-size:8.5pt;width:28%;">{_h(_reg(rs.regulation.value))}</td>'
+            f'<td style="{FONT}padding:6pt 8pt;text-align:center;font-weight:800;font-size:10pt;color:{bc};width:10%;">{rs.score_percent:.0f}%</td>'
+            f'<td style="padding:6pt 8pt;width:38%;">'
+            f'<div style="height:8pt;background:#f1f5f9;border-radius:10pt;overflow:hidden;">'
+            f'<div style="height:8pt;width:{bw}%;background:linear-gradient(90deg,{bc}cc,{bc});border-radius:10pt;"></div>'
+            f'</div></td>'
+            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#16a34a;font-weight:600;font-size:8.5pt;width:8%;">{rs.compliant}</td>'
+            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#b45309;font-weight:600;font-size:8.5pt;width:8%;">{rs.partially_compliant}</td>'
+            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#dc2626;font-weight:600;font-size:8.5pt;width:8%;">{rs.non_compliant}</td>'
+            f'</tr>'
+        )
 
-            pdf.set_fill_color(*LIGHT_GREY)
-            pdf.rect(MARGIN, row_y, CONTENT_W, 7, style="F")
-
-            # Article text (leave 36 mm on right for badge)
-            pdf.set_xy(MARGIN + 2, row_y)
-            pdf.set_font("Helvetica", "B", 9)
-            pdf.set_text_color(*NAVY_LIGHT)
-            pdf.cell(CONTENT_W - 36, 7, _s(art_str))
-
-            # Status badge
-            badge_x = MARGIN + CONTENT_W - 34
-            pdf.set_fill_color(*status_colour)
-            pdf.set_text_color(*WHITE)
-            pdf.set_font("Helvetica", "B", 7)
-            pdf.rect(badge_x, row_y + 1, 34, 5, style="F")
-            pdf.set_xy(badge_x, row_y + 1)
-            pdf.cell(34, 5, _s(status_label), align="C")
-
-            pdf.set_xy(MARGIN, row_y + 8)
-            pdf.set_text_color(*BLACK)
-
-            # --- Evidence (full, no truncation) ---
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.cell(22, 5, "Evidence:")
-            pdf.ln()
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "", 8)
-            pdf.multi_cell(CONTENT_W - 3, 5, _s(gap.evidence))
-
-            # --- Deficiency (full, no truncation) ---
-            if gap.deficiency_description:
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.set_text_color(192, 57, 43)
-                pdf.cell(30, 5, "Deficiency:")
-                pdf.ln()
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "", 8)
-                pdf.set_text_color(*DARK_GREY)
-                pdf.multi_cell(CONTENT_W - 3, 5, _s(gap.deficiency_description))
-
-            pdf.set_text_color(*BLACK)
-            pdf.ln(2)
-            pdf.separator_line()
-
-
-def _build_action_plan(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("5. Action Plan")
-
-    pdf.body_text(
-        "The following actions are recommended to address identified compliance gaps. "
-        "Priority and effort are indicated for each item. Full action text is shown."
+    return (
+        f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+        f'{_hbar(report.company_name, "Score Breakdown", logo)}'
+        f'{_body_open()}'
+        f'{_sec_title("Section 03", "Score Breakdown")}'
+        f'<div style="background:{sbg};border:1.5pt solid {sbr};border-radius:10pt;'
+        f'padding:7mm 9mm;margin-bottom:6mm;display:flex;align-items:center;gap:9mm;'
+        f'box-shadow:0 2pt 10pt rgba(0,0,0,0.06);">'
+        f'<div style="width:38mm;height:38mm;border-radius:50%;border:3pt solid {sc};'
+        f'background:rgba(255,255,255,0.6);box-shadow:0 0 14pt {sc}33;'
+        f'display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+        f'<div style="{FONT}font-size:20pt;font-weight:800;color:{sc};letter-spacing:-1pt;line-height:1;">{report.overall_score_percent:.1f}%</div>'
+        f'<div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>'
+        f'</div>'
+        f'<div>'
+        f'<div style="{FONT}font-size:11pt;font-weight:700;color:{NAVY};margin-bottom:2.5mm;">Overall Compliance Score</div>'
+        f'<div style="{FONT}font-size:8pt;color:#64748b;line-height:1.7;">'
+        f'{len(report.regulation_scores)} regulations checked &nbsp;&middot;&nbsp; '
+        f'{n_t} requirements assessed &nbsp;&middot;&nbsp; '
+        f'{len(report.gap_analysis)} gaps found</div>'
+        f'</div></div>'
+        f'<table style="width:100%;border-collapse:collapse;margin-bottom:6mm;table-layout:fixed;">'
+        f'<tr>{sbox(n_c,"Compliant","#16a34a")}{sbox(n_p,"Partial","#b45309")}{sbox(n_n,"Non-Compliant","#dc2626")}{sbox(n_t,"Total Checked",NAVY)}</tr>'
+        f'</table>'
+        f'<div style="border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">'
+        f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">'
+        f'<thead><tr>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:left;width:28%;border-bottom:2pt solid #bfdbfe;">Regulation</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:center;width:10%;border-bottom:2pt solid #bfdbfe;">Score</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;width:38%;border-bottom:2pt solid #bfdbfe;">Progress</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#16a34a;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">C</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#b45309;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">P</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#dc2626;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">NC</th>'
+        f'</tr></thead>'
+        f'<tbody>{rows}</tbody></table></div>'
+        f'<div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:3mm;">C = Compliant &nbsp;&nbsp; P = Partially Compliant &nbsp;&nbsp; NC = Non-Compliant</div>'
+        f'{_body_close()}</div>'
     )
-    pdf.ln(3)
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Section 4 — Gap Analysis (continuous flow, no per-regulation page breaks)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _gap_card(g) -> str:
+    cm    = S.get(g.status, S[ComplianceStatus.CANNOT_ASSESS])
+    ev    = _h(_c(g.evidence))
+    defic = _h(_c(g.deficiency_description))
+    art_n = _h(_c(g.article_number))
+    art_t = _h(_c(g.article_title))
+
+    fix = ""
+    if defic:
+        fix = (
+            f'<div style="margin-top:6pt;padding:6pt 9pt;'
+            f'border-left:3.5pt solid #dc2626;background:#fef2f2;border-radius:0 5pt 5pt 0;">'
+            f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;'
+            f'letter-spacing:1.1pt;color:#dc2626;margin-bottom:2.5pt;">What needs to change</div>'
+            f'<div style="{FONT}font-size:8.5pt;color:#7f1d1d;line-height:1.65;">{defic}</div>'
+            f'</div>'
+        )
+
+    return (
+        f'<div style="border:1pt solid #e8edf2;border-radius:8pt;'
+        f'margin-bottom:8mm;overflow:hidden;page-break-inside:avoid;'
+        f'box-shadow:0 1pt 6pt rgba(0,0,0,0.07);">'
+        f'<div style="display:flex;align-items:stretch;background:#f1f5f9;border-bottom:1pt solid #e8edf2;">'
+        f'<div style="width:5pt;background:{cm["c"]};flex-shrink:0;"></div>'
+        f'<div style="flex:1;padding:5.5pt 10pt;display:flex;align-items:center;justify-content:space-between;gap:8pt;">'
+        f'<div>'
+        f'<div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{art_n} &nbsp;&middot;&nbsp; {art_t}</div>'
+        f'</div>'
+        f'<div style="{FONT}display:inline-flex;align-items:center;gap:4pt;font-size:7pt;font-weight:700;'
+        f'padding:3pt 9pt;border-radius:20pt;border:1pt solid {cm["br"]};'
+        f'background:{cm["bg"]};color:{cm["c"]};white-space:nowrap;flex-shrink:0;">'
+        f'<span style="width:5pt;height:5pt;border-radius:50%;background:{cm["c"]};display:inline-block;"></span>'
+        f'{_h(cm["label"])}</div>'
+        f'</div></div>'
+        f'<div style="padding:7pt 10pt 8pt 14pt;background:#fff;">'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5pt;">Assessment</div>'
+        f'<div style="{FONT}font-size:8.5pt;color:#334155;line-height:1.65;">{ev}</div>'
+        f'{fix}</div></div>'
+    )
+
+
+def _reg_header(reg_key, gaps, first=False):
+    n_c = sum(1 for g in gaps if g.status == ComplianceStatus.COMPLIANT)
+    n_p = sum(1 for g in gaps if g.status == ComplianceStatus.PARTIALLY_COMPLIANT)
+    n_n = sum(1 for g in gaps if g.status == ComplianceStatus.NON_COMPLIANT)
+    return (
+        f'<div style="margin-bottom:4mm;display:flex;align-items:baseline;'
+        f'justify-content:space-between;padding-bottom:3mm;border-bottom:1.5pt solid #e8edf2;">'
+        f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_h(_reg(reg_key))}</div>'
+        f'<div style="{FONT}font-size:7pt;color:#94a3b8;">'
+        f'{n_c} compliant &nbsp;&middot;&nbsp; {n_p} partial &nbsp;&middot;&nbsp; {n_n} non-compliant'
+        f'</div></div>'
+    )
+
+
+def _gaps(report: ComplianceReport, logo: str) -> str:
+    if not report.gap_analysis:
+        return (
+            f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+            f'{_hbar(report.company_name, "Gap Analysis", logo)}'
+            f'{_body_open()}{_sec_title("Section 04","Gap Analysis")}<p>No gaps found.</p>{_body_close()}'
+            f'</div>'
+        )
+
+    by_reg: dict[str, list] = {}
+    for g in report.gap_analysis:
+        by_reg.setdefault(g.regulation.value, []).append(g)
+
+    body = ""
+    for i, (reg_key, gaps) in enumerate(by_reg.items()):
+        spacer = "" if i == 0 else '<div style="height:12mm;"></div>'
+        header = _reg_header(reg_key, gaps, first=(i == 0))
+        cards = [_gap_card(g) for g in gaps]
+        if cards:
+            body += f'<div style="page-break-inside:avoid;">{spacer}{header}{cards[0]}</div>'
+            body += "".join(cards[1:])
+        else:
+            body += spacer + header
+
+    return (
+        f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+        f'{_hbar(report.company_name, "Gap Analysis", logo)}'
+        f'{_body_open()}'
+        f'{_sec_title("Section 04", "Gap Analysis")}'
+        f'{_sec_sub("Every requirement we checked, grouped by regulation. Exactly why each one passed or failed, and what needs to change.")}'
+        f'{body}'
+        f'{_body_close()}</div>'
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Section 5 — Action Plan (continuous flow, no per-regulation page breaks)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _action_card(a) -> str:
+    pm  = P.get(a.priority, P[Priority.LOW])
+    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Deadline:</b> {_h(_c(a.deadline))}" if a.deadline else ""
+    return (
+        f'<div style="border:1pt solid #e8edf2;border-radius:8pt;'
+        f'margin-bottom:8mm;overflow:hidden;page-break-inside:avoid;'
+        f'box-shadow:0 1pt 6pt rgba(0,0,0,0.07);">'
+        f'<div style="display:flex;align-items:center;gap:8pt;padding:5.5pt 10pt;'
+        f'background:#f1f5f9;border-bottom:1pt solid #e8edf2;">'
+        f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;'
+        f'padding:2.5pt 9pt;border-radius:20pt;border:1pt solid {pm["br"]};'
+        f'background:{pm["bg"]};color:{pm["c"]};flex-shrink:0;">{_h(pm["label"])}</span>'
+        f'<span style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{_h(_c(a.article_number))}</span>'
+        f'<span style="{FONT}font-size:7pt;color:#94a3b8;margin-left:auto;">{_h(_reg(a.regulation.value))}</span>'
+        f'</div>'
+        f'<div style="padding:7pt 10pt 8pt;background:#fff;">'
+        f'<div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4.5pt;">{_h(_c(a.action))}</div>'
+        f'<div style="{FONT}font-size:7.5pt;color:#64748b;">'
+        f'<b style="color:#374151;">Effort:</b> {_h(_c(a.estimated_effort))}{dl}'
+        f'</div></div></div>'
+    )
+
+
+def _actions(report: ComplianceReport, logo: str) -> str:
     if not report.action_plan:
-        pdf.body_text("No remediation actions required.")
-        return
+        return (
+            f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+            f'{_hbar(report.company_name, "Action Plan", logo)}'
+            f'{_body_open()}{_sec_title("Section 05","Action Plan")}<p>No actions required.</p>{_body_close()}'
+            f'</div>'
+        )
 
-    # Group by regulation
-    actions_by_reg: dict[str, list] = {}
-    for action in report.action_plan:
-        actions_by_reg.setdefault(action.regulation.value, []).append(action)
+    by_reg: dict[str, list] = {}
+    for a in report.action_plan:
+        by_reg.setdefault(a.regulation.value, []).append(a)
 
-    for reg_key, actions in actions_by_reg.items():
-        pdf.reg_subheading(reg_key)
+    body = ""
+    for i, (reg_key, acts) in enumerate(by_reg.items()):
+        spacer = "" if i == 0 else '<div style="height:12mm;"></div>'
+        header = (
+            f'<div style="margin-bottom:4mm;display:flex;align-items:baseline;'
+            f'justify-content:space-between;padding-bottom:3mm;border-bottom:1.5pt solid #e8edf2;">'
+            f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_h(_reg(reg_key))}</div>'
+            f'</div>'
+        )
+        cards = [_action_card(a) for a in acts]
+        if cards:
+            body += f'<div style="page-break-inside:avoid;">{spacer}{header}{cards[0]}</div>'
+            body += "".join(cards[1:])
+        else:
+            body += spacer + header
 
-        for act in actions:
-            pdf.ensure_space(45)
-
-            priority_colour = PRIORITY_COLOURS.get(act.priority, MID_GREY)
-            row_y           = pdf.get_y()
-            badge_w         = 24
-
-            # Priority badge
-            pdf.set_fill_color(*priority_colour)
-            pdf.set_text_color(*WHITE)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.rect(MARGIN, row_y, badge_w, 6, style="F")
-            pdf.set_xy(MARGIN, row_y)
-            pdf.cell(badge_w, 6, _s(act.priority.value), align="C")
-
-            # Article reference
-            pdf.set_text_color(*NAVY_LIGHT)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.set_xy(MARGIN + badge_w + 2, row_y)
-            pdf.cell(CONTENT_W - badge_w - 2, 6, _s(f"Art. {act.article_number}"))
-            pdf.ln()
-
-            # Full action text (no truncation)
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "", 9)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.multi_cell(CONTENT_W - 3, 5, _s(act.action))
-
-            # Effort & Deadline
-            pdf.set_x(MARGIN + 3)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.set_text_color(*DARK_GREY)
-            pdf.cell(22, 5, "Effort:")
-            pdf.set_font("Helvetica", "", 8)
-            pdf.cell(52, 5, _s(act.estimated_effort))
-
-            if act.deadline:
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.cell(22, 5, "Deadline:")
-                pdf.set_font("Helvetica", "", 8)
-                pdf.cell(0, 5, _s(act.deadline))
-            pdf.ln()
-
-            # Dependencies
-            if act.dependencies:
-                pdf.set_x(MARGIN + 3)
-                pdf.set_font("Helvetica", "B", 8)
-                pdf.set_text_color(*DARK_GREY)
-                pdf.cell(30, 5, "Dependencies:")
-                pdf.set_font("Helvetica", "", 8)
-                pdf.multi_cell(CONTENT_W - 33, 5, _s(", ".join(act.dependencies)))
-
-            pdf.set_text_color(*BLACK)
-            pdf.ln(2)
-            pdf.separator_line()
+    return (
+        f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+        f'{_hbar(report.company_name, "Action Plan", logo)}'
+        f'{_body_open()}'
+        f'{_sec_title("Section 05", "Action Plan")}'
+        f'{_sec_sub("A concrete to-do list for closing your compliance gaps. Start with Critical and High items.")}'
+        f'{body}'
+        f'{_body_close()}</div>'
+    )
 
 
-def _build_closing(pdf: KMUPdf, report: ComplianceReport):
-    pdf.add_page()
-    pdf.section_title("6. Closing & Disclaimer")
+# ─────────────────────────────────────────────────────────────────────────────
+# Section 6 — Closing
+# ─────────────────────────────────────────────────────────────────────────────
 
-    pdf.ln(2)
-    pdf.sub_title("Recommended Next Steps")
-
-    next_steps = [
-        "Review each gap finding with your legal or compliance team.",
-        "Prioritise Critical and High priority action items immediately.",
-        "Establish a compliance calendar with realistic deadlines from the Action Plan.",
-        "Re-run this assessment after implementing changes to track your progress.",
-        "Consult a qualified legal counsel for binding compliance decisions.",
+def _closing(report: ComplianceReport, logo: str) -> str:
+    steps = [
+        "Start with <b>Critical</b> and <b>High</b> priority items. These are your live legal risks right now.",
+        "Give every action an owner and a deadline. Without that, nothing gets done.",
+        "Keep written records of everything you implement. Regulators will ask for proof.",
+        "Run this assessment again after you make changes. You will see the score move.",
+        "For anything you are unsure about, talk to a lawyer before acting on it.",
     ]
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(*DARK_GREY)
-    for step in next_steps:
-        pdf.set_x(MARGIN + 4)
-        pdf.multi_cell(CONTENT_W - 4, 5, _s(f"- {step}"))
-    pdf.set_text_color(*BLACK)
-
-    pdf.ln(6)
-    pdf.sub_title("Legal Disclaimer")
-
-    # Shaded disclaimer box
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.set_text_color(*DARK_GREY)
-    disc_y = pdf.get_y()
-    # First pass: render to measure height
-    pdf.set_x(MARGIN + 3)
-    pdf.multi_cell(CONTENT_W - 6, 5, _s(report.disclaimer))
-    disc_end_y = pdf.get_y()
-    box_h = disc_end_y - disc_y + 4
-
-    # Draw background rect then re-render text on top
-    pdf.set_fill_color(*LIGHT_GREY)
-    pdf.rect(MARGIN, disc_y - 2, CONTENT_W, box_h, style="F")
-    pdf.set_xy(MARGIN + 3, disc_y)
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.set_text_color(*DARK_GREY)
-    pdf.multi_cell(CONTENT_W - 6, 5, _s(report.disclaimer))
-
-    pdf.set_text_color(*BLACK)
-    pdf.ln(10)
-
-    # Branding footer block
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_text_color(*NAVY)
-    pdf.cell(CONTENT_W, 6, "KMU-Comply - AI-Powered Compliance for German SMEs",
-             align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_text_color(*MID_GREY)
-    pdf.cell(CONTENT_W, 5,
-             "This report was generated automatically and is not a substitute for legal advice.",
-             align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    pdf.set_text_color(*BLACK)
+    items = "".join(
+        f'<div style="display:flex;align-items:flex-start;gap:8pt;margin-bottom:5mm;">'
+        f'<div style="{FONT}width:18pt;height:18pt;border-radius:50%;background:{NAVY};'
+        f'color:#fff;font-size:7.5pt;font-weight:700;display:flex;align-items:center;'
+        f'justify-content:center;flex-shrink:0;margin-top:1pt;">{i+1}</div>'
+        f'<div style="{FONT}font-size:9pt;color:#334155;line-height:1.65;flex:1;">{s}</div>'
+        f'</div>'
+        for i, s in enumerate(steps)
+    )
+    return (
+        f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
+        f'{_hbar(report.company_name, "Next Steps", logo)}'
+        f'{_body_open()}'
+        f'{_sec_title("Section 06", "Next Steps")}'
+        f'{_sec_sub("You know where you stand now. Here is what to do next.")}'
+        f'<div style="margin-top:2mm;">{items}</div>'
+        f'<div style="margin-top:8mm;">'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Legal Disclaimer</div>'
+        f'<div style="{FONT}padding:6mm 7mm;background:#f8fafc;border:1pt solid #e8edf2;'
+        f'border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;'
+        f'box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">{_h(report.disclaimer)}</div>'
+        f'</div>'
+        f'<div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;'
+        f'text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">'
+        f'<strong style="color:{NAVY};">Complio</strong> &nbsp;&middot;&nbsp; Autonomous Regulatory Compliance for German SMEs<br>'
+        f'<span style="font-size:7pt;">Produced by an AI agent. Not a certified legal audit. Not legal advice.</span>'
+        f'</div>'
+        f'{_body_close()}</div>'
+    )
 
 
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 
 def generate_pdf(report: ComplianceReport) -> bytes:
-    """
-    Generate a professional compliance PDF report and return raw bytes.
+    logo = _logo()
 
-    Args:
-        report: A fully populated ComplianceReport instance.
+    html = (
+        '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+        '<link rel="preconnect" href="https://fonts.googleapis.com">'
+        '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">'
+        '<style>'
+        '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}'
+        "body{font-family:'Inter',Arial,sans-serif;font-size:9.5pt;color:#0f172a;background:#fff;"
+        '-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+        '@page{size:A4;margin:0;}'
+        '</style></head><body>'
+        + _cover(report, logo)
+        + _summary_and_applicability(report, logo)
+        + _scores(report, logo)
+        + _gaps(report, logo)
+        + _actions(report, logo)
+        + _closing(report, logo)
+        + '</body></html>'
+    )
 
-    Returns:
-        PDF file contents as bytes, suitable for HTTP streaming or writing to disk.
-    """
-    pdf = KMUPdf(company_name=report.company_name)
-
-    _build_cover(pdf, report)
-    _build_executive_summary(pdf, report)
-    _build_regulation_applicability(pdf, report)
-    _build_score_breakdown(pdf, report)
-    _build_gap_analysis(pdf, report)
-    _build_action_plan(pdf, report)
-    _build_closing(pdf, report)
-
-    raw = pdf.output()
-    if isinstance(raw, (bytes, bytearray)):
-        return bytes(raw)
-    # fpdf may return a string in older builds
-    buf = io.BytesIO()
-    buf.write(raw if isinstance(raw, bytes) else raw.encode("latin-1"))
-    return buf.getvalue()
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        pg      = browser.new_page()
+        pg.set_viewport_size({"width": 794, "height": 1123})
+        pg.set_content(html, wait_until="networkidle")
+        pdf_bytes = pg.pdf(
+            format="A4",
+            print_background=True,
+            margin={"top":"0","bottom":"0","left":"0","right":"0"},
+        )
+        browser.close()
+    return pdf_bytes

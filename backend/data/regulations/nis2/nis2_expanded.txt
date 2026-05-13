@@ -1,0 +1,230 @@
+DIRECTIVE (EU) 2022/2555 — NIS2 Directive
+Cybersecurity Risk-Management and Reporting Obligations
+Expanded Article Reference for Compliance Screening
+
+---
+
+nis2 Art. 21(1)
+Title: General obligation to take appropriate cybersecurity risk-management measures
+Obligation: MUST
+Threshold: All essential entities (>250 employees OR >€50M turnover and >€43M balance sheet total) and all important entities (50–250 employees OR €10–50M turnover) operating network and information systems
+Text: Member States must ensure that essential and important entities take appropriate and proportionate technical, operational, and organisational measures to manage the risks posed to the security of network and information systems which those entities use in their operations or in the provision of their services. The measures must be based on an all-hazards approach that aims to protect network and information systems and the physical environment of those systems from incidents. Entities must prevent or minimise the impact of incidents on recipients of their services and on other services. Proportionality must take into account the entity's exposure to risks, its size, and the likelihood and severity of incidents including their societal and economic impact.
+Keywords: cybersecurity, risk management, all-hazards approach, network and information systems, proportionality, essential entity, important entity
+
+---
+
+nis2 Art. 21(2)(a)
+Title: Policies on risk analysis and information system security
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must adopt and maintain written policies on risk analysis and information system security as part of their cybersecurity risk-management measures. These policies must be approved by the management body and cover the entity's approach to identifying, assessing, and treating cybersecurity risks across all relevant systems and processes. The policies must be reviewed regularly and updated to reflect changes in the threat landscape, technology, or business operations. The risk analysis must be conducted systematically to determine the appropriate protective measures required for the entity's network and information systems.
+Keywords: risk analysis, information system security, cybersecurity policy, risk assessment, management approval, policy documentation
+
+---
+
+nis2 Art. 21(2)(b)
+Title: Incident handling — detection, analysis, containment, and recovery
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must establish and implement documented procedures for incident handling, covering the prevention, detection, analysis, containment, and response to, and recovery from cybersecurity incidents. The incident handling procedures must define roles and responsibilities, escalation paths, and communication protocols for responding to incidents affecting the entity's network and information systems. Entities must ensure that staff involved in incident response are trained and that procedures are tested regularly. The goal is to minimise disruption to services and restore normal operations as quickly as possible following an incident.
+Keywords: incident handling, detection, containment, recovery, incident response, cybersecurity incident, incident procedure, roles and responsibilities
+
+---
+
+nis2 Art. 21(2)(c)
+Title: Business continuity — backup management, disaster recovery, and crisis management
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must implement business continuity measures, including backup management, disaster recovery planning, and crisis management procedures, to ensure the continued provision of services following a significant cybersecurity incident. Backup procedures must define the frequency of backups, the types of data backed up, the storage location (including off-site or offline storage), and the process for testing restoration. Disaster recovery plans must specify recovery time objectives and recovery point objectives for critical systems. Crisis management procedures must identify key decision-makers, communication chains, and actions to be taken to manage an incident that exceeds normal operational capacity.
+Keywords: business continuity, backup management, disaster recovery, crisis management, recovery time objective, recovery point objective, service continuity
+
+---
+
+nis2 Art. 21(2)(d)
+Title: Supply chain security — security in relationships with direct suppliers and service providers
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must address cybersecurity risks arising from their supply chain, including security-related aspects concerning the relationships between each entity and its direct suppliers or service providers. This requires entities to assess the cybersecurity practices and posture of their direct suppliers, including software and hardware providers, and to integrate appropriate security requirements into procurement and contractual arrangements. Entities must consider the overall security quality of products and services, including secure development practices, and the results of independent security evaluations where available. Supply chain security assessments must be documented and reviewed regularly, particularly when onboarding new suppliers or renewing material contracts.
+Keywords: supply chain security, supplier assessment, third-party risk, procurement, contractual security requirements, software supply chain, hardware supply chain
+
+---
+
+nis2 Art. 21(2)(e)
+Title: Security in network and information systems acquisition, development, and maintenance — vulnerability handling and disclosure
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must ensure that security requirements are integrated into the acquisition, development, and maintenance of network and information systems, including vulnerability handling and coordinated vulnerability disclosure. Security must be considered throughout the full system lifecycle, from procurement specifications through design, testing, deployment, operation, and decommissioning. Vulnerability management processes must include systematic scanning, patch prioritisation, and timely remediation of known vulnerabilities in software, hardware, and firmware used by the entity. Where entities develop software, they must implement secure development practices including code review, security testing, and a coordinated disclosure policy for vulnerabilities discovered by external researchers.
+Keywords: secure development, vulnerability management, patch management, vulnerability disclosure, system acquisition, security lifecycle, coordinated disclosure
+
+---
+
+nis2 Art. 21(2)(f)
+Title: Policies and procedures to assess the effectiveness of cybersecurity risk-management measures
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must establish policies and procedures to regularly assess the effectiveness of the cybersecurity risk-management measures they have implemented. Assessments may include internal audits, independent security reviews, penetration testing, security assessments against recognised frameworks, or the use of security metrics and key performance indicators. The results of effectiveness assessments must be documented and reported to the management body to support informed decision-making on the adequacy of existing measures and any required improvements. Identified deficiencies must be tracked and remediated within defined timeframes.
+Keywords: effectiveness assessment, security audit, penetration testing, security metrics, internal audit, management reporting, cybersecurity governance
+
+---
+
+nis2 Art. 21(2)(g)
+Title: Basic cyber hygiene practices and cybersecurity training
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must implement basic cyber hygiene practices and provide regular cybersecurity training to all employees, including management. Basic cyber hygiene practices include patch management, password management, least privilege access controls, network segmentation, anti-malware measures, and the hardening of endpoint devices and systems. Cybersecurity training must be appropriate to the employee's role and must ensure that staff are able to identify and respond to common threats such as phishing, social engineering, and malware. Training must be provided at least annually and whenever significant changes to the threat landscape or the entity's systems occur. Records of training must be maintained.
+Keywords: cyber hygiene, cybersecurity training, patch management, password policy, phishing awareness, endpoint security, least privilege, network segmentation, employee training
+
+---
+
+nis2 Art. 21(2)(h)
+Title: Policies and procedures regarding the use of cryptography and, where appropriate, encryption
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must adopt and implement policies and procedures governing the use of cryptography and, where appropriate, encryption to protect the confidentiality, integrity, and authenticity of information processed, stored, or transmitted across their network and information systems. Cryptography policies must define approved algorithms, key lengths, and key management procedures, including key generation, storage, rotation, and destruction. The policy must specify when encryption is required — at minimum for sensitive data in transit and at rest — and must address the use of cryptographic protocols for securing communications (e.g., TLS for data in transit). The policies must be reviewed and updated to reflect advances in cryptographic standards and the emergence of new vulnerabilities.
+Keywords: cryptography, encryption, key management, TLS, data in transit, data at rest, cryptographic policy, algorithm standards, PKI
+
+---
+
+nis2 Art. 21(2)(i)
+Title: Human resources security, access control policies, and asset management
+Obligation: MUST
+Threshold: All essential and important entities
+Text: Entities must implement human resources security measures, access control policies, and asset management practices as part of their cybersecurity risk-management framework. Human resources security must cover background verification of employees in sensitive roles, clear security responsibilities in employment contracts, security awareness onboarding, and defined procedures for the revocation of access upon termination or change of role. Access control policies must enforce the principle of least privilege, ensuring that employees, contractors, and systems are granted only the access rights necessary to perform their functions. Asset management must maintain an up-to-date inventory of all hardware, software, and data assets, with defined ownership and classification, to enable appropriate protective measures to be applied.
+Keywords: human resources security, access control, least privilege, asset management, identity management, access revocation, background checks, asset inventory
+
+---
+
+nis2 Art. 21(2)(j)
+Title: Multi-factor authentication, continuous authentication, and secured communications
+Obligation: MUST
+Threshold: All essential and important entities (where appropriate)
+Text: Entities must implement multi-factor authentication (MFA) or continuous authentication solutions, secured voice, video, and text communications, and secured emergency communication systems within the entity, where appropriate. MFA must be applied as a minimum for remote access to the entity's network and systems, for access to privileged accounts and administrative interfaces, and for access to sensitive data and critical systems. Secured communications means the use of end-to-end encrypted or otherwise cryptographically secured channels for voice, video, and text communications used to discuss or transmit sensitive operational information. Emergency communication systems used in incident response must be designed to remain operational even if primary communication infrastructure is compromised.
+Keywords: multi-factor authentication, MFA, continuous authentication, secured communications, encrypted communications, privileged access, remote access, emergency communications
+
+---
+
+nis2 Art. 23(1)
+Title: Obligation to notify competent authority of significant incidents without undue delay
+Obligation: MUST
+Threshold: All essential and important entities experiencing a significant incident
+Text: Member States must ensure that essential and important entities notify, without undue delay, the competent national authority or the Computer Security Incident Response Team (CSIRT) of any incident having a significant impact on the provision of their services. An incident is considered significant if it has caused or is capable of causing severe operational disruption of the services or financial loss for the entity concerned, or if it has affected or is capable of affecting other natural or legal persons by causing considerable material or non-material damage. The notification obligation is triggered from the moment the entity becomes aware of the significant incident. Entities must also notify, without undue delay, recipients of their services that are likely to be adversely affected by a significant incident.
+Keywords: incident notification, significant incident, competent authority, CSIRT, reporting obligation, service disruption, financial loss, notification trigger
+
+---
+
+nis2 Art. 23(3)
+Title: Early warning within 24 hours of becoming aware of a significant incident
+Obligation: MUST
+Threshold: All essential and important entities experiencing a significant incident
+Text: Entities must submit an early warning to the competent authority or CSIRT without undue delay and in any event within 24 hours of becoming aware of a significant incident. The early warning must indicate whether the incident is suspected of being caused by unlawful or malicious action, and whether it is likely to have a cross-border impact affecting entities or services in other Member States. The early warning does not need to be a full incident notification; it is intended to give authorities timely situational awareness to coordinate a response where necessary. Where the entity suspects unlawful or malicious action, it should also notify law enforcement authorities.
+Keywords: early warning, 24-hour notification, incident reporting, malicious action, cross-border impact, CSIRT, situational awareness, law enforcement notification
+
+---
+
+nis2 Art. 23(4)
+Title: Incident notification within 72 hours including initial assessment of severity and impact
+Obligation: MUST
+Threshold: All essential and important entities experiencing a significant incident
+Text: Entities must submit a full incident notification to the competent authority or CSIRT without undue delay and in any event within 72 hours of becoming aware of the significant incident. The notification must include an initial assessment of the incident, including its severity and impact on the entity's services and, where relevant, on services provided to other entities or individuals. The notification must also specify any indicators of compromise known at the time of the notification, the cause of the incident if known or suspected, and the measures taken or planned to manage and mitigate the impact. This notification updates and replaces the early warning submitted under the 24-hour obligation.
+Keywords: 72-hour notification, incident notification, severity assessment, indicators of compromise, impact assessment, mitigation measures, incident report
+
+---
+
+nis2 Art. 23(4)(d)
+Title: Final incident report no later than one month after submission of the incident notification
+Obligation: MUST
+Threshold: All essential and important entities that have submitted an incident notification
+Text: No later than one month after the submission of the 72-hour incident notification, entities must submit a final report to the competent authority or CSIRT. The final report must include a detailed description of the incident, the type of threat or root cause that is likely to have triggered the incident, the applied and ongoing mitigation measures, and where applicable the cross-border impact of the incident. The report must document lessons learned and any corrective or preventive measures implemented or planned to avoid recurrence. Where an incident is still ongoing at the time the final report is due, the entity must submit a progress report at that stage and a final report within one month of the incident being handled.
+Keywords: final incident report, post-incident report, root cause analysis, lessons learned, corrective measures, one-month deadline, ongoing incident
+
+---
+
+nis2 Art. 32
+Title: Supervisory measures for essential entities — on-site inspections, audits, and enforcement
+Obligation: MUST
+Threshold: Competent national supervisory authorities; essential entities subject to ex-ante and ex-post supervision
+Text: Member States must ensure that competent authorities have the power to subject essential entities to comprehensive supervisory measures, which may be applied both proactively and reactively. Supervisory powers for essential entities include conducting on-site inspections and off-site supervision, targeted security audits carried out by an independent qualified body, security scans based on objective risk assessment criteria, requests for information and documentation necessary to assess the entity's cybersecurity risk-management measures, and access to data, documents, and information necessary for the performance of supervisory tasks. Competent authorities may issue binding instructions requiring entities to implement specific remedial measures within defined timeframes. Member States must ensure that administrative fines for non-compliant essential entities can reach at least €10,000,000 or 2% of total worldwide annual turnover, whichever is higher.
+Keywords: supervisory measures, essential entities, on-site inspection, security audit, enforcement, competent authority, binding instructions, administrative fine
+
+---
+
+nis2 Art. 33
+Title: Supervisory measures for important entities — lighter-touch, ex-post supervision
+Obligation: MUST
+Threshold: Competent national supervisory authorities; important entities subject primarily to ex-post supervision
+Text: Member States must ensure that supervisory measures applied to important entities are effective, proportionate, and dissuasive while being less burdensome than those applied to essential entities. For important entities, supervisory measures are primarily ex-post in nature, meaning that intensive supervision is typically triggered by an incident, a complaint, evidence of non-compliance, or a risk-based decision by the competent authority, rather than applied as a matter of routine. Supervisory measures for important entities include on-site inspections following an incident or upon a reasonable indication of non-compliance, requests for documentation and evidence of implementation of cybersecurity measures, and the power to issue binding instructions requiring remediation. Administrative fines for non-compliant important entities must be capable of reaching at least €7,000,000 or 1.4% of total worldwide annual turnover, whichever is higher.
+Keywords: important entities, ex-post supervision, supervisory measures, incident-triggered, proportionality, administrative fine, enforcement, competent authority
+
+---
+
+nis2 Art. 20(1)
+Title: Management body responsibility — approval and oversight of cybersecurity risk-management measures
+Obligation: MUST
+Threshold: Management bodies of all essential and important entities
+Text: Member States must ensure that the management bodies of essential and important entities approve the cybersecurity risk-management measures taken by those entities, oversee their implementation, and can be held personally liable for infringements by those entities of the obligations laid down in the NIS2 Directive. The management body is the highest governing or decision-making body of the entity, such as the board of directors, supervisory board, executive management, or equivalent. Approval of cybersecurity measures by the management body must be formally documented, and the management body must receive regular reports on the entity's cybersecurity posture and the effectiveness of risk-management measures. Where significant incidents occur or material deficiencies are identified, the management body must be informed and must take appropriate action.
+Keywords: management body, governance, cybersecurity oversight, board responsibility, management liability, approval of measures, cybersecurity governance, accountability
+
+---
+
+nis2 Art. 20(2)
+Title: Mandatory cybersecurity training for management body members
+Obligation: MUST
+Threshold: Members of management bodies of essential and important entities
+Text: Member States must ensure that members of the management bodies of essential and important entities are required to follow regular cybersecurity training, and must encourage entities to offer similar training to their employees on a regular basis. Training must be sufficient to enable management body members to gain an adequate level of knowledge and skills to identify cybersecurity risks, assess cybersecurity risk-management practices, and understand the impact of cybersecurity risks on the services provided by the entity. Training content must be updated to reflect the evolving threat landscape and emerging risks relevant to the entity's sector and operations. Records of training completion by management body members must be maintained by the entity.
+Keywords: management training, cybersecurity training, board training, risk awareness, governance, training records, management competence, ongoing education
+
+---
+
+nis2 Art. 2(1)
+Title: Scope — applicability to essential and important entities; SME exemption
+Obligation: MUST
+Threshold: Entities covered by Annexes I and II; microenterprises and small enterprises generally exempt
+Text: The NIS2 Directive applies to public and private entities of the types listed in Annexes I and II that qualify as medium-sized or large enterprises. Entities that qualify as microenterprises (fewer than 10 employees and annual turnover or balance sheet total not exceeding €2 million) or small enterprises (fewer than 50 employees and annual turnover or balance sheet total not exceeding €10 million) are generally exempt from the Directive's obligations, unless they are specifically identified as essential entities under Article 2(2). The distinction between essential and important entities is relevant because essential entities are subject to more comprehensive ex-ante supervisory measures than important entities, which are subject primarily to ex-post supervision. German SMEs operating in sectors listed in Annexes I or II should assess whether they qualify as important entities (50–249 employees or €10–50M turnover).
+Keywords: scope, essential entity, important entity, SME exemption, Annex I, Annex II, medium-sized enterprise, microenterprise, applicability
+
+---
+
+nis2 Art. 3
+Title: Classification as essential or important entity
+Obligation: MUST
+Threshold: Entities in sectors covered by NIS2 Annexes I and II with 50+ employees or €10M+ turnover
+Text: For the purposes of the NIS2 Directive, essential entities are entities of a type referred to in Annex I that exceed the ceilings for medium-sized enterprises, meaning they have more than 250 employees or an annual turnover exceeding €50 million and a balance sheet total exceeding €43 million. Sectors covered by Annex I include energy, transport, banking, financial market infrastructures, health, drinking water, waste water, digital infrastructure, ICT service management, public administration, and space. Important entities are entities of a type referred to in Annexes I or II that are medium-sized enterprises not qualifying as essential entities, meaning they have 50 to 249 employees or a turnover of €10 to €50 million. Annex II sectors include postal and courier services, waste management, manufacture of certain critical products, food production and distribution, and digital providers.
+Keywords: essential entity classification, important entity classification, Annex I, Annex II, sector classification, employee threshold, turnover threshold, entity type
+
+---
+
+nis2 Art. 21 General
+Title: All-hazards approach — baseline for all cybersecurity measures
+Obligation: MUST
+Threshold: All essential and important entities
+Text: All cybersecurity risk-management measures required under Article 21 of the NIS2 Directive must be based on an all-hazards approach that aims to protect network and information systems and their physical environment from incidents caused by any type of threat, including natural disasters, technical failures, human error, and deliberate malicious acts. Measures must be proportionate to the degree of risk, taking into account the entity's size, exposure to risks, and the likelihood and severity of incidents and their societal and economic impact. The ten minimum categories of measures under Article 21(2)(a)–(j) are not exhaustive; entities may need to implement additional measures depending on their specific risk profile. Implementation of the Article 21 measures must be approved by the management body under Article 20(1) and reviewed for effectiveness under Article 21(2)(f).
+Keywords: all-hazards approach, cybersecurity measures, risk-proportionate, baseline requirements, technical measures, organisational measures, threat landscape, physical security
+
+---
+
+nis2 Art. 34(1)
+Title: Administrative fines for essential entities — maximum of €10,000,000 or 2% of global turnover
+Obligation: MUST
+Threshold: Competent supervisory authorities; essential entities that fail to comply
+Text: Member States must ensure that essential entities that fail to comply with the cybersecurity risk-management obligations in Article 21 or the reporting obligations in Article 23 are subject to administrative fines of a maximum of at least €10,000,000 or a maximum of at least 2% of the total worldwide annual turnover of the undertaking to which the essential entity belongs in the preceding financial year, whichever is higher. In determining whether to impose a fine and its amount, competent authorities must take into account the nature, gravity, and duration of the infringement, the intentional or negligent character of the infringement, any previous infringements, the degree of responsibility of the entity, and the actions taken to mitigate damage and the measures put in place to prevent future infringements.
+Keywords: administrative fine, penalty, essential entity, €10 million, 2% turnover, enforcement, supervisory authority, infringement, fine calculation
+
+---
+
+nis2 Art. 34(2)
+Title: Administrative fines for important entities — maximum of €7,000,000 or 1.4% of global turnover
+Obligation: MUST
+Threshold: Competent supervisory authorities; important entities that fail to comply
+Text: Member States must ensure that important entities that fail to comply with the cybersecurity risk-management obligations in Article 21 or the reporting obligations in Article 23 are subject to administrative fines of a maximum of at least €7,000,000 or a maximum of at least 1.4% of the total worldwide annual turnover of the undertaking to which the important entity belongs in the preceding financial year, whichever is higher. The criteria for setting fines for important entities are the same as those for essential entities, including consideration of the nature, gravity, and duration of the infringement, whether it was intentional or negligent, any history of non-compliance, the entity's degree of responsibility, and mitigation actions taken. German SMEs classified as important entities face significant financial exposure for non-compliance.
+Keywords: administrative fine, penalty, important entity, €7 million, 1.4% turnover, enforcement, supervisory authority, infringement, SME
+
+---
+
+nis2 Art. 23 Significant Incident
+Title: Definition of significant incident for reporting purposes
+Obligation: MUST
+Threshold: All essential and important entities assessing whether an incident is reportable
+Text: An incident must be treated as significant, and therefore subject to the notification obligations under Article 23, if it has caused or is capable of causing severe operational disruption of the entity's services or financial loss to the entity, or if it has affected or is capable of affecting other natural or legal persons by causing considerable material or non-material damage. When assessing significance, entities must consider the number of users affected, the duration of the disruption, the geographic spread of the impact, the extent to which critical societal or economic functions are affected, and whether sensitive data has been compromised. Entities must establish internal criteria and decision-making processes to assess the significance of an incident promptly, because the 24-hour early warning clock starts running from the moment the entity becomes aware of the incident.
+Keywords: significant incident, incident definition, reporting threshold, operational disruption, financial loss, data breach, notification trigger, incident assessment
+
+---

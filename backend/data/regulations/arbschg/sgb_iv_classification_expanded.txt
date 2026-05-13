@@ -1,0 +1,12 @@
+Sozialgesetzbuch Viertes Buch (SGB IV) — Employment Classification
+Relevante Vorschriften zur Abgrenzung Arbeitnehmer / Selbständiger (Scheinselbständigkeit)
+Source: https://www.gesetze-im-internet.de/sgb_4/
+
+---
+
+arbschg SGB IV §7
+Title: Definition of employment — criteria for distinguishing employees from self-employed (Scheinselbständigkeit)
+Obligation: MUST
+Threshold: All businesses engaging natural persons for work, regardless of the contractual form used
+Text: Employment within the meaning of social security law is non-self-employed work, in particular within an employment relationship. The following indicators characterise employment: work performed according to instructions (weisungsgebunden) regarding time, place, type, and manner; integration into the organisation of another person (Eingliederung in einen Betrieb). The following indicators characterise self-employment: setting one's own working hours; working for multiple clients; bearing entrepreneurial risk; having one's own employees; using one's own equipment. Whether a person is an employee or self-employed is determined by the overall picture of all relevant facts — contractual labelling is not decisive. Where an engagement is misclassified as self-employment when it is actually employment, the engaging company becomes liable for all social security contributions (including the employee portion retroactively for up to four years), plus penalties. The status assessment procedure (Statusfeststellungsverfahren) with the Deutsche Rentenversicherung allows voluntary clarification. Indicators pointing towards employment include: working exclusively for one client; using the client's equipment; not appearing in the market independently; not setting prices; being integrated into the client's hierarchy.
+Keywords: Scheinselbständigkeit, sham self-employment, employment definition, §7 SGB IV, social security liability, Statusfeststellungsverfahren, Deutsche Rentenversicherung, freelancer, self-employed, indicators

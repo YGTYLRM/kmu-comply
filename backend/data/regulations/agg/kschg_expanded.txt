@@ -1,0 +1,40 @@
+Kuendigungsschutzgesetz (KSchG)
+Gesetz ueber den Schutz vor Kuendigungen
+vom 25. August 1969 (BGBl. I S. 1317)
+Source: https://www.gesetze-im-internet.de/kschg/
+
+---
+
+agg KSchG §1
+Title: Socially unjustified dismissals are void — applies after 6 months employment in companies with 10+ employees
+Obligation: MUST
+Threshold: Employers with more than 10 employees (full-time equivalent); after 6 months continuous employment of the employee
+Text: The dismissal of an employee whose employment in the same establishment or company has existed continuously for more than six months is legally invalid (rechtsunwirksam) if it is socially unjustified. A dismissal is socially justified only if it is based on reasons related to the person of the employee, the employee's conduct, or urgent operational requirements. Person-related reasons include long-term illness that makes continued employment impossible. Conduct-related reasons require prior warning (Abmahnung) in most cases. Operational reasons must be genuine and substantiated — personal preferences or cost-cutting alone do not suffice. Where multiple employees could be dismissed for operational reasons, the employer must conduct social selection (Sozialauswahl) taking into account tenure, age, family obligations, and disability. A dismissal that fails social selection requirements is void even if the operational need is genuine.
+Keywords: Kuendigungsschutz, dismissal protection, soziale Rechtfertigung, social justification, 6 months, 10 employees, person-related, conduct-related, operational, Sozialauswahl
+
+---
+
+agg KSchG §4
+Title: Three-week deadline for challenging dismissal — failure results in dismissal becoming valid
+Obligation: MUST
+Threshold: Employees wishing to challenge the validity of a dismissal
+Text: An employee who wishes to challenge a dismissal as socially unjustified or invalid on other grounds must file an action at the labour court within three weeks of receiving the written notice of dismissal (schriftliche Kuendigung). If the employee fails to file within three weeks, the dismissal is deemed valid from the outset regardless of whether it was actually justified. This three-week deadline applies to all challenges to dismissal validity, including challenges based on lack of works council consultation, violation of special protection rules (pregnancy, parental leave, severely disabled), and procedural defects. The employer must give notice of dismissal in writing — verbal dismissals are void under §623 BGB. Employees are therefore entitled to receive a written dismissal notice in all cases.
+Keywords: Klagefrist, three-week deadline, Arbeitsgerichtsklage, challenge dismissal, written notice, labour court, §4 KSchG, dismissal validity
+
+---
+
+agg KSchG §9
+Title: Dissolution of employment relationship — compensation ordered by labour court
+Obligation: CONDITIONAL
+Threshold: Courts may order dissolution where continued employment is unreasonable
+Text: Where the labour court finds that the employment relationship should not continue because continued employment would not be reasonable (unzumutbar) for the employee due to the manner of the dismissal, or where the employer applies for dissolution on grounds that the employee's future cooperation cannot reasonably be expected, the court dissolves the employment relationship and orders the employer to pay appropriate compensation. Compensation under §10 KSchG may be up to twelve months wages, or up to fifteen months for employees over 50 with 15 or more years service, or up to eighteen months for employees over 55 with 20 or more years service. Employers must therefore ensure that the manner in which they communicate and implement dismissals does not create additional grounds for dissolution claims.
+Keywords: dissolution, Aufloesung, labour court, compensation, Abfindung, 12 months, 15 months, 18 months, unreasonable continuation, §9 KSchG
+
+---
+
+agg KSchG §23
+Title: Applicability threshold — small establishments with 10 or fewer employees are excluded
+Obligation: CONDITIONAL
+Threshold: Establishments with more than 10 employees (full-time equivalent, excluding apprentices and trainees)
+Text: The dismissal protection provisions of the KSchG (§§1-14) apply only to establishments that regularly employ more than 10 employees full-time, excluding apprentices and trainees. For calculating whether the threshold is met, part-time employees working up to 20 hours per week count as 0.5, and those working up to 30 hours count as 0.75. Employers with 10 or fewer employees may dismiss employees without needing social justification under KSchG, but remain subject to general civil law protections, the ban on discriminatory dismissals under AGG, and special protection rules for pregnant women, parents on parental leave, and severely disabled persons. The KSchG applicability threshold applies per establishment (Betrieb), not per company.
+Keywords: KSchG threshold, 10 employees, small establishments, exclusion, part-time counting, §23 KSchG, Betrieb
