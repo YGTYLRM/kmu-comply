@@ -10,7 +10,7 @@ class Regulation(str, Enum):
     NIS2    = "nis2"
     AI_ACT  = "eu_ai_act"
     HINSCHG = "hinschg"
-    ARBSCHG = "arbschg"
+    ARBSCHG = "workplace_law"
     AGG     = "agg"
     MILOG   = "milog"
 
