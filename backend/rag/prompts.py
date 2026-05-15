@@ -1,6 +1,6 @@
 """All LLM prompt templates. No inline prompts anywhere else in the codebase."""
 import re
-
+from datetime import date as _date
 
 import json as _json
 
@@ -42,7 +42,13 @@ Your role:
 - Distinguish between MUST (legal obligation), SHOULD (best practice), and MAY (optional)
 - Acknowledge uncertainty explicitly: state "this likely applies, but legal review recommended" when unsure
 - Provide realistic effort estimates for every recommendation
-- Never hallucinate legal requirements — every claim must trace to a specific article in the knowledge base"""
+- Never hallucinate legal requirements — every claim must trace to a specific article in the knowledge base
+
+Source authority hierarchy — always respect this order when sources conflict:
+  Level 1 — Official law text (binding): the authoritative legal source; always takes precedence
+  Level 2 — Regulatory guidance (authoritative interpretation): explains how authorities apply the law; follow unless Level 1 says otherwise
+  Level 3 — Company documents (evidence only): evidence of what the company does; never overrides legal obligations
+A company document saying "we comply" does not override a Level 1 requirement showing they must do X."""
 
 
 def profile_enrichment_prompt(profile_json: str) -> str:
@@ -68,7 +74,10 @@ Identify up to 10 inferred characteristics. Look for:
 Output ONLY valid JSON in this exact format:
 {{
   "inferred_characteristics": [
-    "Characteristic stated as one concrete sentence, citing the regulation/article if applicable."
+    "A characteristic directly and unambiguously implied by the profile data — e.g. 'Company employs staff and therefore has employer obligations under ArbSchG §3.'"
+  ],
+  "inferred_assumptions": [
+    "An assumption that is plausible given the industry/size but NOT directly confirmed — e.g. 'A manufacturing company of this size likely operates machinery that generates waste heat, potentially triggering §15 EnEfG.' Prefix each with 'ASSUMPTION:'"
   ],
   "validation_warnings": [
     "Warning about missing or ambiguous data that affects the analysis."
@@ -77,16 +86,31 @@ Output ONLY valid JSON in this exact format:
 }}
 
 Constraints:
+- inferred_characteristics: only what is DIRECTLY AND LOGICALLY implied with high certainty
+- inferred_assumptions: plausible but unconfirmed — must be prefixed with 'ASSUMPTION:'
+- Do NOT put assumptions into inferred_characteristics
 - Do NOT repeat information already explicit in the profile
-- Do NOT invent facts — only infer from what is logically implied by the profile data
 - missing_optional_fields: only fields that materially affect compliance assessment
 - If nothing can be inferred, return empty arrays
 </instructions>"""
 
 
-def gap_analysis_prompt(profile_json: str, chunks_json: str, company_docs_json: str = "") -> str:
+def gap_analysis_prompt(profile_json: str, chunks_json: str, company_docs_json: str = "", inferred_assumptions: list[str] | None = None) -> str:
     profile_json = _sanitize_profile_json(profile_json)
     has_docs = bool(company_docs_json.strip())
+
+    _today = _date.today()
+    _high_risk_active = _today >= _date(2026, 8, 2)
+    _ai_act_phasing_note = (
+        "EU AI Act phasing — high-risk obligations (Arts. 9-17, Annex I and III) "
+        "ARE NOW ACTIVE as of 2 Aug 2026. Assess all missing high-risk measures as NON_COMPLIANT."
+        if _high_risk_active else
+        "EU AI Act phasing — high-risk obligations (Arts. 9-17, Annex I and III) are NOT YET "
+        "active (they come into force 2 Aug 2026). Until that date, assess gaps in high-risk "
+        "requirements as PARTIALLY_COMPLIANT with evidence noting 'preparation required before "
+        "2 Aug 2026' — do NOT mark as NON_COMPLIANT. Art. 5 prohibited practices and GPAI rules "
+        "(Arts. 51-56) are already active and must be assessed as NON_COMPLIANT if unmet."
+    )
 
     docs_section = f"""
 <company_documents>
@@ -97,14 +121,22 @@ Prioritise these as evidence. Quote specific passages in your evidence field.
 """ if has_docs else ""
 
     cannot_assess_note = (
-        "- CANNOT_ASSESS: ONLY if neither the profile, nor the uploaded documents, nor industry norms "
-        "provide ANY basis for assessment. This must be extremely rare — under 2% of items."
+        "- CANNOT_ASSESS: Use when the assessment genuinely depends on information that is not in the "
+        "profile, not in the uploaded documents, and cannot be reasonably inferred. When you use "
+        "CANNOT_ASSESS, the evidence field MUST contain a specific, concrete question that the company "
+        "must answer to complete this assessment — e.g. 'To assess this requirement, confirm: does the "
+        "company conduct annual penetration tests on its network infrastructure?' Never use CANNOT_ASSESS "
+        "simply because a document is missing — absence of a measure is evidence of non-compliance."
         if has_docs
-        else "- CANNOT_ASSESS: ABSOLUTE LAST RESORT only. Do NOT use because a policy document is missing. "
-        "Absence of a measure IS evidence of non-compliance. Use NON_COMPLIANT or PARTIALLY_COMPLIANT instead."
+        else "- CANNOT_ASSESS: Use only when the assessment genuinely depends on information that is "
+        "not in the profile and cannot be reasonably inferred. When you use CANNOT_ASSESS, the evidence "
+        "field MUST contain a specific, concrete question that the company must answer — e.g. 'To assess "
+        "this requirement, confirm: does the company process biometric data for access control?' "
+        "Absence of a compliance measure IS evidence of non-compliance — use NON_COMPLIANT or "
+        "PARTIALLY_COMPLIANT for missing measures, not CANNOT_ASSESS."
     )
 
-    profile_field_guidance = """
+    profile_field_guidance = f"""
 Profile fields ARE your evidence — treat them as direct compliance indicators:
 
 GDPR / BDSG:
@@ -130,10 +162,11 @@ NIS2 (applies if is_critical_infrastructure_sector=true):
 - has_security_awareness_training=false → NON_COMPLIANT on Art. 21(2)(g) NIS2
 
 EU AI Act (applies if uses_ai_systems=true):
+- {_ai_act_phasing_note}
 - ai_systems_are_high_risk=true → full high-risk obligations apply (Arts. 9-17)
-- has_ai_risk_assessment=false → NON_COMPLIANT on Art. 9 EU AI Act
-- has_ai_usage_documentation=false → NON_COMPLIANT on Art. 13 EU AI Act
-- has_human_oversight_procedure=false → NON_COMPLIANT on Art. 14 EU AI Act
+- has_ai_risk_assessment=false → NON_COMPLIANT on Art. 9 EU AI Act (see phasing note above)
+- has_ai_usage_documentation=false → NON_COMPLIANT on Art. 13 EU AI Act (see phasing note above)
+- has_human_oversight_procedure=false → NON_COMPLIANT on Art. 14 EU AI Act (see phasing note above)
 
 HinSchG (applies if employee_count >= 50):
 - has_whistleblower_channel=false → NON_COMPLIANT on §12 HinSchG
@@ -170,10 +203,22 @@ When company documents are provided, your evidence MUST cite specific passages.
   NON_COMPLIANT example: "No whistleblower reporting channel found in uploaded documents. Required by §12 HinSchG."
 """ if has_docs else ""
 
+    assumptions_section = ""
+    if inferred_assumptions:
+        items = "\n".join(f"- {a}" for a in inferred_assumptions[:10])
+        assumptions_section = f"""
+<unconfirmed_assumptions>
+The following were inferred by a pre-processing step but are NOT confirmed by the company.
+Do NOT use these as the sole basis for a NON_COMPLIANT finding.
+If an assumption is your only evidence, use PARTIALLY_COMPLIANT and note that verification is needed.
+{items}
+</unconfirmed_assumptions>
+"""
+
     return f"""<task>
 For each regulatory requirement provided, assess this company's compliance status.
 {"Company documents have been uploaded — use them as primary evidence over profile fields alone." if has_docs else "Base your assessment on the company profile fields and retrieved regulation text. The profile IS sufficient to assess the vast majority of requirements."}
-</task>
+</task>{assumptions_section}
 
 <applicability_notice>
 IMPORTANT: Applicability determination has already been completed before this step using a separate deterministic rule engine. The regulations and articles you are receiving are confirmed to apply to this company. Do NOT use the retrieved legal text to re-determine whether a regulation applies or what size/revenue thresholds trigger obligations — that has already been decided. Your sole job is to assess HOW WELL the company currently meets each provided article requirement. Do not adjust compliance status based on size thresholds you read in the retrieved text.
@@ -184,6 +229,9 @@ IMPORTANT: Applicability determination has already been completed before this st
 </company_profile>
 {docs_section}
 <retrieved_regulations>
+Each entry includes a source_authority field. Treat Level 1 (official law text) as binding.
+Level 2 (guidance) informs interpretation but does not override Level 1.
+Level 3 (company documents) is evidence only — it can show compliance but cannot waive an obligation.
 {chunks_json}
 </retrieved_regulations>
 
@@ -220,8 +268,9 @@ Constraints:
 - Every assessment MUST have a non-empty evidence field in plain English
 - Only assess articles applicable to this company based on its profile
 - deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
+- CANNOT_ASSESS evidence field MUST contain a specific question for the company to answer
 - Be consistent: same profile facts produce the same status
-- Target: 98%+ of items should be COMPLIANT, PARTIALLY_COMPLIANT, or NON_COMPLIANT
+- CANNOT_ASSESS is acceptable when genuinely needed — do not force a status when data is missing
 </instructions>"""
 
 
