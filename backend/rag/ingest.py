@@ -157,7 +157,12 @@ def _strip_gesetze_noise(text: str) -> str:
     """
     text = re.sub(r'\bzum Seitenanfang\b\s*', "", text)
     text = re.sub(r'\bNichtamtliches Inhaltsverzeichnis\b[^\n]*', "", text)
+    text = re.sub(r'\bInhaltsübersicht\b[^\n]*', "", text)
     text = re.sub(r'\bSeite ausdrucken\b[^\n]*', "", text)
+    # Normalize non-breaking space between section number and title on the same line.
+    # gesetze-im-internet.de TOC entries use "§ N\xa0Title" — convert to "§ N\nTitle"
+    # so Format A regex can split section number from title correctly.
+    text = re.sub(r'(?m)(^§\s*\d+[a-z]?)\xa0', r'\1\n', text)
     # JS remnants and footer block — only strip from the last 1000 chars
     tail_start = max(0, len(text) - 1_000)
     head, tail = text[:tail_start], text[tail_start:]
@@ -421,6 +426,8 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
 
     elif regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "workplace_law", "agg", "milog") and path.suffix == ".txt":
         chunks = _chunk_german_law(text, regulation, name, url)
+        if not chunks:
+            chunks = _chunk_guidance(text, regulation, name, url)
 
     elif regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
         chunks = _chunk_eu_law(text, regulation, name, url)
@@ -428,7 +435,7 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
             chunks = _chunk_guidance(text, regulation, name, url)
 
     elif regulation == "compliance_guides" and path.suffix == ".txt":
-        if _RE_GERMAN_SECTION.search(text):
+        if _RE_GERMAN_A.search(text):
             chunks = _chunk_german_law(text, regulation, name, url)
             if not chunks:
                 chunks = _chunk_guidance(text, regulation, name, url)
