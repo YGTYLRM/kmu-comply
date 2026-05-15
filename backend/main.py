@@ -41,38 +41,61 @@ def _check_rate_limit(user_id: str) -> None:
     calls = [t for t in _analyze_calls[user_id] if now - t < ANALYZE_WINDOW]
     _analyze_calls[user_id] = calls
     if len(calls) >= ANALYZE_LIMIT:
-        raise HTTPException(status_code=429, detail="Rate limit reached. Maximum 10 screenings per hour.")
+        oldest = min(calls)
+        retry_in = int(ANALYZE_WINDOW - (now - oldest)) + 1
+        mins = retry_in // 60
+        secs = retry_in % 60
+        wait = f"{mins}m {secs}s" if mins else f"{secs}s"
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit reached — maximum {ANALYZE_LIMIT} screenings per hour. "
+                   f"Try again in {wait}.",
+            headers={"Retry-After": str(retry_in)},
+        )
     _analyze_calls[user_id].append(now)
 
 
-def _assert_owns_job(job_id: str, user_id: str) -> None:
+async def _assert_owns_job(job_id: str, user_id: str) -> None:
+    # Fast path: job was created in this process (in-progress or recently completed)
     owner = _job_owners.get(job_id)
+    if owner is None and settings.database_url:
+        # DB fallback: handles post-restart access to completed jobs
+        from services.db_service import get_job_owner
+        owner = await get_job_owner(job_id)
     if owner is None:
-        # Not in memory — check disk (handles post-restart scenario)
-        from services.report_store import get_owner
-        owner = get_owner(job_id)
-    if owner is None:
-        return  # truly legacy report with no recorded owner — allow
+        raise HTTPException(status_code=403, detail="Access denied.")
     if owner != user_id:
         raise HTTPException(status_code=403, detail="Access denied.")
 
 
+def _cleanup_orphaned_chroma_collections() -> None:
+    """Delete any per-job ChromaDB collections left over from a previous crashed process."""
+    try:
+        import chromadb
+        from rag.ingest import CHROMA_DIR
+        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        orphans = [c.name for c in client.list_collections() if c.name.startswith("job_")]
+        for name in orphans:
+            client.delete_collection(name)
+        if orphans:
+            import logging
+            logging.getLogger(__name__).info(
+                "startup: deleted %d orphaned job collections: %s", len(orphans), orphans
+            )
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("startup: orphan cleanup failed: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _cleanup_orphaned_chroma_collections()
     if settings.database_url:
         from db.database import init_db
         await init_db()
-    # Rebuild in-memory ownership map from persisted reports
-    from services.report_store import load_all_owners
-    _job_owners.update(load_all_owners())
     await job_manager.start()
-    # Start monitoring scheduler
-    from services.scheduler import start_scheduler
-    start_scheduler()
     yield
     await job_manager.stop()
-    from services.scheduler import stop_scheduler
-    stop_scheduler()
 
 
 app = FastAPI(
@@ -238,7 +261,7 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
 
 @app.get("/api/status/{job_id}", response_model=StatusResponse)
 async def get_status(job_id: str, current_user: dict = Depends(get_current_user)):
-    _assert_owns_job(job_id, current_user["id"])
+    await _assert_owns_job(job_id, current_user["id"])
     status = job_manager.get_status(job_id)
     if status is None:
         raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
@@ -247,7 +270,7 @@ async def get_status(job_id: str, current_user: dict = Depends(get_current_user)
 
 @app.get("/api/report/{job_id}", response_model=ComplianceReport)
 async def get_report(job_id: str, current_user: dict = Depends(get_current_user)):
-    _assert_owns_job(job_id, current_user["id"])
+    await _assert_owns_job(job_id, current_user["id"])
     report = job_manager.get_report(job_id)
     if report is None:
         status = job_manager.get_status(job_id)
@@ -262,7 +285,7 @@ async def get_report(job_id: str, current_user: dict = Depends(get_current_user)
 
 @app.get("/api/report/{job_id}/profile")
 async def get_profile(job_id: str, current_user: dict = Depends(get_current_user)):
-    _assert_owns_job(job_id, current_user["id"])
+    await _assert_owns_job(job_id, current_user["id"])
     from services.report_store import load_profile
     profile = load_profile(job_id)
     if profile is None:
@@ -276,7 +299,7 @@ async def generate_pdf_endpoint(job_id: str, current_user: dict = Depends(get_cu
     from fastapi.responses import Response
     from services.pdf_generator import generate_pdf as _gen_pdf
 
-    _assert_owns_job(job_id, current_user["id"])
+    await _assert_owns_job(job_id, current_user["id"])
     report = job_manager.get_report(job_id)
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found or not completed.")

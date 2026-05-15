@@ -72,7 +72,9 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
     prompt = profile_enrichment_prompt(profile.model_dump_json(indent=2))
     last_exc: Exception | None = None
 
-    for attempt in range(settings.llm_max_retries + 1):
+    import time
+    max_attempts = settings.llm_max_retries + 1
+    for attempt in range(max_attempts):
         try:
             response = _llm_client().messages.create(
                 model=settings.llm_model,
@@ -88,31 +90,35 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
                 raw = "\n".join(lines[1:end]).strip()
             data = json.loads(raw)
 
-            llm_chars: list[str] = data.get("inferred_characteristics", [])
-            llm_warnings: list[str] = data.get("validation_warnings", [])
-            llm_missing: list[str] = data.get("missing_optional_fields", [])
+            llm_chars: list[str]       = data.get("inferred_characteristics", [])
+            llm_assumptions: list[str] = data.get("inferred_assumptions", [])
+            llm_warnings: list[str]    = data.get("validation_warnings", [])
+            llm_missing: list[str]     = data.get("missing_optional_fields", [])
 
-            merged_missing = list(dict.fromkeys(missing + [f for f in llm_missing if f not in missing]))
-            merged_warnings = list(dict.fromkeys(warnings + [w for w in llm_warnings if w not in warnings]))
+            merged_missing   = list(dict.fromkeys(missing + [f for f in llm_missing if f not in missing]))
+            merged_warnings  = list(dict.fromkeys(warnings + [w for w in llm_warnings if w not in warnings]))
 
             return EnrichedCompanyProfile(
                 **profile.model_dump(),
                 inferred_characteristics=llm_chars,
+                inferred_assumptions=llm_assumptions,
                 missing_optional_fields=merged_missing,
                 validation_warnings=merged_warnings,
             )
 
         except json.JSONDecodeError as exc:
-            logger.warning("profiling: JSON parse error on attempt %d: %s", attempt + 1, exc)
+            logger.warning("profiling: JSON parse error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         except anthropic.APIError as exc:
-            logger.warning("profiling: API error on attempt %d: %s", attempt + 1, exc)
+            logger.warning("profiling: API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         except Exception as exc:
-            logger.warning("profiling: unexpected error on attempt %d: %s", attempt + 1, exc)
+            logger.warning("profiling: unexpected error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
+        if attempt < max_attempts - 1:
+            time.sleep(2 ** attempt)
 
-    logger.error("profiling: all %d attempts failed (%s), returning deterministic enrichment", settings.llm_max_retries + 1, last_exc)
+    logger.error("profiling: all %d attempts failed (%s), returning deterministic enrichment", max_attempts, last_exc)
     return EnrichedCompanyProfile(
         **profile.model_dump(),
         inferred_characteristics=[],
