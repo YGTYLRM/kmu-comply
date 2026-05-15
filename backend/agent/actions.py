@@ -276,11 +276,18 @@ def _compute_scores(
         if not reg_gaps:
             continue
         total = len(reg_gaps)
-        compliant = sum(1 for g in reg_gaps if g.status == ComplianceStatus.COMPLIANT)
-        partial = sum(1 for g in reg_gaps if g.status == ComplianceStatus.PARTIALLY_COMPLIANT)
+        compliant     = sum(1 for g in reg_gaps if g.status == ComplianceStatus.COMPLIANT)
+        partial       = sum(1 for g in reg_gaps if g.status == ComplianceStatus.PARTIALLY_COMPLIANT)
         non_compliant = sum(1 for g in reg_gaps if g.status == ComplianceStatus.NON_COMPLIANT)
-        cannot = sum(1 for g in reg_gaps if g.status == ComplianceStatus.CANNOT_ASSESS)
-        score = round((compliant * 100 + partial * 50 + cannot * 50) / total, 1)
+        cannot        = sum(1 for g in reg_gaps if g.status == ComplianceStatus.CANNOT_ASSESS)
+
+        # Compliance score: excludes CANNOT_ASSESS — unknown is not half-compliant
+        assessed = compliant + partial + non_compliant
+        score = round((compliant * 100 + partial * 50) / assessed, 1) if assessed else 0.0
+
+        # Assessment completeness: proportion of items that could be assessed
+        completeness = round(assessed / total * 100, 1) if total else 100.0
+
         scores.append(RegulationScore(
             regulation=reg_app.regulation,
             total_requirements=total,
@@ -289,6 +296,7 @@ def _compute_scores(
             non_compliant=non_compliant,
             cannot_assess=cannot,
             score_percent=score,
+            assessment_completeness_percent=completeness,
         ))
     return scores
 

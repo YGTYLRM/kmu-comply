@@ -43,6 +43,8 @@ class EnEfGResult:
 class CSRDResult:
     applies: bool
     criteria_met: int
+    wave: int | None   # 1 = PIE >500 employees; 2 = large not-Wave-1; 3 = listed SME; None = N/A
+    first_reporting_fy: int | None  # first fiscal year with reporting obligation
     reason: str
 
 
@@ -366,17 +368,16 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
         "before planning implementation."
     )
 
-    if profile.is_listed_company and not is_large:
-        reason = (
-            f"CSRD applies: listed company on EU-regulated market (Wave 3, postponed). "
-            f"First reporting year postponed to FY 2028 under Directive (EU) 2025/794."
-        )
-    elif is_large:
-        reason = (
-            f"CSRD applies: {criteria_met}/3 size criteria met ({'; '.join(met_list)}) "
-            f"(EU Directive 2022/2464, Art. 5).{stop_the_clock_note}"
-        )
-    else:
+    # Wave assignment per Directive (EU) 2025/794 stop-the-clock
+    # Wave 1: PIEs already subject to NFRD with >500 employees — FY2024, report 2025 (not postponed)
+    # Wave 2: Large companies (2/3 criteria) not in Wave 1 — postponed FY2027, report 2028
+    # Wave 3: Listed SMEs on EU-regulated markets — postponed FY2028, report 2029
+    is_pie_above_500 = profile.employee_count > 500 and profile.is_listed_company
+    wave: int | None = None
+    first_fy: int | None = None
+
+    if not applies:
+        wave, first_fy = None, None
         unmet_count = 3 - criteria_met
         reason = (
             f"CSRD does not apply: only {criteria_met}/3 size criteria met"
@@ -384,8 +385,28 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
             + f" — 2/3 required. {unmet_count} criteria not met "
             + f"(EU Directive 2022/2464, Art. 5)."
         )
+    elif is_pie_above_500:
+        wave, first_fy = 1, 2024
+        reason = (
+            f"CSRD applies as Wave 1 (PIE with >500 employees): first reporting FY 2024 "
+            f"(report published 2025). Not postponed by Directive (EU) 2025/794."
+        )
+    elif is_large:
+        wave, first_fy = 2, 2027
+        reason = (
+            f"CSRD applies as Wave 2: {criteria_met}/3 size criteria met ({'; '.join(met_list)}) "
+            f"(EU Directive 2022/2464, Art. 5). First reporting year: FY 2027 (report 2028) "
+            f"per Directive (EU) 2025/794 stop-the-clock. Verify your specific wave with your auditor."
+        )
+    else:
+        wave, first_fy = 3, 2028
+        reason = (
+            f"CSRD applies as Wave 3 (listed SME on EU-regulated market). "
+            f"First reporting year postponed to FY 2028 (report 2029) "
+            f"under Directive (EU) 2025/794."
+        )
 
-    return CSRDResult(applies=applies, criteria_met=criteria_met, reason=reason)
+    return CSRDResult(applies=applies, criteria_met=criteria_met, wave=wave, first_reporting_fy=first_fy, reason=reason)
 
 
 def check_bdsg(profile: CompanyProfile) -> BDSGResult:
@@ -423,8 +444,39 @@ def check_bdsg(profile: CompanyProfile) -> BDSGResult:
 
 # ── New Tier 1 regulations ─────────────────────────────────────────────────────
 
-_NIS2_CRITICAL_INDUSTRIES = {
-    "energy", "finance", "healthcare", "logistics", "it_software",
+# BSIG Annex I — besonders kritische Sektoren (highly critical, §28(6) BSIG)
+# Mirrors NIS2 Annex I categories translated to Complio industry strings
+_NIS2_ANNEX_I = {
+    "energy",        # Energie (electricity, gas, oil, hydrogen)
+    "transport",     # Verkehr (air, rail, water, road)
+    "finance",       # Bankwesen + Finanzmarktinfrastrukturen
+    "healthcare",    # Gesundheit (hospitals, labs, pharma, medical devices)
+    "water",         # Trinkwasser + Abwasser
+    "digital",       # Digitale Infrastruktur (DNS, IXPs, cloud, datacenters, CDN)
+    "it_software",   # IKT-Dienstleistungsmanagement (managed services, security)
+    "space",         # Raumfahrt
+    "government",    # Öffentliche Verwaltung (central/regional)
+}
+
+# BSIG Annex II — wichtige Sektoren (important, §28(7) BSIG)
+_NIS2_ANNEX_II = {
+    "manufacturing",   # Verarbeitendes Gewerbe (medical devices, electronics, machinery, vehicles)
+    "chemicals",       # Chemische Industrie
+    "food_beverage",   # Lebensmittel (production and distribution)
+    "logistics",       # Post- und Kurierdienste
+    "waste",           # Abfallwirtschaft
+    "construction",    # Digitale Anbieter (online marketplaces, search engines, platforms)
+    "research",        # Forschung (research organisations)
+}
+
+# Combined set for initial sector check
+_NIS2_CRITICAL_INDUSTRIES = _NIS2_ANNEX_I | _NIS2_ANNEX_II
+
+# Industries that are definitively NOT in NIS2 scope (to support CANNOT_ASSESS path)
+_NIS2_OUT_OF_SCOPE = {
+    "retail",      # Einzelhandel — not listed in Annex I or II
+    "consulting",  # Unternehmensberatung — not listed unless providing IT/security services
+    "other",       # Unknown — cannot determine
 }
 
 
@@ -443,17 +495,29 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
 
     Source: NIS2 Art. 2, 3; BSIG §28(6), §28(7); BSI sector guidance.
     """
-    in_critical_sector = (
-        profile.is_critical_infrastructure_sector
-        or profile.industry in _NIS2_CRITICAL_INDUSTRIES
-    )
+    in_annex_i   = profile.is_critical_infrastructure_sector or profile.industry in _NIS2_ANNEX_I
+    in_annex_ii  = profile.industry in _NIS2_ANNEX_II
+    in_any_scope = in_annex_i or in_annex_ii
+    ambiguous    = profile.industry not in _NIS2_CRITICAL_INDUSTRIES and profile.industry not in _NIS2_OUT_OF_SCOPE
 
-    if not in_critical_sector:
+    if ambiguous and not profile.is_critical_infrastructure_sector:
+        return NIS2Result(
+            applies=False, particularly_important=False, important=False,
+            reason=(
+                f"NIS2 sector classification cannot be determined for industry '{profile.industry}'. "
+                f"NIS2 / BSIG applies to 18 specific sector categories (Annex I and II). "
+                f"Consult BSI sector guidance to confirm whether your company falls under "
+                f"§28(6) or §28(7) BSIG. Set 'is_critical_infrastructure_sector=true' if "
+                f"your company has been designated as a KRITIS operator."
+            ),
+        )
+
+    if not in_any_scope:
         return NIS2Result(
             applies=False, particularly_important=False, important=False,
             reason=(
                 f"NIS2 does not apply: industry '{profile.industry}' is not in a critical "
-                f"or important sector under NIS2 Art. 3, and no KRITIS designation set."
+                f"or important sector under NIS2 Annex I or II / BSIG, and no KRITIS designation set."
             ),
         )
 
@@ -466,8 +530,12 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
         or (profile.annual_revenue_eur is not None and profile.annual_revenue_eur >= 10_000_000)
     )
 
-    # besonders wichtige Einrichtung: size threshold OR KRITIS operator status
-    is_particularly_important = is_large or profile.is_critical_infrastructure_sector
+    # besonders wichtige Einrichtung: Annex I sector + large, OR KRITIS operator
+    is_particularly_important = (in_annex_i and is_large) or profile.is_critical_infrastructure_sector
+    # wichtige Einrichtung: Annex I medium OR Annex II large/medium
+    is_important_entity = (not is_particularly_important) and (
+        (in_annex_i and is_medium) or (in_annex_ii and is_medium)
+    )
 
     if is_particularly_important:
         kritis_note = (
@@ -490,12 +558,13 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
                 f"Full BSIG obligations apply (§28(6) BSIG / Art. 3(1) NIS2).{revenue_caveat}"
             ),
         )
-    if is_medium:
+    if is_important_entity:
+        annex = "Annex I" if in_annex_i else "Annex II"
         return NIS2Result(
             applies=True, particularly_important=False, important=True,
             reason=(
                 f"NIS2 (BSIG) applies as wichtige Einrichtung: "
-                f"{profile.employee_count} employees in critical/important sector. "
+                f"{profile.employee_count} employees in {annex} sector '{profile.industry}'. "
                 f"Security and incident reporting obligations apply (§28(7) BSIG / Art. 3(2) NIS2)."
             ),
         )
@@ -504,7 +573,7 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
         applies=False, particularly_important=False, important=False,
         reason=(
             f"NIS2 does not apply: below size thresholds (< 50 employees, < 10M revenue) "
-            f"for the identified sector. Small enterprises generally exempt (Art. 2(2) NIS2)."
+            f"for the identified sector (NIS2 Art. 2(2)). Small enterprises generally exempt."
         ),
     )
 
@@ -725,7 +794,10 @@ def determine_applicable_regulations(
             regulation=Regulation.CSRD,
             applies=csrd.applies,
             reason=csrd.reason,
-            key_threshold="2 of 3: >250 employees, >50M revenue, >25M balance sheet",
+            key_threshold=(
+                f"2 of 3: >250 employees, >50M revenue, >25M balance sheet"
+                + (f" — Wave {csrd.wave}, first FY {csrd.first_reporting_fy}" if csrd.wave else "")
+            ),
         ),
         RegulationApplicability(
             regulation=Regulation.BDSG,

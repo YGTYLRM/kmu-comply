@@ -207,6 +207,10 @@ async def fetch_and_stage_updates() -> list[str]:
     return pending
 
 
+# Annex-I regulations require a second approver before KB update goes live
+_ANNEX_I_REGULATIONS = {"gdpr", "nis2", "eu_ai_act", "csrd", "lksg"}
+
+
 async def _create_pending(
     regulation: str,
     source_url: str,
@@ -219,13 +223,15 @@ async def _create_pending(
     from db.models import PendingRegulationUpdate
     from sqlalchemy import select
 
+    needs_second = regulation in _ANNEX_I_REGULATIONS
+
     async with AsyncSessionLocal() as db:
         # Don't create a duplicate if the same hash is already pending
         existing = (await db.execute(
             select(PendingRegulationUpdate).where(
                 PendingRegulationUpdate.regulation == regulation,
                 PendingRegulationUpdate.new_hash == new_hash,
-                PendingRegulationUpdate.status == "pending",
+                PendingRegulationUpdate.status.in_(["pending", "awaiting_second"]),
             )
         )).scalar_one_or_none()
         if existing:
@@ -237,11 +243,12 @@ async def _create_pending(
             previous_hash=previous_hash,
             staging_path=staging_path,
             change_summary=change_summary,
+            requires_second_approval=needs_second,
         ))
         await db.commit()
 
 
-async def approve_update(update_id: str) -> dict:
+async def approve_update(update_id: str, approver_identity: str = "admin", approver_ip: str = "") -> dict:
     """
     Approve a pending regulation update:
     1. Copy staging file to production regulations directory
@@ -259,14 +266,42 @@ async def approve_update(update_id: str) -> dict:
         )).scalar_one_or_none()
         if not row:
             raise ValueError(f"Update {update_id} not found")
-        if row.status != "pending":
+        if row.status not in ("pending", "awaiting_second"):
             raise ValueError(f"Update {update_id} is already {row.status}")
+
+        now = datetime.now(timezone.utc)
+
+        # First approval for Annex-I regulations (requires second approval before ingestion)
+        if row.requires_second_approval and not row.first_approved_by:
+            row.first_approved_by = approver_identity
+            row.first_approved_at = now
+            row.first_approver_ip = approver_ip
+            row.status            = "awaiting_second"
+            await db.commit()
+            return {
+                "regulation": row.regulation,
+                "status": "awaiting_second",
+                "message": (
+                    f"First approval by {approver_identity} recorded. "
+                    f"{row.regulation} is an Annex-I regulation — a second different approver must confirm."
+                ),
+            }
+
+        # Prevent the same person approving twice
+        if row.requires_second_approval and row.first_approved_by == approver_identity:
+            raise ValueError(
+                f"Second approval must come from a different approver. "
+                f"First approval was by {row.first_approved_by}."
+            )
+
+        if row.requires_second_approval:
+            row.second_approved_by = approver_identity
+            row.second_approved_at = now
 
         staging = Path(row.staging_path)
         if not staging.exists():
             raise FileNotFoundError(f"Staging file missing: {staging}")
 
-        # Find the destination filename from REGULATION_SOURCES
         src = next((s for s in REGULATION_SOURCES if s["regulation"] == row.regulation), None)
         if not src:
             raise ValueError(f"Unknown regulation: {row.regulation}")
@@ -276,17 +311,22 @@ async def approve_update(update_id: str) -> dict:
         prod_file = prod_dir / src["dest_filename"]
         prod_file.write_text(staging.read_text(encoding="utf-8"), encoding="utf-8")
 
-        # Re-ingest
         loop = asyncio.get_event_loop()
         def _ingest():
             from rag.ingest import ingest_regulation
             return ingest_regulation(row.regulation, reset=True)
         chunk_count = await loop.run_in_executor(None, _ingest)
 
-        # Mark approved
+        if not row.first_approved_by:
+            row.first_approved_by = approver_identity
+            row.first_approved_at = now
+            row.first_approver_ip = approver_ip
         row.status      = "approved"
-        row.reviewed_at = datetime.now(timezone.utc)
-        row.change_summary = (row.change_summary or "") + f" | Approved: {chunk_count} chunks ingested."
+        row.reviewed_at = now
+        row.change_summary = (
+            (row.change_summary or "")
+            + f" | Approved by {approver_identity} (IP: {approver_ip}): {chunk_count} chunks ingested."
+        )
         await db.commit()
 
         # Clean up staging file
