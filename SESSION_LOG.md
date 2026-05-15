@@ -4,6 +4,40 @@ This file is appended after every working session. It documents what was built, 
 
 ---
 
+## Session 24 — 2026-05-15 — Second evaluator fix pass (13 remaining issues from re-evaluation)
+
+### Fixes implemented
+- profile_raw column on companies table; load_profile reads DB first, disk fallback
+- Production startup checks: hard-fail on ENVIRONMENT=production if CHROMA_SERVER_URL/
+  DOCUMENT_ENCRYPTION_KEY/ADMIN_API_KEY/DATABASE_URL unset
+- docker-compose: backend+worker use CHROMA_SERVER_URL, named volumes, worker service added
+- NIS2 taxonomy: expanded from 5 strings to full BSIG Annex I/II (17 categories); Annex I vs II
+  distinction; CANNOT_ASSESS path for ambiguous sectors
+- CSRD wave cohort: Wave 1 (PIE >500), Wave 2 (large, FY2027), Wave 3 (listed SME, FY2028)
+- CANNOT_ASSESS no longer counts toward compliance score; separate assessment_completeness_percent
+- Feature gating: template generation (Professional+), expert review (Professional+)
+- Admin audit trail: first/second approver identity + IP logged; Annex-I regulations require
+  two different approvers before KB ingestion
+- Sentry SDK integrated; /api/health returns real subsystem status
+- Partial report PDF blocked by confirmation modal with failed step list
+- Job manager: DB-backed persistence (jobs table); crash recovery on startup;
+  step transitions written to DB; async status lookup falls back to DB
+- Hybrid retrieval: BM25 + dense vector (70/30 split); per-collection tuned k;
+  similarity floor 0.35 drops irrelevant chunks
+- Annual billing plans: starter_annual (€470/yr), professional_annual (€1,430/yr),
+  report_credit (€19 one-time); checkout handles subscription vs one-time payment
+- LLM-based injection classifier (claude-haiku): runs on document upload and after
+  PDF text extraction; keyword pre-filter; non-fatal on failure
+
+### Still not fixed (require external action or product decisions)
+- Lawyer review of threshold rules (external)
+- Expert review as a real paid tier (needs partner network)
+- Obligation-catalog-driven RAG (architectural rework)
+- Observability dashboards beyond Sentry (admin tooling)
+- Market focus narrowing (product decision)
+
+---
+
 ## Session 23 — 2026-05-15 — Full evaluator fix pass (24 issues from 3 evaluations)
 
 ### Summary
