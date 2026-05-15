@@ -113,6 +113,39 @@ async def _assert_owns_job(job_id: str, user_id: str) -> None:
         raise HTTPException(status_code=403, detail="Access denied.")
 
 
+def _check_production_config() -> None:
+    """Hard-fail on startup if critical env vars are missing in production."""
+    if settings.environment != "production":
+        return
+    errors = []
+    if not settings.chroma_server_url:
+        errors.append(
+            "CHROMA_SERVER_URL must be set in production — ChromaDB embedded mode "
+            "is single-writer and will corrupt under concurrent access."
+        )
+    if not settings.document_encryption_key:
+        errors.append(
+            "DOCUMENT_ENCRYPTION_KEY must be set in production — without it, "
+            "uploaded documents use an ephemeral key lost on restart."
+        )
+    if not settings.admin_api_key:
+        errors.append(
+            "ADMIN_API_KEY must be set in production — without it, the regulation "
+            "update approval API is inaccessible."
+        )
+    if not settings.database_url:
+        errors.append(
+            "DATABASE_URL must be set in production — rate limiting, report "
+            "persistence, and job ownership require PostgreSQL."
+        )
+    if errors:
+        import sys
+        print("\n[STARTUP ERROR] Production config validation failed:\n", file=sys.stderr)
+        for e in errors:
+            print(f"  ✗ {e}\n", file=sys.stderr)
+        sys.exit(1)
+
+
 def _cleanup_orphaned_chroma_collections() -> None:
     """Delete any per-job ChromaDB collections left over from a previous crashed process."""
     try:
@@ -134,6 +167,7 @@ def _cleanup_orphaned_chroma_collections() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _check_production_config()
     _cleanup_orphaned_chroma_collections()
     if settings.database_url:
         from db.database import init_db
@@ -587,6 +621,11 @@ class ExpertReviewRequestBody(BaseModel):
 async def request_expert_review(req: ExpertReviewRequestBody, current_user: dict = Depends(get_current_user)):
     """Submit a request for expert review of a compliance report."""
     await _assert_owns_job(req.job_id, current_user["id"])
+    if settings.stripe_enabled:
+        from services.stripe_service import check_feature_access
+        allowed, reason = await check_feature_access(current_user["id"], "expert_review")
+        if not allowed:
+            raise HTTPException(status_code=402, detail=reason)
 
     from services.report_store import load_profile
     profile = load_profile(req.job_id)
@@ -686,6 +725,11 @@ async def list_templates():
 async def generate_template(job_id: str, template_id: str, current_user: dict = Depends(get_current_user)):
     """Generate a compliance document template personalised to a completed report's company profile."""
     await _assert_owns_job(job_id, current_user["id"])
+    if settings.stripe_enabled:
+        from services.stripe_service import check_feature_access
+        allowed, reason = await check_feature_access(current_user["id"], "templates")
+        if not allowed:
+            raise HTTPException(status_code=402, detail=reason)
     from services.report_store import load_profile
     from services.template_generator import generate_template as _gen
     import json
@@ -945,11 +989,13 @@ async def list_regulation_updates(_: None = Depends(_require_admin)):
 
 
 @app.post("/api/admin/regulation-updates/{update_id}/approve")
-async def approve_regulation_update(update_id: str, _: None = Depends(_require_admin)):
-    """Approve a staged regulation update — copies to production and re-ingests."""
+async def approve_regulation_update(update_id: str, request: Request, x_admin_key: str = Header(None)):
+    """Approve a staged regulation update — copies to production and re-ingests. Records approver IP."""
+    _require_admin(x_admin_key)
     from services.regulation_updater import approve_update
+    approver_ip = request.client.host if request.client else "unknown"
     try:
-        result = await approve_update(update_id)
+        result = await approve_update(update_id, approver_identity=x_admin_key[:8] + "...", approver_ip=approver_ip)
         return {"ok": True, **result}
     except (ValueError, FileNotFoundError) as exc:
         raise HTTPException(status_code=400, detail=str(exc))

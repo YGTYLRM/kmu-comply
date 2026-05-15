@@ -26,6 +26,7 @@ class RegulatoryChunk(BaseModel):
     applicable_to: list[str] = Field(default_factory=list)
     threshold: Optional[str] = None
     source_url: Optional[str] = None
+    document_type: str = "law"  # "law" | "guidance" — controls source authority in prompts
 
 
 class ComplianceGap(BaseModel):
@@ -35,6 +36,9 @@ class ComplianceGap(BaseModel):
     status: ComplianceStatus
     evidence: str = Field(..., description="Explanation of WHY this status was assigned")
     deficiency_description: Optional[str] = None
+    confidence: str = "HIGH"          # HIGH | MEDIUM | LOW
+    confidence_reason: Optional[str] = None
+    source_url: Optional[str] = None  # official source URL for this regulation
 
 
 class ActionItem(BaseModel):
@@ -42,6 +46,7 @@ class ActionItem(BaseModel):
     article_number: str
     action: str
     priority: Priority
+    source_url: Optional[str] = None  # official source URL for this regulation
     estimated_effort: str = Field(
         ..., description="e.g., '2-4 hours', '1-2 weeks', '1 FTE-month'"
     )
@@ -57,7 +62,11 @@ class RegulationScore(BaseModel):
     partially_compliant: int
     non_compliant: int
     cannot_assess: int
+    # compliance_score: only counts COMPLIANT/PARTIALLY_COMPLIANT/NON_COMPLIANT (excludes CANNOT_ASSESS)
+    # CANNOT_ASSESS items do NOT contribute — unknown compliance is not half-compliance
     score_percent: float = Field(..., ge=0, le=100)
+    # assessment_completeness: ratio of assessed items (CANNOT_ASSESS lowers this, not the score)
+    assessment_completeness_percent: float = Field(default=100.0, ge=0, le=100)
 
 
 class ComplianceReport(BaseModel):
@@ -68,6 +77,7 @@ class ComplianceReport(BaseModel):
     # Section 2 — profile summary
     applicable_regulations: list[RegulationApplicability]
     inferred_characteristics: list[str]
+    inferred_assumptions: list[str] = Field(default_factory=list)
     missing_optional_fields: list[str]
     validation_warnings: list[str]
 
@@ -84,6 +94,12 @@ class ComplianceReport(BaseModel):
 
     # Section 1 — executive summary (assembled last)
     executive_summary: str = Field(default="")
+
+    # Profile completeness
+    profile_completeness: Optional[dict] = None
+
+    # Knowledge base versioning — maps regulation → {fetched_at, source_file_hash, source_url}
+    knowledge_base_versions: Optional[dict] = None
 
     # Meta
     disclaimer: str = Field(
