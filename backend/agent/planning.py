@@ -116,7 +116,10 @@ def run_gap_analysis(
             if doc_chunks:
                 company_docs_json = _doc_chunks_to_json(doc_chunks)
 
-        prompt = gap_analysis_prompt(profile_json, chunks_json, company_docs_json)
+        prompt = gap_analysis_prompt(
+            profile_json, chunks_json, company_docs_json,
+            inferred_assumptions=getattr(profile, "inferred_assumptions", []),
+        )
         gaps = _llm_call(prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures)
         all_gaps.extend(gaps)
 
@@ -178,14 +181,17 @@ def _build_query(profile: EnrichedCompanyProfile, regulation: Regulation) -> str
     if regulation == Regulation.BDSG:
         return f"BDSG Bundesdatenschutzgesetz data protection {base}"
     if regulation == Regulation.NIS2:
-        entity = "essential entity" if profile.employee_count >= 250 else "important entity"
-        return f"NIS2 cybersecurity risk management incident reporting {entity} {base}"
+        entity = "besonders wichtige Einrichtung" if profile.employee_count >= 250 else "wichtige Einrichtung"
+        return f"NIS2 BSIG cybersecurity risk management incident reporting {entity} {base}"
     if regulation == Regulation.AI_ACT:
         return f"EU AI Act high-risk AI system deployer transparency human oversight obligations {base}"
     if regulation == Regulation.HINSCHG:
         return f"HinSchG Hinweisgeberschutzgesetz whistleblower internal reporting channel {base}"
     if regulation == Regulation.ARBSCHG:
-        return f"ArbSchG Gefaehrdungsbeurteilung risk assessment documentation employer {base}"
+        return (
+            f"ArbSchG ArbZG MuSchG JArbSchG BUrlG BBiG AEntG workplace law "
+            f"Gefaehrdungsbeurteilung risk assessment working time employee protection {base}"
+        )
     if regulation == Regulation.AGG:
         return f"AGG Gleichbehandlung anti-discrimination employer obligations complaints {base}"
     if regulation == Regulation.MILOG:
@@ -228,6 +234,7 @@ def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
                 applicable_to=raw_applicable,
                 threshold=c.get("threshold"),
                 source_url=c.get("source_url"),
+                document_type=c.get("document_type", "law"),
             ))
         except Exception as exc:
             logger.warning("could not parse retrieval chunk: %s", exc)
@@ -242,19 +249,29 @@ def _reg_from_key(reg_key: str) -> Regulation:
 
 
 def _doc_chunks_to_json(chunks: list[dict]) -> str:
-    import json
+    from rag.prompts import _sanitize
     parts = []
     for c in chunks:
+        safe_text   = _sanitize(c.get("text", ""), max_len=800)
+        safe_source = _sanitize(c.get("source", "uploaded document"), max_len=100)
         parts.append(
-            f"[Source: {c.get('source', 'uploaded document')}]\n{c['text'][:800]}"
+            f"[Level 3 — Company document (evidence only, not legal authority) | "
+            f"Source: {safe_source}]\n{safe_text}"
         )
     return "\n\n---\n\n".join(parts)
+
+
+_SOURCE_AUTHORITY: dict[str, str] = {
+    "law":      "Level 1 — Official law text (binding)",
+    "guidance": "Level 2 — Regulatory guidance (authoritative interpretation)",
+}
 
 
 def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:
     return json.dumps(
         [
             {
+                "source_authority": _SOURCE_AUTHORITY.get(c.document_type, "Level 1 — Official law text (binding)"),
                 "regulation": c.regulation.value,
                 "article_number": c.article_number,
                 "title": c.title,
