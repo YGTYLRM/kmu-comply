@@ -18,8 +18,10 @@ Collection → directory mapping:
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import chromadb
@@ -52,7 +54,8 @@ REGULATION_COLLECTIONS: dict[str, str] = {
     "nis2":             "nis2",
     "eu_ai_act":        "eu_ai_act",
     "hinschg":          "hinschg",
-    "arbschg":          "arbschg",
+    "workplace_law":    "workplace_law",
+    "arbschg":          "workplace_law",  # alias: collection renamed from arbschg
     "agg":              "agg",
     "milog":            "milog",
 }
@@ -67,6 +70,7 @@ OFFICIAL_URLS: dict[str, str] = {
     "nis2":             "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022L2555",
     "eu_ai_act":        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202401689",
     "hinschg":          "https://www.gesetze-im-internet.de/hinschg/",
+    "workplace_law":    "https://www.gesetze-im-internet.de/arbschg/",
     "arbschg":          "https://www.gesetze-im-internet.de/arbschg/",
     "agg":              "https://www.gesetze-im-internet.de/agg/",
     "milog":            "https://www.gesetze-im-internet.de/milog/",
@@ -104,9 +108,19 @@ def _load(path: Path) -> str:
 # Chunkers
 # ---------------------------------------------------------------------------
 
-# German § sections (BDSG, LkSG, EnEfG)
-_RE_GERMAN_SECTION = re.compile(
+# Format A — standard gesetze-im-internet.de layout: § N\n then title on next line
+# The lookahead requires \n after the number so mid-body cross-refs (§ 26 Abs. 2\n...) don't
+# falsely terminate a section.
+_RE_GERMAN_A = re.compile(
     r"(?m)^§\s{1,3}(\d+[a-z]?)\s*\n(.*?)(?=^§\s{1,3}\d+[a-z]?\s*\n|\Z)",
+    re.DOTALL,
+)
+
+# Format B — SGB books layout: § [NBSP]NTitle all on one line.
+# The title starts immediately after the section number (no separator), so we capture
+# everything up to the end of the line with ([^\n]*).
+_RE_GERMAN_B = re.compile(
+    r"(?m)^§[ \t\xa0]{0,3}(\d+[a-z]?)([^\n]*)\n(.*?)(?=^§[ \t\xa0]{0,3}\d+[a-z]?|\Z)",
     re.DOTALL,
 )
 
@@ -130,6 +144,26 @@ _RE_SECTION = re.compile(
 
 # Sub-paragraph markers for oversized articles
 _RE_ABSATZ = re.compile(r"(?m)^\(\d+\)")
+
+# Minimum useful chunk size — below this a chunk has no retrievable legal content
+MIN_CHUNK_CHARS = 150
+
+def _strip_gesetze_noise(text: str) -> str:
+    """Remove navigation links and JS remnants from gesetze-im-internet.de downloads.
+
+    These strings appear after every section as in-page nav links — they must be
+    removed inline, not by cutting at their position, because large files (SGB, etc.)
+    contain hundreds of them scattered throughout.
+    """
+    text = re.sub(r'\bzum Seitenanfang\b\s*', "", text)
+    text = re.sub(r'\bNichtamtliches Inhaltsverzeichnis\b[^\n]*', "", text)
+    text = re.sub(r'\bSeite ausdrucken\b[^\n]*', "", text)
+    # JS remnants and footer block — only strip from the last 1000 chars
+    tail_start = max(0, len(text) - 1_000)
+    head, tail = text[:tail_start], text[tail_start:]
+    tail = re.sub(r'(Impressum|Datenschutz|Barrierefreiheitserkl|Feedback-Formular).*', "", tail, flags=re.DOTALL)
+    tail = re.sub(r'["\']?\s*\)\s*/\*.*?\*/\s*//.*', "", tail, flags=re.DOTALL)
+    return head + tail.rstrip()
 
 
 def _split_oversized(text: str, header: str) -> list[str]:
@@ -196,21 +230,52 @@ def _make_chunk(
 
 
 def _chunk_german_law(text: str, regulation: str, filename: str, url: str) -> list[dict]:
-    # Collect all matches first, then deduplicate by section number keeping the longest.
-    # gesetze-im-internet.de pages contain both a TOC and the full text, so each § N
-    # appears twice — once as a short TOC entry and once with its actual content.
+    text = _strip_gesetze_noise(text)
+
+    # Choose format by counting valid matches from each regex.
+    # Format B wins if it produces at least 2× more valid-body matches than Format A —
+    # which reliably distinguishes SGB-style files from standard short laws.
+    format_a_matches = [m for m in _RE_GERMAN_A.finditer(text) if len(m.group(2).strip()) >= 80]
+    format_b_matches = [m for m in _RE_GERMAN_B.finditer(text) if len(m.group(3).strip()) >= 80]
+    use_format_b = len(format_b_matches) > len(format_a_matches) * 2
+
     best: dict[str, dict] = {}
-    for m in _RE_GERMAN_SECTION.finditer(text):
-        num = m.group(1)
-        body = m.group(2).strip()
-        if len(body) < 80:
-            continue
-        lines = body.splitlines()
-        title = lines[0].strip() if lines else f"§ {num}"
-        full = f"§ {num} {title}\n\n{body}"
-        key = f"§ {num}"
-        if key not in best or len(full) > len(best[key]["text"]):
-            best[key] = {"text": full, "title": title, "num": num}
+
+    if use_format_b:
+        for m in _RE_GERMAN_B.finditer(text):
+            num = m.group(1)
+            inline_title = m.group(2).strip()
+            body = m.group(3).strip()
+            if len(body) < 80:
+                continue
+            raw_title = inline_title or f"§ {num}"
+            if raw_title == "(weggefallen)" or raw_title.startswith("(weggefallen)"):
+                continue
+            abs_match = re.search(r'\s*\(\s*1\s*\)', raw_title)
+            title = (raw_title[:abs_match.start()].strip() if abs_match else raw_title[:120]).strip() or f"§ {num}"
+            full = f"§ {num} {title}\n\n{body}"
+            key = f"§ {num}"
+            if key not in best or len(full) > len(best[key]["text"]):
+                best[key] = {"text": full, "title": title, "num": num}
+    else:
+        # Collect all Format A matches, deduplicate by section number keeping longest.
+        # gesetze-im-internet.de pages contain both a TOC and the full text, so each § N
+        # appears twice — once as a short TOC entry and once with its actual content.
+        for m in _RE_GERMAN_A.finditer(text):
+            num = m.group(1)
+            body = m.group(2).strip()
+            if len(body) < 80:
+                continue
+            lines = body.splitlines()
+            raw_title = lines[0].strip() if lines else f"§ {num}"
+            if raw_title == "(weggefallen)" or raw_title.startswith("(weggefallen)"):
+                continue
+            abs_match = re.search(r'\s*\(\s*1\s*\)', raw_title)
+            title = (raw_title[:abs_match.start()].strip() if abs_match else raw_title[:120]).strip() or f"§ {num}"
+            full = f"§ {num} {title}\n\n{body}"
+            key = f"§ {num}"
+            if key not in best or len(full) > len(best[key]["text"]):
+                best[key] = {"text": full, "title": title, "num": num}
 
     chunks: list[dict] = []
     for key, item in best.items():
@@ -319,6 +384,32 @@ def _chunk_fixed(text: str, regulation: str, filename: str, url: str) -> list[di
 # Routing
 # ---------------------------------------------------------------------------
 
+def _stamp_provenance(chunks: list[dict], path: Path) -> list[dict]:
+    """Add source versioning metadata to every chunk from a given file.
+
+    Fields added:
+      fetched_at       — ISO-8601 UTC timestamp of the file's last modification
+                         (proxy for when the source was downloaded / last updated)
+      source_file_hash — first 16 hex chars of SHA-256 of the raw file bytes;
+                         changes when the source document is updated
+      content_hash     — first 16 hex chars of SHA-256 of the chunk text;
+                         used for section-level change detection in the scheduler
+    """
+    raw = path.read_bytes()
+    file_hash = hashlib.sha256(raw).hexdigest()[:16]
+    fetched_at = datetime.fromtimestamp(
+        path.stat().st_mtime, tz=timezone.utc
+    ).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    for chunk in chunks:
+        text = chunk["text"]
+        chunk["metadata"]["fetched_at"] = fetched_at
+        chunk["metadata"]["source_file_hash"] = file_hash
+        chunk["metadata"]["content_hash"] = hashlib.sha256(text.encode()).hexdigest()[:16]
+
+    return chunks
+
+
 def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     url = OFFICIAL_URLS.get(regulation, "")
     text = _load(path)
@@ -326,24 +417,28 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
 
     # Structured expanded files (any regulation) — split on '---' blocks
     if "_expanded" in path.stem:
-        return _chunk_separator_blocks(text, regulation, name, url)
+        chunks = _chunk_separator_blocks(text, regulation, name, url)
 
-    if regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "agg", "milog") and path.suffix == ".txt":
-        return _chunk_german_law(text, regulation, name, url)
+    elif regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "workplace_law", "agg", "milog") and path.suffix == ".txt":
+        chunks = _chunk_german_law(text, regulation, name, url)
 
-    if regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
+    elif regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
         chunks = _chunk_eu_law(text, regulation, name, url)
-        return chunks if chunks else _chunk_guidance(text, regulation, name, url)
+        if not chunks:
+            chunks = _chunk_guidance(text, regulation, name, url)
 
-    # For compliance_guides text files that look like German law (contain § sections),
-    # use the German law chunker so § N sections are properly split
-    if regulation == "compliance_guides" and path.suffix == ".txt":
+    elif regulation == "compliance_guides" and path.suffix == ".txt":
         if _RE_GERMAN_SECTION.search(text):
             chunks = _chunk_german_law(text, regulation, name, url)
-            if chunks:
-                return chunks
+            if not chunks:
+                chunks = _chunk_guidance(text, regulation, name, url)
+        else:
+            chunks = _chunk_guidance(text, regulation, name, url)
 
-    return _chunk_guidance(text, regulation, name, url)
+    else:
+        chunks = _chunk_guidance(text, regulation, name, url)
+
+    return _stamp_provenance(chunks, path)
 
 
 # ---------------------------------------------------------------------------
@@ -371,7 +466,9 @@ def ingest_regulation(
     Returns total number of chunks indexed.
     """
     collection_name = REGULATION_COLLECTIONS[regulation]
-    source_dir = source_dir or (DATA_DIR / regulation)
+    if source_dir is None:
+        # workplace_law data lives in the arbschg/ folder on disk (folder name unchanged)
+        source_dir = DATA_DIR / ("arbschg" if regulation == "workplace_law" else regulation)
 
     if not source_dir.exists():
         raise FileNotFoundError(f"Source directory not found: {source_dir}")
@@ -406,6 +503,12 @@ def ingest_regulation(
         if not chunks:
             logger.warning("  No chunks from %s", path.name)
             continue
+
+        before = len(chunks)
+        chunks = [c for c in chunks if len(c["text"]) >= MIN_CHUNK_CHARS]
+        dropped = before - len(chunks)
+        if dropped:
+            logger.info("  Dropped %d stub chunk(s) under %d chars", dropped, MIN_CHUNK_CHARS)
 
         BATCH = 32
         for i in range(0, len(chunks), BATCH):
