@@ -4,6 +4,425 @@ This file is appended after every working session. It documents what was built, 
 
 ---
 
+## Session 23 — 2026-05-15 — Full evaluator fix pass (24 issues from 3 evaluations)
+
+### Summary
+Addressed all 24 problems identified by three external evaluations of the system.
+21 tasks completed across technical, legal, and product categories.
+
+### Technical fixes
+- T1: config default llm_model gpt-4o → claude-sonnet-4-6
+- T2: rate limiter DB-backed (rate_limit_events table); Stripe subscriptions already in DB
+- T3/T4: DB is now primary report source of truth; list_recent uses O(1) DB query
+- T5: orphaned per-job ChromaDB collections deleted on startup
+- T6: CHROMA_SERVER_URL config enables server mode; no code changes needed
+- T8: _strip_fences replaced with Anthropic tool use for guaranteed structured JSON
+- T11: legacy report access loophole closed
+- T12: retry count 3→5 total; exponential backoff added to all LLM calls
+- T13: action item completion moved from localStorage to DB (action_completions table)
+- T14: uploaded company documents encrypted at rest with Fernet (DOCUMENT_ENCRYPTION_KEY)
+
+### Legal fixes
+- L1: AI Act high-risk date modeled as uncertain — Digital Omnibus may delay Annex III to Dec 2027
+- L3: knowledge_base_versions surfaced in report UI (collapsible table with fetch date and source links)
+- L4: weekly official-source fetch (gesetze-im-internet.de + EUR-Lex) + human-approval gate
+  (PendingRegulationUpdate DB table, admin API with approve/reject endpoints, ADMIN_API_KEY)
+- L5: retrieval eval expanded from 48 to 246 test cases (14 adversarial, 15 German-language,
+  coverage across all 11 collections)
+
+### Product features
+- P1: /welcome onboarding page for new users; dashboard OnboardingEmpty with 3-step guide
+- P2: plan config updated — company_limit is primary differentiator (Starter=1, Pro=5, Enterprise=unlimited)
+- P3: action plan upgraded to workflow: open/in_progress/done status, notes, evidence, progress bar
+- P4: 10 document templates (privacy notice, processing records, TOM, IRP, AI policy, AI inventory,
+  whistleblower policy, safety instruction, supplier code of conduct, NIS2 risk register)
+- P5: expert review request flow with DB tracking and admin email notification
+
+### Pending
+- Push ~30+ commits on feat/polish (need PAT)
+- Stripe activation (keys from Yigit)
+- Deployment
+- Re-run retrieval eval with workspace_law collection
+
+---
+
+## Session 22 — 2026-05-15 — Legal fixes (all 4 from Session 21 audit)
+
+### What was fixed
+
+#### Fix 1 — EnEfG / EDL-G separation (threshold_engine.py, pdf_generator.py)
+- Renamed `EnEfGResult.energy_audit_required` → `edl_g_audit_required`
+- Docstring updated: 4-year audit attributed to EDL-G §8 (not EnEfG §8(3)); EnMS obligation to EnEfG §8(1); added EnEfG §9 implementation plans
+- Reason strings now clearly label which law requires what
+- PDF label updated: "EnEfG" → "EnEfG / EDL-G"
+- key_threshold updated: now cites "EnEfG §8 / EDL-G §8: non-SME + energy consumption"
+- test_thresholds.py field references updated
+
+#### Fix 2 — NIS2 BSIG categories (threshold_engine.py, planning.py)
+- Renamed `NIS2Result.essential` → `particularly_important`
+- Docstring updated to reference BSIG (NIS2UmsuCG) implementation
+- "besonders wichtige Einrichtung" (§28(6) BSIG): large company OR KRITIS operator
+- "wichtige Einrichtung" (§28(7) BSIG): medium company
+- KRITIS operator status now triggers besonders wichtige Einrichtung regardless of size
+- Revenue caveat added: revenue alone may not be sufficient for all sectors
+- planning.py NIS2 retrieval query updated to BSIG terminology
+
+#### Fix 3 — AI Act current vs future obligations (threshold_engine.py, prompts.py)
+- Added `from datetime import date` to threshold_engine.py
+- AIActResult now has `high_risk_obligations_active: bool` and `gpai_rules_active: bool` computed at runtime
+- Reason string split into "Active now:" and "Coming:" sections
+- prompts.py gap_analysis_prompt now has dynamic AI Act phasing note:
+  - Until 2026-08-02: high-risk gaps assessed as PARTIALLY_COMPLIANT with "preparation required" note
+  - From 2026-08-02: assessed as NON_COMPLIANT (computed from current date each run)
+
+#### Fix 4 — ArbSchG → workplace_law collection rename (multiple files)
+- `Regulation.ARBSCHG` enum value changed from "arbschg" to "workplace_law"
+- ingest.py: "workplace_law" added as primary key; "arbschg" kept as alias
+- ingest.py: source_dir override so "workplace_law" reads from data/regulations/arbschg/ on disk
+- ingest.py: "workplace_law" added to German law elif condition in _chunks_for_file
+- actions.py: _OFFICIAL_URLS and _REG_FIELDS keys updated to "workplace_law"
+- pdf_generator.py: label updated to "Employment & Workplace Law"
+- planning.py: query for ARBSCHG expanded to cover all 7 laws in the collection
+- scripts/inspect_chunks.py, build_section_hash_baseline.py: "arbschg" → "workplace_law"
+- eval_retrieval.py: "workplace_law" added to normalization regex
+
+### Pending after this session
+- Re-ingest required for workplace_law: `python -c "from rag.ingest import ingest_regulation; ingest_regulation('workplace_law', reset=True)"` (old 'arbschg' ChromaDB collection becomes obsolete)
+- 7 commits on feat/polish, NOT yet pushed (need PAT)
+- Remaining ~15 commits from Sessions 17-19 also unpushed
+- Stripe activation and deployment still pending
+
+---
+
+## Session 21 — 2026-05-15 — Legal precision audit (no code changes)
+
+### What happened
+Reviewed an external evaluation of the Complio documentation (cld.txt on Desktop). No code was changed this session. The following legal correctness issues were identified and need to be fixed next session.
+
+---
+
+### Legal fixes to implement (next session)
+
+#### Fix 1 — EnEfG / EDL-G separation (threshold_engine.py, pdf_generator.py)
+**Problem:** The current code attributes the "energy audit every 4 years" obligation to EnEfG §8(3), but BAFA separates this: energy audits are an **EDL-G §8** obligation for non-SMEs; EnEfG §8 covers energy management systems above the 7.5 GWh threshold.
+**Files:** `backend/services/threshold_engine.py`, `backend/services/pdf_generator.py`
+**What to change:**
+- Rename `EnEfGResult.energy_audit_required` → `edl_g_audit_required` to make the source law explicit
+- Update `check_enefg()` docstring: attribute the 4-year audit to EDL-G §8, EnMS obligation to EnEfG §8(1), implementation plans to EnEfG §9
+- Update reason strings to clearly label which law requires what
+- Add EnEfG §9 (energy-saving measure implementation plans for companies above relevant consumption thresholds)
+- Update display label in pdf_generator.py: `"enefg":"EnEfG"` → `"enefg":"EnEfG / EDL-G"`
+- Update `key_threshold` in master function to say "EnEfG §8 / EDL-G §8: non-SME + energy consumption"
+
+#### Fix 2 — NIS2 must use German BSIG categories, not EU Directive wording (threshold_engine.py)
+**Problem:** The current logic uses "essential entity" / "important entity" (EU Directive terms) and relies on employee count alone. German implementation under BSIG uses **besonders wichtige Einrichtungen** / **wichtige Einrichtungen**, and "besonders wichtig" can also be triggered by KRITIS operator status — not just headcount/revenue. Revenue-only thresholds are also insufficient (balance sheet may apply sector-dependently).
+**Files:** `backend/services/threshold_engine.py`, `backend/agent/planning.py`
+**What to change:**
+- `NIS2Result`: rename field `essential` → `particularly_important`
+- Update `check_nis2()` docstring to reference BSIG implementation, not just EU Directive
+- "Particularly important" should also be triggered by `is_critical_infrastructure_sector=True` (KRITIS status), not only size thresholds
+- Add caveat: revenue-based threshold alone may not be sufficient — some sectors require balance sheet + revenue (sector-dependent); note this in the reason string
+- Update reason strings to use BSIG terminology: "besonders wichtige Einrichtung" / "wichtige Einrichtung"
+- Update planning.py line 184: `"essential entity"` → `"besonders wichtige Einrichtung"`, `"important entity"` → `"wichtige Einrichtung"`
+
+#### Fix 3 — EU AI Act: separate current vs future obligations (threshold_engine.py, prompts.py)
+**Problem:** The current code lists all AI Act obligations together. As of 2026-05-15, the active obligations are Art. 5 prohibitions (active Feb 2025) and GPAI rules (active Aug 2025). High-risk Annex I system obligations are active from **2 Aug 2026** (78 days away). High-risk Annex III obligations for legacy systems aren't until **2 Aug 2027**. Marking these as NON_COMPLIANT today is incorrect.
+**Files:** `backend/services/threshold_engine.py`, `backend/rag/prompts.py`
+**What to change:**
+- Add `from datetime import date` import to threshold_engine.py
+- Add fields to `AIActResult`: `high_risk_obligations_active: bool`, `gpai_rules_active: bool`
+- Compute in `check_ai_act()`: `high_risk_obligations_active = date.today() >= date(2026, 8, 2)`, `gpai_rules_active = date.today() >= date(2025, 8, 2)` — both resolve to True/False at runtime
+- Update the reason string to split into "Active now:" and "Coming:" sections
+- Update gap analysis prompt in prompts.py: add AI Act phasing note — high-risk obligations (Arts. 9–17) should produce "preparation recommended" status, not NON_COMPLIANT, until `high_risk_obligations_active=True`
+
+#### Fix 4 — ArbSchG collection is 7 laws — rename to workplace_law (multiple files)
+**Problem:** The ChromaDB collection named "arbschg" actually contains ArbSchG + ArbZG + MuSchG + JArbSchG + BUrlG + BBiG + AEntG. Calling it ArbSchG is misleading for the thesis and for users reading reports.
+**Files:** `backend/models/enums.py`, `backend/rag/ingest.py`, `backend/services/pdf_generator.py`, `backend/agent/actions.py`, `backend/agent/planning.py`, `backend/scripts/inspect_chunks.py`, `backend/scripts/build_section_hash_baseline.py`, `backend/scripts/eval_retrieval.py`
+**What to change:**
+- `enums.py`: `ARBSCHG = "arbschg"` → `ARBSCHG = "workplace_law"` (keeping Python member name to minimise code churn)
+- `ingest.py`: 
+  - `REGULATION_COLLECTIONS`: `"arbschg": "arbschg"` → `"workplace_law": "workplace_law"`; add `"arbschg": "workplace_law"` alias so old calls still resolve
+  - `OFFICIAL_URLS`: `"arbschg": "..."` → `"workplace_law": "https://www.gesetze-im-internet.de/arbschg/"` (ArbSchG is the anchor law); add `"arbschg"` alias
+  - `_chunks_for_file` line 420: add `"workplace_law"` to the German law elif condition alongside the existing list
+  - `source_dir` fallback in `ingest_regulation()`: add override so `"workplace_law"` reads from `data/regulations/arbschg/` (folder stays unchanged on disk)
+- `pdf_generator.py`: `"arbschg":"ArbSchG"` → `"workplace_law":"Employment & Workplace Law"`
+- `actions.py`: rename `"arbschg"` keys to `"workplace_law"` in both the URL dict and the optional fields dict
+- `planning.py`: update the `Regulation.ARBSCHG` query string to include ArbZG, MuSchG, etc.
+- `scripts/inspect_chunks.py`, `build_section_hash_baseline.py`: `"arbschg"` → `"workplace_law"`
+- `eval_retrieval.py`: update regex string to include `workplace_law`
+- **After code changes**: re-ingest required (`python -c "from rag.ingest import ingest_regulation; ingest_regulation('workplace_law', reset=True)"`) — ChromaDB collection named `arbschg` will be obsolete
+
+---
+
+### Files that do NOT need changing
+- `backend/scripts/debug_sgb*.py` — reference `data/regulations/arbschg/` as a disk path; folder stays on disk
+- `backend/fetch_laws.py` — uses `"arbschg"` as a download subfolder name; folder stays on disk
+- `backend/test_pdf.py`, `test_pdf_preview.py` — use `Regulation.ARBSCHG` enum member (not the value string); will work once enum value is changed
+
+---
+
+## Session 20 — 2026-05-14 — Legal rule engine correctness + epistemics
+
+### What was fixed
+
+#### Fix 1 — LkSG applicability trigger (threshold_engine.py)
+- Removed `has_supply_chain_abroad` as the applicability condition — it was never a legal trigger
+- LkSG now applies based on: German domicile + ≥1,000 employees (since Jan 2024)
+- Added group employee counting note (foreign affiliates where German parent has decisive influence)
+- Added indirect relevance note for SMEs below threshold who may receive supplier due diligence questionnaires from LkSG-covered customers
+- Source: §1(1), §2(6) LkSG; BAFA Guidance 2023
+
+#### Fix 2 — EnEfG energy consumption threshold restored (threshold_engine.py)
+- Non-SME status (≥250 employees / >€50M revenue / >€43M balance sheet) remains the applicability gate
+- Within non-SME: ≥7.5 GWh annual consumption → certified EnMS (ISO 50001/EMAS) mandatory (§8(1))
+- Within non-SME: <7.5 GWh → energy audit every 4 years (DIN EN 16247-1) is a permissible alternative (§8(3))
+- Waste heat trigger correctly defined as: non-SME + technically usable waste heat ≥200 kW (§15), NOT total energy consumption
+- When consumption data not provided: report explicitly states what needs to be confirmed
+- Source: §8(1), §8(3), §15 EnEfG; BAFA Guidance 2023
+
+#### Fix 3 — CSRD Stop-the-clock postponement (threshold_engine.py)
+- Added Directive (EU) 2025/794 ("Stop-the-clock") note to all applicable CSRD determinations
+- Wave 2 obligations postponed by 2 years; listed SMEs postponed to FY 2028
+- `legal_effective_date` context included in reason string
+- Source: EU Directive 2022/2464 Art. 5; Directive (EU) 2025/794
+
+#### Fix 4 — EU AI Act role and risk classification (threshold_engine.py)
+- Added provider vs deployer role distinction with specific article obligations for each
+- Risk classification: high-risk (Annex III) vs limited-risk (Art. 50) vs unconfirmed
+- Application timeline explicitly stated: Feb 2025 (prohibitions), Aug 2025 (GPAI), Aug 2026 (high-risk), Aug 2027 (legacy systems)
+- Assessment adapts based on `ai_systems_are_high_risk` profile field
+- Source: Art. 2, 3, 5, 6, 9–17, 26, 50, 113 EU AI Act
+
+#### Fix 5 — CANNOT_ASSESS made actionable (prompts.py)
+- Removed the "<2% target" framing — it suppressed legitimate uncertainty and created false confidence
+- CANNOT_ASSESS is now valid when genuinely needed, but the evidence field MUST contain a specific, concrete question the company must answer
+- Example: "To assess this requirement, confirm: does the company process biometric data for access control?"
+- Absence of a measure is still NON_COMPLIANT; CANNOT_ASSESS is for genuinely missing information only
+
+#### Fix 6 — Confirmed facts vs inferred assumptions separated
+- `EnrichedCompanyProfile.inferred_assumptions: list[str]` added — LLM-inferred, unconfirmed context
+- `EnrichedCompanyProfile.inferred_characteristics` now contains only directly and logically implied facts
+- Enrichment prompt updated to return both fields, assumptions prefixed with "ASSUMPTION:"
+- Gap analysis prompt receives `<unconfirmed_assumptions>` block — LLM instructed not to use assumptions as the sole basis for NON_COMPLIANT findings
+- `inferred_assumptions` added to `ComplianceReport` and passed through the full pipeline
+- Prevents: LLM inference → NON_COMPLIANT finding with same confidence as confirmed profile data
+
+### Still open
+- Push remaining commits (need PAT)
+- Stripe activation (need keys)
+- Deployment
+- Expand retrieval eval to 100+ questions (thesis)
+- Applicability accuracy evaluation set (thesis)
+
+---
+
+## Session 19 — 2026-05-14 — Architecture hardening + legal correctness fixes
+
+### What was fixed
+
+#### 1. EnEfG threshold corrections (threshold_engine.py)
+- `> 250` → `>= 250` boundary bug fixed (250-employee company was incorrectly excluded)
+- Added balance sheet ≥€43M as third non-SME criterion (was missing entirely)
+- Corrected waste heat reporting trigger: non-SME status + operational heat processes (not arbitrary 2,500 MWh energy consumption)
+- Energy management obligation clarified: non-SME must have ISO 50001/EMAS OR energy audit every 4 years (§8 EnEfG)
+- Source: EU SME Recommendation 2003/361/EC Art. 2, §8(3) EnEfG, §15 EnEfG
+
+#### 2. ArbSchG/SGB knowledge base cleanup (arbschg collection)
+- Audited all 1,604 chunks by source file
+- Archived SGB II (basic income support, 138 chunks), SGB III (unemployment insurance, 346 chunks), SGB VI (pension insurance, 92 chunks), SGB XI (long-term care, 275 chunks) to `data/regulations/arbschg/_archived/`
+- These are benefits administration laws — individual employer compliance obligations under them are minimal and unrelated to occupational safety
+- Re-ingested: 399 clean chunks remain (down from 1,604)
+- Retrieval quality held: arbschg still 100% top-1, 100% top-5 in eval
+- Overall eval score unchanged: Top-1 81%, Top-5 100%, Miss 0%
+
+#### 3. Citation source URLs on every gap and action
+- `source_url: Optional[str]` added to `ComplianceGap` and `ActionItem` models
+- `_OFFICIAL_URLS` dict maps all 11 regulation keys to their canonical official source
+- `_stamp_source_urls(gaps, actions)` called during report assembly — stamps every finding
+- Frontend gap-analysis.tsx: small ExternalLink icon next to each article title links to official source
+- Every finding is now directly traceable to its legal source
+
+#### 4. Rate limiter — user-facing retry time
+- `_check_rate_limit()` now computes exact retry time from oldest call timestamp
+- Returns: "Try again in Xm Ys." with `Retry-After: N` header
+- No more invisible wall for users hitting the limit
+
+#### 5. Prompt injection in uploaded documents
+- `_doc_chunks_to_json()` in planning.py now sanitizes both chunk text and source filename through `_sanitize()` before inserting into LLM context
+- Previously: user-uploaded PDFs could contain injection text that reached the LLM unfiltered
+
+#### 6. Job ownership migrated from disk to database
+- `_assert_owns_job()` made async
+- Fallback path: DB query (`Report → Company.user_id`) instead of disk file read
+- Startup `load_all_owners()` scan removed — no more O(n) file reads on every restart
+- Survives disk loss (reports still owned if DB has the record)
+- In-memory dict still handles in-progress jobs created in the current process
+
+#### 7. Knowledge base version metadata in reports
+- `knowledge_base_versions: Optional[dict]` added to `ComplianceReport`
+- `_build_kb_versions(applicability)` reads `fetched_at` and `source_file_hash` from ChromaDB chunk metadata for each applicable regulation
+- Every report now records which legal version it was generated against: `{regulation: {fetched_at, source_file_hash, source_url}}`
+- Enables audit trail: "this report used GDPR retrieved on 2026-05-14, hash a3f2b1"
+
+### Final state after Session 19
+- Retrieval eval: Top-1 81%, Top-5 100%, Miss 0% (48 test cases, all 11 regulations)
+- ArbSchG: 399 chunks (was 1,604 — 1,205 irrelevant SGB chunks removed)
+- All 7 architecture/legal correctness fixes applied
+- Backend compiles cleanly, all endpoint types correct
+
+### Still open
+- Push remaining commits (need PAT)
+- Stripe activation (need keys)
+- Deployment
+- Edge case documentation (for thesis)
+- Stripe webhook tests (once Stripe is activated)
+
+---
+
+## Session 18 — 2026-05-14 — SaaS hardening: legal defensibility + retrieval quality
+
+### What was built
+
+#### Stripe checkout success page fix
+- `frontend/src/app/checkout/success/page.tsx` — removed dead `/api/backend/checkout/verify` call and obsolete `complio_access_token` localStorage code (left over from Phase 13 one-time token system, replaced by Phase 12 subscription DB)
+- Now simply shows success and redirects to `/account/billing` after 3 seconds
+- Confirmed `api.ts` and all other frontend files are clean — no remaining access token references
+
+#### Profile completeness warning
+- `backend/agent/actions.py` — `_compute_completeness(profile)` calculates which `Optional[bool]` fields are unanswered, scoped to what's actually relevant (e.g. AI Act fields only count if `uses_ai_systems=True`, HinSchG only if ≥50 employees)
+- Returns `score_percent`, `answered`, `relevant`, `unanswered_count`, `unanswered_fields`
+- `backend/models/compliance_report.py` — `profile_completeness: Optional[dict]` added to `ComplianceReport`
+- `frontend/src/lib/types.ts` — `profile_completeness` added to `ComplianceReport` interface
+- `frontend/src/app/report/[id]/page.tsx` — orange warning banner shown when completeness < 70%: shows percentage, unanswered field count, and "Re-run with more data" link
+
+#### Disclaimer on PDF cover page
+- `backend/services/pdf_generator.py` — `_cover()` now renders two amber-tinted boxes at the bottom of the dark cover:
+  1. Completeness warning (only shown when < 70%): orange-tinted, shows percentage and unanswered count
+  2. Legal disclaimer: amber-tinted, labeled "Preliminary screening only — Not legal advice", full disclaimer text
+- Previously: single line of tiny gray text. Now: prominent, styled boxes visible before the reader reaches the score
+
+#### Confidence indicator per gap
+- `backend/models/compliance_report.py` — `confidence: str = "HIGH"` and `confidence_reason: Optional[str]` added to `ComplianceGap`
+- `backend/agent/actions.py` — `_REG_FIELDS` dict maps each regulation to its relevant profile fields; `_assign_gap_confidence(gaps, profile)` sets confidence on every gap based on how many relevant fields were answered:
+  - HIGH: ≥80% of relevant fields answered (no badge shown)
+  - MEDIUM: 50–79% answered — "X field(s) not provided — finding may rely on assumptions"
+  - LOW: <50% answered or CANNOT_ASSESS — "verify with a complete profile"
+- `frontend/src/lib/types.ts` — `confidence` and `confidence_reason` added to `ComplianceGap` interface
+- `frontend/src/components/report/gap-analysis.tsx` — MEDIUM gaps show amber badge, LOW gaps show orange badge, HIGH gaps show nothing (clean)
+- `backend/services/pdf_generator.py` — `_gap_card()` renders colored confidence badge and reason subtitle on MEDIUM/LOW gaps
+
+#### Retrieval evaluation set + HinSchG fixes (from Session 17 continuation)
+- `backend/data/retrieval_eval.json` — 48 test cases across all 11 regulations
+- `backend/scripts/eval_retrieval.py` — evaluation runner with normalised article matching, per-regulation breakdown, top-1/top-5/miss metrics
+- `backend/data/regulations/hinschg/hinschg_expanded.txt` — fixed 5 mislabeled section numbers: §21(1)→§36(1), §21(2)→§36(2), §27→§37, §36→§42, §36 Documentation→§11
+- Final result: Top-1 81%, Top-5 100%, Miss 0% across 48 test cases
+
+### Final retrieval eval results
+| Regulation | Top-1 | Top-5 | Miss |
+|---|---|---|---|
+| AGG | 100% | 100% | 0% |
+| ArbSchG | 100% | 100% | 0% |
+| BDSG | 100% | 100% | 0% |
+| CSRD | 0% | 100% | 0% |
+| EnEfG | 0% | 100% | 0% |
+| EU AI Act | 83% | 100% | 0% |
+| GDPR | 86% | 100% | 0% |
+| HinSchG | 100% | 100% | 0% |
+| LkSG | 80% | 100% | 0% |
+| MiLoG | 67% | 100% | 0% |
+| NIS2 | 100% | 100% | 0% |
+| **OVERALL** | **81%** | **100%** | **0%** |
+
+### Still open
+- APScheduler → separate worker process (reliability for deployment)
+- Phases 7–12 not pushed — need PAT
+- Stripe not activated — need Stripe keys
+- Deployment pending
+- edge case documentation (for thesis)
+
+---
+
+## Session 17 — 2026-05-14 — Knowledge base overhaul + source hierarchy
+
+### What was built
+
+#### Full regulation knowledge base rebuild
+- GDPR: ingested from full PDF (106 chunks) — was completely missing from ChromaDB
+- AGG, HinSchG, MiLoG: fetched full official texts from gesetze-im-internet.de, replacing summaries (103/75/53 chunks)
+- NIS2, CSRD, EU AI Act: ingested from manually downloaded full PDFs (91/32/160 chunks)
+- ArbSchG: fixed dual-format regex to handle both `§ N\nTitle` (standard) and `§ NTitle` (SGB books) — 1604 chunks (was 255)
+
+#### Ingest pipeline improvements (rag/ingest.py)
+- Footer noise stripping: removes `zum Seitenanfang`, navigation links, JS remnants from gesetze-im-internet.de downloads (inline replacement, not cut-at-position)
+- `(weggefallen)` filter: skips repealed sections with no legal force
+- Minimum chunk length: drops chunks under 150 chars (removes amendment stubs)
+- Title fix: prevents title metadata from swallowing article body text
+- Source metadata on every chunk: `fetched_at` (file mtime), `source_file_hash` (first 16 hex of SHA-256 of raw file), `content_hash` (first 16 hex of SHA-256 of chunk text)
+- Dual-format regex: Format A (`§ N\n`) for standard laws, Format B (`§ NTitle`) for SGB books — auto-detected by comparing valid match counts
+
+#### Section-level hashing (services/section_hash_store.py)
+- Builds `{article_number: content_hash}` maps from ChromaDB metadata
+- Diffs old vs new to find which specific sections changed
+- Scheduler now re-ingests on regulation change, diffs sections, passes changed article names to notification
+- Email now shows "Sections that changed" block (e.g. `§ 12, § 15 changed`)
+- Baseline seeded: 1,313 sections across all 11 regulations in `data/section_hashes.json`
+
+#### Source authority hierarchy in prompts
+- `document_type` field added to `RegulatoryChunk` model, populated from ChromaDB metadata
+- Each chunk in LLM prompt now carries `source_authority` label: Level 1 (official law), Level 2 (guidance)
+- Company documents tagged as Level 3 (evidence only, not legal authority)
+- `SYSTEM_PERSONA` now defines the 3-level hierarchy explicitly
+- `gap_analysis_prompt` reinforces hierarchy in retrieved regulations context
+
+### Final chunk counts
+| Regulation | Chunks |
+|---|---|
+| GDPR | 106 |
+| BDSG | 27 |
+| NIS2 | 90 |
+| EU AI Act | 160 |
+| HinSchG | 72 |
+| ArbSchG | 1604 |
+| AGG | 99 |
+| MiLoG | 51 |
+| LkSG | 27 |
+| EnEfG | 22 |
+| CSRD | 31 |
+
+### Still open
+- Retrieval eval set (5-10 test questions per regulation with expected chunks)
+- Phases 7-12 not pushed — need PAT
+- Stripe not activated
+- Deployment pending
+
+---
+
+## Session 16 — 2026-05-14 — LkSG and EnEfG ChromaDB fix
+
+**Branch:** `feat/polish`
+
+### What was fixed
+
+**LkSG and EnEfG — 0 chunks resolved**
+Both regulation text files use `§ N\xa0Title` (non-breaking space before title) from gesetze-im-internet.de, which caused the `§`-based chunking regex to produce 0 splits.
+
+Fix: normalized all `§ N\xa0` occurrences to `§ N\n` using:
+```python
+re.sub(r'(^§\s*\d+[a-z]?)\xa0', r'\1\n', text, flags=re.MULTILINE)
+```
+
+Results after re-ingestion:
+- LkSG: 30 non-breaking spaces replaced → **27 chunks**
+- EnEfG: 31 non-breaking spaces replaced → **23 chunks**
+
+### Still open
+- NIS2, CSRD, EU AI Act: only summaries — need manual PDF downloads from browser (see .dev-notes.md)
+- Phases 7–12 not pushed — need PAT
+- Stripe not activated — need Stripe account keys
+- Deployment pending
+
+---
+
 ## Session 15 — 2026-05-13 — Security hardening + Phases 7–12
 
 **Branch:** `feat/polish`
