@@ -13,7 +13,7 @@ import { DocumentNudge } from "@/components/report/document-nudge";
 import { DocumentTemplates } from "@/components/report/document-templates";
 import { ExpertReview } from "@/components/report/expert-review";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown } from "lucide-react";
+import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown, ShieldAlert, X } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ComplianceReport } from "@/lib/types";
 
@@ -27,6 +27,7 @@ export default function ReportPage() {
   const [prevReport, setPrevReport] = useState<ComplianceReport | null>(null);
   const [headerOpacity, setHeaderOpacity] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [pdfWarningOpen, setPdfWarningOpen] = useState(false);
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -136,15 +137,25 @@ export default function ReportPage() {
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Link2 className="h-3.5 w-3.5" />}
                   {copied ? "Copied!" : "Copy link"}
                 </button>
-                <a
-                  href={`/report/${jobId}/print`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Download PDF
-                </a>
+                {report.requires_manual_review && report.requires_manual_review.length > 0 ? (
+                  <button
+                    onClick={() => setPdfWarningOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] px-4 py-2 text-sm font-medium text-amber-400 hover:bg-amber-500/[0.14] transition-all duration-200"
+                  >
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    Incomplete report
+                  </button>
+                ) : (
+                  <a
+                    href={`/report/${jobId}/print`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Download PDF
+                  </a>
+                )}
                 <Button variant="outline" size="sm" onClick={() => router.push(`/analyze?from=${jobId}`)}>
                   <RefreshCw className="h-3.5 w-3.5" />
                   Re-run
@@ -167,6 +178,74 @@ export default function ReportPage() {
           className="flex flex-col gap-5"
         >
           {prevReport && <DeltaBanner current={report} prev={prevReport} prevJobId={prevJobId!} />}
+
+          {/* Partial report warning */}
+          {report.requires_manual_review && report.requires_manual_review.length > 0 && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] px-5 py-4">
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-amber-300 mb-1">
+                    Incomplete report — {report.requires_manual_review.length} step{report.requires_manual_review.length !== 1 ? "s" : ""} require manual review
+                  </p>
+                  <p className="text-xs text-slate-400 leading-relaxed mb-2">
+                    The following analysis steps failed and the results may be incomplete.
+                    Do not rely on this report for compliance decisions without verifying these gaps.
+                  </p>
+                  <ul className="flex flex-wrap gap-2">
+                    {report.requires_manual_review.map(step => (
+                      <li key={step} className="rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-0.5 text-xs text-amber-400 font-mono">
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PDF blocked modal */}
+          {pdfWarningOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+              <div className="w-full max-w-md rounded-2xl border border-amber-500/25 bg-dark-900 p-6 shadow-2xl">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <ShieldAlert className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <h3 className="text-base font-bold text-white">PDF export blocked</h3>
+                  </div>
+                  <button onClick={() => setPdfWarningOpen(false)} className="text-slate-600 hover:text-slate-300 transition-colors">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                  This report is incomplete — {report.requires_manual_review?.length} analysis step{(report.requires_manual_review?.length ?? 0) !== 1 ? "s" : ""} failed.
+                  Exporting an incomplete compliance report could be misleading and should not be shared with auditors or legal advisors.
+                </p>
+                <p className="text-xs text-slate-500 mb-5">
+                  Failed steps: <span className="text-amber-400">{report.requires_manual_review?.join(", ")}</span>
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setPdfWarningOpen(false)}
+                    className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <a
+                    href={`/report/${jobId}/print`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setPdfWarningOpen(false)}
+                    className="flex-1 text-center rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-medium text-amber-400 hover:bg-amber-500/20 transition-colors"
+                  >
+                    Export anyway (not recommended)
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Profile completeness warning — shown when < 70% of relevant fields were answered */}
           {report.profile_completeness && report.profile_completeness.score_percent < 70 && (
