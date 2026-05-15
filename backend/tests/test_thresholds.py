@@ -173,7 +173,7 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
 
     def test_audit_not_required_below_250_employees_low_revenue(self):
         profile = CompanyProfile(
@@ -184,7 +184,7 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is False
+        assert result.edl_g_audit_required is False
 
     def test_audit_required_by_revenue_above_50m(self):
         profile = CompanyProfile(
@@ -195,7 +195,7 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
 
     def test_energy_management_required_at_7500_mwh(self):
         profile = CompanyProfile(
@@ -244,7 +244,7 @@ class TestEnEfG:
     def test_manufacturer_profile_applies(self, profile_manufacturer):
         result = check_enefg(profile_manufacturer)
         assert result.applies is True
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
         assert result.energy_management_required is True
         assert result.waste_heat_reporting_required is True
 
