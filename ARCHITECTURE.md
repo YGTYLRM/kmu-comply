@@ -559,6 +559,24 @@ SQLAlchemy 2.0 with async engine (`asyncpg` driver). `db/database.py` defines:
 - Linked to a company (not a report) — tracks ongoing action completion state
 - `completed_at` set when the user marks an action done
 
+**`action_completions`**
+- Per-user, per-job tracking of action item workflow state
+- Fields: `user_id`, `job_id`, `regulation`, `article_number`, `status` (open/in_progress/done), `notes`, `evidence_note`, `completed_at`
+- Used by the action plan workflow feature on the report page
+
+**`rate_limit_events`**
+- Persistent rate limiting for the `/api/analyze` endpoint
+- Fields: `user_id`, `endpoint`, `called_at`; pruned of rows older than 2 hours on every write
+- Replaces the previous in-memory `defaultdict(list)` which reset on backend restart
+
+**`pending_regulation_updates`**
+- Staged regulation downloads awaiting human approval before KB update
+- Fields: `regulation`, `source_url`, `fetched_at`, `new_hash`, `previous_hash`, `staging_path`, `status` (pending/approved/rejected), `change_summary`, `reviewed_at`
+
+**`expert_review_requests`**
+- User requests for expert (lawyer/consultant) review of critical compliance findings
+- Fields: `user_id`, `job_id`, `company_name`, `user_email`, `focus_items` (JSON), `message`, `status` (pending/in_review/completed), `created_at`, `reviewed_at`
+
 **`subscriptions`**
 - One per user (1:1 with profiles)
 - Stores Stripe customer ID, subscription ID, plan, status, period end date
@@ -576,7 +594,27 @@ SQLAlchemy 2.0 with async engine (`asyncpg` driver). `db/database.py` defines:
 
 `worker.py` runs `start_scheduler()` from `services/scheduler.py`. This creates an `AsyncIOScheduler` with two cron jobs and starts it. The worker never starts the FastAPI web server — it runs the event loop in isolation.
 
-### 8.2 Regulation Change Detection
+### 8.2 Official-Source Regulation Fetching (Human-Approval Gate)
+
+**Trigger:** Weekly on Sundays at 02:00 UTC.
+
+**Purpose:** Fetch regulation texts directly from official sources (gesetze-im-internet.de, EUR-Lex) and stage any changes for human review before they enter the knowledge base. This prevents automated updates from introducing unapproved legal content.
+
+**Flow:**
+1. `services/regulation_updater.py::fetch_and_stage_updates()` downloads each regulation's current text from its official URL
+2. SHA-256 hashes the fetched text and compares against the current production file
+3. If changed: saves the new text to `backend/data/staging/` and creates a `PendingRegulationUpdate` record in PostgreSQL with status `pending`
+4. Duplicate hashes (same update staged twice) are silently skipped
+
+**Admin approval endpoints** (all require `X-Admin-Key` header matching `ADMIN_API_KEY` env var):
+- `GET /api/admin/regulation-updates` — list all pending/reviewed updates
+- `POST /api/admin/regulation-updates/{id}/approve` — copies staging file to production dir, re-ingests into ChromaDB, marks `approved`
+- `POST /api/admin/regulation-updates/{id}/reject` — marks `rejected`, deletes staging file
+- `POST /api/admin/regulation-updates/fetch-now` — manually trigger a fetch outside the weekly schedule
+
+A manual trigger is also available via `POST /api/admin/regulation-updates/fetch-now`.
+
+### 8.3 Regulation Change Detection (Local Files)
 
 **Trigger:** Daily at 03:00 UTC.
 
@@ -594,7 +632,7 @@ SQLAlchemy 2.0 with async engine (`asyncpg` driver). `db/database.py` defines:
 
 **Section hash store (`services/section_hash_store.py`):** Maps `{regulation → {article_number → content_hash}}`. The diff identifies which specific articles changed within a regulation update, allowing notification messages to cite the changed sections.
 
-### 8.3 Re-assessment Cycle
+### 8.4 Re-assessment Cycle
 
 **Trigger:** Daily at 04:00 UTC (runs daily; individual companies are skipped if not yet due).
 
@@ -605,7 +643,7 @@ SQLAlchemy 2.0 with async engine (`asyncpg` driver). `db/database.py` defines:
 - Fetches the second-most-recent report for delta comparison (score change, improved/regressed gaps)
 - Creates a notification in DB and sends an email via Resend
 
-### 8.4 Scheduled Analysis Flow
+### 8.5 Scheduled Analysis Flow
 
 Both triggers share `_run_scheduled_analysis()`:
 1. Reconstruct `CompanyProfile` from the company's stored profile dict
@@ -653,12 +691,13 @@ Next.js 14 App Router. Key routes:
 | Route | Purpose |
 |-------|---------|
 | `/` | Landing page — value proposition, regulations list, pricing |
+| `/welcome` | Post-registration onboarding page (3-step guide, shown after first sign-up) |
 | `/analyze` | Multi-step company profile form (3 steps) |
 | `/analyze/processing` | Job progress view, polls `/api/status/{job_id}` |
-| `/report/[id]` | Interactive compliance report |
+| `/report/[id]` | Interactive compliance report with action workflow, templates, expert review |
 | `/report/[id]/print` | Print-optimized layout (stripped navbar) |
 | `/reports` | Recent reports list |
-| `/dashboard` | Company dashboard with score history |
+| `/dashboard` | Company dashboard — shows `OnboardingEmpty` guide for first-time users |
 | `/checkout/success` | Stripe post-payment success |
 | `/checkout/cancel` | Stripe cancellation |
 | `/account/billing` | Subscription management (Stripe Customer Portal) |
@@ -673,7 +712,9 @@ All backend calls flow through a single module that:
 
 ### 10.3 State Management
 
-No global state library. State is component-local with React hooks. The analyze flow uses `useRouter` for navigation and browser `sessionStorage` for transient job ID tracking between pages. Action task completion state is stored in `localStorage` per job ID.
+No global state library. State is component-local with React hooks. The analyze flow uses `useRouter` for navigation and browser `sessionStorage` for transient job ID tracking between pages.
+
+Action task workflow state (open/in_progress/done, notes, evidence) is stored in the `action_completions` PostgreSQL table, loaded per report on mount, and saved on blur/toggle. Optimistic UI updates revert on API failure. The legacy localStorage approach has been removed.
 
 ### 10.4 Design System
 
@@ -780,24 +821,100 @@ All database operations in the main analysis pipeline are wrapped in try/except 
 
 ---
 
-## 14. Deployment Architecture
+## 14. Product Features Architecture
 
-### 14.1 Process Management
+### 14.1 User Onboarding
+
+New users are redirected to `/welcome` after registration. This page shows:
+- A 3-step guide: fill profile → get report → stay current
+- What regulations are covered (all 11)
+- Feature list: gap analysis, action plan, PDF export, automatic re-assessment, regulation alerts
+- CTA to start the first screening
+
+The dashboard (`/dashboard`) shows an `OnboardingEmpty` component for users with no companies — same 3-step structure, replacing the previous minimal "No companies yet" message. The reports page has a similar empty state with dual CTA.
+
+### 14.2 Document Template Generation
+
+`services/template_generator.py` provides 10 compliance document templates generated by an LLM call personalised to the company profile:
+
+| Template ID | Document | Regulation |
+|------------|----------|-----------|
+| `privacy_notice` | GDPR privacy notice | GDPR Art. 13/14 |
+| `processing_records` | Records of processing activities | GDPR Art. 30 |
+| `tom_checklist` | Technical & organisational measures | GDPR Art. 32 |
+| `incident_response_plan` | Incident response procedure | NIS2/GDPR |
+| `ai_usage_policy` | Internal AI usage policy | EU AI Act Art. 26/50 |
+| `ai_inventory` | AI system inventory form | EU AI Act Art. 11 |
+| `whistleblower_policy` | Whistleblower reporting policy | HinSchG §13 |
+| `safety_instruction` | Employee safety instruction | ArbSchG §12 |
+| `supplier_code_of_conduct` | Supplier code of conduct | LkSG §6 |
+| `nis2_risk_register` | Cybersecurity risk register | NIS2 Art. 21 |
+
+Each template is generated by `POST /api/report/{job_id}/templates/{template_id}`. The company profile is loaded from disk (`report_store.load_profile()`), serialized to JSON, and injected into the generation prompt. Output is Markdown. The frontend `DocumentTemplates` component renders a grid of template buttons and an inline preview pane with a download button.
+
+All generated documents carry a footer disclaimer: "Generated by Complio — preliminary template only. Have this reviewed by a qualified legal or compliance professional before use."
+
+### 14.3 Action Plan Workflow
+
+The action plan is a full workflow, not a static checklist:
+
+- **Status cycle:** open → in_progress → done (clicking the status icon cycles forward; reset resets to open)
+- **Notes field:** internal notes per action item, saved on blur
+- **Evidence field:** proof of completion (link to document, policy version, etc.), saved on blur
+- **Progress bar:** shows proportion of done + 0.5×in_progress items
+- All state persisted in the `action_completions` table via `POST /api/report/{job_id}/completions`
+- Optimistic UI updates with revert on API failure
+- `GET /api/report/{job_id}/completions` loads full state on mount
+
+### 14.4 Expert Review Tier
+
+Users can request expert review of compliance findings:
+- `ExpertReview` component on the report page collects the user's focus items (pre-filled with all NON_COMPLIANT/PARTIALLY_COMPLIANT gaps) and an optional message
+- `POST /api/expert-review` stores an `ExpertReviewRequest` in the DB and sends a notification email to the admin via Resend
+- No payment is taken at request time — the expert contacts the user within 2 business days with pricing
+- Users can view their requests via `GET /api/expert-review`
+- Admin can manage review status via the `pending_regulation_updates` admin API pattern
+
+### 14.5 Legal Database Version Display
+
+Every report stores `knowledge_base_versions` — a mapping of regulation → {fetched_at, source_file_hash, source_url}. This is surfaced in the report UI as a collapsible `KnowledgeBaseVersions` section at the bottom of the report page, showing:
+- Regulation name
+- Date the source file was fetched
+- First 8 chars of the file's SHA-256 hash (for reproducibility)
+- Link to the official legal text source
+
+This allows users (and auditors) to verify which version of each law was used when the report was generated.
+
+### 14.6 Subscription Plans
+
+Plans are differentiated primarily by **company count** (the meaningful limit for SME customers), not by re-assessment frequency:
+
+| Plan | Price | Companies | Re-assessment |
+|------|-------|-----------|--------------|
+| Starter | €49/month | 1 | Monthly (30 days) |
+| Professional | €149/month | 5 | Weekly (7 days) |
+| Enterprise | Custom | Unlimited | Weekly |
+
+The `GET /api/plans` endpoint returns the current plan config dynamically so the frontend always shows accurate pricing without hardcoding.
+
+## 15. Deployment Architecture
+
+### 15.1 Process Management
 
 In production, both `uvicorn` (web server) and `python worker.py` (scheduler) should be managed by a process supervisor (systemd, Docker Compose, or platform equivalents). The worker must be restarted alongside the web server on code changes.
 
-### 14.2 Persistent Storage Requirements
+### 15.2 Persistent Storage Requirements
 
 ChromaDB and the report JSON store are file-based and **must** be on a persistent volume. Container restarts without volume mounts will wipe all indexed knowledge and all saved reports. Minimum required mounts:
 - `backend/data/chroma_db/` — ChromaDB collections (~GB-scale depending on regulation count)
 - `backend/data/reports/` — report JSON files
 - `backend/data/section_hashes.json` — regulation change detection baseline
 
-### 14.3 ChromaDB Scalability Note
+### 15.3 ChromaDB Scalability Note
 
 ChromaDB in embedded (file-based) mode is single-writer. Concurrent writes from the web server and worker can produce contention. At scale, migrating to ChromaDB server mode or a managed vector database (Pinecone, Weaviate) would be necessary. For the current single-tenant deployment scale, embedded mode is sufficient.
 
-### 14.4 Environment Split
+### 15.4 Environment Split
 
 | Component | Platform |
 |-----------|---------|
