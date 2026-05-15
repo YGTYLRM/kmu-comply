@@ -12,9 +12,9 @@ from models.enums import ComplianceStatus, Priority
 LOGO_PATH = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
 
 REG_LABELS = {
-    "gdpr_dsgvo":"GDPR / DSGVO","bdsg":"BDSG","lksg":"LkSG","enefg":"EnEfG",
+    "gdpr_dsgvo":"GDPR / DSGVO","bdsg":"BDSG","lksg":"LkSG","enefg":"EnEfG / EDL-G",
     "csrd":"CSRD","nis2":"NIS2","eu_ai_act":"EU AI Act","hinschg":"HinSchG",
-    "arbschg":"ArbSchG","agg":"AGG","milog":"MiLoG",
+    "workplace_law":"Employment & Workplace Law","agg":"AGG","milog":"MiLoG",
 }
 S = {
     ComplianceStatus.COMPLIANT:           {"c":"#16a34a","bg":"#f0fdf4","br":"#bbf7d0","label":"Compliant"},
@@ -181,10 +181,31 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'<div style="height:1pt;background:linear-gradient(90deg,rgba(255,255,255,0.1) 0%,transparent 100%);margin-bottom:5mm;"></div>'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;color:#475569;margin-bottom:3.5mm;">Applicable Regulations</div>'
         f'<div style="line-height:1;">{chips}</div>'
-        f'<div style="{FONT}font-size:7pt;color:#334155;line-height:1.65;margin-top:5mm;">'
-        f'Complio checks your company against German and EU regulations using an autonomous AI agent. '
-        f'This report shows where gaps likely exist. It is not a legal audit and does not replace a lawyer.'
-        f'</div></div></div>'
+
+        # Completeness warning on cover (only shown when < 70%)
+        + (
+            f'<div style="margin-top:4mm;padding:4mm 6mm;'
+            f'background:rgba(251,146,60,0.10);border:1pt solid rgba(251,146,60,0.30);border-radius:6pt;">'
+            f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#fb923c;margin-bottom:1.5mm;">'
+            f'Low data completeness &nbsp;&mdash;&nbsp; {report.profile_completeness["score_percent"]:.0f}%</div>'
+            f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.6;">'
+            f'{report.profile_completeness["unanswered_count"]} compliance-relevant fields were not provided. '
+            f'Some findings may rely on assumptions. Re-run with a complete profile for higher accuracy.'
+            f'</div></div>'
+            if (report.profile_completeness and report.profile_completeness.get("score_percent", 100) < 70)
+            else ""
+        )
+
+        # Legal disclaimer — prominent box on dark cover
+        + f'<div style="margin-top:4mm;padding:4mm 6mm;'
+        f'background:rgba(245,158,11,0.08);border:1pt solid rgba(245,158,11,0.25);border-radius:6pt;">'
+        f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#f59e0b;margin-bottom:1.5mm;">'
+        f'Preliminary screening only &nbsp;&mdash;&nbsp; Not legal advice</div>'
+        f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.6;">'
+        f'{_h(report.disclaimer) if report.disclaimer else "This report is a preliminary AI-generated compliance screening. It does not constitute legal advice and does not replace a qualified legal review. Always consult a licensed attorney before taking compliance decisions."}'
+        f'</div></div>'
+
+        f'</div></div>'
     )
 
 
@@ -347,6 +368,22 @@ def _gap_card(g) -> str:
             f'</div>'
         )
 
+    conf = getattr(g, "confidence", "HIGH")
+    conf_reason = getattr(g, "confidence_reason", None)
+    conf_style = ""
+    if conf == "MEDIUM":
+        conf_style = "background:#fffbeb;color:#b45309;border:1pt solid #fde68a;"
+    elif conf == "LOW":
+        conf_style = "background:#fff7ed;color:#c2410c;border:1pt solid #fed7aa;"
+
+    conf_badge = ""
+    if conf in ("MEDIUM", "LOW"):
+        conf_badge = (
+            f'<span style="{FONT}display:inline-block;font-size:6.5pt;font-weight:700;'
+            f'padding:2pt 7pt;border-radius:20pt;{conf_style}margin-right:4pt;">'
+            f'{_h(conf)} confidence</span>'
+        )
+
     return (
         f'<div style="border:1pt solid #e8edf2;border-radius:8pt;'
         f'margin-bottom:8mm;overflow:hidden;page-break-inside:avoid;'
@@ -356,12 +393,16 @@ def _gap_card(g) -> str:
         f'<div style="flex:1;padding:5.5pt 10pt;display:flex;align-items:center;justify-content:space-between;gap:8pt;">'
         f'<div>'
         f'<div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{art_n} &nbsp;&middot;&nbsp; {art_t}</div>'
-        f'</div>'
+        + (f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;margin-top:1.5pt;font-style:italic;">{_h(conf_reason)}</div>' if conf_reason and conf != "HIGH" else "")
+        + f'</div>'
+        f'<div style="display:flex;align-items:center;gap:4pt;flex-shrink:0;">'
+        f'{conf_badge}'
         f'<div style="{FONT}display:inline-flex;align-items:center;gap:4pt;font-size:7pt;font-weight:700;'
         f'padding:3pt 9pt;border-radius:20pt;border:1pt solid {cm["br"]};'
-        f'background:{cm["bg"]};color:{cm["c"]};white-space:nowrap;flex-shrink:0;">'
+        f'background:{cm["bg"]};color:{cm["c"]};white-space:nowrap;">'
         f'<span style="width:5pt;height:5pt;border-radius:50%;background:{cm["c"]};display:inline-block;"></span>'
         f'{_h(cm["label"])}</div>'
+        f'</div>'
         f'</div></div>'
         f'<div style="padding:7pt 10pt 8pt 14pt;background:#fff;">'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
