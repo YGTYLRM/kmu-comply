@@ -8,9 +8,10 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     llm_model: str = "claude-sonnet-4-6"
 
-    # ChromaDB
-    chroma_host: str = "localhost"
-    chroma_port: int = 8001
+    # ChromaDB — set CHROMA_SERVER_URL to switch from embedded to server mode
+    # e.g. CHROMA_SERVER_URL=http://chroma:8001
+    # When unset, uses embedded PersistentClient at chroma_persist_dir
+    chroma_server_url: str = ""
     chroma_persist_dir: str = "./backend/data/chroma_db"
 
     # Embedding
