@@ -120,7 +120,10 @@ def run_gap_analysis(
             profile_json, chunks_json, company_docs_json,
             inferred_assumptions=getattr(profile, "inferred_assumptions", []),
         )
-        gaps = _llm_call(prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures)
+        gaps = _llm_call(
+            prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures,
+            tool=_TOOL_GAP_ANALYSIS, tool_result_key="gaps",
+        )
         all_gaps.extend(gaps)
 
     return all_gaps
@@ -144,7 +147,10 @@ def generate_action_plan(
     profile_json = profile.model_dump_json(indent=2)
     gaps_json = json.dumps([g.model_dump() for g in actionable], indent=2, default=str)
     prompt = action_plan_prompt(profile_json, gaps_json)
-    actions = _llm_call(prompt, _parse_actions, "action_plan", failures, max_tokens=8192)
+    actions = _llm_call(
+        prompt, _parse_actions, "action_plan", failures, max_tokens=8192,
+        tool=_TOOL_ACTION_PLAN, tool_result_key="actions",
+    )
 
     return sorted(actions, key=lambda a: _PRIORITY_ORDER.get(a.priority, 4))
 
@@ -285,16 +291,63 @@ def _chunks_to_json(chunks: list[RegulatoryChunk]) -> str:
     )
 
 
-def _strip_fences(text: str) -> str:
-    """Remove markdown code fences that some models wrap JSON in."""
-    text = text.strip()
-    if text.startswith("```"):
-        lines = text.splitlines()
-        # drop opening fence line and closing fence line
-        start = 1
-        end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
-        text = "\n".join(lines[start:end]).strip()
-    return text
+# ── Tool schemas for structured output ───────────────────────────────────────
+# Using Anthropic tool use instead of text parsing eliminates the need for
+# _strip_fences() and guarantees valid, schema-conformant JSON output.
+
+_TOOL_GAP_ANALYSIS = {
+    "name": "submit_gap_analysis",
+    "description": "Submit the compliance gap analysis results.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "gaps": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "regulation":             {"type": "string"},
+                        "article_number":         {"type": "string"},
+                        "article_title":          {"type": "string"},
+                        "status":                 {"type": "string", "enum": ["COMPLIANT","PARTIALLY_COMPLIANT","NON_COMPLIANT","CANNOT_ASSESS"]},
+                        "evidence":               {"type": "string"},
+                        "deficiency_description": {"type": "string"},
+                    },
+                    "required": ["regulation","article_number","article_title","status","evidence"],
+                },
+            }
+        },
+        "required": ["gaps"],
+    },
+}
+
+_TOOL_ACTION_PLAN = {
+    "name": "submit_action_plan",
+    "description": "Submit the prioritized compliance action plan.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "actions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "regulation":       {"type": "string"},
+                        "article_number":   {"type": "string"},
+                        "action":           {"type": "string"},
+                        "priority":         {"type": "string", "enum": ["CRITICAL","HIGH","MEDIUM","LOW"]},
+                        "estimated_effort": {"type": "string"},
+                        "deadline":         {"type": ["string", "null"]},
+                        "dependencies":     {"type": "array", "items": {"type": "string"}},
+                        "gap_reference":    {"type": "string"},
+                    },
+                    "required": ["regulation","article_number","action","priority","estimated_effort","gap_reference"],
+                },
+            }
+        },
+        "required": ["actions"],
+    },
+}
 
 
 def _llm_call(
@@ -303,7 +356,18 @@ def _llm_call(
     step_name: str,
     failures: list[str],
     max_tokens: int = 4096,
+    tool: dict | None = None,
+    tool_result_key: str | None = None,
 ) -> list:
+    """
+    Call the LLM and parse structured output.
+
+    When `tool` is provided the call uses Anthropic tool use — the model is
+    forced to return data matching the tool's JSON schema, eliminating manual
+    fence-stripping and json.loads() fragility.  The structured dict at
+    `tool_result_key` is serialised back to a JSON string so that `parse_fn`
+    (which expects a JSON string) remains unchanged.
+    """
     import time
     if not settings.llm_api_key:
         logger.warning("%s: no LLM API key configured, skipping", step_name)
@@ -311,17 +375,42 @@ def _llm_call(
         return []
 
     last_exc: Exception | None = None
-    max_attempts = settings.llm_max_retries + 1  # default: 5 total (4 retries)
+    max_attempts = settings.llm_max_retries + 1
     for attempt in range(max_attempts):
         try:
-            response = _llm_client().messages.create(
+            kwargs: dict = dict(
                 model=settings.llm_model,
                 max_tokens=max_tokens,
                 temperature=0,
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return parse_fn(_strip_fences(response.content[0].text))
+            if tool:
+                kwargs["tools"] = [tool]
+                kwargs["tool_choice"] = {"type": "tool", "name": tool["name"]}
+
+            response = _llm_client().messages.create(**kwargs)
+
+            if tool and tool_result_key:
+                # Extract structured output from tool use block
+                tool_block = next(
+                    (b for b in response.content if b.type == "tool_use"),
+                    None,
+                )
+                if tool_block is None:
+                    raise ValueError("model did not return a tool_use block")
+                raw_list = tool_block.input.get(tool_result_key, [])
+                return parse_fn(json.dumps(raw_list))
+            else:
+                # Text mode fallback (executive summary path never reaches here,
+                # but kept for safety)
+                text = response.content[0].text.strip()
+                if text.startswith("```"):
+                    lines = text.splitlines()
+                    end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
+                    text = "\n".join(lines[1:end]).strip()
+                return parse_fn(text)
+
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("%s: parse error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
@@ -333,7 +422,7 @@ def _llm_call(
             last_exc = exc
 
         if attempt < max_attempts - 1:
-            backoff = 2 ** attempt  # 1s, 2s, 4s, 8s
+            backoff = 2 ** attempt
             logger.info("%s: retrying in %ds", step_name, backoff)
             time.sleep(backoff)
 

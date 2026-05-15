@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""  # Full admin key — bypasses RLS, never expose to clients
     database_url: str = ""
 
+    # Document encryption (Fernet key for uploaded company files at rest)
+    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    # If unset, an ephemeral key is generated per process (fine for dev; set in production)
+    document_encryption_key: str = ""
+
     # CORS (comma-separated list of allowed origins)
     allowed_origins: str = "http://localhost:3000,http://localhost:3001"
 

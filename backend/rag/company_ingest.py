@@ -26,42 +26,50 @@ def collection_name(job_id: str) -> str:
     return f"job_{job_id[:8]}"
 
 
-def ingest_company_documents(job_id: str, file_paths: list[Path]) -> int:
+def ingest_company_documents(job_id: str, session_id: str) -> int:
     """
-    Extract, chunk, embed, and index company documents.
+    Decrypt, extract, chunk, embed, and index company documents for a job.
     Returns the number of chunks indexed (0 if no files).
+
+    Files are read via document_store.read_file() which decrypts them in memory —
+    plaintext bytes never touch disk outside of the temp store.
     """
-    if not file_paths:
+    from services.document_store import document_store
+    enc_paths = document_store.list_files(session_id)
+    if not enc_paths:
         return 0
 
-    col_name = collection_name(job_id)
-    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = client.get_or_create_collection(
+    from rag.ingest import _chroma_client
+    col_name   = collection_name(job_id)
+    collection = _chroma_client().get_or_create_collection(
         name=col_name,
         metadata={"hnsw:space": "cosine"},
     )
 
     total = 0
-    for path in file_paths:
+    for enc_path in enc_paths:
+        # Derive the original filename by stripping the .enc suffix
+        original_name = enc_path.stem  # e.g. "policy.pdf"
         try:
-            text = _extract(path)
-            chunks = _chunk(text, path.name)
+            plaintext = document_store.read_file(session_id, original_name)
+            text = _extract_bytes(plaintext, original_name)
+            chunks = _chunk(text, original_name)
             if not chunks:
                 continue
 
             texts = [c["text"] for c in chunks]
             embeddings = embed_passages(texts)
-            ids = [f"{col_name}_{path.stem}_{i}" for i in range(len(chunks))]
+            ids = [f"{col_name}_{Path(original_name).stem}_{i}" for i in range(len(chunks))]
             collection.upsert(
                 ids=ids,
                 embeddings=embeddings,
                 documents=texts,
                 metadatas=[c["metadata"] for c in chunks],
             )
-            logger.info("company doc %s: %d chunks", path.name, len(chunks))
+            logger.info("company doc %s: %d chunks", original_name, len(chunks))
             total += len(chunks)
         except Exception as exc:
-            logger.warning("company doc %s: skipped (%s)", path.name, exc)
+            logger.warning("company doc %s: skipped (%s)", original_name, exc)
 
     logger.info("job %s: %d company doc chunks indexed in %s", job_id, total, col_name)
     return total
@@ -123,12 +131,15 @@ def delete_company_docs(job_id: str) -> None:
 
 # ── Text extraction ────────────────────────────────────────────────────────────
 
-def _extract(path: Path) -> str:
-    if path.suffix.lower() == ".pdf":
-        with pdfplumber.open(str(path)) as pdf:
+def _extract_bytes(content: bytes, filename: str) -> str:
+    """Extract text from decrypted file bytes without touching disk."""
+    suffix = Path(filename).suffix.lower()
+    if suffix == ".pdf":
+        import io
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
             pages = [p.extract_text() or "" for p in pdf.pages]
         return "\n\n".join(p.strip() for p in pages if p.strip())
-    return path.read_text(encoding="utf-8", errors="replace")
+    return content.decode("utf-8", errors="replace")
 
 
 # ── Chunking ───────────────────────────────────────────────────────────────────

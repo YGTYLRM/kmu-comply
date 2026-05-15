@@ -1,25 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, REGULATION_LABEL } from "@/lib/utils";
 import type { ComplianceReport, Priority } from "@/lib/types";
 import { Clock, CalendarDays, CheckCircle2, Circle } from "lucide-react";
+import { authFetch } from "@/lib/api";
 
 interface Props { report: ComplianceReport }
 
 const PRIORITY_ORDER: Record<Priority, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
 const PRIORITY_STYLE: Record<Priority, { bar: string; badge: string; label: string }> = {
-  CRITICAL: { bar: "bg-red-500",    badge: "bg-red-500/15 text-red-400 border-red-500/30",       label: "Critical" },
+  CRITICAL: { bar: "bg-red-500",    badge: "bg-red-500/15 text-red-400 border-red-500/30",         label: "Critical" },
   HIGH:     { bar: "bg-orange-500", badge: "bg-orange-500/15 text-orange-400 border-orange-500/30", label: "High" },
-  MEDIUM:   { bar: "bg-amber-400",  badge: "bg-amber-500/15 text-amber-400 border-amber-500/30",   label: "Medium" },
+  MEDIUM:   { bar: "bg-amber-400",  badge: "bg-amber-500/15 text-amber-400 border-amber-500/30",    label: "Medium" },
   LOW:      { bar: "bg-emerald-500",badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30", label: "Low" },
 };
 
-function taskKey(jobId: string, regulation: string, article: string) {
-  return `complio_done_${jobId}_${regulation}_${article}`;
+function itemKey(regulation: string, article: string) {
+  return `${regulation}::${article}`;
 }
 
 export function ActionPlan({ report }: Props) {
@@ -31,33 +32,72 @@ export function ActionPlan({ report }: Props) {
   );
 
   const [done, setDone] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
 
+  // Load completion state from DB on mount
   useEffect(() => {
     if (!jobId) return;
-    const initialDone = new Set<string>();
-    sorted.forEach((item) => {
-      const k = taskKey(jobId, item.regulation, item.article_number);
-      if (localStorage.getItem(k) === "done") initialDone.add(k);
-    });
-    setDone(initialDone);
+    authFetch(`/api/report/${jobId}/completions`)
+      .then((res) => res.json())
+      .then((data) => {
+        const keys = new Set<string>(
+          (data.completions ?? []).map((c: { regulation: string; article_number: string }) =>
+            itemKey(c.regulation, c.article_number)
+          )
+        );
+        setDone(keys);
+      })
+      .catch(() => {
+        // Fallback to localStorage if API fails (e.g. unauthenticated)
+        const fallback = new Set<string>();
+        sorted.forEach((item) => {
+          const legacyKey = `complio_done_${jobId}_${item.regulation}_${item.article_number}`;
+          if (localStorage.getItem(legacyKey) === "done") {
+            fallback.add(itemKey(item.regulation, item.article_number));
+          }
+        });
+        setDone(fallback);
+      })
+      .finally(() => setLoading(false));
   }, [jobId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggle = (key: string) => {
+  const toggle = useCallback(async (regulation: string, article: string) => {
+    const key = itemKey(regulation, article);
+    const isDone = done.has(key);
+
+    // Optimistic update
     setDone((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) {
-        next.delete(key);
-        localStorage.removeItem(key);
-      } else {
-        next.add(key);
-        localStorage.setItem(key, "done");
-      }
+      isDone ? next.delete(key) : next.add(key);
       return next;
     });
-  };
+
+    try {
+      if (isDone) {
+        await authFetch(`/api/report/${jobId}/completions`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ regulation, article_number: article }),
+        });
+      } else {
+        await authFetch(`/api/report/${jobId}/completions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ regulation, article_number: article }),
+        });
+      }
+    } catch {
+      // Revert on failure
+      setDone((prev) => {
+        const next = new Set(prev);
+        isDone ? next.add(key) : next.delete(key);
+        return next;
+      });
+    }
+  }, [done, jobId]);
 
   const doneCount = sorted.filter((item) =>
-    done.has(taskKey(jobId, item.regulation, item.article_number))
+    done.has(itemKey(item.regulation, item.article_number))
   ).length;
 
   return (
@@ -78,8 +118,8 @@ export function ActionPlan({ report }: Props) {
       <CardContent className="p-0">
         <div className="divide-y divide-white/[0.04]">
           {sorted.map((item, i) => {
-            const style = PRIORITY_STYLE[item.priority];
-            const key   = taskKey(jobId, item.regulation, item.article_number);
+            const style  = PRIORITY_STYLE[item.priority];
+            const key    = itemKey(item.regulation, item.article_number);
             const isDone = done.has(key);
             return (
               <div key={i} className={cn("flex gap-0 transition-opacity duration-200", isDone && "opacity-40")}>
@@ -95,9 +135,10 @@ export function ActionPlan({ report }: Props) {
                       </span>
                     </div>
                     <button
-                      onClick={() => toggle(key)}
+                      onClick={() => toggle(item.regulation, item.article_number)}
+                      disabled={loading}
                       title={isDone ? "Mark as not done" : "Mark as done"}
-                      className="flex-shrink-0 mt-0.5 text-slate-600 hover:text-emerald-400 transition-colors"
+                      className="flex-shrink-0 mt-0.5 text-slate-600 hover:text-emerald-400 transition-colors disabled:opacity-40"
                     >
                       {isDone
                         ? <CheckCircle2 className="h-4 w-4 text-emerald-400" />
