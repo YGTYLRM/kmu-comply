@@ -175,6 +175,23 @@ class Subscription(Base):
     user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
+class ExpertReviewRequest(Base):
+    """User request for expert (lawyer/consultant) review of compliance findings."""
+    __tablename__ = "expert_review_requests"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    job_id: Mapped[str] = mapped_column(String, nullable=False)
+    company_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    user_email: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    # Which specific findings to review (JSON list of {regulation, article_number})
+    focus_items: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|in_review|completed
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
 class PendingRegulationUpdate(Base):
     """Staged regulation download awaiting human approval before KB update."""
     __tablename__ = "pending_regulation_updates"
@@ -199,7 +216,12 @@ class ActionCompletion(Base):
     job_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
     regulation: Mapped[str] = mapped_column(String(100), nullable=False)
     article_number: Mapped[str] = mapped_column(String(50), nullable=False)
-    completed_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    # status: open | in_progress | done
+    status: Mapped[str] = mapped_column(String(20), default="open", nullable=False)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evidence_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
 
 class RateLimitEvent(Base):
