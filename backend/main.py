@@ -550,6 +550,27 @@ async def mark_notifications_read(current_user: dict = Depends(get_current_user)
     return {"ok": True}
 
 
+@app.get("/api/plans")
+async def list_plans():
+    """Return current plan definitions for the frontend pricing UI."""
+    from services.stripe_service import PLAN_CONFIG
+    return {
+        "plans": [
+            {
+                "id": plan_id,
+                "name": cfg["name"],
+                "amount_cents": cfg["amount"],
+                "currency": cfg["currency"],
+                "interval": cfg["interval"],
+                "company_limit": cfg["company_limit"],
+                "reassessment_days": cfg["reassessment_days"],
+                "features": cfg.get("features", []),
+            }
+            for plan_id, cfg in PLAN_CONFIG.items()
+        ]
+    }
+
+
 @app.get("/api/regulations", response_model=RegulationsListResponse)
 async def list_regulations():
     from models.api_responses import RegulationInfo

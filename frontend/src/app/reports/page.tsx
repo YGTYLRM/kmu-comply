@@ -54,18 +54,34 @@ export default function ReportsPage() {
         )}
 
         {!loading && !error && reports.length === 0 && (
-          <div className="flex flex-col items-center gap-4 py-20 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.03]">
-              <FileText className="h-6 w-6 text-slate-600" />
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-5 py-20 text-center max-w-sm mx-auto"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-500/20 bg-brand-500/10">
+              <FileText className="h-6 w-6 text-brand-400" />
             </div>
-            <p className="text-slate-500 text-sm">No reports yet.</p>
-            <Link
-              href="/analyze"
-              className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors"
-            >
-              Run your first screening
-            </Link>
-          </div>
+            <div>
+              <h3 className="text-base font-bold text-white mb-1">No reports yet</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Run a compliance screening to generate your first report.
+                It covers 11 German and EU regulations and takes about 2 minutes.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              <Link
+                href="/analyze"
+                className="w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-500 transition-colors text-center"
+              >
+                Start a screening
+              </Link>
+              <Link
+                href="/dashboard"
+                className="w-full rounded-xl border border-white/[0.08] px-5 py-3 text-sm font-medium text-slate-400 hover:text-white hover:border-white/20 transition-colors text-center"
+              >
+                Go to dashboard
+              </Link>
+            </div>
+          </motion.div>
         )}
 
         {!loading && reports.length > 0 && (
