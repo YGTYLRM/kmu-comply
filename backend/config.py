@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""  # Full admin key — bypasses RLS, never expose to clients
     database_url: str = ""
 
+    # Observability
+    sentry_dsn: str = ""   # Set to enable Sentry error tracking
+
     # Admin API key — required for regulation update approval endpoints
     admin_api_key: str = ""
 

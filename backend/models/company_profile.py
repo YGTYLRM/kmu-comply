@@ -212,5 +212,8 @@ class EnrichedCompanyProfile(CompanyProfile):
     """Profile after Step 1 enrichment — adds inferred fields and validation notes."""
 
     inferred_characteristics: list[str] = Field(default_factory=list)
+    # Assumptions inferred by the LLM — NOT confirmed by the user.
+    # Must not be used as the sole basis for NON_COMPLIANT gap findings.
+    inferred_assumptions: list[str] = Field(default_factory=list)
     missing_optional_fields: list[str] = Field(default_factory=list)
     validation_warnings: list[str] = Field(default_factory=list)

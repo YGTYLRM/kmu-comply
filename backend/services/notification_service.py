@@ -73,6 +73,7 @@ def _build_email_html(
     report: ComplianceReport,
     triggered_by: str,
     prev_report: ComplianceReport | None,
+    changed_sections: list[str] | None = None,
 ) -> tuple[str, str]:
     """Returns (subject, html_body)."""
     score = report.overall_score_percent
@@ -88,6 +89,23 @@ def _build_email_html(
     else:
         subject = f"Monthly compliance update for {company_name}"
         trigger_line = "Your monthly compliance screening has completed."
+
+    # Changed sections block — only shown for regulation-change notifications
+    changed_sections_block = ""
+    if triggered_by == "reg_change" and changed_sections:
+        items = "".join(
+            f'<li style="margin-bottom:4px;color:#93c5fd;font-family:monospace">{s}</li>'
+            for s in changed_sections[:20]  # cap at 20 to keep email readable
+        )
+        overflow = f'<p style="font-size:11px;color:#475569;margin:6px 0 0">…and {len(changed_sections) - 20} more sections</p>' if len(changed_sections) > 20 else ""
+        changed_sections_block = f"""
+        <div style="background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.25);border-radius:10px;padding:14px 18px;margin-bottom:20px">
+          <p style="font-size:12px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px">
+            Sections that changed
+          </p>
+          <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">{items}</ul>
+          {overflow}
+        </div>"""
 
     regression_block = ""
     if regressions:
@@ -145,6 +163,8 @@ def _build_email_html(
       </div>
     </div>
 
+    {changed_sections_block}
+
     {regression_block}
 
     <!-- CTA -->
@@ -182,6 +202,7 @@ async def send_notification_email(
     report: ComplianceReport,
     triggered_by: str,
     prev_report: ComplianceReport | None = None,
+    changed_sections: list[str] | None = None,
 ) -> bool:
     """
     Send a notification email and mark the notification as sent in the DB.
@@ -195,7 +216,7 @@ async def send_notification_email(
         import resend
         resend.api_key = settings.resend_api_key
 
-        subject, html_body = _build_email_html(company_name, report, triggered_by, prev_report)
+        subject, html_body = _build_email_html(company_name, report, triggered_by, prev_report, changed_sections)
 
         resend.Emails.send({
             "from": "Complio Monitor <onboarding@resend.dev>",

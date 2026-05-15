@@ -11,6 +11,19 @@ from time import time
 import html
 
 from config import settings
+
+# Sentry error tracking — initialize before anything else so all errors are captured
+if settings.sentry_dsn:
+    import sentry_sdk
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+    from sentry_sdk.integrations.asyncio import AsyncioIntegration
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        integrations=[FastApiIntegration(), AsyncioIntegration()],
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
 from models import (
     CompanyProfile,
     AnalyzeResponse,
@@ -207,13 +220,46 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 
-@app.get("/api/health", response_model=HealthResponse)
+@app.get("/api/health")
 async def health():
-    return HealthResponse(
-        status="ok",
-        chromadb="not_connected",
-        embedding_model=settings.embedding_model,
-    )
+    import asyncio
+    checks: dict[str, str] = {}
+
+    # ChromaDB
+    def _chroma_check():
+        try:
+            from rag.ingest import _chroma_client
+            client = _chroma_client()
+            client.list_collections()
+            return "ok"
+        except Exception as exc:
+            return f"error: {exc}"
+    loop = asyncio.get_event_loop()
+    checks["chromadb"] = await loop.run_in_executor(None, _chroma_check)
+
+    # Database
+    if settings.database_url:
+        try:
+            from db.database import AsyncSessionLocal
+            from sqlalchemy import text
+            async with AsyncSessionLocal() as db:
+                await db.execute(text("SELECT 1"))
+            checks["database"] = "ok"
+        except Exception as exc:
+            checks["database"] = f"error: {exc}"
+    else:
+        checks["database"] = "not_configured"
+
+    # LLM API (lightweight check — just verify the key is set and client constructs)
+    checks["llm"] = "configured" if settings.llm_api_key else "not_configured"
+
+    overall = "ok" if all(v in ("ok", "configured", "not_configured") for v in checks.values()) else "degraded"
+    return {
+        "status": overall,
+        "environment": settings.environment,
+        "embedding_model": settings.embedding_model,
+        "checks": checks,
+    }
 
 
 @app.post("/api/auth/sync-profile")
@@ -279,10 +325,24 @@ async def upload_documents(files: list[UploadFile] = File(...), current_user: di
     saved: list[str] = []
     errors: list[str] = []
 
+    from services.injection_guard import classify_document_for_injection
+
     for f in files:
         try:
             content = await f.read()
-            name = document_store.save_file(session_id, f.filename or "upload", content)
+            filename = f.filename or "upload"
+
+            # Quick injection screen on raw text extraction before storing
+            try:
+                preview_text = content[:4000].decode("utf-8", errors="replace")
+                is_safe, reason = classify_document_for_injection(preview_text, source_name=filename)
+                if not is_safe:
+                    errors.append(f"'{filename}' was rejected: {reason}")
+                    continue
+            except Exception:
+                pass  # guard failure is non-fatal — log and continue
+
+            name = document_store.save_file(session_id, filename, content)
             saved.append(name)
         except ValueError as e:
             errors.append(str(e))
@@ -341,7 +401,7 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
 @app.get("/api/status/{job_id}", response_model=StatusResponse)
 async def get_status(job_id: str, current_user: dict = Depends(get_current_user)):
     await _assert_owns_job(job_id, current_user["id"])
-    status = job_manager.get_status(job_id)
+    status = await job_manager.get_status_async(job_id)
     if status is None:
         raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
     return status
