@@ -65,15 +65,14 @@ async def run_analysis(
         None, retrieve_regulatory_context, enriched, applicability
     )
 
-    # Ingest company documents if provided
+    # Ingest company documents if provided (decrypted in memory via document_store)
     if doc_session_id:
         from rag.company_ingest import ingest_company_documents
         from services.document_store import document_store
-        file_paths = document_store.list_files(doc_session_id)
-        if file_paths:
-            logger.info("job %s: ingesting %d company documents", job_id, len(file_paths))
+        if document_store.list_files(doc_session_id):
+            logger.info("job %s: ingesting company documents from session %s", job_id, doc_session_id)
             await loop.run_in_executor(
-                None, ingest_company_documents, job_id, file_paths
+                None, ingest_company_documents, job_id, doc_session_id
             )
 
     # Step 4 — gap analysis (with company doc evidence if available)

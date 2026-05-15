@@ -466,6 +466,71 @@ async def get_company(company_id: str, current_user: dict = Depends(get_current_
     }
 
 
+@app.get("/api/report/{job_id}/completions")
+async def get_completions(job_id: str, current_user: dict = Depends(get_current_user)):
+    """Return completed action item keys for a report."""
+    await _assert_owns_job(job_id, current_user["id"])
+    from db.database import AsyncSessionLocal
+    from db.models import ActionCompletion
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db:
+        rows = (await db.execute(
+            select(ActionCompletion.regulation, ActionCompletion.article_number)
+            .where(ActionCompletion.job_id == job_id, ActionCompletion.user_id == current_user["id"])
+        )).all()
+    return {"completions": [{"regulation": r, "article_number": a} for r, a in rows]}
+
+
+class CompletionRequest(BaseModel):
+    regulation: str
+    article_number: str
+
+
+@app.post("/api/report/{job_id}/completions")
+async def mark_complete(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
+    """Mark an action item as done."""
+    await _assert_owns_job(job_id, current_user["id"])
+    from db.database import AsyncSessionLocal
+    from db.models import ActionCompletion
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db:
+        exists = (await db.execute(
+            select(ActionCompletion).where(
+                ActionCompletion.job_id == job_id,
+                ActionCompletion.user_id == current_user["id"],
+                ActionCompletion.regulation == req.regulation,
+                ActionCompletion.article_number == req.article_number,
+            )
+        )).scalar_one_or_none()
+        if not exists:
+            db.add(ActionCompletion(
+                user_id=current_user["id"], job_id=job_id,
+                regulation=req.regulation, article_number=req.article_number,
+            ))
+            await db.commit()
+    return {"ok": True}
+
+
+@app.delete("/api/report/{job_id}/completions")
+async def mark_incomplete(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
+    """Mark an action item as not done."""
+    await _assert_owns_job(job_id, current_user["id"])
+    from db.database import AsyncSessionLocal
+    from db.models import ActionCompletion
+    from sqlalchemy import delete
+    async with AsyncSessionLocal() as db:
+        await db.execute(
+            delete(ActionCompletion).where(
+                ActionCompletion.job_id == job_id,
+                ActionCompletion.user_id == current_user["id"],
+                ActionCompletion.regulation == req.regulation,
+                ActionCompletion.article_number == req.article_number,
+            )
+        )
+        await db.commit()
+    return {"ok": True}
+
+
 @app.get("/api/notifications")
 async def list_notifications(current_user: dict = Depends(get_current_user)):
     from services.notification_service import get_notifications
