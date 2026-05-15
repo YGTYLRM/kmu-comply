@@ -1,9 +1,10 @@
 """
-Disk-based report persistence.
+Report persistence — DB is the source of truth when DATABASE_URL is set.
+Disk (data/reports/) is kept as a resilience backup and for local-only mode.
 
-Reports are stored at data/reports/{job_id}.json.
-The _user_id field inside the JSON records the owner — never return
-a report to a user whose ID doesn't match.
+Read path:  DB first → disk fallback
+Write path: disk always (fast backup); DB write handled by job_manager via db_service
+List path:  DB query (O(1)) → disk scan fallback
 """
 import json
 import logging
@@ -15,11 +16,9 @@ logger = logging.getLogger(__name__)
 
 REPORTS_DIR = Path(__file__).parent.parent / "data" / "reports"
 
-# Pattern: only actual report files, not *_profile.json side-cars
-_REPORT_GLOB = "[0-9a-zA-Z]*-[0-9a-zA-Z]*.json"
-
 
 def save(report: ComplianceReport, user_id: str | None = None) -> None:
+    """Write report to disk as a resilience backup. DB write is handled by job_manager."""
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     path = REPORTS_DIR / f"{report.job_id}.json"
     try:
@@ -27,57 +26,81 @@ def save(report: ComplianceReport, user_id: str | None = None) -> None:
         if user_id:
             data["_user_id"] = user_id
         path.write_text(json.dumps(data), encoding="utf-8")
-        logger.info("report_store: saved %s (owner=%s)", report.job_id, user_id)
+        logger.info("report_store: disk backup saved %s", report.job_id)
     except Exception as exc:
-        logger.error("report_store: failed to save %s: %s", report.job_id, exc)
+        logger.error("report_store: disk backup failed for %s: %s", report.job_id, exc)
 
 
 def load(job_id: str) -> ComplianceReport | None:
+    """Load report — DB first, disk fallback."""
+    from config import settings
+    if settings.database_url:
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    raw = pool.submit(asyncio.run, _load_from_db(job_id)).result()
+            else:
+                raw = loop.run_until_complete(_load_from_db(job_id))
+            if raw:
+                raw.pop("_user_id", None)
+                return ComplianceReport.model_validate(raw)
+        except Exception as exc:
+            logger.warning("report_store: DB load failed for %s, trying disk: %s", job_id, exc)
+
+    return _load_from_disk(job_id)
+
+
+async def load_async(job_id: str) -> ComplianceReport | None:
+    """Async version of load — preferred in async contexts."""
+    from config import settings
+    if settings.database_url:
+        try:
+            raw = await _load_from_db(job_id)
+            if raw:
+                raw.pop("_user_id", None)
+                return ComplianceReport.model_validate(raw)
+        except Exception as exc:
+            logger.warning("report_store: DB load failed for %s, trying disk: %s", job_id, exc)
+    return _load_from_disk(job_id)
+
+
+def _load_from_disk(job_id: str) -> ComplianceReport | None:
     path = REPORTS_DIR / f"{job_id}.json"
     if not path.exists():
         return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-        data.pop("_user_id", None)  # strip internal field before parsing
+        data.pop("_user_id", None)
         return ComplianceReport.model_validate(data)
     except Exception as exc:
-        logger.error("report_store: failed to load %s: %s", job_id, exc)
+        logger.error("report_store: disk load failed for %s: %s", job_id, exc)
         return None
+
+
+async def _load_from_db(job_id: str) -> dict | None:
+    from services.db_service import get_report_by_job_id
+    return await get_report_by_job_id(job_id)
 
 
 def exists(job_id: str) -> bool:
+    """Check existence — disk only (sync, called from job_manager status resolution)."""
     return (REPORTS_DIR / f"{job_id}.json").exists()
 
 
-def get_owner(job_id: str) -> str | None:
-    """Return the user_id that owns this report, or None if unknown (legacy)."""
-    path = REPORTS_DIR / f"{job_id}.json"
-    if not path.exists():
-        return None
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data.get("_user_id")
-    except Exception:
-        return None
-
-
-def load_all_owners() -> dict[str, str]:
-    """Rebuild the job_id → user_id map from disk on startup."""
-    if not REPORTS_DIR.exists():
-        return {}
-    owners: dict[str, str] = {}
-    for path in REPORTS_DIR.glob("*.json"):
-        if "_profile" in path.name or "_owner" in path.name:
-            continue
+async def exists_async(job_id: str) -> bool:
+    """Async existence check — DB first, disk fallback."""
+    from config import settings
+    if settings.database_url:
+        from services.db_service import report_exists_in_db
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            uid = data.get("_user_id")
-            jid = data.get("job_id")
-            if uid and jid:
-                owners[jid] = uid
+            if await report_exists_in_db(job_id):
+                return True
         except Exception:
             pass
-    return owners
+    return (REPORTS_DIR / f"{job_id}.json").exists()
 
 
 def save_profile(job_id: str, profile: dict) -> None:
@@ -101,11 +124,49 @@ def load_profile(job_id: str) -> dict | None:
 
 
 def list_recent(limit: int = 50, user_id: str | None = None) -> list[dict]:
-    """Return summary metadata for recent reports, scoped to user_id if given."""
+    """
+    Return report summaries. Uses DB query (O(1)) when DATABASE_URL is set,
+    falls back to filesystem scan otherwise.
+    """
+    from config import settings
+    if settings.database_url and user_id:
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    return pool.submit(
+                        asyncio.run, _list_from_db(user_id, limit)
+                    ).result()
+            else:
+                return loop.run_until_complete(_list_from_db(user_id, limit))
+        except Exception as exc:
+            logger.warning("report_store: DB list failed, falling back to disk: %s", exc)
+
+    return _list_from_disk(limit=limit, user_id=user_id)
+
+
+async def list_recent_async(limit: int = 50, user_id: str | None = None) -> list[dict]:
+    """Async version of list_recent — preferred in async contexts."""
+    from config import settings
+    if settings.database_url and user_id:
+        try:
+            return await _list_from_db(user_id, limit)
+        except Exception as exc:
+            logger.warning("report_store: DB list failed, falling back to disk: %s", exc)
+    return _list_from_disk(limit=limit, user_id=user_id)
+
+
+async def _list_from_db(user_id: str, limit: int) -> list[dict]:
+    from services.db_service import list_reports_for_user
+    return await list_reports_for_user(user_id, limit=limit)
+
+
+def _list_from_disk(limit: int = 50, user_id: str | None = None) -> list[dict]:
     if not REPORTS_DIR.exists():
         return []
     entries = []
-    # Exclude _profile.json and other side-car files
     paths = sorted(
         (p for p in REPORTS_DIR.glob("*.json") if "_" not in p.stem),
         key=lambda p: p.stat().st_mtime,
@@ -117,10 +178,8 @@ def list_recent(limit: int = 50, user_id: str | None = None) -> list[dict]:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             owner = data.get("_user_id")
-            # Filter: skip reports that belong to a different user
             if user_id and owner and owner != user_id:
                 continue
-            # Skip legacy unowned reports when user filtering is active
             if user_id and not owner:
                 continue
             applicable = sum(1 for r in data.get("applicable_regulations", []) if r.get("applies"))

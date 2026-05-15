@@ -28,10 +28,14 @@ logger = logging.getLogger(__name__)
 _chroma: chromadb.PersistentClient | None = None
 
 
-def _chroma_client() -> chromadb.PersistentClient:
+def _chroma_client():
     global _chroma
     if _chroma is None:
-        _chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        from config import settings
+        if settings.chroma_server_url:
+            _chroma = chromadb.HttpClient(host=settings.chroma_server_url)
+        else:
+            _chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
     return _chroma
 
 
