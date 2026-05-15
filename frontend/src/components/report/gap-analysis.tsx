@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn, REGULATION_LABEL, STATUS_COLOR } from "@/lib/utils";
 import type { ComplianceReport } from "@/lib/types";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, HelpCircle, ExternalLink } from "lucide-react";
 
 interface Props {
   report: ComplianceReport;
@@ -69,10 +69,39 @@ export function GapAnalysis({ report }: Props) {
                           Art. {gap.article_number}
                         </span>
                         <span className="text-sm font-medium text-slate-300">{gap.article_title}</span>
-                        <Badge className={cn("ml-auto", STATUS_COLOR[gap.status])}>
-                          {gap.status.replace("_", " ")}
-                        </Badge>
+                        {gap.source_url && (
+                          <a
+                            href={gap.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="View official source"
+                            className="flex-shrink-0 text-slate-600 hover:text-brand-400 transition-colors"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
+                        <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
+                          {gap.confidence && gap.confidence !== "HIGH" && (
+                            <span
+                              title={gap.confidence_reason}
+                              className={cn(
+                                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full border",
+                                gap.confidence === "MEDIUM"
+                                  ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                                  : "bg-orange-500/10 border-orange-500/20 text-orange-400"
+                              )}
+                            >
+                              {gap.confidence} confidence
+                            </span>
+                          )}
+                          <Badge className={STATUS_COLOR[gap.status]}>
+                            {gap.status.replace("_", " ")}
+                          </Badge>
+                        </div>
                       </div>
+                      {gap.confidence_reason && gap.confidence !== "HIGH" && (
+                        <p className="mt-1 text-[10px] text-slate-600 italic">{gap.confidence_reason}</p>
+                      )}
                       <p className="mt-1.5 text-xs text-slate-500">{gap.evidence}</p>
                       {gap.deficiency_description && (
                         <p className="mt-1 text-xs text-red-400">{gap.deficiency_description}</p>
