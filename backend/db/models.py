@@ -175,6 +175,15 @@ class Subscription(Base):
     user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
+class RateLimitEvent(Base):
+    __tablename__ = "rate_limit_events"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    endpoint: Mapped[str] = mapped_column(String(100), nullable=False)
+    called_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
 class Notification(Base):
     __tablename__ = "notifications"
 

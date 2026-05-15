@@ -224,6 +224,109 @@ async def get_companies_for_regulation(regulation_name: str) -> list[dict]:
     return results
 
 
+async def get_report_by_job_id(job_id: str) -> dict | None:
+    """
+    Load a full report JSON from the DB by job_id.
+    Returns the raw_json dict or None if not found.
+    """
+    from db.database import AsyncSessionLocal
+    from db.models import Report
+    from sqlalchemy import select
+
+    try:
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(Report.raw_json).where(Report.job_id == job_id)
+            )
+            return result.scalar_one_or_none()
+    except Exception as exc:
+        logger.warning("db_service: get_report_by_job_id failed for %s: %s", job_id, exc)
+        return None
+
+
+async def report_exists_in_db(job_id: str) -> bool:
+    """Return True if a report with this job_id exists in the DB."""
+    from db.database import AsyncSessionLocal
+    from db.models import Report
+    from sqlalchemy import select, func
+
+    try:
+        async with AsyncSessionLocal() as db:
+            count = (await db.execute(
+                select(func.count()).where(Report.job_id == job_id)
+            )).scalar_one()
+            return count > 0
+    except Exception:
+        return False
+
+
+async def list_reports_for_user(user_id: str, limit: int = 50) -> list[dict]:
+    """
+    Return report summaries for a user from the DB, newest first.
+    Replaces the O(n) filesystem scan in report_store.list_recent().
+    """
+    from db.database import AsyncSessionLocal
+    from db.models import Report, Company
+    from sqlalchemy import select
+
+    try:
+        async with AsyncSessionLocal() as db:
+            stmt = (
+                select(
+                    Report.job_id,
+                    Report.overall_score_percent,
+                    Report.created_at,
+                    Company.name.label("company_name"),
+                    Report.raw_json,
+                )
+                .join(Company, Company.id == Report.company_id)
+                .where(Company.user_id == user_id)
+                .order_by(Report.created_at.desc())
+                .limit(limit)
+            )
+            rows = (await db.execute(stmt)).all()
+            results = []
+            for job_id, score, created_at, company_name, raw in rows:
+                applicable = 0
+                if raw:
+                    applicable = sum(
+                        1 for r in raw.get("applicable_regulations", []) if r.get("applies")
+                    )
+                results.append({
+                    "job_id": job_id,
+                    "company_name": company_name,
+                    "generated_at": created_at.isoformat() if created_at else None,
+                    "overall_score_percent": score,
+                    "applicable_regulation_count": applicable,
+                })
+            return results
+    except Exception as exc:
+        logger.warning("db_service: list_reports_for_user failed: %s", exc)
+        return []
+
+
+async def get_job_owner(job_id: str) -> str | None:
+    """
+    Return the user_id that owns a completed job, queried from the DB.
+    Returns None if the job is not yet persisted (still running) or unknown.
+    """
+    from db.database import AsyncSessionLocal
+    from db.models import Report, Company
+    from sqlalchemy import select
+
+    try:
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(Company.user_id)
+                .join(Report, Report.company_id == Company.id)
+                .where(Report.job_id == job_id)
+                .limit(1)
+            )
+            return result.scalar_one_or_none()
+    except Exception:
+        return None
+
+
 def _company_to_profile(company) -> dict:
     """Convert a Company ORM object back to a CompanyProfile-compatible dict."""
     return {

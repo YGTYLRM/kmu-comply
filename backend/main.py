@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from collections import defaultdict
+from datetime import datetime, timezone
 from time import time
 import html
 
@@ -27,32 +28,76 @@ from services.auth_service import get_current_user, get_optional_user
 
 job_manager = JobManager(ttl_seconds=settings.job_ttl_seconds)
 
-# Simple in-memory rate limiter: user_id → list of timestamps
-_analyze_calls: dict[str, list[float]] = defaultdict(list)
-ANALYZE_LIMIT = 10   # max requests
-ANALYZE_WINDOW = 3600  # per hour
-
 # Job ownership: job_id → user_id (guards report endpoints)
 _job_owners: dict[str, str] = {}
 
+ANALYZE_LIMIT = 10
+ANALYZE_WINDOW = 3600  # seconds
 
-def _check_rate_limit(user_id: str) -> None:
-    now = time()
-    calls = [t for t in _analyze_calls[user_id] if now - t < ANALYZE_WINDOW]
-    _analyze_calls[user_id] = calls
-    if len(calls) >= ANALYZE_LIMIT:
-        oldest = min(calls)
-        retry_in = int(ANALYZE_WINDOW - (now - oldest)) + 1
-        mins = retry_in // 60
-        secs = retry_in % 60
-        wait = f"{mins}m {secs}s" if mins else f"{secs}s"
-        raise HTTPException(
-            status_code=429,
-            detail=f"Rate limit reached — maximum {ANALYZE_LIMIT} screenings per hour. "
-                   f"Try again in {wait}.",
-            headers={"Retry-After": str(retry_in)},
-        )
-    _analyze_calls[user_id].append(now)
+# In-memory fallback used only when DB is not configured
+_analyze_calls_fallback: dict[str, list[float]] = defaultdict(list)
+
+
+async def _check_rate_limit(user_id: str) -> None:
+    if settings.database_url:
+        from db.database import AsyncSessionLocal
+        from db.models import RateLimitEvent
+        from sqlalchemy import select, func, delete
+        from datetime import timedelta
+        now_dt = datetime.now(timezone.utc)
+        window_start = now_dt - timedelta(seconds=ANALYZE_WINDOW)
+        async with AsyncSessionLocal() as db:
+            # Count calls in the last hour
+            count = (await db.execute(
+                select(func.count()).where(
+                    RateLimitEvent.user_id == user_id,
+                    RateLimitEvent.endpoint == "analyze",
+                    RateLimitEvent.called_at >= window_start,
+                )
+            )).scalar_one()
+            if count >= ANALYZE_LIMIT:
+                # Find oldest call in window to compute retry time
+                oldest = (await db.execute(
+                    select(func.min(RateLimitEvent.called_at)).where(
+                        RateLimitEvent.user_id == user_id,
+                        RateLimitEvent.endpoint == "analyze",
+                        RateLimitEvent.called_at >= window_start,
+                    )
+                )).scalar_one()
+                retry_in = int(ANALYZE_WINDOW - (now_dt - oldest).total_seconds()) + 1
+                mins, secs = retry_in // 60, retry_in % 60
+                wait = f"{mins}m {secs}s" if mins else f"{secs}s"
+                raise HTTPException(
+                    status_code=429,
+                    detail=f"Rate limit reached — maximum {ANALYZE_LIMIT} screenings per hour. "
+                           f"Try again in {wait}.",
+                    headers={"Retry-After": str(retry_in)},
+                )
+            db.add(RateLimitEvent(user_id=user_id, endpoint="analyze"))
+            # Prune old events older than 2 hours to keep the table lean
+            await db.execute(
+                delete(RateLimitEvent).where(
+                    RateLimitEvent.called_at < now_dt - timedelta(hours=2)
+                )
+            )
+            await db.commit()
+    else:
+        # Fallback: in-memory (acceptable when DB is not configured)
+        now = time()
+        calls = [t for t in _analyze_calls_fallback[user_id] if now - t < ANALYZE_WINDOW]
+        _analyze_calls_fallback[user_id] = calls
+        if len(calls) >= ANALYZE_LIMIT:
+            oldest = min(calls)
+            retry_in = int(ANALYZE_WINDOW - (now - oldest)) + 1
+            mins, secs = retry_in // 60, retry_in % 60
+            wait = f"{mins}m {secs}s" if mins else f"{secs}s"
+            raise HTTPException(
+                status_code=429,
+                detail=f"Rate limit reached — maximum {ANALYZE_LIMIT} screenings per hour. "
+                       f"Try again in {wait}.",
+                headers={"Retry-After": str(retry_in)},
+            )
+        _analyze_calls_fallback[user_id].append(now)
 
 
 async def _assert_owns_job(job_id: str, user_id: str) -> None:
@@ -222,7 +267,7 @@ async def upload_documents(files: list[UploadFile] = File(...), current_user: di
 @app.post("/api/analyze", response_model=AnalyzeResponse)
 async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current_user)):
     """Submit a company profile for compliance analysis. Returns a job_id."""
-    _check_rate_limit(current_user["id"])
+    await _check_rate_limit(current_user["id"])
 
     # Enforce subscription plan limits
     if settings.stripe_enabled and settings.database_url:
@@ -271,7 +316,12 @@ async def get_status(job_id: str, current_user: dict = Depends(get_current_user)
 @app.get("/api/report/{job_id}", response_model=ComplianceReport)
 async def get_report(job_id: str, current_user: dict = Depends(get_current_user)):
     await _assert_owns_job(job_id, current_user["id"])
+    # Try in-memory job first (fastest path for recently completed jobs)
     report = job_manager.get_report(job_id)
+    if report is None:
+        # Try DB then disk
+        from services.report_store import load_async
+        report = await load_async(job_id)
     if report is None:
         status = job_manager.get_status(job_id)
         if status is None:
@@ -317,8 +367,8 @@ async def generate_pdf_endpoint(job_id: str, current_user: dict = Depends(get_cu
 @app.get("/api/reports")
 async def list_reports(current_user: dict = Depends(get_current_user)):
     """List persisted reports for the current user, newest first."""
-    from services.report_store import list_recent
-    return {"reports": list_recent(user_id=current_user["id"])}
+    from services.report_store import list_recent_async
+    return {"reports": await list_recent_async(user_id=current_user["id"])}
 
 
 @app.get("/api/companies")

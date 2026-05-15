@@ -448,11 +448,17 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
 _chroma: chromadb.PersistentClient | None = None
 
 
-def _chroma_client() -> chromadb.PersistentClient:
+def _chroma_client():
     global _chroma
     if _chroma is None:
-        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-        _chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        from config import settings
+        if settings.chroma_server_url:
+            _chroma = chromadb.HttpClient(host=settings.chroma_server_url)
+            logger.info("ChromaDB: using server mode at %s", settings.chroma_server_url)
+        else:
+            CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+            _chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+            logger.info("ChromaDB: using embedded mode at %s", CHROMA_DIR)
     return _chroma
 
 
