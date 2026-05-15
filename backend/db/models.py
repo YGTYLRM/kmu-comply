@@ -175,6 +175,22 @@ class Subscription(Base):
     user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
+class PendingRegulationUpdate(Base):
+    """Staged regulation download awaiting human approval before KB update."""
+    __tablename__ = "pending_regulation_updates"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    regulation: Mapped[str] = mapped_column(String(100), nullable=False)
+    source_url: Mapped[str] = mapped_column(Text, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    new_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    previous_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    staging_path: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|approved|rejected
+    change_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
 class ActionCompletion(Base):
     __tablename__ = "action_completions"
 

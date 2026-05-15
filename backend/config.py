@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""  # Full admin key — bypasses RLS, never expose to clients
     database_url: str = ""
 
+    # Admin API key — required for regulation update approval endpoints
+    admin_api_key: str = ""
+
     # Document encryption (Fernet key for uploaded company files at rest)
     # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     # If unset, an ephemeral key is generated per process (fine for dev; set in production)

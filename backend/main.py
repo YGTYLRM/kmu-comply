@@ -736,6 +736,70 @@ async def billing_portal(current_user: dict = Depends(get_current_user)):
     return {"url": url}
 
 
+# ── Admin — regulation update approval ────────────────────────────────────────
+
+def _require_admin(x_admin_key: str = Header(None)):
+    if not settings.admin_api_key or x_admin_key != settings.admin_api_key:
+        raise HTTPException(status_code=403, detail="Admin access required.")
+
+
+@app.get("/api/admin/regulation-updates")
+async def list_regulation_updates(_: None = Depends(_require_admin)):
+    """List all pending (and recent) regulation updates awaiting human approval."""
+    from db.database import AsyncSessionLocal
+    from db.models import PendingRegulationUpdate
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db:
+        rows = (await db.execute(
+            select(PendingRegulationUpdate).order_by(PendingRegulationUpdate.fetched_at.desc()).limit(100)
+        )).scalars().all()
+    return {"updates": [
+        {
+            "id": r.id,
+            "regulation": r.regulation,
+            "source_url": r.source_url,
+            "fetched_at": r.fetched_at.isoformat() if r.fetched_at else None,
+            "status": r.status,
+            "change_summary": r.change_summary,
+            "new_hash": r.new_hash[:12],
+            "previous_hash": r.previous_hash[:12] if r.previous_hash else None,
+            "reviewed_at": r.reviewed_at.isoformat() if r.reviewed_at else None,
+        }
+        for r in rows
+    ]}
+
+
+@app.post("/api/admin/regulation-updates/{update_id}/approve")
+async def approve_regulation_update(update_id: str, _: None = Depends(_require_admin)):
+    """Approve a staged regulation update — copies to production and re-ingests."""
+    from services.regulation_updater import approve_update
+    try:
+        result = await approve_update(update_id)
+        return {"ok": True, **result}
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/admin/regulation-updates/{update_id}/reject")
+async def reject_regulation_update(update_id: str, _: None = Depends(_require_admin)):
+    """Reject a staged regulation update — deletes the staging file."""
+    from services.regulation_updater import reject_update
+    try:
+        await reject_update(update_id)
+        return {"ok": True}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/admin/regulation-updates/fetch-now")
+async def trigger_regulation_fetch(_: None = Depends(_require_admin)):
+    """Manually trigger an official-source regulation fetch (runs async)."""
+    import asyncio
+    from services.regulation_updater import fetch_and_stage_updates
+    asyncio.create_task(fetch_and_stage_updates())
+    return {"ok": True, "message": "Fetch started in background — check /api/admin/regulation-updates for results."}
+
+
 @app.post("/api/webhook/stripe")
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
     if not settings.stripe_webhook_secret:

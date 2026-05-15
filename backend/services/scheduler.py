@@ -55,8 +55,10 @@ def _save_hashes(hashes: dict[str, str]) -> None:
 async def daily_regulation_check() -> None:
     """
     Compare current regulation file hashes against stored ones.
-    For each changed regulation, queue a re-assessment for every company
-    that had that regulation apply to them in their last report.
+    For each changed regulation:
+      1. Re-ingest the updated source files into ChromaDB
+      2. Diff section hashes to find which specific articles changed
+      3. Queue a re-assessment for every affected company, with section detail
     """
     logger.info("scheduler: running daily regulation check")
     if not _REG_DIR.exists():
@@ -83,15 +85,41 @@ async def daily_regulation_check() -> None:
         logger.info("scheduler: no regulation changes detected")
         return
 
-    # Queue re-assessments for affected companies
     from services.db_service import get_companies_for_regulation
+    from services.section_hash_store import build_section_hashes, diff, save, summarise_diff
+    from rag.ingest import ingest_regulation, REGULATION_COLLECTIONS
+
     for reg_name in changed:
         try:
+            # Load section hashes from before re-ingestion
+            from services.section_hash_store import load_all
+            old_section_hashes = load_all().get(reg_name, {})
+
+            # Re-ingest so ChromaDB reflects the updated source
+            if reg_name in REGULATION_COLLECTIONS:
+                logger.info("scheduler: re-ingesting %s", reg_name)
+                n = ingest_regulation(reg_name, reset=True)
+                logger.info("scheduler: %s re-ingested (%d chunks)", reg_name, n)
+
+            # Compute new section hashes and diff
+            new_section_hashes = build_section_hashes(reg_name)
+            section_diff = diff(old_section_hashes, new_section_hashes)
+            save(reg_name, new_section_hashes)
+
+            changed_sections = section_diff["changed"] + section_diff["added"]
+            summary = summarise_diff(reg_name, section_diff)
+            logger.info("scheduler: %s section diff — %s", reg_name, summary)
+
             companies = await get_companies_for_regulation(reg_name)
             logger.info("scheduler: %s changed — queuing %d companies", reg_name, len(companies))
             for c in companies:
                 asyncio.create_task(
-                    _run_scheduled_analysis(c, triggered_by="reg_change", reason=f"{reg_name} updated")
+                    _run_scheduled_analysis(
+                        c,
+                        triggered_by="reg_change",
+                        reason=f"{reg_name} updated: {summary}",
+                        changed_sections=changed_sections,
+                    )
                 )
         except Exception as exc:
             logger.error("scheduler: error processing regulation %s: %s", reg_name, exc)
@@ -131,7 +159,12 @@ async def monthly_reassessment() -> None:
 
 # ── Shared analysis runner ────────────────────────────────────────────────────
 
-async def _run_scheduled_analysis(company: dict, triggered_by: str, reason: str) -> None:
+async def _run_scheduled_analysis(
+    company: dict,
+    triggered_by: str,
+    reason: str,
+    changed_sections: list[str] | None = None,
+) -> None:
     """
     Run a full analysis pipeline for a company dict as returned by db_service.
     Saves result to disk + DB and queues a notification.
@@ -189,7 +222,11 @@ async def _run_scheduled_analysis(company: dict, triggered_by: str, reason: str)
         except Exception:
             pass
 
-        await _queue_notification(user_id, company["user_email"], company_name, report, triggered_by, prev_report=prev_report)
+        await _queue_notification(
+            user_id, company["user_email"], company_name, report, triggered_by,
+            prev_report=prev_report,
+            changed_sections=changed_sections,
+        )
 
     except Exception as exc:
         logger.error("scheduler: analysis failed for %s: %s", company_name, exc)
@@ -202,6 +239,7 @@ async def _queue_notification(
     report,
     triggered_by: str,
     prev_report=None,
+    changed_sections: list[str] | None = None,
 ) -> None:
     """Save a notification to the DB and send the email immediately."""
     try:
@@ -243,6 +281,7 @@ async def _queue_notification(
             report=report,
             triggered_by=triggered_by,
             prev_report=prev_report,
+            changed_sections=changed_sections,
         )
 
     except Exception as exc:
@@ -277,9 +316,39 @@ def start_scheduler() -> AsyncIOScheduler:
         max_instances=1,
     )
 
+    # Weekly on Sunday at 02:00 UTC — fetch regulation updates from official sources
+    # Creates PendingRegulationUpdate records; requires human approval before KB update
+    _scheduler.add_job(
+        _fetch_official_updates,
+        trigger="cron",
+        day_of_week="sun",
+        hour=2,
+        minute=0,
+        id="weekly_official_fetch",
+        replace_existing=True,
+        max_instances=1,
+    )
+
     _scheduler.start()
-    logger.info("scheduler: started — regulation check at 03:00 UTC, re-assessments at 04:00 UTC")
+    logger.info(
+        "scheduler: started — regulation check 03:00 UTC daily, "
+        "re-assessments 04:00 UTC daily, official fetch 02:00 UTC Sundays"
+    )
     return _scheduler
+
+
+async def _fetch_official_updates() -> None:
+    """Weekly job: fetch regulations from official sources and stage any changes for review."""
+    logger.info("scheduler: starting weekly official regulation fetch")
+    try:
+        from services.regulation_updater import fetch_and_stage_updates
+        pending = await fetch_and_stage_updates()
+        if pending:
+            logger.info("scheduler: %d regulation(s) staged for review: %s", len(pending), pending)
+        else:
+            logger.info("scheduler: no regulation changes detected from official sources")
+    except Exception as exc:
+        logger.error("scheduler: official fetch failed: %s", exc)
 
 
 def stop_scheduler() -> None:
