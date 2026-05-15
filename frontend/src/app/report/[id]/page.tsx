@@ -10,6 +10,8 @@ import { ScoreBreakdown } from "@/components/report/score-breakdown";
 import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { DocumentNudge } from "@/components/report/document-nudge";
+import { DocumentTemplates } from "@/components/report/document-templates";
+import { ExpertReview } from "@/components/report/expert-review";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown } from "lucide-react";
 import { api } from "@/lib/api";
@@ -198,6 +200,8 @@ export default function ReportPage() {
           </div>
           <GapAnalysis report={report} />
           <ActionPlan report={report} />
+          <DocumentTemplates jobId={jobId} />
+          <ExpertReview report={report} jobId={jobId} />
 
           {/* Legal database versions */}
           {report.knowledge_base_versions && Object.keys(report.knowledge_base_versions).length > 0 && (

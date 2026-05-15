@@ -468,33 +468,50 @@ async def get_company(company_id: str, current_user: dict = Depends(get_current_
 
 @app.get("/api/report/{job_id}/completions")
 async def get_completions(job_id: str, current_user: dict = Depends(get_current_user)):
-    """Return completed action item keys for a report."""
+    """Return action item workflow state for a report."""
     await _assert_owns_job(job_id, current_user["id"])
     from db.database import AsyncSessionLocal
     from db.models import ActionCompletion
     from sqlalchemy import select
     async with AsyncSessionLocal() as db:
         rows = (await db.execute(
-            select(ActionCompletion.regulation, ActionCompletion.article_number)
-            .where(ActionCompletion.job_id == job_id, ActionCompletion.user_id == current_user["id"])
-        )).all()
-    return {"completions": [{"regulation": r, "article_number": a} for r, a in rows]}
+            select(ActionCompletion).where(
+                ActionCompletion.job_id == job_id,
+                ActionCompletion.user_id == current_user["id"],
+            )
+        )).scalars().all()
+    return {"completions": [
+        {
+            "regulation": r.regulation,
+            "article_number": r.article_number,
+            "status": r.status,
+            "notes": r.notes,
+            "evidence_note": r.evidence_note,
+            "completed_at": r.completed_at.isoformat() if r.completed_at else None,
+        }
+        for r in rows
+    ]}
 
 
 class CompletionRequest(BaseModel):
     regulation: str
     article_number: str
+    status: str = "done"           # open | in_progress | done
+    notes: Optional[str] = None
+    evidence_note: Optional[str] = None
 
 
 @app.post("/api/report/{job_id}/completions")
-async def mark_complete(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
-    """Mark an action item as done."""
+async def upsert_completion(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
+    """Create or update the workflow status of an action item."""
+    if req.status not in ("open", "in_progress", "done"):
+        raise HTTPException(status_code=400, detail="status must be open, in_progress, or done")
     await _assert_owns_job(job_id, current_user["id"])
     from db.database import AsyncSessionLocal
     from db.models import ActionCompletion
     from sqlalchemy import select
     async with AsyncSessionLocal() as db:
-        exists = (await db.execute(
+        row = (await db.execute(
             select(ActionCompletion).where(
                 ActionCompletion.job_id == job_id,
                 ActionCompletion.user_id == current_user["id"],
@@ -502,18 +519,28 @@ async def mark_complete(job_id: str, req: CompletionRequest, current_user: dict 
                 ActionCompletion.article_number == req.article_number,
             )
         )).scalar_one_or_none()
-        if not exists:
+        if row:
+            row.status       = req.status
+            row.notes        = req.notes if req.notes is not None else row.notes
+            row.evidence_note = req.evidence_note if req.evidence_note is not None else row.evidence_note
+            if req.status == "done" and not row.completed_at:
+                row.completed_at = datetime.now(timezone.utc)
+            elif req.status != "done":
+                row.completed_at = None
+        else:
             db.add(ActionCompletion(
                 user_id=current_user["id"], job_id=job_id,
                 regulation=req.regulation, article_number=req.article_number,
+                status=req.status, notes=req.notes, evidence_note=req.evidence_note,
+                completed_at=datetime.now(timezone.utc) if req.status == "done" else None,
             ))
-            await db.commit()
+        await db.commit()
     return {"ok": True}
 
 
 @app.delete("/api/report/{job_id}/completions")
-async def mark_incomplete(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
-    """Mark an action item as not done."""
+async def reset_completion(job_id: str, req: CompletionRequest, current_user: dict = Depends(get_current_user)):
+    """Reset an action item back to open status."""
     await _assert_owns_job(job_id, current_user["id"])
     from db.database import AsyncSessionLocal
     from db.models import ActionCompletion
@@ -548,6 +575,133 @@ async def mark_notifications_read(current_user: dict = Depends(get_current_user)
     from services.notification_service import mark_all_read
     await mark_all_read(current_user["id"])
     return {"ok": True}
+
+
+class ExpertReviewRequestBody(BaseModel):
+    job_id: str
+    message: Optional[str] = None
+    focus_items: Optional[list[dict]] = None  # [{regulation, article_number}, ...]
+
+
+@app.post("/api/expert-review")
+async def request_expert_review(req: ExpertReviewRequestBody, current_user: dict = Depends(get_current_user)):
+    """Submit a request for expert review of a compliance report."""
+    await _assert_owns_job(req.job_id, current_user["id"])
+
+    from services.report_store import load_profile
+    profile = load_profile(req.job_id)
+    company_name = profile.get("company_name", "Unknown") if profile else "Unknown"
+
+    from db.database import AsyncSessionLocal
+    from db.models import ExpertReviewRequest
+
+    async with AsyncSessionLocal() as db:
+        review = ExpertReviewRequest(
+            user_id=current_user["id"],
+            job_id=req.job_id,
+            company_name=company_name,
+            user_email=current_user.get("email"),
+            focus_items=req.focus_items,
+            message=req.message,
+        )
+        db.add(review)
+        await db.commit()
+        await db.refresh(review)
+        review_id = review.id
+
+    # Email notification to admin
+    if settings.resend_api_key and settings.contact_email:
+        try:
+            import resend, html as html_module
+            resend.api_key = settings.resend_api_key
+            esc_company = html_module.escape(company_name)
+            esc_email   = html_module.escape(current_user.get("email", "unknown"))
+            esc_message = html_module.escape(req.message or "No message provided")
+            focus_str   = ", ".join(
+                f"{f.get('regulation','?')} {f.get('article_number','?')}"
+                for f in (req.focus_items or [])
+            ) or "Full report review"
+            resend.Emails.send({
+                "from": "Complio <onboarding@resend.dev>",
+                "to": [settings.contact_email],
+                "subject": f"Expert Review Request — {company_name}",
+                "html": f"""
+                <div style="font-family:sans-serif;max-width:560px">
+                  <h2>New Expert Review Request</h2>
+                  <p><b>Company:</b> {esc_company}</p>
+                  <p><b>User:</b> {esc_email}</p>
+                  <p><b>Report:</b> {req.job_id}</p>
+                  <p><b>Focus:</b> {html_module.escape(focus_str)}</p>
+                  <p><b>Message:</b> {esc_message}</p>
+                  <p><b>Review ID:</b> {review_id}</p>
+                </div>""",
+            })
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning("expert review email failed: %s", exc)
+
+    return {"ok": True, "review_id": review_id, "message": "Expert review request submitted. We will contact you within 2 business days."}
+
+
+@app.get("/api/expert-review")
+async def list_expert_reviews(current_user: dict = Depends(get_current_user)):
+    """List expert review requests for the current user."""
+    from db.database import AsyncSessionLocal
+    from db.models import ExpertReviewRequest
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db:
+        rows = (await db.execute(
+            select(ExpertReviewRequest)
+            .where(ExpertReviewRequest.user_id == current_user["id"])
+            .order_by(ExpertReviewRequest.created_at.desc())
+        )).scalars().all()
+    return {"requests": [
+        {
+            "id": r.id,
+            "job_id": r.job_id,
+            "company_name": r.company_name,
+            "status": r.status,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        }
+        for r in rows
+    ]}
+
+
+@app.get("/api/templates")
+async def list_templates():
+    """List available compliance document templates."""
+    from services.template_generator import TEMPLATES
+    return {"templates": [
+        {
+            "id": tid,
+            "title": t["title"],
+            "regulation": t["regulation"],
+            "description": t["description"],
+        }
+        for tid, t in TEMPLATES.items()
+    ]}
+
+
+@app.post("/api/report/{job_id}/templates/{template_id}")
+async def generate_template(job_id: str, template_id: str, current_user: dict = Depends(get_current_user)):
+    """Generate a compliance document template personalised to a completed report's company profile."""
+    await _assert_owns_job(job_id, current_user["id"])
+    from services.report_store import load_profile
+    from services.template_generator import generate_template as _gen
+    import json
+
+    profile = load_profile(job_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Company profile not found for this report.")
+
+    try:
+        content = _gen(template_id, json.dumps(profile, indent=2))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+    return {"template_id": template_id, "content": content}
 
 
 @app.get("/api/plans")
