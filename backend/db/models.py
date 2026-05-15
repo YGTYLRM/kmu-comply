@@ -106,6 +106,10 @@ class Company(Base):
     has_lksg_complaints_procedure: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     existing_compliance_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Full profile JSON snapshot — source of truth for re-assessment and template generation
+    # Eliminates reliance on disk-only _profile.json files which break on volume failure
+    profile_raw: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=datetime.utcnow)
 
@@ -203,8 +207,15 @@ class PendingRegulationUpdate(Base):
     new_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     previous_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     staging_path: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|approved|rejected
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|awaiting_second|approved|rejected
     change_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # Audit trail — who approved/rejected, from where
+    first_approved_by: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    first_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    first_approver_ip: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    second_approved_by: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    second_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    requires_second_approval: Mapped[bool] = mapped_column(Boolean, default=False)
     reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 

@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     # If unset, an ephemeral key is generated per process (fine for dev; set in production)
     document_encryption_key: str = ""
 
+    # Deployment environment — set to "production" in prod to enable hard startup checks
+    environment: str = "development"
+
     # CORS (comma-separated list of allowed origins)
     allowed_origins: str = "http://localhost:3000,http://localhost:3001"
 

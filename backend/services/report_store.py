@@ -113,6 +113,22 @@ def save_profile(job_id: str, profile: dict) -> None:
 
 
 def load_profile(job_id: str) -> dict | None:
+    """Load company profile — DB first (via job→report→company), disk fallback."""
+    from config import settings
+    if settings.database_url:
+        try:
+            import asyncio, concurrent.futures
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    result = pool.submit(asyncio.run, _load_profile_from_db(job_id)).result()
+            else:
+                result = loop.run_until_complete(_load_profile_from_db(job_id))
+            if result:
+                return result
+        except Exception as exc:
+            logger.warning("report_store: DB profile load failed for %s, trying disk: %s", job_id, exc)
+
     path = REPORTS_DIR / f"{job_id}_profile.json"
     if not path.exists():
         return None
@@ -120,6 +136,24 @@ def load_profile(job_id: str) -> dict | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
         logger.error("report_store: failed to load profile %s: %s", job_id, exc)
+        return None
+
+
+async def _load_profile_from_db(job_id: str) -> dict | None:
+    """Load company profile_raw from DB via the report's company_id."""
+    from db.database import AsyncSessionLocal
+    from db.models import Report, Company
+    from sqlalchemy import select
+    try:
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(Company.profile_raw)
+                .join(Report, Report.company_id == Company.id)
+                .where(Report.job_id == job_id)
+                .limit(1)
+            )
+            return result.scalar_one_or_none()
+    except Exception:
         return None
 
 

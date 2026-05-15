@@ -147,6 +147,34 @@ async def get_active_subscription(user_id: str) -> Optional[dict]:
         }
 
 
+async def check_feature_access(user_id: str, feature: str) -> tuple[bool, str]:
+    """
+    Check if the user's plan grants access to a specific feature.
+    Features: 'templates', 'document_upload', 'expert_review'
+    Returns (allowed, reason_if_denied).
+    """
+    if not settings.stripe_enabled:
+        return True, ""
+    sub = await get_active_subscription(user_id)
+    if not sub:
+        return False, "Active subscription required."
+    plan = sub["plan"]
+
+    FEATURE_GATES = {
+        "templates":       {"professional", "enterprise"},
+        "document_upload": {"starter", "professional", "enterprise"},
+        "expert_review":   {"professional", "enterprise"},
+    }
+    allowed_plans = FEATURE_GATES.get(feature, {"starter", "professional", "enterprise"})
+    if plan not in allowed_plans:
+        plan_names = " or ".join(p.capitalize() for p in sorted(allowed_plans))
+        return False, (
+            f"This feature requires a {plan_names} plan. "
+            f"Your current plan is {plan.capitalize()}. Upgrade to access it."
+        )
+    return True, ""
+
+
 async def check_company_limit(user_id: str) -> tuple[bool, str]:
     if not settings.stripe_enabled:
         return True, ""

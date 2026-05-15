@@ -95,6 +95,7 @@ async def upsert_company(user_id: str, profile: CompanyProfile) -> str:
             "has_supplier_risk_assessment": data.get("has_supplier_risk_assessment"),
             "has_lksg_complaints_procedure": data.get("has_lksg_complaints_procedure"),
             "existing_compliance_notes": data.get("existing_compliance_notes"),
+            "profile_raw": data,   # full profile snapshot for re-assessment and template generation
             "updated_at": datetime.now(timezone.utc),
         }
 
