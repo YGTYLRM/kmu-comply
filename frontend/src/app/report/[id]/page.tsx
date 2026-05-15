@@ -11,7 +11,7 @@ import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { DocumentNudge } from "@/components/report/document-nudge";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ComplianceReport } from "@/lib/types";
 
@@ -165,6 +165,31 @@ export default function ReportPage() {
           className="flex flex-col gap-5"
         >
           {prevReport && <DeltaBanner current={report} prev={prevReport} prevJobId={prevJobId!} />}
+
+          {/* Profile completeness warning — shown when < 70% of relevant fields were answered */}
+          {report.profile_completeness && report.profile_completeness.score_percent < 70 && (
+            <div className="rounded-xl border border-orange-500/30 bg-orange-500/[0.06] px-5 py-4 flex gap-3 items-start">
+              <AlertTriangle className="h-4 w-4 text-orange-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-orange-300 mb-1">
+                  Report completeness: {report.profile_completeness.score_percent}%
+                </p>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {report.profile_completeness.unanswered_count} compliance-relevant{" "}
+                  {report.profile_completeness.unanswered_count === 1 ? "field was" : "fields were"} not
+                  provided. Some findings may be based on assumptions rather than confirmed data.{" "}
+                  <button
+                    onClick={() => router.push(`/analyze?from=${jobId}`)}
+                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                  >
+                    Re-run with more data
+                  </button>{" "}
+                  to improve accuracy.
+                </p>
+              </div>
+            </div>
+          )}
+
           <DocumentNudge report={report} />
           <ExecutiveSummary report={report} />
           <div className="grid lg:grid-cols-2 gap-5">
@@ -174,6 +199,11 @@ export default function ReportPage() {
           <GapAnalysis report={report} />
           <ActionPlan report={report} />
 
+          {/* Legal database versions */}
+          {report.knowledge_base_versions && Object.keys(report.knowledge_base_versions).length > 0 && (
+            <KnowledgeBaseVersions versions={report.knowledge_base_versions} />
+          )}
+
           {/* Legal disclaimer */}
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-5 py-4">
             <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Preliminary screening only — not legal advice</p>
@@ -181,6 +211,67 @@ export default function ReportPage() {
           </div>
         </motion.div>
       </main>
+    </div>
+  );
+}
+
+const REG_DISPLAY: Record<string, string> = {
+  gdpr_dsgvo: "GDPR / DSGVO", bdsg: "BDSG", nis2: "NIS2", eu_ai_act: "EU AI Act",
+  hinschg: "HinSchG", workplace_law: "Employment & Workplace Law", agg: "AGG",
+  milog: "MiLoG", lksg: "LkSG", enefg: "EnEfG / EDL-G", csrd: "CSRD",
+};
+
+function KnowledgeBaseVersions({ versions }: { versions: Record<string, { fetched_at: string; source_file_hash: string; source_url: string }> }) {
+  const [open, setOpen] = useState(false);
+  const entries = Object.entries(versions);
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-white/[0.02]">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <Database className="h-3.5 w-3.5 text-slate-500" />
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Legal database versions</span>
+          <span className="text-xs text-slate-600">— which law version was used for this report</span>
+        </div>
+        <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="border-t border-white/[0.05] px-5 pb-4 pt-3">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-slate-600 uppercase tracking-wider">
+                <th className="text-left pb-2 font-medium">Regulation</th>
+                <th className="text-left pb-2 font-medium">Fetched at</th>
+                <th className="text-left pb-2 font-medium">File hash</th>
+                <th className="text-left pb-2 font-medium">Source</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.03]">
+              {entries.map(([reg, meta]) => (
+                <tr key={reg}>
+                  <td className="py-1.5 pr-4 text-slate-300 font-medium">{REG_DISPLAY[reg] ?? reg}</td>
+                  <td className="py-1.5 pr-4 text-slate-500 font-mono">
+                    {meta.fetched_at !== "unknown" ? meta.fetched_at.split("T")[0] : "unknown"}
+                  </td>
+                  <td className="py-1.5 pr-4 text-slate-600 font-mono">{meta.source_file_hash.slice(0, 8)}</td>
+                  <td className="py-1.5 text-slate-600">
+                    {meta.source_url
+                      ? <a href={meta.source_url} target="_blank" rel="noopener noreferrer" className="hover:text-brand-400 transition-colors underline underline-offset-2">official text</a>
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-3 text-xs text-slate-600 leading-relaxed">
+            This report was generated using the legal texts listed above. If a regulation has been amended since the date shown,
+            re-run the screening to get an updated assessment.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

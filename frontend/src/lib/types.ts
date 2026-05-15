@@ -3,7 +3,7 @@
 
 export type Regulation =
   | "gdpr_dsgvo" | "lksg" | "enefg" | "csrd" | "bdsg"
-  | "nis2" | "eu_ai_act" | "hinschg" | "arbschg" | "agg" | "milog";
+  | "nis2" | "eu_ai_act" | "hinschg" | "workplace_law" | "arbschg" | "agg" | "milog";
 export type Industry =
   | "it_software" | "manufacturing" | "healthcare" | "retail"
   | "finance" | "logistics" | "construction" | "energy"
@@ -95,6 +95,9 @@ export interface ComplianceGap {
   status: ComplianceStatus;
   evidence: string;
   deficiency_description?: string;
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  confidence_reason?: string;
+  source_url?: string;
 }
 
 export interface ActionItem {
@@ -133,6 +136,20 @@ export interface ComplianceReport {
   executive_summary: string;
   disclaimer: string;
   requires_manual_review: string[];
+  profile_completeness?: {
+    score: number;
+    score_percent: number;
+    answered: number;
+    relevant: number;
+    unanswered_count: number;
+    unanswered_fields: string[];
+  };
+  knowledge_base_versions?: Record<string, {
+    fetched_at: string;
+    source_file_hash: string;
+    source_url: string;
+  }>;
+  inferred_assumptions?: string[];
 }
 
 export interface StepProgress {
