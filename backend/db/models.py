@@ -175,6 +175,17 @@ class Subscription(Base):
     user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
+class ActionCompletion(Base):
+    __tablename__ = "action_completions"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    job_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    regulation: Mapped[str] = mapped_column(String(100), nullable=False)
+    article_number: Mapped[str] = mapped_column(String(50), nullable=False)
+    completed_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
 class RateLimitEvent(Base):
     __tablename__ = "rate_limit_events"
 

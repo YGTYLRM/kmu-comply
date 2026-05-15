@@ -37,6 +37,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/** Authenticated fetch returning raw Response — use when you need full control over parsing. */
+export async function authFetch(path: string, init?: RequestInit): Promise<Response> {
+  const authHeader = await getAuthHeader();
+  const headers: Record<string, string> = {
+    ...authHeader,
+    ...(init?.headers as Record<string, string> | undefined),
+  };
+  return fetch(`${BASE}${path}`, { ...init, headers });
+}
+
 export const api = {
   health: () => request<{ status: string }>("/api/health"),
 

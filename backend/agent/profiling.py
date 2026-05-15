@@ -69,6 +69,21 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
             validation_warnings=warnings,
         )
 
+    _TOOL_ENRICHMENT = {
+        "name": "submit_profile_enrichment",
+        "description": "Submit inferred company compliance characteristics.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "inferred_characteristics": {"type": "array", "items": {"type": "string"}},
+                "inferred_assumptions":     {"type": "array", "items": {"type": "string"}},
+                "validation_warnings":      {"type": "array", "items": {"type": "string"}},
+                "missing_optional_fields":  {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["inferred_characteristics","inferred_assumptions","validation_warnings","missing_optional_fields"],
+        },
+    }
+
     prompt = profile_enrichment_prompt(profile.model_dump_json(indent=2))
     last_exc: Exception | None = None
 
@@ -81,14 +96,16 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
                 max_tokens=4096,
                 temperature=0,
                 system=SYSTEM_PERSONA,
+                tools=[_TOOL_ENRICHMENT],
+                tool_choice={"type": "tool", "name": "submit_profile_enrichment"},
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = response.content[0].text.strip()
-            if raw.startswith("```"):
-                lines = raw.splitlines()
-                end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
-                raw = "\n".join(lines[1:end]).strip()
-            data = json.loads(raw)
+            tool_block = next(
+                (b for b in response.content if b.type == "tool_use"), None
+            )
+            if tool_block is None:
+                raise ValueError("model did not return a tool_use block")
+            data = tool_block.input
 
             llm_chars: list[str]       = data.get("inferred_characteristics", [])
             llm_assumptions: list[str] = data.get("inferred_assumptions", [])
@@ -106,8 +123,8 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
                 validation_warnings=merged_warnings,
             )
 
-        except json.JSONDecodeError as exc:
-            logger.warning("profiling: JSON parse error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("profiling: parse error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         except anthropic.APIError as exc:
             logger.warning("profiling: API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
