@@ -304,13 +304,15 @@ def _llm_call(
     failures: list[str],
     max_tokens: int = 4096,
 ) -> list:
+    import time
     if not settings.llm_api_key:
         logger.warning("%s: no LLM API key configured, skipping", step_name)
         failures.append(step_name)
         return []
 
     last_exc: Exception | None = None
-    for attempt in range(settings.llm_max_retries + 1):
+    max_attempts = settings.llm_max_retries + 1  # default: 5 total (4 retries)
+    for attempt in range(max_attempts):
         try:
             response = _llm_client().messages.create(
                 model=settings.llm_model,
@@ -321,16 +323,21 @@ def _llm_call(
             )
             return parse_fn(_strip_fences(response.content[0].text))
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
-            logger.warning("%s: parse error attempt %d: %s", step_name, attempt + 1, exc)
+            logger.warning("%s: parse error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
         except anthropic.APIError as exc:
-            logger.warning("%s: API error attempt %d: %s", step_name, attempt + 1, exc)
+            logger.warning("%s: API error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
         except Exception as exc:
-            logger.warning("%s: unexpected error attempt %d: %s", step_name, attempt + 1, exc)
+            logger.warning("%s: unexpected error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
 
-    logger.error("%s: all %d attempts failed (%s)", step_name, settings.llm_max_retries + 1, last_exc)
+        if attempt < max_attempts - 1:
+            backoff = 2 ** attempt  # 1s, 2s, 4s, 8s
+            logger.info("%s: retrying in %ds", step_name, backoff)
+            time.sleep(backoff)
+
+    logger.error("%s: all %d attempts failed (%s)", step_name, max_attempts, last_exc)
     failures.append(step_name)
     return []
 

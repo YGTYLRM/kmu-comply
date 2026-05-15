@@ -103,13 +103,18 @@ def gap_analysis_prompt(profile_json: str, chunks_json: str, company_docs_json: 
     _high_risk_active = _today >= _date(2026, 8, 2)
     _ai_act_phasing_note = (
         "EU AI Act phasing — high-risk obligations (Arts. 9-17, Annex I and III) "
-        "ARE NOW ACTIVE as of 2 Aug 2026. Assess all missing high-risk measures as NON_COMPLIANT."
+        "ARE NOW ACTIVE as of 2 Aug 2026 under current law. Note: Digital Omnibus proposal "
+        "(pending formal adoption in EU Official Journal) may delay Annex III to 2 Dec 2027. "
+        "Assess missing high-risk measures as PARTIALLY_COMPLIANT with a note that the "
+        "effective date is legally uncertain until the Digital Omnibus is formally adopted."
         if _high_risk_active else
         "EU AI Act phasing — high-risk obligations (Arts. 9-17, Annex I and III) are NOT YET "
-        "active (they come into force 2 Aug 2026). Until that date, assess gaps in high-risk "
-        "requirements as PARTIALLY_COMPLIANT with evidence noting 'preparation required before "
-        "2 Aug 2026' — do NOT mark as NON_COMPLIANT. Art. 5 prohibited practices and GPAI rules "
-        "(Arts. 51-56) are already active and must be assessed as NON_COMPLIANT if unmet."
+        "active. Current law sets 2 Aug 2026; Digital Omnibus proposal (pending formal adoption) "
+        "may delay Annex III to 2 Dec 2027. Assess gaps in high-risk requirements as "
+        "PARTIALLY_COMPLIANT with evidence noting 'preparation required — effective date uncertain "
+        "(2 Aug 2026 under current law, possible delay to 2 Dec 2027 pending Digital Omnibus)'. "
+        "Art. 5 prohibited practices and GPAI rules (Arts. 51-56) are already active and must "
+        "be assessed as NON_COMPLIANT if unmet."
     )
 
     docs_section = f"""

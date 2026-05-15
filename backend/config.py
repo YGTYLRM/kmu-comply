@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     # LLM API
     llm_api_key: str = ""
-    llm_model: str = "gpt-4o"
+    llm_model: str = "claude-sonnet-4-6"
 
     # ChromaDB
     chroma_host: str = "localhost"
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # LLM
     llm_temperature: float = 0.0
     llm_timeout_seconds: int = 120
-    llm_max_retries: int = 2
+    llm_max_retries: int = 4
 
 
 settings = Settings()

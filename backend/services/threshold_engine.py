@@ -542,8 +542,12 @@ def check_ai_act(profile: CompanyProfile) -> AIActResult:
     Source: Art. 2, 3, 5, 6, 9–17, 26, 50, 113 EU AI Act.
     """
     today = date.today()
-    high_risk_obligations_active = today >= date(2026, 8, 2)
     gpai_rules_active = today >= date(2025, 8, 2)
+    # High-risk Annex I/III obligations: officially 2 Aug 2026 per Art. 113 EU AI Act.
+    # Digital Omnibus proposal (provisional EU agreement, Reuters 2025) may delay
+    # Annex III to 2 Dec 2027 — pending formal adoption. Treating as uncertain until
+    # formal adoption is published in the Official Journal.
+    high_risk_obligations_active = today >= date(2026, 8, 2)
 
     if not profile.uses_ai_systems:
         return AIActResult(
@@ -585,7 +589,11 @@ def check_ai_act(profile: CompanyProfile) -> AIActResult:
     if not gpai_rules_active:
         coming.append("GPAI rules Arts. 51-56 (2 Aug 2025)")
     if not high_risk_obligations_active:
-        coming.append("high-risk Annex I + III system obligations Arts. 9-17 (2 Aug 2026)")
+        coming.append(
+            "high-risk Annex I + III system obligations Arts. 9-17 — current law: 2 Aug 2026; "
+            "NOTE: Digital Omnibus proposal (pending formal adoption) may delay Annex III to 2 Dec 2027. "
+            "Treat as uncertain until published in the EU Official Journal."
+        )
     coming.append("high-risk legacy Annex III obligations for systems already on market before Aug 2026 (2 Aug 2027)")
 
     timeline = (

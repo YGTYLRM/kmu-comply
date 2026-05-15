@@ -341,8 +341,10 @@ def _executive_summary(
     prompt = executive_summary_prompt(
         company_name, applicable_count, total_regs, overall_score, critical_findings
     )
+    import time
     last_exc: Exception | None = None
-    for attempt in range(settings.llm_max_retries + 1):
+    max_attempts = settings.llm_max_retries + 1
+    for attempt in range(max_attempts):
         try:
             resp = _llm_client().messages.create(
                 model=settings.llm_model,
@@ -353,11 +355,13 @@ def _executive_summary(
             )
             return resp.content[0].text.strip()
         except anthropic.APIError as exc:
-            logger.warning("actions: summary API error attempt %d: %s", attempt + 1, exc)
+            logger.warning("actions: summary API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         except Exception as exc:
-            logger.warning("actions: summary error attempt %d: %s", attempt + 1, exc)
+            logger.warning("actions: summary error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
+        if attempt < max_attempts - 1:
+            time.sleep(2 ** attempt)
 
     logger.error("actions: summary failed after retries (%s), using fallback", last_exc)
     failures.append("executive_summary")
