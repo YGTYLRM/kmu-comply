@@ -18,8 +18,10 @@
 10. [Local Development Setup](#10-local-development-setup)
 11. [Environment Variables](#11-environment-variables)
 12. [Running the Services](#12-running-the-services)
-13. [Deployment](#13-deployment)
-14. [Known Constraints & Watch-outs](#14-known-constraints--watch-outs)
+13. [Database Migrations](#13-database-migrations)
+14. [CI/CD](#14-cicd)
+15. [Deployment](#15-deployment)
+16. [Known Constraints & Watch-outs](#16-known-constraints--watch-outs)
 
 ---
 

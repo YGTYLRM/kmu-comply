@@ -4,6 +4,142 @@ This file is appended after every working session. It documents what was built, 
 
 ---
 
+## Session 25 — 2026-05-15 — Infrastructure fixes, knowledge base expansion, CI/CD
+
+**Branch:** `feat/polish`
+
+### Context
+
+Full codebase evaluation revealed three categories of work: knowledge base bugs (LkSG/EnEfG 0-chunk ingest, missing supplementary regulation content), missing DevOps infrastructure (no CI/CD, no Alembic migrations), and dataset gaps (regulation collection too narrow for production-quality gap analysis).
+
+---
+
+### Bug fixes — `backend/rag/ingest.py`
+
+**Bug 1: `_RE_GERMAN_SECTION` NameError**
+- `_chunks_for_file()` referenced `_RE_GERMAN_SECTION` which was never defined. Only `_RE_SECTION` exists in the module.
+- This caused an `AttributeError` crash whenever `compliance_guides` .txt files were processed, silently skipping the entire collection.
+- Fixed: replaced `_RE_GERMAN_SECTION` with `_RE_GERMAN_A` (correct: checks whether text looks like a German law file before trying German chunking, then falls back to guidance chunking).
+
+**Bug 2: `\xa0` non-breaking space not normalized before chunking**
+- `gesetze-im-internet.de` TOC entries use `§ N\xa0Title` (non-breaking space before title) on a single line.
+- `_RE_GERMAN_A` requires a newline after the section number (`§ N\n`) and silently produced 0 chunks on affected files (LkSG, EnEfG).
+- Fixed: added `re.sub(r'(?m)(^§\s*\d+[a-z]?)\xa0', r'\1\n', text)` in `_strip_gesetze_noise()` to normalize before any regex runs. Also added removal of `Inhaltsübersicht` navigation noise (present in EnEfG).
+
+**Bug 3: no fallback when German law chunker returns 0 chunks**
+- If `_chunk_german_law()` produced 0 chunks (e.g. due to unrecognized text structure), `_chunks_for_file()` returned an empty list with no warning.
+- Fixed: added a fallback to `_chunk_guidance()` for German law files that produce 0 chunks, consistent with the existing fallback pattern for EU law files.
+
+---
+
+### New scripts
+
+#### `backend/scripts/ingest_all.py`
+Full re-ingest script. Replaces the one-off Python snippets previously documented in `.dev-notes.md`.
+
+Features:
+- Re-ingests all 12 collections from scratch (or a single collection with `--regulation <name>`)
+- Runs `\xa0` normalization on `.txt` files before ingesting (so the fix applies even to files downloaded before the ingest.py patch)
+- `--dry-run` flag shows source files and sizes without touching ChromaDB
+- `--no-normalize` flag skips normalization (for files already known-clean)
+- Prints final ChromaDB chunk counts for all collections after completion
+
+Usage: `cd backend && python scripts/ingest_all.py`
+
+#### `backend/scripts/fetch_supplementary_docs.py`
+Fetches additional regulation content that expands the knowledge base beyond the core directive/law texts.
+
+Documents fetched:
+- GDPR recitals (173 recitals from EUR-Lex; essential for legal interpretation of each article)
+- BSIG 2009 — German BSI Act (national cybersecurity law underpinning NIS2 obligations for German companies)
+- ESRS 1 — General Requirements (cross-cutting CSRD reporting standard; every Wave 1 reporter must apply)
+- ESRS 2 — General Disclosures (cross-cutting; covers governance, strategy, materiality assessment)
+- LkSG-Sorgfaltspflichtenverordnung (implementing regulation; defines due diligence report format and audit requirements)
+- EnEG (predecessor energy savings law; still referenced by EnEfG for definitions)
+- HinSchG-Meldestellenverordnung (implementing regulation for whistleblower channel technical requirements)
+
+After fetching, each document is immediately ingested into the existing ChromaDB collection for that regulation (non-destructive; does not reset existing chunks).
+
+Usage: `cd backend && python scripts/fetch_supplementary_docs.py`
+
+---
+
+### CI/CD — `.github/workflows/ci.yml`
+
+GitHub Actions workflow, runs on push/PR to `main`, `dev`, `feat/**`.
+
+Jobs:
+1. **backend-lint** — `ruff check backend/ --select E,F,W --ignore E501`
+2. **backend-tests** — `pytest tests/test_thresholds.py tests/test_models.py -v` (unit tests only; no LLM key or ChromaDB required)
+3. **frontend-typecheck** — `npx tsc --noEmit` from `frontend/`
+4. **docker-build** — `docker compose config --quiet` (validates docker-compose syntax; runs on main/dev only)
+
+No secrets required for the first three jobs. Tests use a placeholder `LLM_API_KEY` and a dummy `DOCUMENT_ENCRYPTION_KEY`.
+
+---
+
+### Database migrations — Alembic
+
+Alembic was already in `requirements.txt` but never initialized. Added:
+
+- `backend/alembic.ini` — standard Alembic config; database URL is injected at runtime from `DATABASE_URL` env var or pydantic settings (not hardcoded in the ini file)
+- `backend/alembic/env.py` — async-compatible setup using `asyncio.run()` + `create_async_engine`; supports both offline and online migration modes
+- `backend/alembic/script.py.mako` — revision template
+- `backend/alembic/versions/0001_initial_schema.py` — complete initial migration capturing all 11 ORM tables with correct FK constraints, indexes, and server defaults
+
+**For existing Supabase databases** (already set up via `init_db()`):
+```bash
+cd backend && alembic stamp head
+```
+**For new databases:**
+```bash
+cd backend && alembic upgrade head
+```
+**Future schema changes** (after modifying `db/models.py`):
+```bash
+cd backend && alembic revision --autogenerate -m "describe change" && alembic upgrade head
+```
+
+---
+
+### `.dev-notes.md` updated
+
+- Replaced stale one-off Python snippets for LkSG/EnEfG normalization and EUR-Lex ingest with references to the new scripts
+- Added Alembic migration instructions (new vs existing database)
+
+---
+
+### Dataset gap analysis
+
+The current regulation collections cover directive/law texts but lack the interpretation layer. The fetch_supplementary_docs.py script begins addressing this. Remaining gaps for a high-accuracy production deployment:
+
+| Gap | Collection | Priority |
+|-----|-----------|---------|
+| GDPR recitals (173) | gdpr_dsgvo | Critical — recitals are the primary interpretation source for most articles |
+| ESRS 1 + 2 (CSRD) | csrd | Critical — companies must follow ESRS, not just the CSRD directive |
+| BSIG (German NIS2) | nis2 | High — German national implementation supersedes directive for German companies |
+| BSI-Grundschutz profiles | nis2 | High — practical NIS2 technical requirements for each sector |
+| BAFA LkSG guidance | lksg | Medium — enforcement authority interpretations of the law |
+| EDPB guidelines | compliance_guides | Already partially covered — 10 PDFs present |
+
+---
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `backend/rag/ingest.py` | Fixed `_RE_GERMAN_SECTION` NameError; added `\xa0` normalization + `Inhaltsübersicht` removal in `_strip_gesetze_noise()`; added 0-chunk fallback for German law files |
+| `backend/scripts/ingest_all.py` | New — full re-ingest script with normalization, dry-run mode, and chunk count summary |
+| `backend/scripts/fetch_supplementary_docs.py` | New — fetches supplementary regulation docs (GDPR recitals, BSIG, ESRS 1+2, LkSG implementing reg, EnEG, HinSchG implementing reg) and ingests them |
+| `.github/workflows/ci.yml` | New — GitHub Actions: lint, unit tests, TypeScript check, docker-compose validation |
+| `backend/alembic.ini` | New — Alembic configuration |
+| `backend/alembic/env.py` | New — async SQLAlchemy-compatible migration runner |
+| `backend/alembic/script.py.mako` | New — revision template |
+| `backend/alembic/versions/0001_initial_schema.py` | New — complete initial migration for all 11 tables |
+| `.dev-notes.md` | Updated: regulation content section, new Alembic instructions |
+
+---
+
 ## Session 24 — 2026-05-15 — Second evaluator fix pass (13 remaining issues from re-evaluation)
 
 ### Fixes implemented
