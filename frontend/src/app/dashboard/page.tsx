@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { api, type CompanySummary } from "@/lib/api";
-import { Building2, ChevronRight, Plus, Clock, BarChart3, AlertCircle, Loader2 } from "lucide-react";
+import { Building2, ChevronRight, Plus, Clock, BarChart3, AlertCircle, Loader2, FileText, ShieldCheck, Bell } from "lucide-react";
 
 function ScoreRing({ score }: { score: number | null }) {
   if (score === null) return (
@@ -25,6 +25,75 @@ function ScoreRing({ score }: { score: number | null }) {
       </svg>
       <span className="absolute text-sm font-bold" style={{ color }}>{score.toFixed(0)}%</span>
     </div>
+  );
+}
+
+function OnboardingEmpty() {
+  const steps = [
+    {
+      icon: <FileText className="h-5 w-5 text-brand-400" />,
+      number: "01",
+      title: "Fill in your company profile",
+      desc: "Tell us your size, industry, and how you operate. Takes about 5 minutes. The more you fill in, the more accurate your report.",
+    },
+    {
+      icon: <ShieldCheck className="h-5 w-5 text-brand-400" />,
+      number: "02",
+      title: "Get your compliance report",
+      desc: "Complio checks 11 German and EU regulations automatically — GDPR, NIS2, AI Act, EnEfG, and more. You get a scored report with a prioritized action plan.",
+    },
+    {
+      icon: <Bell className="h-5 w-5 text-brand-400" />,
+      number: "03",
+      title: "Track and stay current",
+      desc: "We monitor regulation changes and re-run your screening automatically. You get notified when something changes that affects you.",
+    },
+  ];
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto py-12">
+      {/* Welcome header */}
+      <div className="text-center mb-10">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/20 mb-4">
+          <BarChart3 className="h-7 w-7 text-brand-400" />
+        </div>
+        <h2 className="text-2xl font-black text-white tracking-tight mb-2">Welcome to Complio</h2>
+        <p className="text-sm text-slate-400 leading-relaxed max-w-md mx-auto">
+          Your autonomous compliance screening agent for German law. Here&apos;s how it works — your first report takes about 5 minutes.
+        </p>
+      </div>
+
+      {/* Steps */}
+      <div className="flex flex-col gap-3 mb-8">
+        {steps.map((step, i) => (
+          <div key={i} className="flex gap-4 rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-500/10 border border-brand-500/20">
+              {step.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-xs font-bold text-brand-500 tracking-widest">{step.number}</span>
+                <h3 className="text-sm font-bold text-white">{step.title}</h3>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <div className="text-center">
+        <Link
+          href="/analyze"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-3.5 text-sm font-bold text-white hover:bg-brand-500 transition-all shadow-glow-blue-sm hover:shadow-glow-blue"
+        >
+          <Plus className="h-4 w-4" /> Start your first screening
+        </Link>
+        <p className="mt-3 text-xs text-slate-600">
+          Free to start · No credit card required during trial · Report ready in ~2 minutes
+        </p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -79,27 +148,7 @@ export default function DashboardPage() {
         )}
 
         {!loading && !error && companies.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-24 text-center gap-4"
-          >
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/20">
-              <BarChart3 className="h-7 w-7 text-brand-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white mb-1">No companies yet</h2>
-              <p className="text-sm text-slate-500 max-w-xs">
-                Run your first screening to enrol a company in continuous compliance monitoring.
-              </p>
-            </div>
-            <Link
-              href="/analyze"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-500 transition-all"
-            >
-              <Plus className="h-4 w-4" /> Start a screening
-            </Link>
-          </motion.div>
+          <OnboardingEmpty />
         )}
 
         {/* Company grid */}

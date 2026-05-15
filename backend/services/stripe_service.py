@@ -19,19 +19,53 @@ logger = logging.getLogger(__name__)
 PLAN_CONFIG = {
     "starter": {
         "name": "Complio Starter",
-        "amount": 4900,
+        "amount": 4900,            # €49/month
         "currency": "eur",
         "interval": "month",
-        "company_limit": 1,
-        "reassessment_days": 30,
+        "company_limit": 1,        # 1 company profile — the primary differentiator
+        "reassessment_days": 30,   # monthly auto re-assessment
+        "features": [
+            "1 company profile",
+            "11 regulations checked",
+            "Full gap analysis & action plan",
+            "PDF report export",
+            "Monthly automatic re-assessment",
+            "Regulation change alerts",
+        ],
     },
     "professional": {
         "name": "Complio Professional",
-        "amount": 14900,
+        "amount": 14900,           # €149/month
         "currency": "eur",
         "interval": "month",
-        "company_limit": 3,
+        "company_limit": 5,        # 5 companies — main upsell reason
+        "reassessment_days": 7,    # weekly re-assessment
+        "features": [
+            "Up to 5 company profiles",
+            "11 regulations checked per company",
+            "Full gap analysis & action plan",
+            "PDF report export",
+            "Weekly automatic re-assessment",
+            "Regulation change alerts",
+            "Document upload & evidence extraction",
+            "Priority support",
+        ],
+    },
+    "enterprise": {
+        "name": "Complio Enterprise",
+        "amount": 0,               # custom pricing — contact us
+        "currency": "eur",
+        "interval": "month",
+        "company_limit": 999,      # unlimited
         "reassessment_days": 7,
+        "features": [
+            "Unlimited company profiles",
+            "Custom regulation coverage",
+            "White-label PDF reports",
+            "API access",
+            "Dedicated compliance expert review",
+            "SLA-backed support",
+        ],
     },
 }
 

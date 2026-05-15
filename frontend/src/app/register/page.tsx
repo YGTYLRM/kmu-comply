@@ -47,7 +47,7 @@ export default function RegisterPage() {
         method: "POST",
         headers: { Authorization: `Bearer ${data.session.access_token}` },
       }).catch(() => {});
-      router.push("/analyze");
+      router.push("/welcome");
       router.refresh();
     } else {
       setDone(true);
