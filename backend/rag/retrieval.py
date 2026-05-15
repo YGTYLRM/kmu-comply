@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import math
 from functools import lru_cache
 
 import anthropic
@@ -18,6 +19,25 @@ import chromadb
 from config import settings
 from rag.embeddings import embed_query
 from rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS
+
+# Per-regulation top-k — tuned to collection size and legal breadth
+# Broader laws (GDPR, workplace) need more chunks; narrow laws (BDSG, EnEfG) fewer
+_COLLECTION_TOP_K: dict[str, int] = {
+    "gdpr_dsgvo":     10,
+    "bdsg":            6,
+    "nis2":            8,
+    "eu_ai_act":       8,
+    "hinschg":         6,
+    "workplace_law":   8,
+    "agg":             6,
+    "milog":           5,
+    "lksg":            6,
+    "enefg":           5,
+    "csrd":            6,
+    "compliance_guides": 8,
+}
+_DEFAULT_TOP_K = 6
+_SIMILARITY_FLOOR = 0.35   # drop chunks below this cosine similarity (too far from query)
 
 logger = logging.getLogger(__name__)
 
@@ -48,20 +68,45 @@ def _llm_client() -> anthropic.Anthropic:
 # Public API
 # ---------------------------------------------------------------------------
 
+def _bm25_score(query_terms: list[str], text: str) -> float:
+    """Simple BM25-approximation using term frequency. Returns a normalized score 0-1."""
+    if not query_terms or not text:
+        return 0.0
+    text_lower = text.lower()
+    words = text_lower.split()
+    n = len(words)
+    if n == 0:
+        return 0.0
+    k1, b, avgdl = 1.5, 0.75, 200.0
+    score = 0.0
+    for term in query_terms:
+        tf = text_lower.count(term.lower())
+        if tf == 0:
+            continue
+        tf_norm = tf * (k1 + 1) / (tf + k1 * (1 - b + b * n / avgdl))
+        score += tf_norm
+    # Normalize to 0-1 range
+    return min(1.0, score / (len(query_terms) * (k1 + 1)))
+
+
 def retrieve(
     query: str,
     regulations: list[str],
-    top_k: int = 15,
+    top_k: int | None = None,
 ) -> list[dict]:
-    """Dense semantic search across the given regulation collections.
+    """Hybrid retrieval: dense vector search + BM25 keyword scoring, merged and filtered.
 
-    Returns chunks sorted by cosine similarity score descending.
-    Each chunk dict has all metadata fields plus 'score' and 'collection'.
+    top_k: if None, uses per-collection tuned values from _COLLECTION_TOP_K.
+    Results are filtered by _SIMILARITY_FLOOR to drop low-relevance chunks.
+    Returns chunks sorted by combined score descending.
+    Each chunk dict has all metadata fields plus 'score', 'dense_score',
+    'bm25_score', and 'collection'.
     """
     if not regulations:
         return []
 
     query_embedding = embed_query(query)
+    query_terms = [t for t in re.sub(r'[^\w\s]', ' ', query.lower()).split() if len(t) > 2]
     client = _chroma_client()
     results: list[dict] = []
 
@@ -82,9 +127,14 @@ def retrieve(
             logger.warning("Empty collection: %s", collection_name)
             continue
 
+        # Use per-collection tuned k, or caller-provided top_k
+        k = top_k if top_k is not None else _COLLECTION_TOP_K.get(collection_name, _DEFAULT_TOP_K)
+        # Fetch more raw results to allow BM25 re-ranking to surface additional relevant chunks
+        raw_k = min(k * 3, count)
+
         res = collection.query(
             query_embeddings=[query_embedding],
-            n_results=min(top_k, count),
+            n_results=raw_k,
             include=["documents", "metadatas", "distances"],
         )
 
@@ -93,10 +143,18 @@ def retrieve(
             res["metadatas"][0],
             res["distances"][0],
         ):
+            dense_score = round(1.0 - dist, 4)
+            if dense_score < _SIMILARITY_FLOOR:
+                continue  # drop below threshold
+            bm25 = _bm25_score(query_terms, doc)
+            # Combined score: 70% dense, 30% BM25
+            combined = round(0.7 * dense_score + 0.3 * bm25, 4)
             results.append({
-                "text": doc,
-                "score": round(1.0 - dist, 4),
-                "collection": collection_name,
+                "text":        doc,
+                "score":       combined,
+                "dense_score": dense_score,
+                "bm25_score":  bm25,
+                "collection":  collection_name,
                 **meta,
             })
 

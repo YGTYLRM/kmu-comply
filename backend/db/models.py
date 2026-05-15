@@ -179,6 +179,20 @@ class Subscription(Base):
     user: Mapped["Profile"] = relationship(back_populates="subscription")
 
 
+class JobRecord(Base):
+    """Persistent job state — survives backend restarts."""
+    __tablename__ = "jobs"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)   # = job_id (UUID)
+    user_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, index=True)
+    company_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|running|completed|failed|partial
+    current_step: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
+
+
 class ExpertReviewRequest(Base):
     """User request for expert (lawyer/consultant) review of compliance findings."""
     __tablename__ = "expert_review_requests"

@@ -67,6 +67,58 @@ PLAN_CONFIG = {
             "SLA-backed support",
         ],
     },
+    # Annual plans — ~20% discount vs monthly
+    "starter_annual": {
+        "name": "Complio Starter (Annual)",
+        "amount": 47000,           # €470/year (~€39/month, ~20% off €49)
+        "currency": "eur",
+        "interval": "year",
+        "company_limit": 1,
+        "reassessment_days": 30,
+        "features": [
+            "1 company profile",
+            "11 regulations checked",
+            "Full gap analysis & action plan",
+            "PDF report export",
+            "Monthly automatic re-assessment",
+            "Regulation change alerts",
+            "20% discount vs monthly",
+        ],
+    },
+    "professional_annual": {
+        "name": "Complio Professional (Annual)",
+        "amount": 143000,          # €1,430/year (~€119/month, ~20% off €149)
+        "currency": "eur",
+        "interval": "year",
+        "company_limit": 5,
+        "reassessment_days": 7,
+        "features": [
+            "Up to 5 company profiles",
+            "11 regulations checked per company",
+            "Document template generation",
+            "Expert review access",
+            "Weekly automatic re-assessment",
+            "Document upload & evidence extraction",
+            "Priority support",
+            "20% discount vs monthly",
+        ],
+    },
+    # One-time report credit — for lead capture and first-time buyers
+    "report_credit": {
+        "name": "Complio Single Report",
+        "amount": 1900,            # €19 one-time report
+        "currency": "eur",
+        "interval": "one_time",
+        "company_limit": 1,
+        "reassessment_days": 0,    # no re-assessment
+        "features": [
+            "1 compliance screening",
+            "11 regulations checked",
+            "Full gap analysis & action plan",
+            "PDF report export",
+            "No subscription required",
+        ],
+    },
 }
 
 
@@ -90,24 +142,34 @@ async def create_subscription_checkout(
     cfg    = PLAN_CONFIG[plan]
     stripe = _stripe()
     customer_id = await _get_or_create_customer(user_id, user_email)
-    session = stripe.checkout.Session.create(
+    is_one_time = cfg["interval"] == "one_time"
+    mode = "payment" if is_one_time else "subscription"
+
+    price_data: dict = {
+        "currency": cfg["currency"],
+        "unit_amount": cfg["amount"],
+        "product_data": {"name": cfg["name"]},
+    }
+    if not is_one_time:
+        price_data["recurring"] = {
+            "interval": "year" if cfg["interval"] == "year" else "month"
+        }
+
+    session_kwargs: dict = dict(
         customer=customer_id,
-        mode="subscription",
-        line_items=[{
-            "price_data": {
-                "currency": cfg["currency"],
-                "unit_amount": cfg["amount"],
-                "product_data": {"name": cfg["name"]},
-                "recurring": {"interval": cfg["interval"]},
-            },
-            "quantity": 1,
-        }],
+        mode=mode,
+        line_items=[{"price_data": price_data, "quantity": 1}],
         success_url=success_url,
         cancel_url=cancel_url,
         client_reference_id=user_id,
-        subscription_data={"metadata": {"plan": plan, "user_id": user_id}},
         allow_promotion_codes=True,
     )
+    if not is_one_time:
+        session_kwargs["subscription_data"] = {"metadata": {"plan": plan, "user_id": user_id}}
+    else:
+        session_kwargs["payment_intent_data"] = {"metadata": {"plan": plan, "user_id": user_id}}
+
+    session = stripe.checkout.Session.create(**session_kwargs)
     return session.url
 
 

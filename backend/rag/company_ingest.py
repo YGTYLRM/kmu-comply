@@ -53,6 +53,14 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
         try:
             plaintext = document_store.read_file(session_id, original_name)
             text = _extract_bytes(plaintext, original_name)
+
+            # Secondary injection check on extracted text (catches PDF-encoded injections)
+            from services.injection_guard import classify_document_for_injection
+            is_safe, reason = classify_document_for_injection(text, source_name=original_name)
+            if not is_safe:
+                logger.warning("company_ingest: blocked %s from RAG pipeline: %s", original_name, reason)
+                continue
+
             chunks = _chunk(text, original_name)
             if not chunks:
                 continue
