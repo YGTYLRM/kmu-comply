@@ -131,26 +131,30 @@ The `JobManager` is an in-memory async job queue. When `POST /api/analyze` is ca
 ```
 create_job()
     │
-    ├── saves profile to disk (report_store.save_profile)
+    ├── saves profile to disk AND writes jobs row to DB (status=pending)
     ├── returns job_id to caller
     └── asyncio.create_task(_run_pipeline(job))
 
 _run_pipeline(job)
     │
-    ├── status = RUNNING
+    ├── writes jobs row: status=running
     ├── calls run_analysis() from agent/compliance_agent.py
-    │       (6-step pipeline, each step updates job.current_step)
+    │       (6-step pipeline — each step writes current_step to DB)
     ├── on success:
-    │     ├── status = COMPLETED (or PARTIAL if requires_manual_review)
-    │     ├── saves report to disk
-    │     └── saves report to DB (if company_id exists)
+    │     ├── writes jobs row: status=completed/partial
+    │     ├── saves report to disk and DB
+    │     └── saves report to companies.reports table
     └── on failure:
-          └── status = FAILED, stores error message
+          └── writes jobs row: status=failed, error message stored
 ```
 
-**Status resolution:** `get_status()` first checks the in-memory `_jobs` dict. If not found (job expired from TTL), it checks whether a report file exists on disk via `report_store.exists()`. This allows status queries on completed jobs that have been evicted from memory.
+**PostgreSQL-backed persistence:** Job state is written to the `jobs` table at creation and on every step transition. This means job status survives backend restarts. `get_status_async()` first checks the in-memory dict; if not found, queries the `jobs` table by `job_id`.
+
+**Crash recovery on startup:** In the `lifespan` handler, any `jobs` rows left in `running` status from a previous process are immediately set to `failed` with a message explaining the restart. Users are directed to re-run the screening — in-flight state (profile data, document sessions) cannot be reliably recovered.
 
 **TTL cleanup:** A background `asyncio.Task` runs every 5 minutes, evicting jobs older than `job_ttl_seconds`. On eviction, it also deletes the per-job ChromaDB collection for uploaded company documents and clears the temporary document store.
+
+**Profile persistence:** Company profiles are saved to `backend/data/reports/{job_id}_profile.json` (disk backup) and also stored in the `companies.profile_raw` JSON column (DB primary). `report_store.load_profile()` reads DB first, falls back to disk. This ensures template generation and re-assessment pre-fill work even after a volume failure.
 
 ### 3.5 Report Persistence (`services/report_store.py`)
 
@@ -161,7 +165,7 @@ _run_pipeline(job)
 - **List path (`list_recent_async`):** Executes a single SQL query joining `reports` and `companies` on `user_id`, sorted by `created_at DESC`. O(1) regardless of report count — no filesystem scan.
 - **Disk fallback:** All operations fall back to the disk scan if the DB is unavailable or not configured.
 
-Company profiles are saved to `backend/data/reports/{job_id}_profile.json` (disk only — used for re-assessment pre-fill, not stored in the DB).
+Company profiles are saved to `backend/data/reports/{job_id}_profile.json` (disk backup) and to `companies.profile_raw` (DB primary). `load_profile()` reads DB first, falls back to disk.
 
 ---
 
@@ -219,12 +223,18 @@ Each regulation has a dedicated check function returning a typed frozen dataclas
 - DPO threshold mirrors GDPR: ≥20 employees processing non-occasionally
 
 #### NIS2 (`check_nis2`)
-Implemented using German BSIG categories, not EU Directive terms:
-- Sector check: `is_critical_infrastructure_sector == True` OR `industry in {energy, finance, healthcare, logistics, it_software}`
-- If not in scope: does not apply
-- **besonders wichtige Einrichtung** (§28(6) BSIG): `employee_count >= 250` OR `revenue >= 50M EUR` OR `is_critical_infrastructure_sector == True` (KRITIS override regardless of size)
-- **wichtige Einrichtung** (§28(7) BSIG): `employee_count >= 50` OR `revenue >= 10M EUR`
-- Revenue caveat: revenue alone may be insufficient for some sectors; flagged in reason string
+Implemented using German BSIG categories and the full Annex I/II sector taxonomy:
+
+**Sector taxonomy:**
+- **Annex I** (highly critical — §28(6) BSIG): energy, transport, finance, healthcare, water, digital infrastructure, IT/managed services, space, government
+- **Annex II** (important — §28(7) BSIG): manufacturing, chemicals, food & beverage, logistics/postal, waste, digital providers (marketplaces/search), research
+- **Out of scope:** retail, consulting — explicitly not listed in Annex I or II
+- **Ambiguous:** if the industry string doesn't match any known category and `is_critical_infrastructure_sector` is not set, returns CANNOT_ASSESS with guidance to consult BSI sector classification
+
+**Size thresholds (applied after sector check):**
+- **besonders wichtige Einrichtung** (§28(6) BSIG): Annex I sector + `employee_count >= 250` OR `revenue >= 50M EUR`, OR `is_critical_infrastructure_sector == True` (KRITIS override regardless of size)
+- **wichtige Einrichtung** (§28(7) BSIG): Annex I medium OR Annex II medium/large: `employee_count >= 50` OR `revenue >= 10M EUR`
+- Revenue caveat: revenue alone may not be sufficient for all sectors; flagged in reason string
 
 #### EU AI Act (`check_ai_act`)
 - Applies if `uses_ai_systems == True`
@@ -259,9 +269,13 @@ Implemented using German BSIG categories, not EU Directive terms:
   - EnEfG §15: waste heat assessment required if technically usable waste heat ≥200 kW
 
 #### CSRD (`check_csrd`)
-- Large company: 2 of 3 size criteria met: `employees > 250`, `revenue > 50M EUR`, `balance_sheet > 25M EUR`
-- Listed company: applies under Wave 3 regardless of size
-- Stop-the-clock (Directive (EU) 2025/794): Wave 2 postponed to FY2027; flagged in reason string
+- Large company: 2 of 3 size criteria: `employees > 250`, `revenue > 50M EUR`, `balance_sheet > 25M EUR`
+- Listed company: Wave 3 regardless of size
+- **Wave cohort assignment** (per Directive (EU) 2025/794 stop-the-clock):
+  - **Wave 1:** PIEs already subject to NFRD with >500 employees — FY2024, report 2025 (not postponed)
+  - **Wave 2:** Large companies (2/3 criteria) not in Wave 1 — FY2027, report 2028 (postponed from FY2025)
+  - **Wave 3:** Listed SMEs on EU-regulated markets — FY2028, report 2029 (postponed)
+- `CSRDResult` now includes `wave: int | None` and `first_reporting_fy: int | None`; these are surfaced in the `key_threshold` field and reason string
 
 **Output:** `List[RegulationApplicability]` — each entry has `regulation`, `applies`, `reason` (human-readable explanation citing the specific statute), `key_threshold` (the precise legal trigger).
 
@@ -271,16 +285,21 @@ Implemented using German BSIG categories, not EU Directive terms:
 
 **Input:** `EnrichedCompanyProfile` + `List[RegulationApplicability]`
 
-**Retrieval architecture:**
+**Retrieval architecture — hybrid BM25 + dense vector:**
 
 For each applicable regulation:
-1. Constructs a tailored retrieval query via `_build_query()` — a regulation-specific function that combines industry context, employee count, and regulation-specific terminology. For example, NIS2 queries use BSIG terminology (`besonders wichtige Einrichtung`); workplace law queries include all 7 laws in the collection.
-2. Calls `retrieve(query, [reg_key], top_k=15)` — dense semantic search against the regulation's ChromaDB collection
-3. If fewer than 5 chunks returned, retries with a broader fallback query
-4. Deduplicates results: for each `(regulation, article_number)` pair, keeps the highest-scoring chunk
-5. Takes top-5 chunks per regulation
+1. Constructs a tailored retrieval query via `_build_query()` — regulation-specific, uses BSIG terminology for NIS2, covers all 7 laws for workplace_law, etc.
+2. Calls `retrieve(query, [reg_key])` — **hybrid retrieval** combining dense vector search (70%) and BM25 keyword scoring (30%)
+3. Dense search: `multilingual-e5-large` embeddings, cosine similarity against ChromaDB collection
+4. BM25 scoring: term frequency scoring on the same candidate set — improves recall for exact article numbers, thresholds, and definitions that dense search can miss
+5. Combined score: `0.7 × dense_score + 0.3 × bm25_score`
+6. Similarity floor: chunks below 0.35 cosine similarity are dropped regardless of BM25
+7. Per-collection tuned top-k: GDPR=10, NIS2=8, workplace_law=8, BDSG=6, EnEfG=5, etc. (reflects collection size and legal breadth)
+8. Raw fetch: `k × 3` chunks fetched from ChromaDB for BM25 re-ranking; top-k returned
+9. Deduplicates: for each `(regulation, article_number)` pair, keeps the highest-combined-score chunk
+10. If fewer than 5 chunks returned after dedup, retries with a broader fallback query
 
-This per-regulation isolation is intentional: a global retrieval step with a single query could allow high-chunk-count collections (e.g. GDPR) to dominate, leaving other applicable regulations with insufficient context.
+Per-regulation isolation prevents high-chunk-count collections (GDPR: 106 chunks) from dominating smaller but equally applicable ones (LkSG: 27 chunks).
 
 If company documents were uploaded, a second retrieval is performed against the per-job ChromaDB collection (`job_{job_id}`) for the same regulation query. These company document chunks are passed to the gap analysis as Level 3 evidence (evidence only, cannot override legal obligations).
 
@@ -350,9 +369,9 @@ The model is instructed to translate profile field states into plain-English evi
 
 **Gap confidence scoring:** For each gap, the system counts how many of the regulation's relevant profile fields were answered (`not None`). Ratio ≥0.8 → HIGH; ≥0.5 → MEDIUM; else LOW. CANNOT_ASSESS is always LOW. Regulations with no optional fields (ENEFG, CSRD) default to HIGH (assessed from structural data only).
 
-**Score computation:**
-- Per-regulation score: `(compliant × 100 + partial × 50 + cannot_assess × 50) / total_requirements`
-- CANNOT_ASSESS is treated as 50% (neutral) — the system cannot determine compliance, not assumed non-compliant
+**Score computation — two separate metrics:**
+- **Compliance score** (`score_percent`): `(compliant × 100 + partial × 50) / assessed_requirements` where `assessed = compliant + partial + non_compliant`. CANNOT_ASSESS items are excluded — unknown compliance is not half-compliance and must not inflate the score.
+- **Assessment completeness** (`assessment_completeness_percent`): `assessed / total_requirements × 100`. This decreases when items cannot be assessed; a low completeness score is displayed alongside the compliance score so users understand its reliability.
 - Overall weighted score: GDPR and BDSG weighted 1.5×, all others 1.0×
 - Rationale: GDPR/BDSG represent the highest legal exposure and enforcement activity for German SMEs
 
@@ -559,6 +578,11 @@ SQLAlchemy 2.0 with async engine (`asyncpg` driver). `db/database.py` defines:
 - Linked to a company (not a report) — tracks ongoing action completion state
 - `completed_at` set when the user marks an action done
 
+**`jobs`**
+- Persistent job state — survives backend restarts
+- Fields: `id` (= job_id UUID), `user_id`, `company_id`, `status` (pending/running/completed/failed/partial), `current_step`, `error`, `created_at`, `updated_at`
+- Written at job creation and on every step transition; used for crash recovery on startup
+
 **`action_completions`**
 - Per-user, per-job tracking of action item workflow state
 - Fields: `user_id`, `job_id`, `regulation`, `article_number`, `status` (open/in_progress/done), `notes`, `evidence_note`, `completed_at`
@@ -740,10 +764,17 @@ Dark premium aesthetic for the main UI:
 - Numeric fields have `ge`/`le` constraints
 - Free text fields (company name, compliance notes) sanitized via `_sanitize()` before prompt embedding
 
-### 11.3 Prompt Injection Protection
-- `_sanitize()` strips XML/HTML tags, truncates at configured max lengths, and replaces injection keywords with `[removed]`
-- Uploaded document content is run through the same sanitizer before being embedded in prompts
-- The `<applicability_notice>` block in the gap analysis prompt provides defense-in-depth against prompt injection attempting to override applicability decisions
+### 11.3 Prompt Injection Protection — Layered Defense
+
+**Layer 1 — Keyword sanitizer (`rag/prompts.py::_sanitize()`):** Strips XML/HTML tags, truncates at configured limits, replaces injection keywords with `[removed]`. Applied to all user-supplied free text fields before prompt embedding.
+
+**Layer 2 — LLM injection classifier (`services/injection_guard.py`):** A dedicated lightweight LLM call (`claude-haiku`) that classifies extracted document text for injection intent before it enters the RAG pipeline. Applied at two points:
+1. At document upload (on raw bytes preview) — before the file is stored
+2. After PDF text extraction in `company_ingest.py` — before chunking and embedding
+
+The classifier returns `{is_injection: bool, confidence: HIGH/MEDIUM/LOW, reason: str}`. Documents classified as injection (HIGH or MEDIUM confidence) are blocked with a user-facing error and never reach the analysis prompt. A keyword pre-filter avoids the LLM cost when no suspicious terms are present.
+
+**Layer 3 — `<applicability_notice>` block:** The gap analysis prompt contains an explicit instruction block telling the model that applicability is already decided and it must not re-derive thresholds from retrieved text — limiting the blast radius of any injection that does get through.
 
 ### 11.4 Uploaded Document Encryption
 
@@ -751,11 +782,30 @@ Company-uploaded files are encrypted at rest using **Fernet** (AES-128-CBC + HMA
 
 Files are stored as `{filename}.enc` in a per-session temp directory. Decryption happens in memory via `document_store.read_file()` — plaintext bytes are passed directly to text extraction (`pdfplumber` via `io.BytesIO`), never written to disk unencrypted. The per-session directory is wiped by the job TTL cleanup.
 
-### 11.5 Stripe Webhook Verification
+### 11.5 Observability
+
+**Sentry error tracking:** When `SENTRY_DSN` is set, `sentry_sdk` is initialized at startup before the FastAPI app is created. Integrations: `FastApiIntegration`, `AsyncioIntegration`. Captures LLM call failures, pipeline step errors, webhook handler errors, and unhandled exceptions. `send_default_pii=False` — no personal data sent to Sentry. `traces_sample_rate=0.1` — 10% of requests sampled for performance tracing.
+
+**Enhanced health endpoint (`GET /api/health`):** Returns real subsystem status rather than a static "ok":
+- `chromadb`: calls `list_collections()` — returns `ok` or `error: <message>`
+- `database`: executes `SELECT 1` — returns `ok`, `error: <message>`, or `not_configured`
+- `llm`: returns `configured` or `not_configured` (no API call — just checks key presence)
+- `status`: `ok` if all subsystems healthy; `degraded` if any error
+
+### 11.6 Partial Report Safety
+
+When `requires_manual_review` is non-empty (pipeline steps failed), the report page:
+1. Shows a prominent amber warning banner listing the failed steps
+2. Replaces the PDF download button with an "Incomplete report" button
+3. Clicking shows a modal explaining the risk and requiring explicit acknowledgment before allowing export
+
+PDF export is not hard-blocked (users may still export for debugging) but the acknowledgment modal prevents accidental sharing.
+
+### 11.7 Stripe Webhook Verification
 - Stripe-Signature header verified using `stripe_webhook_secret` before any event processing
 - Redirect URLs in checkout requests validated against the allowed origins list
 
-### 11.5 Response Headers
+### 11.8 Response Headers
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
 - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -885,17 +935,24 @@ Every report stores `knowledge_base_versions` — a mapping of regulation → {f
 
 This allows users (and auditors) to verify which version of each law was used when the report was generated.
 
-### 14.6 Subscription Plans
+### 14.6 Subscription Plans and Billing
 
-Plans are differentiated primarily by **company count** (the meaningful limit for SME customers), not by re-assessment frequency:
+Plans are differentiated primarily by **company count** and **feature access**, not re-assessment frequency alone:
 
-| Plan | Price | Companies | Re-assessment |
-|------|-------|-----------|--------------|
-| Starter | €49/month | 1 | Monthly (30 days) |
-| Professional | €149/month | 5 | Weekly (7 days) |
-| Enterprise | Custom | Unlimited | Weekly |
+| Plan | Price | Companies | Re-assessment | Templates | Expert Review |
+|------|-------|-----------|--------------|-----------|--------------|
+| Starter | €49/month | 1 | Monthly | ✗ | ✗ |
+| Professional | €149/month | 5 | Weekly | ✓ | ✓ |
+| Enterprise | Custom | Unlimited | Weekly | ✓ | ✓ |
+| Starter Annual | €470/year | 1 | Monthly | ✗ | ✗ |
+| Professional Annual | €1,430/year | 5 | Weekly | ✓ | ✓ |
+| Single Report | €19 one-time | 1 | None | ✗ | ✗ |
 
-The `GET /api/plans` endpoint returns the current plan config dynamically so the frontend always shows accurate pricing without hardcoding.
+**Feature gating:** Template generation (`POST /api/report/{id}/templates/{template_id}`) and expert review (`POST /api/expert-review`) return HTTP 402 with an upgrade message when accessed on the Starter or one-time-report plan and `STRIPE_ENABLED=true`.
+
+**Checkout flow:** Annual plans and single reports use `mode=payment` (one-time); monthly/weekly plans use `mode=subscription`. Both paths go through the same `POST /api/checkout` endpoint, which detects the interval from `PLAN_CONFIG`.
+
+The `GET /api/plans` endpoint returns the current plan configuration dynamically.
 
 ## 15. Deployment Architecture
 

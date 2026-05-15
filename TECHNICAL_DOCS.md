@@ -720,6 +720,8 @@ python scripts/eval_retrieval.py
 | `CHROMA_SERVER_URL` | No | If set (e.g. `http://chroma:8001`), switches ChromaDB from embedded to server mode. Resolves single-writer contention and enables horizontal scaling. |
 | `DOCUMENT_ENCRYPTION_KEY` | No | Fernet key for encrypting uploaded company documents at rest. Generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`. If unset, an ephemeral key is used (dev only — lost on restart). **Must be set in production.** |
 | `ADMIN_API_KEY` | No | API key for regulation update approval endpoints (`/api/admin/regulation-updates/*`). Set to a strong random value. If unset, admin endpoints return 403. |
+| `SENTRY_DSN` | No | Sentry project DSN. When set, SDK captures all LLM failures, pipeline errors, and unhandled exceptions. `send_default_pii=False` — no personal data sent. |
+| `ENVIRONMENT` | No | Set to `production` to enable hard startup checks (missing critical env vars cause process exit). Default: `development`. |
 
 ### Frontend (`frontend/.env.local`)
 
@@ -843,7 +845,27 @@ If `DOCUMENT_ENCRYPTION_KEY` is not set in production, an ephemeral Fernet key i
 
 ### Regulation Update Approval
 
-The weekly official-source fetch creates `PendingRegulationUpdate` records. These do **not** automatically update the knowledge base — a human must call `POST /api/admin/regulation-updates/{id}/approve`. The `ADMIN_API_KEY` env var must be set; without it, all admin endpoints return 403.
+The weekly official-source fetch creates `PendingRegulationUpdate` records. These do **not** automatically update the knowledge base — a human must call `POST /api/admin/regulation-updates/{id}/approve`. Annex-I regulations (GDPR, NIS2, EU AI Act, CSRD, LkSG) require **two different approvers** before ingestion proceeds. Approver identity (first 8 chars of key) and IP are logged on the record.
+
+### Job Crash Recovery
+
+On startup, the `lifespan` handler marks any `jobs` rows left in `running` status as `failed`. These represent analyses that were interrupted by a server restart. Users polling `GET /api/status/{job_id}` will see `failed` with a message to re-run. There is no automatic retry — in-flight state (document sessions, profile enrichment) cannot be reliably recovered.
+
+### CANNOT_ASSESS Scoring
+
+CANNOT_ASSESS items do **not** count toward the compliance score (`score_percent`). They reduce `assessment_completeness_percent` instead. A report with many CANNOT_ASSESS items will show a high compliance score for the assessed items but a low completeness score — both are displayed to the user. This is intentional: unknown compliance is not half-compliance.
+
+### NIS2 Sector Ambiguity
+
+Industries that don't match any BSIG Annex I or Annex II category (and have `is_critical_infrastructure_sector=False`) return a CANNOT_ASSESS NIS2 result with guidance to consult BSI sector classification. This is correct behavior — forcing a classification for an unknown sector would be legally unreliable.
+
+### CSRD Wave Assignment
+
+The wave is computed at analysis time using profile data. PIE status (Wave 1 trigger) requires both `is_listed_company=True` and `employee_count > 500`. Users who don't specify listing status may receive an incorrect Wave 2 assignment if they are actually PIEs. Advise users to set `is_listed_company` accurately.
+
+### Injection Guard Failure Mode
+
+The LLM injection classifier (`injection_guard.py`) is non-fatal on API failure — if the LLM call fails, the keyword check result is used as the fallback. This means a document that triggered the keyword filter but would have been cleared by the LLM classifier will be blocked. This is intentional: when in doubt, block.
 
 ---
 
@@ -882,6 +904,36 @@ Every `ComplianceReport` includes `knowledge_base_versions`: a dict mapping each
 `POST /api/admin/regulation-updates/fetch-now` — manually trigger a fetch outside the weekly schedule.
 All endpoints require `X-Admin-Key` header matching `ADMIN_API_KEY`.
 
-### 15.7 Subscription Plans
+### 15.7 Subscription Plans and Billing
 
-`GET /api/plans` returns the current plan configuration dynamically. Primary differentiator is company count: Starter=1, Professional=5, Enterprise=unlimited. Re-assessment frequency is secondary (30-day vs 7-day cycles).
+`GET /api/plans` returns the current plan configuration dynamically. Primary differentiator is company count and feature access.
+
+**Plans:**
+- `starter` — €49/month, 1 company, monthly re-assessment
+- `professional` — €149/month, 5 companies, weekly re-assessment, templates + expert review
+- `enterprise` — custom pricing, unlimited companies
+- `starter_annual` — €470/year (~€39/month, ~20% off), 1 company
+- `professional_annual` — €1,430/year (~€119/month, ~20% off), 5 companies
+- `report_credit` — €19 one-time, 1 screening, no subscription
+
+**Feature gates (when `STRIPE_ENABLED=true`):**
+- Template generation: Professional+ only
+- Expert review: Professional+ only
+- Document upload: all plans
+
+### 15.8 Hybrid Retrieval
+
+`rag/retrieval.py` uses a hybrid BM25 + dense vector approach:
+- Dense: cosine similarity via `multilingual-e5-large`
+- BM25: approximate term-frequency scoring on the same candidate set
+- Combined: `0.7 × dense + 0.3 × BM25`
+- Per-collection tuned k: GDPR=10, NIS2=8, EU AI Act=8, workplace_law=8, BDSG=6, LkSG=6, EnEfG=5, MiLoG=5, others=6
+- Similarity floor: 0.35 — chunks below this are dropped regardless of BM25
+- Raw fetch: `k × 3` candidates fetched for BM25 re-ranking before final top-k selection
+
+### 15.9 LLM Injection Guard
+
+`services/injection_guard.py` provides two-stage injection detection for uploaded documents:
+1. Keyword pre-filter — no LLM cost when clean
+2. `claude-haiku` LLM classifier for suspicious text — returns confidence level
+Applied at upload time (raw bytes preview) and again after PDF extraction (encoded injections).
