@@ -3,68 +3,111 @@ PDF Report Generator — Complio
 Playwright/Chromium renderer. Zero external margin — all spacing in HTML.
 """
 from __future__ import annotations
-import base64, re
+import base64
+import logging
+import re
 from pathlib import Path
+
 from playwright.sync_api import sync_playwright
+
 from models.compliance_report import ComplianceReport
 from models.enums import ComplianceStatus, Priority
 
+logger = logging.getLogger(__name__)
+
 LOGO_PATH = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
 
-REG_LABELS = {
-    "gdpr_dsgvo":"GDPR / DSGVO","bdsg":"BDSG","lksg":"LkSG","enefg":"EnEfG / EDL-G",
-    "csrd":"CSRD","nis2":"NIS2","eu_ai_act":"EU AI Act","hinschg":"HinSchG",
-    "workplace_law":"Employment & Workplace Law","agg":"AGG","milog":"MiLoG",
-}
-S = {
-    ComplianceStatus.COMPLIANT:           {"c":"#16a34a","bg":"#f0fdf4","br":"#bbf7d0","label":"Compliant"},
-    ComplianceStatus.PARTIALLY_COMPLIANT: {"c":"#b45309","bg":"#fffbeb","br":"#fde68a","label":"Partial"},
-    ComplianceStatus.NON_COMPLIANT:       {"c":"#dc2626","bg":"#fef2f2","br":"#fecaca","label":"Non-Compliant"},
-    ComplianceStatus.CANNOT_ASSESS:       {"c":"#64748b","bg":"#f8fafc","br":"#e2e8f0","label":"Cannot Assess"},
-}
-P = {
-    Priority.CRITICAL:{"c":"#dc2626","bg":"#fef2f2","br":"#fecaca","label":"Critical"},
-    Priority.HIGH:    {"c":"#ea580c","bg":"#fff7ed","br":"#fed7aa","label":"High"},
-    Priority.MEDIUM:  {"c":"#b45309","bg":"#fffbeb","br":"#fde68a","label":"Medium"},
-    Priority.LOW:     {"c":"#16a34a","bg":"#f0fdf4","br":"#bbf7d0","label":"Low"},
+REGULATION_LABELS: dict[str, str] = {
+    "gdpr_dsgvo":    "GDPR / DSGVO",
+    "bdsg":          "BDSG",
+    "lksg":          "LkSG",
+    "enefg":         "EnEfG / EDL-G",
+    "csrd":          "CSRD",
+    "nis2":          "NIS2",
+    "eu_ai_act":     "EU AI Act",
+    "hinschg":       "HinSchG",
+    "workplace_law": "Employment & Workplace Law",
+    "agg":           "AGG",
+    "milog":         "MiLoG",
 }
 
-def _reg(k): return REG_LABELS.get(k, k.upper())
-def _sc(v):
-    if v>=75: return "#16a34a"
-    if v>=40: return "#b45309"
+STATUS_STYLES: dict[ComplianceStatus, dict[str, str]] = {
+    ComplianceStatus.COMPLIANT:           {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Compliant"},
+    ComplianceStatus.PARTIALLY_COMPLIANT: {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Partial"},
+    ComplianceStatus.NON_COMPLIANT:       {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Non-Compliant"},
+    ComplianceStatus.CANNOT_ASSESS:       {"c": "#64748b", "bg": "#f8fafc", "br": "#e2e8f0", "label": "Cannot Assess"},
+}
+
+PRIORITY_STYLES: dict[Priority, dict[str, str]] = {
+    Priority.CRITICAL: {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Critical"},
+    Priority.HIGH:     {"c": "#ea580c", "bg": "#fff7ed", "br": "#fed7aa", "label": "High"},
+    Priority.MEDIUM:   {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Medium"},
+    Priority.LOW:      {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Low"},
+}
+
+
+def _reg_label(key: str) -> str:
+    return REGULATION_LABELS.get(key, key.upper())
+
+
+def _score_color(score: float) -> str:
+    if score >= 75:
+        return "#16a34a"
+    if score >= 40:
+        return "#b45309"
     return "#dc2626"
-def _sbg(v):
-    if v>=75: return "#f0fdf4"
-    if v>=40: return "#fffbeb"
+
+
+def _score_bg(score: float) -> str:
+    if score >= 75:
+        return "#f0fdf4"
+    if score >= 40:
+        return "#fffbeb"
     return "#fef2f2"
-def _sbr(v):
-    if v>=75: return "#bbf7d0"
-    if v>=40: return "#fde68a"
+
+
+def _score_border(score: float) -> str:
+    if score >= 75:
+        return "#bbf7d0"
+    if score >= 40:
+        return "#fde68a"
     return "#fecaca"
 
-def _h(t):
-    if not t: return ""
-    return str(t).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace('"',"&quot;")
 
-def _c(t):
-    """Clean LLM artefacts: field=value patterns and dashes."""
-    if not t: return ""
-    t = re.sub(r'\b\w+=(?:true|false|null|\d+(?:\.\d+)?)\b', '', t)
-    t = t.replace('—',' ').replace('–',' ').replace('--',' ')
-    return re.sub(r'  +', ' ', t).strip().lstrip('.,;')
+def _esc(text) -> str:
+    if not text:
+        return ""
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
-def _logo():
+
+def _clean(text) -> str:
+    """Strip LLM artefacts: field=value patterns and stray dashes."""
+    if not text:
+        return ""
+    text = re.sub(r'\b\w+=(?:true|false|null|\d+(?:\.\d+)?)\b', '', text)
+    text = text.replace("—", " ").replace("–", " ").replace("--", " ")
+    return re.sub(r"  +", " ", text).strip().lstrip(".,;")
+
+
+def _logo_data_uri() -> str:
     if LOGO_PATH.exists():
         try:
             return "data:image/png;base64," + base64.b64encode(LOGO_PATH.read_bytes()).decode()
-        except: pass
+        except (OSError, IOError) as exc:
+            logger.warning("pdf: failed to load logo: %s", exc)
     return ""
 
-FONT  = "font-family:'Inter',Arial,sans-serif;"
-NAVY  = "#0f172a"
-BLUE  = "#2563eb"
-M     = "20mm"
+
+FONT         = "font-family:'Inter',Arial,sans-serif;"
+NAVY         = "#0f172a"
+BLUE         = "#2563eb"
+PAGE_MARGIN  = "20mm"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Page header bar — dark bar + blue accent line underneath
@@ -73,9 +116,9 @@ M     = "20mm"
 def _hbar(company, section, logo):
     return (
         f'<div>'
-        f'<div style="{FONT}background:{NAVY};padding:5mm {M};display:flex;align-items:center;justify-content:space-between;">'
-        f'<div style="font-size:9.5pt;font-weight:700;color:#fff;letter-spacing:.1pt;">{_h(section)}</div>'
-        f'<div style="font-size:7pt;color:#475569;font-weight:500;">{_h(company)}</div>'
+        f'<div style="{FONT}background:{NAVY};padding:5mm {PAGE_MARGIN};display:flex;align-items:center;justify-content:space-between;">'
+        f'<div style="font-size:9.5pt;font-weight:700;color:#fff;letter-spacing:.1pt;">{_esc(section)}</div>'
+        f'<div style="font-size:7pt;color:#475569;font-weight:500;">{_esc(company)}</div>'
         f'</div>'
         f'<div style="height:2.5pt;background:linear-gradient(90deg,{BLUE} 0%,{BLUE} 55%,rgba(37,99,235,0) 100%);"></div>'
         f'</div>'
@@ -83,7 +126,7 @@ def _hbar(company, section, logo):
 
 
 def _body_open():
-    return f'<div style="padding:10mm {M} 12mm;">'
+    return f'<div style="padding:10mm {PAGE_MARGIN} 12mm;">'
 
 def _body_close():
     return '</div>'
@@ -109,8 +152,8 @@ def _sec_sub(text):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _cover(report: ComplianceReport, logo: str) -> str:
-    sc   = _sc(report.overall_score_percent)
-    sbg  = _sbg(report.overall_score_percent)
+    sc   = _score_color(report.overall_score_percent)
+    sbg  = _score_bg(report.overall_score_percent)
     date = report.generated_at[:10] if report.generated_at else ""
 
     n_app  = sum(1 for r in report.applicable_regulations if r.applies)
@@ -126,7 +169,7 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'<span style="{FONT}font-size:7pt;font-weight:600;color:#93c5fd;'
         f'background:rgba(59,130,246,.12);border:1pt solid rgba(147,197,253,.25);'
         f'border-radius:20pt;padding:2.5pt 10pt;margin:0 2mm 2.5mm 0;display:inline-block;">'
-        f'{_h(_reg(r.regulation.value))}</span>'
+        f'{_esc(_reg_label(r.regulation.value))}</span>'
         for r in report.applicable_regulations if r.applies
     )
 
@@ -151,17 +194,17 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'<div style="position:absolute;right:0;top:0;bottom:0;width:1pt;'
         f'background:linear-gradient(180deg,transparent 0%,rgba(37,99,235,0.4) 40%,rgba(37,99,235,0.4) 60%,transparent 100%);"></div>'
 
-        f'<div style="padding:9mm {M} 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">'
+        f'<div style="padding:9mm {PAGE_MARGIN} 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">'
         f'{logo_el}'
         f'<div style="{FONT}font-size:6.5pt;font-weight:600;letter-spacing:1.8pt;text-transform:uppercase;'
         f'color:#93c5fd;border:1pt solid rgba(147,197,253,.25);padding:3.5pt 10pt;border-radius:20pt;">'
         f'Regulatory Compliance Assessment</div></div>'
 
-        f'<div style="flex:1;padding:10mm {M} 5mm;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">'
+        f'<div style="flex:1;padding:10mm {PAGE_MARGIN} 5mm;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">'
         f'<div style="{FONT}font-size:7pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;color:{BLUE};margin-bottom:4mm;">Autonomous AI Compliance Agent</div>'
         f'<div style="{FONT}font-size:34pt;font-weight:800;color:#f8fafc;line-height:1.08;'
-        f'letter-spacing:-.8pt;margin-bottom:3mm;max-width:155mm;">{_h(report.company_name)}</div>'
-        f'<div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Report issued {_h(date)}</div>'
+        f'letter-spacing:-.8pt;margin-bottom:3mm;max-width:155mm;">{_esc(report.company_name)}</div>'
+        f'<div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Report issued {_esc(date)}</div>'
 
         f'<div style="display:flex;align-items:center;gap:0;">'
         f'<div style="position:relative;margin-right:7mm;flex-shrink:0;">'
@@ -177,7 +220,7 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'{divider}{stat(n_act,"Actions")}{divider}{stat(n_crit,"Critical","#f87171")}'
         f'</div></div>'
 
-        f'<div style="padding:0 {M} 9mm;position:relative;z-index:1;">'
+        f'<div style="padding:0 {PAGE_MARGIN} 9mm;position:relative;z-index:1;">'
         f'<div style="height:1pt;background:linear-gradient(90deg,rgba(255,255,255,0.1) 0%,transparent 100%);margin-bottom:5mm;"></div>'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;color:#475569;margin-bottom:3.5mm;">Applicable Regulations</div>'
         f'<div style="line-height:1;">{chips}</div>'
@@ -202,7 +245,7 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#f59e0b;margin-bottom:1.5mm;">'
         f'Preliminary screening only &nbsp;&mdash;&nbsp; Not legal advice</div>'
         f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.6;">'
-        f'{_h(report.disclaimer) if report.disclaimer else "This report is a preliminary AI-generated compliance screening. It does not constitute legal advice and does not replace a qualified legal review. Always consult a licensed attorney before taking compliance decisions."}'
+        f'{_esc(report.disclaimer) if report.disclaimer else "This report is a preliminary AI-generated compliance screening. It does not constitute legal advice and does not replace a qualified legal review. Always consult a licensed attorney before taking compliance decisions."}'
         f'</div></div>'
 
         f'</div></div>'
@@ -214,11 +257,11 @@ def _cover(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
-    summary = _h(_c(report.executive_summary)) or "No executive summary available."
+    summary = _esc(_clean(report.executive_summary)) or "No executive summary available."
 
     warns = ""
     if report.validation_warnings:
-        items = "".join(f'<li style="margin-bottom:3pt;">{_h(w)}</li>'
+        items = "".join(f'<li style="margin-bottom:3pt;">{_esc(w)}</li>'
                         for w in report.validation_warnings)
         warns = (
             f'<div style="margin-top:5mm;">'
@@ -233,11 +276,11 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
                  else "background:#f8fafc;color:#64748b;border:1pt solid #e2e8f0;")
         rows += (
             f'<tr style="background:{bg};">'
-            f'<td style="{FONT}padding:6pt 9pt;font-weight:600;font-size:8.5pt;width:22%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;">{_h(_reg(r.regulation.value))}</td>'
+            f'<td style="{FONT}padding:6pt 9pt;font-weight:600;font-size:8.5pt;width:22%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;">{_esc(_reg_label(r.regulation.value))}</td>'
             f'<td style="padding:6pt 9pt;text-align:center;width:12%;border-bottom:1pt solid #f1f5f9;">'
             f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;padding:2pt 8pt;border-radius:20pt;{badge}">{"Yes" if r.applies else "No"}</span>'
             f'</td>'
-            f'<td style="{FONT}padding:6pt 9pt;font-size:8.5pt;color:#334155;line-height:1.55;width:66%;border-bottom:1pt solid #f1f5f9;">{_h(_c(r.reason))}</td>'
+            f'<td style="{FONT}padding:6pt 9pt;font-size:8.5pt;color:#334155;line-height:1.55;width:66%;border-bottom:1pt solid #f1f5f9;">{_esc(_clean(r.reason))}</td>'
             f'</tr>'
         )
 
@@ -269,9 +312,9 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _scores(report: ComplianceReport, logo: str) -> str:
-    sc  = _sc(report.overall_score_percent)
-    sbg = _sbg(report.overall_score_percent)
-    sbr = _sbr(report.overall_score_percent)
+    sc  = _score_color(report.overall_score_percent)
+    sbg = _score_bg(report.overall_score_percent)
+    sbr = _score_border(report.overall_score_percent)
     n_c = sum(rs.compliant for rs in report.regulation_scores)
     n_p = sum(rs.partially_compliant for rs in report.regulation_scores)
     n_n = sum(rs.non_compliant for rs in report.regulation_scores)
@@ -289,12 +332,12 @@ def _scores(report: ComplianceReport, logo: str) -> str:
 
     rows = ""
     for i, rs in enumerate(report.regulation_scores):
-        bc  = _sc(rs.score_percent)
+        bc  = _score_color(rs.score_percent)
         bw  = min(100.0, max(0.0, rs.score_percent))
         bg  = "#fafafa" if i % 2 == 1 else "#fff"
         rows += (
             f'<tr style="background:{bg};">'
-            f'<td style="{FONT}padding:6pt 8pt;font-weight:600;font-size:8.5pt;width:28%;">{_h(_reg(rs.regulation.value))}</td>'
+            f'<td style="{FONT}padding:6pt 8pt;font-weight:600;font-size:8.5pt;width:28%;">{_esc(_reg_label(rs.regulation.value))}</td>'
             f'<td style="{FONT}padding:6pt 8pt;text-align:center;font-weight:800;font-size:10pt;color:{bc};width:10%;">{rs.score_percent:.0f}%</td>'
             f'<td style="padding:6pt 8pt;width:38%;">'
             f'<div style="height:8pt;background:#f1f5f9;border-radius:10pt;overflow:hidden;">'
@@ -351,11 +394,11 @@ def _scores(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _gap_card(g) -> str:
-    cm    = S.get(g.status, S[ComplianceStatus.CANNOT_ASSESS])
-    ev    = _h(_c(g.evidence))
-    defic = _h(_c(g.deficiency_description))
-    art_n = _h(_c(g.article_number))
-    art_t = _h(_c(g.article_title))
+    cm    = STATUS_STYLES.get(g.status, STATUS_STYLES[ComplianceStatus.CANNOT_ASSESS])
+    ev    = _esc(_clean(g.evidence))
+    defic = _esc(_clean(g.deficiency_description))
+    art_n = _esc(_clean(g.article_number))
+    art_t = _esc(_clean(g.article_title))
 
     fix = ""
     if defic:
@@ -381,7 +424,7 @@ def _gap_card(g) -> str:
         conf_badge = (
             f'<span style="{FONT}display:inline-block;font-size:6.5pt;font-weight:700;'
             f'padding:2pt 7pt;border-radius:20pt;{conf_style}margin-right:4pt;">'
-            f'{_h(conf)} confidence</span>'
+            f'{_esc(conf)} confidence</span>'
         )
 
     return (
@@ -393,7 +436,7 @@ def _gap_card(g) -> str:
         f'<div style="flex:1;padding:5.5pt 10pt;display:flex;align-items:center;justify-content:space-between;gap:8pt;">'
         f'<div>'
         f'<div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{art_n} &nbsp;&middot;&nbsp; {art_t}</div>'
-        + (f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;margin-top:1.5pt;font-style:italic;">{_h(conf_reason)}</div>' if conf_reason and conf != "HIGH" else "")
+        + (f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;margin-top:1.5pt;font-style:italic;">{_esc(conf_reason)}</div>' if conf_reason and conf != "HIGH" else "")
         + f'</div>'
         f'<div style="display:flex;align-items:center;gap:4pt;flex-shrink:0;">'
         f'{conf_badge}'
@@ -401,7 +444,7 @@ def _gap_card(g) -> str:
         f'padding:3pt 9pt;border-radius:20pt;border:1pt solid {cm["br"]};'
         f'background:{cm["bg"]};color:{cm["c"]};white-space:nowrap;">'
         f'<span style="width:5pt;height:5pt;border-radius:50%;background:{cm["c"]};display:inline-block;"></span>'
-        f'{_h(cm["label"])}</div>'
+        f'{_esc(cm["label"])}</div>'
         f'</div>'
         f'</div></div>'
         f'<div style="padding:7pt 10pt 8pt 14pt;background:#fff;">'
@@ -419,7 +462,7 @@ def _reg_header(reg_key, gaps, first=False):
     return (
         f'<div style="margin-bottom:4mm;display:flex;align-items:baseline;'
         f'justify-content:space-between;padding-bottom:3mm;border-bottom:1.5pt solid #e8edf2;">'
-        f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_h(_reg(reg_key))}</div>'
+        f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_esc(_reg_label(reg_key))}</div>'
         f'<div style="{FONT}font-size:7pt;color:#94a3b8;">'
         f'{n_c} compliant &nbsp;&middot;&nbsp; {n_p} partial &nbsp;&middot;&nbsp; {n_n} non-compliant'
         f'</div></div>'
@@ -466,8 +509,8 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _action_card(a) -> str:
-    pm  = P.get(a.priority, P[Priority.LOW])
-    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Deadline:</b> {_h(_c(a.deadline))}" if a.deadline else ""
+    pm  = PRIORITY_STYLES.get(a.priority, PRIORITY_STYLES[Priority.LOW])
+    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Deadline:</b> {_esc(_clean(a.deadline))}" if a.deadline else ""
     return (
         f'<div style="border:1pt solid #e8edf2;border-radius:8pt;'
         f'margin-bottom:8mm;overflow:hidden;page-break-inside:avoid;'
@@ -476,14 +519,14 @@ def _action_card(a) -> str:
         f'background:#f1f5f9;border-bottom:1pt solid #e8edf2;">'
         f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;'
         f'padding:2.5pt 9pt;border-radius:20pt;border:1pt solid {pm["br"]};'
-        f'background:{pm["bg"]};color:{pm["c"]};flex-shrink:0;">{_h(pm["label"])}</span>'
-        f'<span style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{_h(_c(a.article_number))}</span>'
-        f'<span style="{FONT}font-size:7pt;color:#94a3b8;margin-left:auto;">{_h(_reg(a.regulation.value))}</span>'
+        f'background:{pm["bg"]};color:{pm["c"]};flex-shrink:0;">{_esc(pm["label"])}</span>'
+        f'<span style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">Art.&nbsp;{_esc(_clean(a.article_number))}</span>'
+        f'<span style="{FONT}font-size:7pt;color:#94a3b8;margin-left:auto;">{_esc(_reg_label(a.regulation.value))}</span>'
         f'</div>'
         f'<div style="padding:7pt 10pt 8pt;background:#fff;">'
-        f'<div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4.5pt;">{_h(_c(a.action))}</div>'
+        f'<div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4.5pt;">{_esc(_clean(a.action))}</div>'
         f'<div style="{FONT}font-size:7.5pt;color:#64748b;">'
-        f'<b style="color:#374151;">Effort:</b> {_h(_c(a.estimated_effort))}{dl}'
+        f'<b style="color:#374151;">Effort:</b> {_esc(_clean(a.estimated_effort))}{dl}'
         f'</div></div></div>'
     )
 
@@ -507,7 +550,7 @@ def _actions(report: ComplianceReport, logo: str) -> str:
         header = (
             f'<div style="margin-bottom:4mm;display:flex;align-items:baseline;'
             f'justify-content:space-between;padding-bottom:3mm;border-bottom:1.5pt solid #e8edf2;">'
-            f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_h(_reg(reg_key))}</div>'
+            f'<div style="{FONT}font-size:10pt;font-weight:700;color:{BLUE};">{_esc(_reg_label(reg_key))}</div>'
             f'</div>'
         )
         cards = [_action_card(a) for a in acts]
@@ -560,7 +603,7 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Legal Disclaimer</div>'
         f'<div style="{FONT}padding:6mm 7mm;background:#f8fafc;border:1pt solid #e8edf2;'
         f'border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;'
-        f'box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">{_h(report.disclaimer)}</div>'
+        f'box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">{_esc(report.disclaimer)}</div>'
         f'</div>'
         f'<div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;'
         f'text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">'
@@ -574,7 +617,7 @@ def _closing(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def generate_pdf(report: ComplianceReport) -> bytes:
-    logo = _logo()
+    logo = _logo_data_uri()
 
     html = (
         '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
