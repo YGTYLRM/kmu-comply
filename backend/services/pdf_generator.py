@@ -153,7 +153,6 @@ def _sec_sub(text):
 
 def _cover(report: ComplianceReport, logo: str) -> str:
     sc   = _score_color(report.overall_score_percent)
-    sbg  = _score_bg(report.overall_score_percent)
     date = report.generated_at[:10] if report.generated_at else ""
 
     n_app  = sum(1 for r in report.applicable_regulations if r.applies)

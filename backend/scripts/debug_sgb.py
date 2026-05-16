@@ -40,5 +40,5 @@ if matches:
 # Find where 'zum Seitenanfang' sits relative to a § header
 idx = text.find("zum Seitenanfang")
 if idx != -1:
-    print(f"\nContext around first 'zum Seitenanfang':")
+    print("\nContext around first 'zum Seitenanfang':")
     print(repr(text[max(0, idx-80):idx+60]))

@@ -19,18 +19,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import re as _re
 import sys
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from rag.retrieval import retrieve
 
 EVAL_FILE = Path(__file__).parent.parent / "data" / "retrieval_eval.json"
-
-
-import re as _re
 
 def _normalise(article: str) -> str:
     """

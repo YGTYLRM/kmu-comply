@@ -362,12 +362,6 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
     is_large = criteria_met >= 2
     applies  = is_large or profile.is_listed_company
 
-    stop_the_clock_note = (
-        " IMPORTANT: Directive (EU) 2025/794 ('Stop-the-clock') has postponed Wave 2 "
-        "reporting obligations by 2 years. Verify your specific wave with your auditor "
-        "before planning implementation."
-    )
-
     # Wave assignment per Directive (EU) 2025/794 stop-the-clock
     # Wave 1: PIEs already subject to NFRD with >500 employees — FY2024, report 2025 (not postponed)
     # Wave 2: Large companies (2/3 criteria) not in Wave 1 — postponed FY2027, report 2028
@@ -383,13 +377,13 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
             f"CSRD does not apply: only {criteria_met}/3 size criteria met"
             + (f" ({'; '.join(met_list)})" if met_list else "")
             + f" — 2/3 required. {unmet_count} criteria not met "
-            + f"(EU Directive 2022/2464, Art. 5)."
+            + "(EU Directive 2022/2464, Art. 5)."
         )
     elif is_pie_above_500:
         wave, first_fy = 1, 2024
         reason = (
-            f"CSRD applies as Wave 1 (PIE with >500 employees): first reporting FY 2024 "
-            f"(report published 2025). Not postponed by Directive (EU) 2025/794."
+            "CSRD applies as Wave 1 (PIE with >500 employees): first reporting FY 2024 "
+            "(report published 2025). Not postponed by Directive (EU) 2025/794."
         )
     elif is_large:
         wave, first_fy = 2, 2027
@@ -401,9 +395,9 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
     else:
         wave, first_fy = 3, 2028
         reason = (
-            f"CSRD applies as Wave 3 (listed SME on EU-regulated market). "
-            f"First reporting year postponed to FY 2028 (report 2029) "
-            f"under Directive (EU) 2025/794."
+            "CSRD applies as Wave 3 (listed SME on EU-regulated market). "
+            "First reporting year postponed to FY 2028 (report 2029) "
+            "under Directive (EU) 2025/794."
         )
 
     return CSRDResult(applies=applies, criteria_met=criteria_met, wave=wave, first_reporting_fy=first_fy, reason=reason)
@@ -432,7 +426,7 @@ def check_bdsg(profile: CompanyProfile) -> BDSGResult:
         applies=True,
         dpo_required=dpo_required,
         reason=(
-            f"BDSG applies: German company processing personal data (BDSG §1). "
+            "BDSG applies: German company processing personal data (BDSG §1). "
             + (
                 f"DPO required: {profile.employee_count} employees >= 20 threshold (BDSG §38(1))."
                 if dpo_required
@@ -572,8 +566,8 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
     return NIS2Result(
         applies=False, particularly_important=False, important=False,
         reason=(
-            f"NIS2 does not apply: below size thresholds (< 50 employees, < 10M revenue) "
-            f"for the identified sector (NIS2 Art. 2(2)). Small enterprises generally exempt."
+            "NIS2 does not apply: below size thresholds (< 50 employees, < 10M revenue) "
+            "for the identified sector (NIS2 Art. 2(2)). Small enterprises generally exempt."
         ),
     )
 
@@ -795,7 +789,7 @@ def determine_applicable_regulations(
             applies=csrd.applies,
             reason=csrd.reason,
             key_threshold=(
-                f"2 of 3: >250 employees, >50M revenue, >25M balance sheet"
+                "2 of 3: >250 employees, >50M revenue, >25M balance sheet"
                 + (f" — Wave {csrd.wave}, first FY {csrd.first_reporting_fy}" if csrd.wave else "")
             ),
         ),

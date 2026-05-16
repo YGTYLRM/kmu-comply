@@ -17,7 +17,6 @@ from models.enums import (
     Regulation,
     ComplianceStatus,
     Priority,
-    ObligationType,
 )
 
 
