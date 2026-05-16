@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-import math
 from functools import lru_cache
 
 import anthropic

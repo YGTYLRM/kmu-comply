@@ -14,7 +14,6 @@ import asyncio
 import hashlib
 import json
 import logging
-from datetime import datetime, timezone
 from pathlib import Path
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -214,7 +213,6 @@ async def _run_scheduled_analysis(
                     .limit(2)
                 )).scalars().all()
                 if len(rows) >= 2:
-                    import json
                     from models.compliance_report import ComplianceReport as CR
                     raw = rows[1].raw_json
                     if raw:

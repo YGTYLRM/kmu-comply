@@ -90,7 +90,7 @@ def main():
             print(f"  Length   : {len(text)} chars")
             if issues:
                 print(f"  ISSUES   : {', '.join(issues)}")
-            print(f"  Text preview (first 400 chars):")
+            print("  Text preview (first 400 chars):")
             print("  " + text[:400].replace("\n", "\n  "))
             if len(text) > 400:
                 print(f"  ... [{len(text)-400} more chars]")

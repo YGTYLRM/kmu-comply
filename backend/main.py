@@ -7,6 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import settings
+from routes.admin import router as admin_router
+from routes.analysis import router as analysis_router
+from routes.billing import router as billing_router
+from routes.companies import router as companies_router
+from routes.completions import router as completions_router
+from routes.expert_review import router as expert_review_router
+from routes.misc import router as misc_router
+from routes.notifications import router as notifications_router
 from state import job_manager
 
 if settings.sentry_dsn:
@@ -115,16 +123,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(SecurityHeadersMiddleware)
-
-# ── Routers ───────────────────────────────────────────────────────────────────
-from routes.analysis import router as analysis_router
-from routes.companies import router as companies_router
-from routes.completions import router as completions_router
-from routes.notifications import router as notifications_router
-from routes.expert_review import router as expert_review_router
-from routes.billing import router as billing_router
-from routes.admin import router as admin_router
-from routes.misc import router as misc_router
 
 app.include_router(analysis_router)
 app.include_router(companies_router)

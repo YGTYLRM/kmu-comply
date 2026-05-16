@@ -44,7 +44,7 @@ async def main() -> None:
         await init_db()
         logger.info("worker: database initialised")
 
-    scheduler = start_scheduler()
+    start_scheduler()
     logger.info("worker: scheduler running — regulation check 03:00 UTC, reassessments 04:00 UTC")
 
     stop_event = asyncio.Event()

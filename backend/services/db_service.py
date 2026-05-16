@@ -170,7 +170,7 @@ async def get_all_companies_due_for_reassessment(interval_days: int = 30) -> lis
             .join(Profile, Profile.id == Company.user_id)
             .outerjoin(subq, subq.c.company_id == Company.id)
             .where(
-                (subq.c.last_report == None) |  # never assessed
+                (subq.c.last_report.is_(None)) |  # never assessed
                 (func.extract("epoch", subq.c.last_report) < cutoff)
             )
         )

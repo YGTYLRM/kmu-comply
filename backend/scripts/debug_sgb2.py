@@ -12,11 +12,11 @@ for fname in ["sgb_3_text.txt", "sgb_6_text.txt"]:
     lines = text.splitlines()
 
     # Find lines that start with §
-    sec_lines = [(i, l) for i, l in enumerate(lines) if l.startswith("§")]
+    sec_lines = [(i, line) for i, line in enumerate(lines) if line.startswith("§")]
     print(f"\n{fname}: {len(sec_lines)} lines starting with §")
-    for i, l in sec_lines[:5]:
-        print(f"  Line {i}: {repr(l[:80])}")
-        for j, c in enumerate(l[:6]):
+    for i, line in sec_lines[:5]:
+        print(f"  Line {i}: {repr(line[:80])}")
+        for j, c in enumerate(line[:6]):
             print(f"    [{j}] ord={ord(c)} repr={repr(c)}")
 
     matches = list(_RE_B.finditer(text))
