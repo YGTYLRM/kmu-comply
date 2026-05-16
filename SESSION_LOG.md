@@ -4,6 +4,157 @@ This file is appended after every working session. It documents what was built, 
 
 ---
 
+## Session 26 — 2026-05-16 — Deployment, code quality, CI fixes, knowledge base ingest
+
+**Branch:** `feat/polish`
+
+### Context
+
+Full deployment prep and code quality pass. All Phases 7–12 work (previously committed locally only) pushed to remote for the first time. CI set up and debugged to green.
+
+---
+
+### Knowledge base — full re-ingest completed
+
+Ran `python scripts/ingest_all.py` from `backend/`. All 12 ChromaDB collections now populated:
+
+| Collection | Chunks |
+|---|---|
+| gdpr_dsgvo | 106 |
+| bdsg | 27 |
+| lksg | 27 |
+| enefg | 22 |
+| csrd | 31 |
+| nis2 | 90 |
+| eu_ai_act | 36 |
+| hinschg | 72 |
+| workplace_law | 401 |
+| agg | 99 |
+| milog | 51 |
+| compliance_guides | 448 |
+
+Supplementary docs script fixed (Unicode encoding bug on Windows cp1254, missing `sys.path` insert, 4 dead gesetze-im-internet.de URLs removed). GDPR recitals, ESRS 1, and ESRS 2 fetched from EUR-Lex and ingested. BSIG, LkSG-Sorgfaltspflichtenverordnung, EnEG, and HinSchG-Meldestellenverordnung not yet on gesetze-im-internet.de.
+
+---
+
+### Docker deployment setup
+
+Created full Docker deployment infrastructure:
+
+| File | What it does |
+|---|---|
+| `backend/Dockerfile` | Multi-stage Python 3.11 build; installs deps + Playwright chromium |
+| `frontend/Dockerfile` | 3-stage Node 20 build using Next.js standalone output |
+| `docker-compose.yml` | Orchestrates chromadb + backend + worker + frontend; fixed version key, env path, internal URLs |
+| `.dockerignore` | Excludes chroma_db, .env, node_modules, .next, screenshots |
+| `.env.example` | Updated with all required vars: LLM, Stripe, Supabase, Resend, Sentry, security |
+
+Also added `output: "standalone"` to `frontend/next.config.js` to enable the Docker multi-stage build.
+
+---
+
+### Code quality — main.py split into route modules
+
+`backend/main.py` was 1,094 lines with 42 inline endpoints. Split into:
+
+| File | Endpoints |
+|---|---|
+| `backend/state.py` | Shared state: JobManager instance, job_owners, rate limit dicts |
+| `backend/dependencies.py` | Shared deps: check_rate_limit, assert_owns_job, validate_redirect_url, require_admin |
+| `backend/routes/analysis.py` | Profile validate, document upload, analyze, status, report, PDF |
+| `backend/routes/companies.py` | Companies list, company detail, reports list |
+| `backend/routes/completions.py` | Action item workflow CRUD |
+| `backend/routes/notifications.py` | Notifications list, unread count, mark-read |
+| `backend/routes/expert_review.py` | Expert review submit and list |
+| `backend/routes/billing.py` | Stripe checkout, billing status, portal, webhook |
+| `backend/routes/admin.py` | Regulation update approval workflow |
+| `backend/routes/misc.py` | Health, auth sync, regulations, templates, plans, contact |
+
+`main.py` reduced to ~115 lines: app config, middleware, and router registration only.
+
+---
+
+### Code quality — pdf_generator.py cleanup
+
+Renamed all cryptic single-letter helpers to readable names:
+
+| Before | After |
+|---|---|
+| `_h()` | `_esc()` — HTML escape |
+| `_c()` | `_clean()` — strip LLM artefacts |
+| `_reg()` | `_reg_label()` — regulation display name |
+| `_sc()` | `_score_color()` |
+| `_sbg()` | `_score_bg()` |
+| `_sbr()` | `_score_border()` |
+| `_logo()` | `_logo_data_uri()` |
+| `S` | `STATUS_STYLES` |
+| `P` | `PRIORITY_STYLES` |
+| `M` | `PAGE_MARGIN` |
+
+Fixed bare `except: pass` on logo load → `except (OSError, IOError) as exc: logger.warning(...)`.
+
+---
+
+### Supabase RLS policies
+
+Created `backend/db/rls_policies.sql` with Row Level Security policies for all 12 tables. Enables RLS and adds user-scoped policies so clients can only access their own data. Internal tables (jobs, rate_limit_events, pending_regulation_updates) have RLS enabled with no client policies — service_role only.
+
+**Not yet applied** — run in Supabase SQL Editor before production.
+
+Also: enable Leaked Password Protection in Supabase Auth → Settings.
+
+---
+
+### CI fixes
+
+GitHub Actions CI was failing on every push since it was added. Three root causes found and fixed:
+
+1. **`asyncio-task-runner` phantom dependency** — package does not exist on PyPI. `pip install -r requirements.txt` was failing immediately, preventing any tests from running. Removed from requirements.txt.
+
+2. **Outdated tests** — 4 tests written when there were 5 regulations, now there are 11. `test_returns_all_five_regulations` updated to check all 11. `test_large_listed_all_regulations_apply` updated. Two EnEfG threshold tests used 50 employees (SME, EnEfG exempt) — corrected to 300 (non-SME).
+
+3. **Lint errors** — 50 ruff violations across multiple files (E402 import order, F401 unused imports, F541 bare f-strings, F841 unused variables, E711 SQLAlchemy `== None`). All fixed. CI now passes lint, unit tests (57/57), and frontend typecheck.
+
+---
+
+### Stripe setup
+
+Stripe test secret key added to `backend/.env`. `STRIPE_ENABLED=false` until webhook secret is added. Next step: register webhook in Stripe dashboard → `/api/webhook/stripe` → event `checkout.session.completed` → paste `whsec_...` into `.env` → flip `STRIPE_ENABLED=true`.
+
+---
+
+### Files changed (Session 26)
+
+| File | Change |
+|---|---|
+| `backend/main.py` | Rewritten: 1,094 lines → 115 lines |
+| `backend/state.py` | New — shared state module |
+| `backend/dependencies.py` | New — shared FastAPI deps |
+| `backend/routes/*.py` | New — 8 route modules (9 files incl. `__init__.py`) |
+| `backend/services/pdf_generator.py` | Renamed helpers, fixed bare except |
+| `backend/db/rls_policies.sql` | New — Supabase RLS SQL |
+| `backend/db/models.py` | Fixed import order, removed unused UUID/ARRAY imports |
+| `backend/services/job_manager.py` | Fixed import order |
+| `backend/services/threshold_engine.py` | Removed unused variable, fixed f-strings |
+| `backend/services/db_service.py` | Fixed SQLAlchemy `== None` → `.is_(None)` |
+| `backend/services/pdf_generator.py` | Removed unused `sbg` variable |
+| `backend/worker.py` | Fixed unused `scheduler` variable |
+| `backend/scripts/fetch_supplementary_docs.py` | Fixed sys.path, Unicode bug, removed 4 dead URLs |
+| `backend/scripts/eval_retrieval.py` | Fixed import order |
+| `backend/scripts/debug_sgb2.py` | Fixed ambiguous variable name |
+| `backend/tests/test_thresholds.py` | Updated 4 tests for 11-regulation system |
+| `backend/tests/test_models.py` | Removed unused import |
+| `backend/data/regulations/**/*.txt` | \xa0 normalization applied to 21 German law source files |
+| `requirements.txt` | Removed nonexistent asyncio-task-runner |
+| `backend/Dockerfile` | New |
+| `frontend/Dockerfile` | New |
+| `docker-compose.yml` | Fixed version key, context paths, env file path |
+| `.dockerignore` | New |
+| `.env.example` | Updated with full production var set |
+| `frontend/next.config.js` | Added `output: "standalone"` |
+
+---
+
 ## Session 25 — 2026-05-15 — Infrastructure fixes, knowledge base expansion, CI/CD
 
 **Branch:** `feat/polish`
