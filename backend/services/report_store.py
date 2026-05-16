@@ -117,7 +117,8 @@ def load_profile(job_id: str) -> dict | None:
     from config import settings
     if settings.database_url:
         try:
-            import asyncio, concurrent.futures
+            import asyncio
+            import concurrent.futures
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 with concurrent.futures.ThreadPoolExecutor() as pool:

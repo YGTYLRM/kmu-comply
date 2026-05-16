@@ -2,7 +2,8 @@
 Run from backend/ to render a PDF with fake data — no LLM calls.
 Output: preview_report.pdf in the backend directory.
 """
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from models.compliance_report import (

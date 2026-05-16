@@ -12,7 +12,6 @@ The job manager cleans up by calling clear() after the job TTL expires.
 from __future__ import annotations
 
 import logging
-import os
 import shutil
 import uuid
 from functools import lru_cache

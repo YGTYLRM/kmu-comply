@@ -5,7 +5,6 @@ import asyncio
 import html
 import json
 import logging
-from collections import defaultdict
 from time import time
 from typing import Optional
 
@@ -15,7 +14,7 @@ from pydantic import BaseModel
 from config import settings
 from models import RegulationsListResponse
 from models.api_responses import RegulationInfo
-from services.auth_service import get_current_user, get_optional_user
+from services.auth_service import get_current_user
 from state import contact_calls
 
 logger = logging.getLogger(__name__)

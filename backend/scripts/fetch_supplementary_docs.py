@@ -15,7 +15,6 @@ Run from backend/:  python scripts/fetch_supplementary_docs.py [--regulation <na
 import argparse
 import html as html_module
 import re
-import sys
 import urllib.request
 from pathlib import Path
 

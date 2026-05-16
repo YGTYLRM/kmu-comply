@@ -2,7 +2,6 @@
 Stripe billing endpoints: checkout, subscription status, portal, webhook.
 """
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel

@@ -12,7 +12,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from services.section_hash_store import build_section_hashes, save
-from rag.ingest import REGULATION_COLLECTIONS
 
 REGULATIONS = [
     "gdpr", "bdsg", "nis2", "eu_ai_act",

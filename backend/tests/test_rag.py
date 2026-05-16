@@ -8,7 +8,6 @@ Run scripts/ingest_regulations.py --regulation all first.
 """
 from __future__ import annotations
 
-import pytest
 import chromadb
 
 from backend.rag.retrieval import deduplicate, retrieve

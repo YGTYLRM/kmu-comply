@@ -2,13 +2,13 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
+from sqlalchemy import String, Boolean, Float, Integer, DateTime, JSON, Text, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from db.database import Base
+
 
 def _now():
     return datetime.now(timezone.utc)
-from sqlalchemy import String, Boolean, Float, Integer, DateTime, JSON, Text, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from db.database import Base
 
 
 def _uuid():

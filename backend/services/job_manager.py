@@ -15,12 +15,12 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-logger = logging.getLogger(__name__)
-
+from models.api_responses import StatusResponse, StepProgress
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
-from models.api_responses import StatusResponse, StepProgress
 from models.enums import AnalysisStep, JobStatus
+
+logger = logging.getLogger(__name__)
 
 
 class _Job:
@@ -136,7 +136,7 @@ class JobManager:
         try:
             from db.database import AsyncSessionLocal
             from db.models import JobRecord
-            from sqlalchemy import select, update
+            from sqlalchemy import select
             async with AsyncSessionLocal() as db:
                 result = await db.execute(
                     select(JobRecord).where(JobRecord.status == "running")
