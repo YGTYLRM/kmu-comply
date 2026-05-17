@@ -95,16 +95,59 @@ class MiLoGResult:
     reason: str
 
 
+@dataclass(frozen=True)
+class TTDSGResult:
+    applies: bool
+    reason: str
+
+
+@dataclass(frozen=True)
+class GwGResult:
+    applies: bool
+    reason: str
+
+
+@dataclass(frozen=True)
+class EUDataActResult:
+    applies: bool
+    reason: str
+
+
 # ── Existing regulations ───────────────────────────────────────────────────────
 
 def check_gdpr(profile: CompanyProfile) -> GDPRResult:
     """
-    GDPR applies if the company processes personal data of EU residents.
-    DPO required if employee_count >= 20 and processing not occasional (BDSG s38).
-    Processing records required if:
-      - employee_count >= 250, OR
-      - processing is not occasional, OR
-      - processes special categories of data (Art. 9 GDPR).
+    SOURCE: Regulation (EU) 2016/679 (GDPR)
+
+    Applicability — Art. 2(1) GDPR:
+      "This Regulation applies to the processing of personal data wholly or partly
+       by automated means and to the processing other than by automated means of
+       personal data which form part of a filing system or are intended to form
+       part of a filing system."
+      → Applies to any company processing personal data of EU residents.
+
+    DPO (Data Protection Officer) — BDSG §38(1) [verified from gesetze-im-internet.de]:
+      "Nichtöffentliche Stellen benennen eine Datenschutzbeauftragte oder einen
+       Datenschutzbeauftragten, soweit sie in der Regel mindestens 20 Personen
+       ständig mit der automatisierten Verarbeitung personenbezogener Daten
+       beschäftigen."
+      → Threshold: ≥20 PERSONS CONSTANTLY engaged in AUTOMATED processing.
+      IMPORTANT: This is not simply ≥20 employees. A 30-person company where
+      only 3 staff regularly use a CRM/ERP system may not meet this threshold.
+      A 25-person SaaS company where all staff process customer data does.
+      We approximate this as ≥20 employees + non-occasional processing; this
+      is conservative and correct for most digital/service businesses but may
+      OVERSTATE the DPO obligation for manual-processing-heavy industries.
+      ⚠ LEGAL REVIEW RECOMMENDED for borderline cases.
+
+    Processing records — Art. 30(5) GDPR:
+      "The obligations referred to in paragraphs 1 and 2 shall not apply to an
+       enterprise or an organisation employing fewer than 250 persons unless the
+       processing it carries out is likely to result in a risk to the rights and
+       freedoms of data subjects, the processing is not occasional, or the
+       processing includes special categories of data as referred to in Article 9(1)."
+      → Exemption: <250 employees AND occasional processing AND no special categories.
+      → Required if: ≥250 employees OR non-occasional OR special categories (Art. 9).
     """
     applies = profile.processes_personal_data
 
@@ -118,17 +161,21 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
             records_reason="N/A",
         )
 
+    # BDSG §38(1): ≥20 persons CONSTANTLY engaged in AUTOMATED processing.
+    # Approximated as ≥20 employees + non-occasional; conservative for digital businesses.
     dpo_required = (
         profile.employee_count >= 20
         and not profile.processing_is_occasional
     )
     dpo_reason = (
-        f"DPO required: {profile.employee_count} employees regularly processing personal data "
-        f"(BDSG §38(1) — threshold: 20 employees)."
+        f"DPO likely required: {profile.employee_count} employees regularly processing "
+        f"personal data automatically (BDSG §38(1) — ≥20 persons constantly in automated "
+        f"processing). Note: exact applicability depends on how many staff are constantly "
+        f"engaged in automated processing, not just total headcount."
         if dpo_required
         else (
-            f"DPO not required: employee count {profile.employee_count} < 20 threshold "
-            f"(BDSG §38(1)) or processing is occasional."
+            f"DPO not required: {profile.employee_count} employees < 20 threshold or "
+            f"processing is occasional (BDSG §38(1))."
         )
     )
 
@@ -163,26 +210,40 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
 
 def check_lksg(profile: CompanyProfile) -> LkSGResult:
     """
-    LkSG — Lieferkettensorgfaltspflichtengesetz.
+    SOURCE: Gesetz über die unternehmerischen Sorgfaltspflichten zur Vermeidung von
+    Menschenrechtsverletzungen in Lieferketten (LkSG) — gesetze-im-internet.de/lksg/
 
-    Direct applicability (§1(1) LkSG):
-      - Company has its registered seat, principal place of business, or administrative
-        headquarters in Germany, AND
-      - >= 3,000 employees (effective 1 Jan 2023), OR
-      - >= 1,000 employees (effective 1 Jan 2024)
-    Employee count includes employees at foreign affiliates where the German parent
-    has decisive influence (group counting).
+    Applicability — §1(1) LkSG [verified from official text]:
+      "Dieses Gesetz ist anzuwenden auf Unternehmen ungeachtet ihrer Rechtsform, die
+       1. ihre Hauptverwaltung, ihre Hauptniederlassung, ihren Verwaltungssitz oder
+          ihren satzungsmäßigen Sitz im Inland haben und
+       2. in der Regel mindestens 3.000 Arbeitnehmer im Inland beschäftigen."
+      "Ab dem 1. Januar 2024 betragen die [...] Schwellenwerte jeweils 1.000 Arbeitnehmer."
+      → From 1 January 2024: threshold is ≥1,000 employees.
 
-    Note on indirect relevance: SMEs below the threshold may still receive LkSG
-    supplier questionnaires and contractual due diligence obligations from their
-    LkSG-covered customers. This does not trigger direct LkSG applicability but
-    is worth flagging for any company with large-enterprise customers.
+    Leiharbeitnehmer — §1(2) LkSG [verified from official text]:
+      "Leiharbeitnehmer sind bei der Berechnung der Arbeitnehmerzahl des
+       Entleihunternehmens zu berücksichtigen, wenn die Einsatzdauer sechs Monate
+       übersteigt."
+      → Temporary workers (Leiharbeitnehmer) with >6 months tenure COUNT toward
+        the 1,000-employee threshold for the company using them (Entleiher).
+      ⚠ We cannot capture this without a specific field. Employee count provided
+        by the user should include long-term temp workers.
 
-    Supply chain location is NOT an applicability trigger — LkSG due diligence
-    covers both the company's own business area and its supply chain, regardless
-    of whether suppliers are domestic or international.
+    Group companies — §1(3) LkSG [verified from official text]:
+      "Innerhalb von verbundenen Unternehmen (§15 AktG) sind die im Inland
+       beschäftigten Arbeitnehmer sämtlicher konzernangehriger Gesellschaften
+       bei der Berechnung der Arbeitnehmerzahl der Obergesellschaft zu
+       berücksichtigen."
+      → For group companies (Konzern), ALL domestic employees of all group
+        entities count toward the PARENT company's threshold.
+      ⚠ We cannot automatically detect group structures. If this company is
+        a parent or subsidiary, the displayed employee count may be understated.
 
-    Source: §1(1), §2(6) LkSG; BAFA Guidance 2023.
+    Supply chain location is NOT an applicability trigger — LkSG covers both
+    the company's own operations and its supply chain regardless of supplier location.
+
+    Source: §1(1), §1(2), §1(3) LkSG; BAFA Guidance 2023.
     """
     directly_applies = profile.employee_count >= 1000
 
@@ -211,31 +272,39 @@ def check_lksg(profile: CompanyProfile) -> LkSGResult:
 
 def check_enefg(profile: CompanyProfile) -> EnEfGResult:
     """
-    EnEfG / EDL-G — German Energy Efficiency Act 2023 + Energy Services Act (EDL-G).
+    SOURCE: Energieeffizienzgesetz (EnEfG) + Energiedienstleistungsgesetz (EDL-G)
+    gesetze-im-internet.de/enefg/ and gesetze-im-internet.de/edl-g/
 
-    Step 1 — Applicability gate: non-SME status by EU Recommendation 2003/361/EC.
-    A company is NOT an SME (and therefore subject to these obligations) if it exceeds
-    ANY ONE of the three EU criteria:
-      >= 250 employees, OR
-      > EUR 50M annual turnover, OR
-      > EUR 43M balance sheet total
-    Source: EU Recommendation 2003/361/EC Art. 2.
+    TWO SEPARATE LEGAL TRACKS — do not conflate:
 
-    Step 2 — Which obligation applies (only for non-SME companies):
-    EDL-G §8: Energy audit every 4 years (DIN EN 16247-1) is the baseline obligation
-      for all non-SME companies. A certified EnMS satisfies this obligation.
-    EnEfG §8(1): If annual total final energy consumption >= 7.5 GWh (averaged
-      over the last 3 completed calendar years), a certified energy management
-      system (ISO 50001) or EMAS registration is mandatory (replaces audit).
-    EnEfG §9: Companies above applicable consumption thresholds must prepare and
-      implement energy-saving measure plans and document their progress.
+    TRACK 1 — EDL-G §8: Energy audit (Energieaudit):
+      Applies to: non-SME enterprises (EU Recommendation 2003/361/EC Art. 2).
+      A company is non-SME if it exceeds ANY ONE of:
+        ≥250 employees, OR >€50M annual turnover, OR >€43M balance sheet total.
+      Obligation: energy audit every 4 years (DIN EN 16247-1).
+      A certified EnMS (ISO 50001 or EMAS) satisfies this obligation.
 
-    Waste heat (EnEfG §15):
-    Non-SME companies with technically usable waste heat >= 200 kW must assess,
-    document, and report waste heat potential, and consider reuse options.
-    This is triggered by operational heat processes, not by total energy consumption.
+    TRACK 2 — EnEfG §8(1): Energy or environmental management system:
+      [Verified from official text — gesetze-im-internet.de/enefg/__8.html]:
+      "Unternehmen mit einem jährlichen durchschnittlichen Gesamtendenergieverbrauch
+       innerhalb der letzten drei abgeschlossenen Kalenderjahre von mehr als
+       7,5 Gigawattstunden sind verpflichtet, ein Energie- oder
+       Umweltmanagementsystem gemäß Absatz 2 Satz 1 oder Satz 2 einzurichten."
+      → Applies to ANY company (SME or not) with >7.5 GWh AVERAGE consumption
+        over the last 3 completed calendar years.
+      ⚠ PREVIOUS CODE ERROR: this was incorrectly gated on non-SME status.
+        An SME with >7.5 GWh annual energy consumption IS subject to §8(1).
+      ⚠ THRESHOLD IS A 3-YEAR AVERAGE, not a single year's consumption.
 
-    Source: EDL-G §8; EnEfG §8(1), §9, §15; BAFA Guidance on EnEfG 2023.
+    TRACK 2 — EnEfG §9: Energy-saving implementation plans:
+      Required for companies subject to §8(1) (>7.5 GWh).
+
+    Waste heat — EnEfG §15 (now §16 after 2024 renumbering):
+      Non-SME companies with technically usable waste heat ≥200 kW must assess,
+      document, and report waste heat potential.
+
+    Source: EDL-G §8; EnEfG §8(1), §9, §16; EU Recommendation 2003/361/EC Art. 2;
+            BAFA Guidance on EnEfG 2023.
     """
     exceeds_employees = profile.employee_count >= 250
     exceeds_revenue   = (profile.annual_revenue_eur is not None
@@ -245,106 +314,113 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
 
     is_non_sme = exceeds_employees or exceeds_revenue or exceeds_balance
 
-    if not is_non_sme:
+    energy_mwh = profile.annual_energy_consumption_mwh or 0
+    energy_gwh = energy_mwh / 1000
+
+    # TRACK 2: EnEfG §8(1) — applies to ANY company >7.5 GWh (3-year average)
+    # regardless of SME status. Previous code incorrectly gated this on non-SME.
+    enms_required = energy_gwh > 7.5
+
+    # TRACK 1: EDL-G §8 audit — applies only to non-SME companies
+    edl_g_audit_required = is_non_sme
+
+    applies = is_non_sme or enms_required
+
+    if not applies:
         unmet = []
         if not exceeds_employees:
             unmet.append(f"{profile.employee_count} employees < 250")
         if not exceeds_revenue:
             unmet.append(
                 "revenue not provided" if profile.annual_revenue_eur is None
-                else f"revenue {profile.annual_revenue_eur:,.0f} EUR <= 50M"
+                else f"revenue {profile.annual_revenue_eur:,.0f} EUR ≤ 50M"
             )
         if not exceeds_balance:
             unmet.append(
                 "balance sheet not provided" if profile.balance_sheet_total_eur is None
-                else f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR <= 43M"
+                else f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR ≤ 43M"
             )
+        energy_note = (
+            "annual energy consumption not provided — provide it to check EnEfG §8(1)"
+            if energy_mwh == 0
+            else f"energy consumption {energy_gwh:.1f} GWh ≤ 7.5 GWh threshold"
+        )
         return EnEfGResult(
             applies=False,
             edl_g_audit_required=False,
             energy_management_required=False,
             waste_heat_reporting_required=False,
             reason=(
-                f"EnEfG / EDL-G do not apply — qualifies as EU SME ({'; '.join(unmet)}). "
-                f"Energy audit and management obligations only apply to non-SME enterprises."
+                f"EnEfG / EDL-G do not apply — qualifies as EU SME ({'; '.join(unmet)}) "
+                f"and {energy_note} (EnEfG §8(1))."
             ),
         )
 
-    # Non-SME — determine which specific obligation applies
-    energy_mwh = profile.annual_energy_consumption_mwh or 0
-    energy_gwh  = energy_mwh / 1000  # convert MWh → GWh for §8 threshold
-
-    # >= 7.5 GWh → certified EnMS mandatory under EnEfG §8(1); satisfies the EDL-G §8 audit
-    # <  7.5 GWh → energy audit every 4 years under EDL-G §8 is the baseline obligation
-    enms_required      = energy_gwh >= 7.5
-    edl_g_audit_required = True  # always required for non-SME; EnMS satisfies this if enms_required
-
+    obligations = []
     criteria = []
-    if exceeds_employees:
-        criteria.append(f"{profile.employee_count} employees >= 250")
-    if exceeds_revenue:
-        criteria.append(f"revenue {profile.annual_revenue_eur:,.0f} EUR > 50M")
-    if exceeds_balance:
-        criteria.append(f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR > 43M")
+
+    if is_non_sme:
+        if exceeds_employees:
+            criteria.append(f"{profile.employee_count} employees ≥ 250")
+        if exceeds_revenue:
+            criteria.append(f"revenue {profile.annual_revenue_eur:,.0f} EUR > 50M")
+        if exceeds_balance:
+            criteria.append(f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR > 43M")
+        obligations.append(f"non-SME ({'; '.join(criteria)}) → EDL-G §8 energy audit every 4 years")
 
     if energy_mwh == 0:
-        energy_note = (
-            "Annual energy consumption not provided — cannot determine whether EnEfG §8(1) EnMS "
-            "obligation (>= 7.5 GWh) or EDL-G §8 energy audit (every 4 years) applies. "
-            "Provide annual energy consumption for a precise assessment."
+        obligations.append(
+            "annual energy consumption not provided — cannot confirm EnEfG §8(1) status; "
+            "provide 3-year average consumption in GWh"
         )
     elif enms_required:
-        energy_note = (
-            f"Annual energy consumption {energy_gwh:.1f} GWh >= 7.5 GWh threshold: "
-            f"certified energy management system (ISO 50001 or EMAS) mandatory (EnEfG §8(1)). "
-            f"This satisfies the EDL-G §8 energy audit obligation. "
-            f"Energy-saving measure implementation plans also required (EnEfG §9)."
-        )
-    else:
-        energy_note = (
-            f"Annual energy consumption {energy_gwh:.1f} GWh < 7.5 GWh threshold: "
-            f"energy audit every 4 years (DIN EN 16247-1) required (EDL-G §8). "
-            f"A certified EnMS (ISO 50001 or EMAS) is an accepted alternative."
+        obligations.append(
+            f"energy consumption {energy_gwh:.1f} GWh > 7.5 GWh (3-year average) → "
+            f"certified energy management system (ISO 50001 or EMAS) mandatory (EnEfG §8(1)); "
+            f"energy-saving implementation plans required (EnEfG §9)"
         )
 
     reason = (
-        f"EnEfG / EDL-G apply — non-SME enterprise ({'; '.join(criteria)}). "
-        f"{energy_note} "
-        f"Waste heat assessment required if technically usable waste heat >= 200 kW (EnEfG §15)."
+        f"EnEfG / EDL-G apply. Obligations: {'; '.join(obligations)}. "
+        f"Waste heat assessment required if technically usable waste heat ≥ 200 kW (EnEfG §16)."
     )
 
     return EnEfGResult(
         applies=True,
         edl_g_audit_required=edl_g_audit_required,
         energy_management_required=enms_required,
-        waste_heat_reporting_required=True,
+        waste_heat_reporting_required=is_non_sme,
         reason=reason,
     )
 
 
 def check_csrd(profile: CompanyProfile) -> CSRDResult:
     """
-    CSRD — Corporate Sustainability Reporting Directive (EU) 2022/2464.
+    SOURCE: Directive (EU) 2022/2464 (CSRD) — eur-lex.europa.eu/eli/dir/2022/2464
 
-    Size criteria (2 of 3 must be met to qualify as a large company):
-      > 250 employees, OR
-      > EUR 50M annual net turnover, OR
-      > EUR 25M balance sheet total
-    Source: Art. 3(4) Accounting Directive 2013/34/EU as amended by CSRD.
+    ⚠ THRESHOLD UNCERTAINTY — LEGAL REVIEW REQUIRED:
+    The CSRD scope is actively changing due to the "Omnibus" simplification package.
 
-    Application timeline — IMPORTANT: Directive (EU) 2025/794 ("Stop-the-clock")
-    postponed certain CSRD obligations:
-      Wave 1 (FY 2024, report 2025): Large PIEs already subject to NFRD with >500 employees
-        — NOT postponed, reporting as scheduled.
-      Wave 2 (FY 2025, report 2026 → postponed to FY 2027, report 2028):
-        Large companies meeting 2/3 criteria, not yet in Wave 1.
-      Wave 3 (FY 2026, report 2027 → postponed to FY 2028, report 2029):
-        Listed SMEs, small and non-complex credit institutions, captive insurance.
-      Source: Directive (EU) 2025/794, April 2025.
+    ORIGINAL CSRD THRESHOLDS (Directive 2022/2464, amending Art. 3(4) of 2013/34/EU):
+      A "large undertaking" meets 2 of 3 criteria:
+        > 250 employees, OR > €50M net turnover, OR > €25M balance sheet total.
+      [Source: Art. 3(4) Directive 2013/34/EU as amended]
 
-    Listed SMEs:
-      Listed SMEs on EU-regulated markets fall under CSRD (Wave 3, postponed).
-      They may opt out until 2028 under the Stop-the-clock postponement.
+    OMNIBUS SIMPLIFICATION (Council agreement February 2026 — consilium.europa.eu):
+      The Council agreed to narrow CSRD scope to companies with:
+        > 1,000 employees AND > €450M net annual turnover.
+      ⚠ STATUS: As of May 2026, the Omnibus formal adoption and transposition
+        status is uncertain. We continue to use the original 2/3 criteria as
+        the conservative (broader) baseline. This will OVERSTATE CSRD applicability
+        for companies between the two thresholds.
+      ⚠ ACTION: This threshold MUST be updated once the Omnibus directive is
+        formally published in the EU Official Journal and transposed into German law.
+
+    APPLICATION TIMELINE (per Directive (EU) 2025/794 "Stop-the-clock"):
+      Wave 1 (FY 2024, report 2025): PIEs with >500 employees — NOT postponed.
+      Wave 2 (postponed to FY 2027, report 2028): Large companies not in Wave 1.
+      Wave 3 (postponed to FY 2028, report 2029): Listed SMEs.
+      [Source: Directive (EU) 2025/794, April 2025]
     """
     criteria_met = 0
     met_list = []
@@ -405,9 +481,22 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
 
 def check_bdsg(profile: CompanyProfile) -> BDSGResult:
     """
-    BDSG applies if the company is in Germany and processes personal data.
-    DPO required if >= 20 employees regularly processing personal data (BDSG §38(1)).
-    BDSG supplements GDPR — cannot apply without GDPR also applying.
+    SOURCE: Bundesdatenschutzgesetz (BDSG) — gesetze-im-internet.de/bdsg_2018/
+
+    Applicability — BDSG §1(1):
+      BDSG supplements GDPR for companies in Germany. Cannot apply without GDPR.
+      Applies to any non-public body (nichtöffentliche Stelle) in Germany that
+      processes personal data.
+
+    DPO threshold — BDSG §38(1) [verified from gesetze-im-internet.de/bdsg_2018/__38.html]:
+      "Nichtöffentliche Stellen benennen eine Datenschutzbeauftragte oder einen
+       Datenschutzbeauftragten, soweit sie in der Regel mindestens 20 Personen
+       ständig mit der automatisierten Verarbeitung personenbezogener Daten
+       beschäftigen."
+      → ≥20 persons CONSTANTLY engaged in AUTOMATED processing of personal data.
+      ⚠ This is stricter than "20 employees total." A construction firm with 25
+        employees where only 2 admin staff use digital systems may not meet this.
+        We approximate as ≥20 employees + non-occasional processing (conservative).
     """
     applies = profile.country == "DE" and profile.processes_personal_data
     if not applies:
@@ -476,18 +565,35 @@ _NIS2_OUT_OF_SCOPE = {
 
 def check_nis2(profile: CompanyProfile) -> NIS2Result:
     """
-    NIS2 Directive (EU) 2022/2555, implemented in Germany via BSIG (NIS2UmsuCG).
+    SOURCE: Directive (EU) 2022/2555 (NIS2) — eur-lex.europa.eu/eli/dir/2022/2555
+    Implemented in Germany via BSIG (NIS2UmsuCG — Umsetzungsgesetz NIS2).
 
-    German BSIG categories (not EU Directive terms):
-      besonders wichtige Einrichtungen (§28(6) BSIG): >= 250 employees OR >= 50M revenue
-        in a critical sector — OR designated KRITIS operator regardless of size.
-      wichtige Einrichtungen (§28(7) BSIG): >= 50 employees OR >= 10M revenue
-        in a critical/important sector.
+    Applicability — NIS2 Art. 3 [verified from official text]:
+      "Essential entities are entities of a type referred to in Annex I that exceed
+       the ceilings for medium-sized enterprises within the meaning of Article 2(1)
+       of the Annex to Recommendation 2003/361/EC."
+      "Important entities are entities of a type referred to in Annex I or II that
+       do not qualify as essential entities."
 
-    Note: revenue-based thresholds may not be sufficient alone — some sectors also require
-    balance sheet assessment; in all cases, KRITIS designation overrides size thresholds.
+    EU medium enterprise ceiling (Recommendation 2003/361/EC Art. 2(1)):
+      Medium: ≥50 employees OR ≥€10M turnover.
+      Large (above medium ceiling): ≥250 employees OR ≥€50M turnover.
 
-    Source: NIS2 Art. 2, 3; BSIG §28(6), §28(7); BSI sector guidance.
+    German BSIG implementation thresholds (BSIG §28(6)+(7)):
+      besonders wichtige Einrichtung (essential): Annex I sector + large (≥250/≥€50M)
+        OR designated KRITIS operator regardless of size.
+      wichtige Einrichtung (important): Annex I or II sector + medium (≥50/≥€10M)
+        but not meeting the essential threshold.
+
+    Incident reporting — NIS2 Art. 23 [verified from official text]:
+      ⚠ NIS2 has TWO reporting steps — NOT a single deadline:
+        1. Early warning: within 24 hours of becoming aware of a significant incident.
+        2. Incident notification: within 72 hours, with initial assessment of severity.
+        3. Final report: within 1 month, with full details.
+      ⚠ PREVIOUS ERROR in product documentation: described this as "changed from
+        72 to 24 hours" — this is WRONG. Both deadlines exist simultaneously.
+
+    Source: NIS2 Art. 2, 3, 23; BSIG §28(6), §28(7); BSI sector guidance.
     """
     in_annex_i   = profile.is_critical_infrastructure_sector or profile.industry in _NIS2_ANNEX_I
     in_annex_ii  = profile.industry in _NIS2_ANNEX_II
@@ -574,13 +680,24 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
 
 def check_ai_act(profile: CompanyProfile) -> AIActResult:
     """
-    EU AI Act — Regulation (EU) 2024/1689.
+    SOURCE: Regulation (EU) 2024/1689 (EU AI Act)
+    eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202401689
 
-    Application timeline (phased rollout):
-      2 Feb 2025: Prohibited AI practices banned (Art. 5)
-      2 Aug 2025: GPAI model rules and governance obligations (Art. 51–56, Title III Ch. 2)
-      2 Aug 2026: High-risk AI system obligations for Annex I systems (safety components)
-      2 Aug 2027: High-risk AI obligations for Annex III systems already on market before Aug 2026
+    Applicability — Art. 2(1) EU AI Act:
+      "This Regulation applies to [...] providers that place on the market or
+       put into service AI systems or place on the market general-purpose AI models
+       in the Union, irrespective of whether those providers are established or
+       located within the Union or in a third country."
+      And to deployers: Art. 2(1)(b): "deployers of AI systems that are established
+       or located within the Union."
+      → Applies to any company that DEVELOPS (provider) or USES (deployer) AI systems
+        in the EU. No size threshold.
+
+    Application timeline — Art. 113 EU AI Act [verified]:
+      2 Feb 2025: Prohibited AI practices (Art. 5) — IN FORCE.
+      2 Aug 2025: GPAI model rules (Art. 51–56) — IN FORCE.
+      2 Aug 2026: High-risk Annex I system obligations.
+      2 Aug 2027: High-risk Annex III systems already on market before Aug 2026.
     Source: Art. 113 EU AI Act.
 
     Roles and obligations:
@@ -677,9 +794,19 @@ def check_ai_act(profile: CompanyProfile) -> AIActResult:
 
 def check_hinschg(profile: CompanyProfile) -> HinSchGResult:
     """
-    HinSchG — Hinweisgeberschutzgesetz (Whistleblower Protection Act).
-    Mandatory internal reporting channel for employers with >= 50 employees.
-    Source: HinSchG §12(2).
+    SOURCE: Hinweisgeberschutzgesetz (HinSchG) — gesetze-im-internet.de/hinschg/
+
+    Applicability — HinSchG §12(1) [verified from official text]:
+      "Beschäftigungsstellen des privaten Sektors, die in der Regel 50 oder mehr
+       Beschäftigte haben, sind verpflichtet, interne Meldestellen einzurichten
+       und zu betreiben."
+      → ≥50 employees → mandatory internal whistleblower reporting channel.
+
+    Implementation deadlines — HinSchG §12(2)+(3) [verified from official text]:
+      50–249 employees: obligation from 17 December 2023 (could use shared channel).
+      ≥250 employees: obligation from 2 July 2023.
+
+    Note: "Beschäftigte" includes employees, trainees, and workers posted abroad.
     """
     applies = profile.employee_count >= 50
     reason = (
@@ -694,13 +821,29 @@ def check_hinschg(profile: CompanyProfile) -> HinSchGResult:
 
 def check_arbschg(profile: CompanyProfile) -> ArbSchGResult:
     """
-    ArbSchG — Arbeitsschutzgesetz (Occupational Health and Safety Act).
-    Applies to all employers with at least one employee.
-    Source: ArbSchG §2(3), §3.
+    SOURCE: Arbeitsschutzgesetz (ArbSchG) — gesetze-im-internet.de/arbschg/
+
+    Applicability — ArbSchG §1(1)+(2) [verified from official text]:
+      "(1) Dieses Gesetz dient dazu, Sicherheit und Gesundheitsschutz der
+       Beschäftigten bei der Arbeit durch Maßnahmen des Arbeitsschutzes zu
+       sichern und zu verbessern. Es gilt in allen Tätigkeitsbereichen."
+      "(2) Dieses Gesetz gilt für alle Arbeitgeber in Deutschland, unabhängig
+       von der Anzahl der Beschäftigten."
+      Exception (§1(2) last sentence): "Es gilt nicht für private Haushalte."
+      → Applies to ALL employers in Germany with ≥1 employee, in all sectors.
+      → Does NOT apply to private households employing domestic staff.
+
+    Key obligations:
+      §5: Gefährdungsbeurteilung (workplace risk assessment) — mandatory.
+      §6: Documentation of risk assessment — mandatory.
+      §10: First aid measures — mandatory.
+      §12: Employee safety instruction — mandatory at onboarding and regularly.
     """
     applies = profile.employee_count >= 1
     reason = (
-        f"ArbSchG applies to all employers: {profile.employee_count} employees. "
+        f"ArbSchG applies to all employers: {profile.employee_count} employees "
+        f"(ArbSchG §1(2) — 'gilt für alle Arbeitgeber in Deutschland, unabhängig "
+        f"von der Anzahl der Beschäftigten'). "
         f"Risk assessment (§5), documentation (§6), and employee instruction (§12) are mandatory."
         if applies
         else "ArbSchG does not apply: no employees reported."
@@ -710,9 +853,25 @@ def check_arbschg(profile: CompanyProfile) -> ArbSchGResult:
 
 def check_agg(profile: CompanyProfile) -> AGGResult:
     """
-    AGG — Allgemeines Gleichbehandlungsgesetz (General Equal Treatment Act).
-    Applies to all employers. Prohibits discrimination on 6 protected grounds.
-    Source: AGG §6(2), §12.
+    SOURCE: Allgemeines Gleichbehandlungsgesetz (AGG) — gesetze-im-internet.de/agg/
+
+    Applicability — AGG §6(2) [verified from official text]:
+      "Arbeitgeber im Sinne dieses Gesetzes sind natürliche und juristische
+       Personen sowie rechtsfähige Personengesellschaften, die Personen nach
+       Absatz 1 beschäftigen. Werden Beschäftigte einem Dritten zur Arbeits-
+       leistung überlassen, so gilt auch dieser als Arbeitgeber im Sinne
+       dieses Abschnitts."
+      → Applies to ALL employers (natural persons, legal entities, partnerships)
+        with ≥1 employee. No size threshold.
+      → Also applies to companies that USE leased workers (Leiharbeitnehmer) —
+        they count as employer for AGG purposes too.
+
+    Protected grounds (AGG §1): race, ethnic origin, gender, religion/belief,
+      disability, age, sexual identity.
+
+    Key obligations:
+      §12: Preventive measures (training, policies) — mandatory for all employers.
+      §13: Complaints procedure — mandatory for all employers.
     """
     applies = profile.employee_count >= 1
     reason = (
@@ -728,10 +887,28 @@ def check_agg(profile: CompanyProfile) -> AGGResult:
 
 def check_milog(profile: CompanyProfile) -> MiLoGResult:
     """
-    MiLoG — Mindestlohngesetz (Minimum Wage Act).
-    Applies to all employers. Current minimum wage: EUR 12.82/hour (2025).
-    Working time documentation required for employees earning < EUR 2,000/month.
-    Source: MiLoG §1, §17, §20.
+    SOURCE: Mindestlohngesetz (MiLoG) — gesetze-im-internet.de/milog/
+
+    Applicability — MiLoG §20 [verified from official text]:
+      "Arbeitgeber mit Sitz im In- oder Ausland sind verpflichtet, ihren im
+       Inland beschäftigten Arbeitnehmerinnen und Arbeitnehmern ein Arbeitsentgelt
+       mindestens in Höhe des Mindestlohns nach §1 Absatz 2 spätestens zu dem in
+       §2 Absatz 1 Satz 1 Nummer 2 genannten Zeitpunkt zu zahlen."
+      → Applies to ALL employers (domestic or foreign) with employees working
+        in Germany. No size threshold.
+
+    Current minimum wage — MiLoG §1(2) + MiLoG-VO:
+      EUR 12.82/hour (effective 1 January 2025).
+      ⚠ This changes periodically via Mindestlohnkommission recommendation.
+        Verify current rate at: gesetze-im-internet.de/milog/__1.html
+
+    Working time documentation — MiLoG §17(1):
+      Required for employees earning ≤ EUR 2,000/month gross AND in covered sectors
+      (§17(4) MiLoG lists exemptions for fully documented payroll systems).
+
+    Subcontractor liability — MiLoG §13:
+      Principal employers are jointly liable for minimum wage violations by
+      subcontractors providing labour.
     """
     applies = profile.employee_count >= 1
     reason = (
@@ -744,6 +921,180 @@ def check_milog(profile: CompanyProfile) -> MiLoGResult:
     return MiLoGResult(applies=applies, reason=reason)
 
 
+def check_ttdsg(profile: CompanyProfile) -> TTDSGResult:
+    """
+    TTDSG / TDDDG — Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz.
+
+    §25 TTDSG (now §25 TDDDG) prohibits storing or accessing information on
+    a user's terminal equipment (cookies, local storage, tracking pixels,
+    fingerprinting) without prior informed consent, unless strictly necessary
+    for the requested service.
+
+    Applies to any operator of a website or app that is accessible by users
+    in Germany and processes personal data through tracking technologies.
+    There is no size threshold — a one-person company with a website is bound.
+
+    Source: §25, §26 TTDSG (TDDDG); ePrivacy Directive 2002/58/EC Art. 5(3).
+    """
+    applies = profile.has_website and profile.processes_personal_data
+    if not applies:
+        if not profile.has_website:
+            reason = "TTDSG does not apply: company has no public-facing website or app."
+        else:
+            reason = "TTDSG does not apply: company does not process personal data online."
+        return TTDSGResult(applies=False, reason=reason)
+
+    return TTDSGResult(
+        applies=True,
+        reason=(
+            "TTDSG (§25 TDDDG) applies: company operates a website or app and processes "
+            "personal data of users in Germany. Prior informed consent is required before "
+            "setting any non-essential cookies, tracking pixels, analytics scripts, or "
+            "fingerprinting technologies on users' devices. No size threshold applies — "
+            "all website operators are bound regardless of company size."
+        ),
+    )
+
+
+# AML-obligated industries under §2 GwG — maps to Complio industry strings.
+# Source: §2(1) GwG [verified from gesetze-im-internet.de/gwg_2017/]
+# Nr. 1:  Kreditinstitute (banks, savings banks)
+# Nr. 2:  Finanzdienstleistungsinstitute (financial service providers)
+# Nr. 3:  Zahlungsinstitute, E-Geld-Institute (payment, e-money)
+# Nr. 5:  Investmentvermittler (investment intermediaries)
+# Nr. 6:  Versicherungsunternehmen (life insurance)
+# Nr. 8:  Kapitalverwaltungsgesellschaften (fund management)
+# Nr. 10: Rechtsanwälte, Notare (lawyers, notaries — when managing assets, company formation, real estate)
+# Nr. 11: Wirtschaftsprüfer, Steuerberater (accountants, tax advisors)
+# Nr. 12: Immobilienmakler (real estate agents) — for transactions ≥€10,000 cash
+# Nr. 14: Glücksspielveranstalter (gambling operators)
+# Nr. 15: Kryptowertedienstleister (crypto-asset service providers)
+# Nr. 13: Güterhändler (goods traders) — only for cash transactions >€10,000
+#
+# ⚠ The "finance" industry covers Nr. 1-8, 15.
+# ⚠ "legal", "real_estate", "gambling", "crypto" must also auto-trigger but may not
+#    appear as named industries in the current Industry enum. Companies in these sectors
+#    MUST set is_aml_obligated_sector=true if their industry field does not map here.
+_GWG_OBLIGATED_INDUSTRIES = {
+    "finance",      # banks, financial services, payment, e-money, investment, insurance, crypto
+    "real_estate",  # Immobilienmakler — real estate agents (§2(1) Nr. 12)
+}
+
+
+def check_gwg(profile: CompanyProfile) -> GwGResult:
+    """
+    GwG — Geldwäschegesetz (Anti-Money Laundering Act).
+
+    §2(1) GwG lists 16 categories of obligated entities (Verpflichtete).
+    Key categories relevant to German SMEs:
+      Nr. 1:  Credit institutions (Kreditinstitute)
+      Nr. 2:  Financial service providers (Finanzdienstleistungsinstitute)
+      Nr. 3:  Payment and e-money institutions
+      Nr. 6:  Life insurance companies and intermediaries
+      Nr. 10: Lawyers, notaries, and legal professionals (when managing assets,
+              establishing companies, or advising on real estate transactions)
+      Nr. 12: Real estate agents (Immobilienmakler)
+      Nr. 14: Gambling operators (Glücksspielveranstalter)
+      Nr. 15: Crypto-asset service providers (Kryptowertedienstleister)
+
+    Obligated entities must implement: risk analysis (§5), internal safeguards (§6),
+    KYC / customer due diligence (§10-§13), AML officer appointment (§7 for larger
+    entities), transaction monitoring, and suspicious transaction reporting (§43).
+
+    Source: §2, §5, §6, §7, §10, §43 GwG; FATF Recommendations.
+    """
+    in_obligated_industry = profile.industry in _GWG_OBLIGATED_INDUSTRIES
+    applies = in_obligated_industry or profile.is_aml_obligated_sector
+
+    if not applies:
+        return GwGResult(
+            applies=False,
+            reason=(
+                f"GwG does not apply: industry '{profile.industry}' is not in an AML-obligated "
+                f"sector under §2 GwG. If the company provides financial services, crypto, "
+                f"real estate brokerage, legal/notarial services, or gambling operations, "
+                f"set is_aml_obligated_sector=true to trigger a GwG assessment."
+            ),
+        )
+
+    trigger = (
+        f"industry '{profile.industry}' is a GwG-obligated sector (§2 GwG)"
+        if in_obligated_industry
+        else "company self-declared as AML-obligated sector (is_aml_obligated_sector=true)"
+    )
+    return GwGResult(
+        applies=True,
+        reason=(
+            f"GwG applies: {trigger}. Obligated entities must implement: risk analysis (§5 GwG), "
+            f"internal AML safeguards (§6 GwG), customer due diligence / KYC procedures (§10 GwG), "
+            f"beneficial owner identification (§11 GwG), transaction monitoring, and suspicious "
+            f"transaction reporting to the FIU (§43 GwG). An AML compliance officer "
+            f"(Geldwäschebeauftragter) is mandatory for regulated financial institutions (§7 GwG)."
+        ),
+    )
+
+
+def check_eu_data_act(profile: CompanyProfile) -> EUDataActResult:
+    """
+    EU Data Act — Regulation (EU) 2023/2854.
+    Applicable from 12 September 2025.
+
+    Applies to:
+      - Manufacturers of connected products (Art. 3-4): IoT devices, smart appliances,
+        industrial sensors, wearables, connected vehicles, smart meters — any product
+        that generates data during use and is placed on the EU market.
+      - Providers of related services (Art. 3): services intrinsically linked to the
+        connected product (e.g. companion apps, cloud processing of device data).
+      - Data processing service providers (Art. 23-31): cloud, edge, and other data
+        processing services — must enable customer switching without obstacles.
+
+    Key obligations for manufacturers / related service providers:
+      - By design: products must be designed so data is easily accessible to users (Art. 3)
+      - On request: provide users with real-time or near-real-time data access (Art. 4)
+      - Third-party sharing: share data with designated third parties on user instruction (Art. 5)
+      - No exclusive use: data holders may not prevent user access to their own data (Art. 6)
+
+    Key obligations for data processing service providers (cloud switching):
+      - Must enable customers to switch to another provider within maximum 30 business days (Art. 25)
+      - Must remove barriers (technical, contractual, financial) to switching (Art. 23)
+      - Switching fees must be phased out by 12 September 2027 (Art. 25)
+
+    Source: Art. 2, 3, 4, 5, 6, 23, 25, 40 EU Data Act (Regulation (EU) 2023/2854).
+    """
+    applies = profile.produces_connected_products or profile.provides_data_processing_services
+
+    if not applies:
+        return EUDataActResult(
+            applies=False,
+            reason=(
+                "EU Data Act does not apply: company does not manufacture connected (IoT) "
+                "products and does not provide cloud or data processing services. "
+                "If either applies, set produces_connected_products=true or "
+                "provides_data_processing_services=true."
+            ),
+        )
+
+    obligations = []
+    if profile.produces_connected_products:
+        obligations.append(
+            "connected product manufacturer: design-for-access obligation (Art. 3), "
+            "user data access on request (Art. 4), third-party sharing on user instruction (Art. 5)"
+        )
+    if profile.provides_data_processing_services:
+        obligations.append(
+            "data processing service provider: cloud switching obligations (Art. 23-25), "
+            "30-day maximum switching period, elimination of switching barriers by Sept 2027"
+        )
+
+    return EUDataActResult(
+        applies=True,
+        reason=(
+            f"EU Data Act (Regulation (EU) 2023/2854) applies — applicable since 12 September 2025. "
+            f"Obligations: {'; '.join(obligations)}."
+        ),
+    )
+
+
 # ── Master applicability function ──────────────────────────────────────────────
 
 def determine_applicable_regulations(
@@ -753,17 +1104,20 @@ def determine_applicable_regulations(
     Run all threshold checks and return a list of RegulationApplicability objects
     ready for inclusion in the compliance report.
     """
-    gdpr    = check_gdpr(profile)
-    lksg    = check_lksg(profile)
-    enefg   = check_enefg(profile)
-    csrd    = check_csrd(profile)
-    bdsg    = check_bdsg(profile)
-    nis2    = check_nis2(profile)
-    ai_act  = check_ai_act(profile)
-    hinschg = check_hinschg(profile)
-    arbschg = check_arbschg(profile)
-    agg     = check_agg(profile)
-    milog   = check_milog(profile)
+    gdpr         = check_gdpr(profile)
+    lksg         = check_lksg(profile)
+    enefg        = check_enefg(profile)
+    csrd         = check_csrd(profile)
+    bdsg         = check_bdsg(profile)
+    nis2         = check_nis2(profile)
+    ai_act       = check_ai_act(profile)
+    hinschg      = check_hinschg(profile)
+    arbschg      = check_arbschg(profile)
+    agg          = check_agg(profile)
+    milog        = check_milog(profile)
+    ttdsg        = check_ttdsg(profile)
+    gwg          = check_gwg(profile)
+    eu_data_act  = check_eu_data_act(profile)
 
     return [
         RegulationApplicability(
@@ -834,5 +1188,23 @@ def determine_applicable_regulations(
             applies=milog.applies,
             reason=milog.reason,
             key_threshold="All employers, EUR 12.82/hour minimum (§1 MiLoG)",
+        ),
+        RegulationApplicability(
+            regulation=Regulation.TTDSG,
+            applies=ttdsg.applies,
+            reason=ttdsg.reason,
+            key_threshold="Website/app operator processing personal data of users in Germany (§25 TTDSG)",
+        ),
+        RegulationApplicability(
+            regulation=Regulation.GWG,
+            applies=gwg.applies,
+            reason=gwg.reason,
+            key_threshold="AML-obligated sector under §2 GwG (finance, crypto, real estate, legal, gambling)",
+        ),
+        RegulationApplicability(
+            regulation=Regulation.EU_DATA_ACT,
+            applies=eu_data_act.applies,
+            reason=eu_data_act.reason,
+            key_threshold="Connected product manufacturer or data processing service provider (Art. 2 EU Data Act)",
         ),
     ]

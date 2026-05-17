@@ -61,9 +61,14 @@ async def run_analysis(
     # Step 3 — RAG retrieval + optional company doc ingestion
     notify(AnalysisStep.ARTICLE_RETRIEVAL)
     logger.info("job %s step 3: article retrieval", job_id)
-    chunks = await loop.run_in_executor(
+    chunks, empty_regs = await loop.run_in_executor(
         None, retrieve_regulatory_context, enriched, applicability
     )
+    if empty_regs:
+        logger.warning(
+            "job %s: %d regulation(s) have empty KB — will produce CANNOT_ASSESS: %s",
+            job_id, len(empty_regs), empty_regs,
+        )
 
     # Ingest company documents if provided (decrypted in memory via document_store)
     if doc_session_id:
@@ -76,10 +81,12 @@ async def run_analysis(
             )
 
     # Step 4 — gap analysis (with company doc evidence if available)
+    # Regulations with empty KB are passed separately — they get CANNOT_ASSESS
+    # without calling the LLM, preventing ungrounded legal citation hallucination.
     notify(AnalysisStep.GAP_ANALYSIS)
     logger.info("job %s step 4: gap analysis", job_id)
     gaps = await loop.run_in_executor(
-        None, run_gap_analysis, enriched, chunks, failures, job_id
+        None, run_gap_analysis, enriched, chunks, failures, job_id, empty_regs
     )
 
     # Step 5 — action plan
