@@ -53,3 +53,7 @@ passlib[bcrypt]>=1.7.4
 
 # Observability
 sentry-sdk[fastapi]>=2.0.0
+
+# Job queue (optional — set REDIS_URL to enable; falls back to asyncio without it)
+celery[redis]>=5.3.0
+redis>=5.0.0

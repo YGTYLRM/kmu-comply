@@ -76,6 +76,9 @@ async def check_rate_limit(user_id: str) -> None:
 
 async def assert_owns_job(job_id: str, user_id: str) -> None:
     owner = job_owners.get(job_id)
+    if owner is None and settings.redis_url:
+        from services.redis_store import get_job_owner as redis_get_owner
+        owner = await redis_get_owner(job_id)
     if owner is None and settings.database_url:
         from services.db_service import get_job_owner
         owner = await get_job_owner(job_id)
