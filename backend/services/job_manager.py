@@ -118,6 +118,8 @@ class JobManager:
 
     async def start(self) -> None:
         await self._recover_crashed_jobs()
+        from services.document_store import document_store
+        document_store.recover_sessions()
         self._cleanup_task = asyncio.create_task(self._cleanup_loop())
 
     async def stop(self) -> None:
@@ -262,9 +264,14 @@ class JobManager:
                     delete_company_docs(jid)
                 except Exception:
                     pass
-                if job.doc_session_id:
-                    try:
-                        from services.document_store import document_store
-                        document_store.clear(job.doc_session_id)
-                    except Exception:
-                        pass
+                # NOTE: uploaded documents are NOT cleared here — they use their own TTL
+                # (DOCUMENT_TTL_SECONDS, default 7 days) so users can re-run analysis
+                # without re-uploading. See document_store.purge_expired() below.
+
+            # Purge expired document sessions (separate from job TTL)
+            try:
+                from config import settings as _s
+                from services.document_store import document_store
+                document_store.purge_expired(_s.document_ttl_seconds)
+            except Exception:
+                pass

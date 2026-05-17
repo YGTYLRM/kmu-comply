@@ -25,6 +25,9 @@ ENV/
 # ChromaDB data
 backend/data/chroma_db/
 
+# Uploaded document sessions (persistent vault, not committed)
+backend/data/documents/
+
 # Pytest
 .pytest_cache/
 .coverage

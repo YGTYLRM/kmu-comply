@@ -64,6 +64,7 @@ REGULATION_COLLECTIONS: dict[str, str] = {
 
 OFFICIAL_URLS: dict[str, str] = {
     "gdpr":             "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+    "gdpr_dsgvo":       "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
     "bdsg":             "https://www.gesetze-im-internet.de/bdsg_2018/",
     "lksg":             "https://www.gesetze-im-internet.de/lksg/",
     "enefg":            "https://www.gesetze-im-internet.de/enefg/",
