@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     job_ttl_seconds: int = 3600
     max_concurrent_jobs: int = 5
 
+    # Documents — persistent vault (separate TTL from jobs)
+    document_store_dir: str = "./backend/data/documents"
+    document_ttl_seconds: int = 7 * 24 * 3600  # 7 days
+
     # Email (Resend)
     resend_api_key: str = ""
     contact_email: str = ""
