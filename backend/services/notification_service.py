@@ -70,12 +70,32 @@ def _regressions(current_report: ComplianceReport, prev_report: ComplianceReport
 
 def _build_email_html(
     company_name: str,
-    report: ComplianceReport,
+    report: ComplianceReport | None,
     triggered_by: str,
     prev_report: ComplianceReport | None,
     changed_sections: list[str] | None = None,
 ) -> tuple[str, str]:
     """Returns (subject, html_body)."""
+    # Document ageing alerts have no associated report
+    if triggered_by == "document_ageing" or report is None:
+        subject = f"Action required: compliance report for {company_name} may be outdated"
+        html = f"""<html><body style="font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;padding:32px;">
+<div style="max-width:560px;margin:0 auto;">
+<h2 style="color:#60a5fa;">Compliance Update Needed</h2>
+<p>The regulatory knowledge base used to generate your compliance report for
+<strong>{company_name}</strong> has been updated since your last assessment.</p>
+<p>We recommend re-running the compliance analysis in Complio to ensure your report
+reflects the latest legal text. This is especially important if any of the updated
+regulations are relevant to your business.</p>
+<p style="margin-top:24px;"><a href="{BASE_URL}/dashboard"
+style="background:#2563eb;color:#fff;padding:12px 24px;border-radius:6px;
+text-decoration:none;font-weight:600;">Re-run Analysis</a></p>
+<p style="font-size:11px;color:#64748b;margin-top:24px;">
+You are receiving this because you have an active Complio account.
+This is not legal advice.</p>
+</div></body></html>"""
+        return subject, html
+
     score = report.overall_score_percent
     compliant, partial, non_compliant = _gap_summary(report, prev_report)
     prev_score = prev_report.overall_score_percent if prev_report else None
@@ -199,7 +219,7 @@ async def send_notification_email(
     notification_id: str,
     user_email: str,
     company_name: str,
-    report: ComplianceReport,
+    report: ComplianceReport | None,
     triggered_by: str,
     prev_report: ComplianceReport | None = None,
     changed_sections: list[str] | None = None,
