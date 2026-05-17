@@ -15,6 +15,7 @@ from routes.completions import router as completions_router
 from routes.expert_review import router as expert_review_router
 from routes.misc import router as misc_router
 from routes.notifications import router as notifications_router
+from routes.scanning import router as scanning_router
 from state import job_manager
 
 if settings.sentry_dsn:
@@ -132,3 +133,4 @@ app.include_router(expert_review_router)
 app.include_router(billing_router)
 app.include_router(admin_router)
 app.include_router(misc_router)
+app.include_router(scanning_router)

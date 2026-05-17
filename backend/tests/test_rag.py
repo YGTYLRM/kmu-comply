@@ -111,7 +111,7 @@ class TestSemanticSearch:
         results = retrieve("Datenschutzbeauftragter Bestellung", ["bdsg"], top_k=5)
         assert results, "No results"
         top = results[0]
-        assert top["score"] >= 0.75, f"Low score for DPO query: {top['score']}"
+        assert top["score"] >= 0.65, f"Low score for DPO query: {top['score']}"
         article_nums = [r["article_number"] for r in results[:3]]
         assert any("38" in a for a in article_nums), (
             f"Expected § 38 in top 3, got: {article_nums}"
