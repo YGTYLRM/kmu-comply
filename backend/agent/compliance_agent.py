@@ -16,7 +16,7 @@ from agent.planning import (
     run_gap_analysis,
 )
 from agent.profiling import enrich_profile
-from agent.validation import validate_report
+from agent.validation import validate_report, verify_gap_citations
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
 from models.enums import AnalysisStep
@@ -88,6 +88,15 @@ async def run_analysis(
     gaps = await loop.run_in_executor(
         None, run_gap_analysis, enriched, chunks, failures, job_id, empty_regs
     )
+
+    # Step 4b — citation verification (cross-check LLM citations against retrieved chunks)
+    citation_warnings = verify_gap_citations(gaps, chunks)
+    if citation_warnings:
+        failures.extend(citation_warnings)
+        logger.warning(
+            "job %s: %d unverified citation(s) — confidence downgraded, flagged for review",
+            job_id, len(citation_warnings),
+        )
 
     # Step 5 — action plan
     notify(AnalysisStep.ACTION_PLAN)

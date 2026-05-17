@@ -157,6 +157,78 @@ class TestComplianceReportModels:
         assert "not constitute legal advice" in report.disclaimer
 
 
+class TestCitationVerification:
+    """Tests for agent.validation.verify_gap_citations."""
+
+    def _make_gap(self, reg: Regulation, article: str, status=ComplianceStatus.NON_COMPLIANT):
+        return ComplianceGap(
+            regulation=reg,
+            article_number=article,
+            article_title="Test",
+            status=status,
+            evidence="Test evidence",
+            confidence="HIGH",
+        )
+
+    def _make_chunk(self, reg: Regulation, article: str):
+        from models.compliance_report import RegulatoryChunk
+        from models.enums import ObligationType
+        return RegulatoryChunk(
+            regulation=reg,
+            article_number=article,
+            title="Test",
+            text="Test text",
+            obligation_type=ObligationType.MUST,
+        )
+
+    def test_verified_citation_no_warning(self):
+        from agent.validation import verify_gap_citations
+        gap = self._make_gap(Regulation.GDPR, "Art. 32")
+        chunk = self._make_chunk(Regulation.GDPR, "Art. 32")
+        warnings = verify_gap_citations([gap], [chunk])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+    def test_hallucinated_citation_flagged(self):
+        from agent.validation import verify_gap_citations
+        gap = self._make_gap(Regulation.GDPR, "Art. 99")
+        chunk = self._make_chunk(Regulation.GDPR, "Art. 32")
+        warnings = verify_gap_citations([gap], [chunk])
+        assert len(warnings) == 1
+        assert "Art. 99" in warnings[0]
+        assert gap.confidence == "LOW"
+
+    def test_cannot_assess_skipped(self):
+        from agent.validation import verify_gap_citations
+        gap = self._make_gap(Regulation.GDPR, "KB-EMPTY", ComplianceStatus.CANNOT_ASSESS)
+        warnings = verify_gap_citations([gap], [])
+        assert warnings == []
+
+    def test_normalisation_ignores_whitespace_and_dots(self):
+        from agent.validation import verify_gap_citations
+        gap = self._make_gap(Regulation.GDPR, "Art.32(1)(a)")
+        chunk = self._make_chunk(Regulation.GDPR, "Art. 32")
+        warnings = verify_gap_citations([gap], [chunk])
+        assert warnings == []  # "3210a" contains "32" — matches
+
+    def test_no_chunks_for_regulation_skipped(self):
+        from agent.validation import verify_gap_citations
+        gap = self._make_gap(Regulation.LKSG, "§ 5")
+        chunk = self._make_chunk(Regulation.GDPR, "Art. 32")  # different regulation
+        warnings = verify_gap_citations([gap], [chunk])
+        assert warnings == []  # no chunks for LkSG → skip (zero-chunks guard handles it)
+
+    def test_multiple_gaps_one_hallucinated(self):
+        from agent.validation import verify_gap_citations
+        gap_good = self._make_gap(Regulation.GDPR, "Art. 32")
+        gap_bad = self._make_gap(Regulation.GDPR, "Art. 99")
+        chunk = self._make_chunk(Regulation.GDPR, "Art. 32")
+        warnings = verify_gap_citations([gap_good, gap_bad], [chunk])
+        assert len(warnings) == 1
+        assert gap_good.confidence == "HIGH"
+        assert gap_bad.confidence == "LOW"
+
+
 class TestAPIModels:
     def test_health_response_defaults(self):
         from models.api_responses import HealthResponse
