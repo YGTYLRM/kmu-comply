@@ -50,3 +50,6 @@ alembic>=1.13.0
 supabase>=2.0.0
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
+
+# Observability
+sentry-sdk[fastapi]>=2.0.0

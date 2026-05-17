@@ -597,6 +597,72 @@ def _actions(report: ComplianceReport, logo: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Knowledge base audit trail
+# ─────────────────────────────────────────────────────────────────────────────
+
+_REG_DISPLAY: dict[str, str] = {
+    "gdpr_dsgvo":    "GDPR / DSGVO",
+    "bdsg":          "BDSG",
+    "nis2":          "NIS2",
+    "eu_ai_act":     "EU AI Act",
+    "hinschg":       "HinSchG",
+    "workplace_law": "ArbSchG / Employment Law",
+    "agg":           "AGG",
+    "milog":         "MiLoG",
+    "lksg":          "LkSG",
+    "enefg":         "EnEfG",
+    "csrd":          "CSRD",
+    "ttdsg":         "TTDSG / TDDDG",
+    "gwg":           "GwG",
+    "eu_data_act":   "EU Data Act",
+}
+
+
+def _kb_versions_table(report: ComplianceReport) -> str:
+    """Render a compact audit-trail table showing which KB version each finding used."""
+    versions = report.knowledge_base_versions
+    if not versions:
+        return ""
+
+    rows = ""
+    for reg_key, meta in sorted(versions.items()):
+        fetched = meta.get("fetched_at", "unknown")[:10]  # date part only
+        src_hash = meta.get("source_file_hash", "")
+        hash_short = src_hash[:12] if src_hash and src_hash != "unknown" else "—"
+        src_url = meta.get("source_url", "")
+        label = _REG_DISPLAY.get(reg_key, reg_key.upper())
+        url_html = (
+            f'<a href="{_esc(src_url)}" style="color:{BLUE};text-decoration:none;">'
+            f'official text</a>'
+            if src_url else "—"
+        )
+        rows += (
+            f'<tr style="border-bottom:0.5pt solid #f1f5f9;">'
+            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:600;color:#334155;">{_esc(label)}</td>'
+            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#64748b;font-family:monospace;">{_esc(fetched)}</td>'
+            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#94a3b8;font-family:monospace;">{_esc(hash_short)}</td>'
+            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;">{url_html}</td>'
+            f'</tr>'
+        )
+
+    return (
+        f'<div style="margin-top:8mm;">'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Knowledge Base Audit Trail</div>'
+        f'<table style="width:100%;border-collapse:collapse;border:1pt solid #e8edf2;border-radius:6pt;overflow:hidden;">'
+        f'<thead><tr style="background:#f8fafc;">'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Regulation</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Ingested</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source Hash</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source</th>'
+        f'</tr></thead>'
+        f'<tbody>{rows}</tbody>'
+        f'</table>'
+        f'</div>'
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Section 6 — Closing
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -630,7 +696,8 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         f'border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;'
         f'box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">{_esc(report.disclaimer)}</div>'
         f'</div>'
-        f'<div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;'
+        + _kb_versions_table(report)
+        + f'<div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;'
         f'text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">'
         f'<strong style="color:{NAVY};">Complio</strong> &nbsp;&middot;&nbsp; Autonomous Regulatory Compliance for German SMEs<br>'
         f'<span style="font-size:7pt;">Produced by an AI agent. Not a certified legal audit. Not legal advice.</span>'
