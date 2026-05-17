@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     job_ttl_seconds: int = 3600
     max_concurrent_jobs: int = 5
 
+    # Redis + Celery (leave empty to use in-process asyncio fallback)
+    redis_url: str = ""                    # e.g. redis://localhost:6379/0
+    celery_concurrency: int = 2            # worker processes per Celery worker
+
     # Documents — persistent vault (separate TTL from jobs)
     document_store_dir: str = "./backend/data/documents"
     document_ttl_seconds: int = 7 * 24 * 3600  # 7 days

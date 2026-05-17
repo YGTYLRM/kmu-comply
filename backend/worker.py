@@ -1,22 +1,38 @@
 """
-Complio monitoring worker.
+Complio monitoring worker (APScheduler).
 
-Runs the APScheduler jobs in a separate process from the FastAPI web server.
-This means the scheduler survives web restarts and avoids duplicate job firing
-when multiple web instances run behind a load balancer.
+Runs the APScheduler jobs in a separate process from the FastAPI web server so
+the scheduler survives web restarts and doesn't fire duplicate jobs behind a
+load balancer.
 
 Start:
     cd backend/
     python worker.py
 
-In production: run alongside uvicorn as a separate process or container.
-Both processes share the same .env, PostgreSQL DB, ChromaDB files, and
-regulation files — safe as long as they run on the same host (single-server
-deployment). For multi-server deployments, migrate ChromaDB to a managed store first.
+In production, run alongside uvicorn as a separate process or container.
+
+── With Celery (REDIS_URL set) ──────────────────────────────────────────────
+Also start a Celery worker to process analysis jobs:
+
+    celery -A celery_app worker --loglevel=info --concurrency=2
+
+Or via the helper:
+    python celery_app.py worker --loglevel=info --concurrency=2
+
+Process map:
+  1. uvicorn main:app      — FastAPI web server (submits jobs to Celery)
+  2. python worker.py      — APScheduler (regulation checks, re-assessments)
+  3. celery -A celery_app  — Analysis workers (runs the 6-step pipeline)
+
+── Without Celery (REDIS_URL not set) ───────────────────────────────────────
+Analysis jobs run as asyncio tasks inside the uvicorn process (single-server
+dev mode). Only process 1 and 2 are needed.
 
 Cron jobs (UTC):
+    02:00 Sun — Fetch regulation updates from official sources (staged for review)
     03:00 — Regulation change detection + re-ingestion + section diff
     04:00 — Scheduled company re-assessments (7d Professional, 30d Starter)
+    05:00 Mon — Document ageing alerts
 """
 import asyncio
 import logging

@@ -1,13 +1,13 @@
 """
-Async job manager with PostgreSQL-backed persistence.
+Async job manager — dual-mode: Celery (Redis) or in-process asyncio.
 
-Jobs are written to the `jobs` table at creation and on every status transition.
-On startup, any jobs left in RUNNING state from a previous process are marked FAILED
-with a message directing the user to retry — there is no automatic re-run since the
-in-flight state (profile, doc session) cannot be reliably recovered after a crash.
+Mode is selected at startup based on settings.redis_url:
+  - REDIS_URL set   → Celery mode: jobs dispatched to a Celery worker via Redis broker;
+                       status tracked in Redis; reports persisted to disk + DB as before.
+  - REDIS_URL empty → asyncio mode: jobs run as asyncio tasks inside the web process
+                       (original behaviour, safe for single-server dev deployments).
 
-The in-memory dict is still used for active jobs (fast status polling). The DB is the
-source of truth for jobs that have expired from memory or survived a restart.
+The public API (create_job, get_status, get_report) is identical in both modes.
 """
 import asyncio
 import logging
@@ -106,18 +106,29 @@ async def _db_get_status(job_id: str) -> Optional[StatusResponse]:
 
 class JobManager:
     """
-    Async job manager with DB-backed persistence.
-    Active jobs are kept in memory for fast polling.
-    The DB is the source of truth after restarts.
+    Dual-mode job manager: Celery (Redis) when REDIS_URL is set, asyncio otherwise.
+
+    Both modes expose the same interface so routes/dependencies don't change.
     """
 
     def __init__(self, ttl_seconds: int = 3600) -> None:
-        self._jobs: dict[str, _Job] = {}
+        self._jobs: dict[str, _Job] = {}   # asyncio mode only
         self._ttl  = ttl_seconds
         self._cleanup_task: Optional[asyncio.Task] = None
+        self._celery_mode: bool = False
+
+    # ── Lifecycle ─────────────────────────────────────────────────────────────
 
     async def start(self) -> None:
-        await self._recover_crashed_jobs()
+        from config import settings
+        self._celery_mode = bool(settings.redis_url)
+        if self._celery_mode:
+            logger.info("job_manager: Celery mode (REDIS_URL=%s...)", settings.redis_url[:20])
+            # In Celery mode, crashed-job recovery is handled per task (task_acks_late)
+        else:
+            logger.info("job_manager: asyncio mode (no REDIS_URL set)")
+            await self._recover_crashed_jobs()
+
         from services.document_store import document_store
         document_store.recover_sessions()
         self._cleanup_task = asyncio.create_task(self._cleanup_loop())
@@ -131,7 +142,7 @@ class JobManager:
                 pass
 
     async def _recover_crashed_jobs(self) -> None:
-        """Mark any jobs left as RUNNING from a previous process as FAILED."""
+        """(asyncio mode only) Mark any RUNNING jobs from a crashed process as FAILED."""
         from config import settings
         if not settings.database_url:
             return
@@ -155,6 +166,8 @@ class JobManager:
         except Exception as exc:
             logger.warning("job_manager: crash recovery failed: %s", exc)
 
+    # ── Job creation ──────────────────────────────────────────────────────────
+
     async def create_job(
         self,
         profile: CompanyProfile,
@@ -163,22 +176,67 @@ class JobManager:
         company_id: Optional[str] = None,
     ) -> str:
         job_id = str(uuid.uuid4())
+
+        from services.report_store import save_profile
+        save_profile(job_id, profile.model_dump())
+        await _db_upsert_job(job_id, "pending", user_id=user_id, company_id=company_id)
+
+        if self._celery_mode:
+            await self._create_celery_job(job_id, profile, doc_session_id, user_id, company_id)
+        else:
+            await self._create_asyncio_job(job_id, profile, doc_session_id, user_id, company_id)
+
+        return job_id
+
+    async def _create_celery_job(
+        self,
+        job_id: str,
+        profile: CompanyProfile,
+        doc_session_id: Optional[str],
+        user_id: Optional[str],
+        company_id: Optional[str],
+    ) -> None:
+        from services.redis_store import set_job_initial, set_job_owner
+        await set_job_initial(job_id, user_id=user_id, company_id=company_id)
+
+        # job_owners fast path — also written to Redis
+        if user_id:
+            from state import job_owners
+            job_owners[job_id] = user_id
+            await set_job_owner(job_id, user_id)
+
+        from tasks import run_analysis_celery
+        run_analysis_celery.delay(
+            job_id,
+            profile.model_dump(),
+            doc_session_id,
+            user_id,
+            company_id,
+        )
+        logger.info("job_manager: dispatched %s to Celery", job_id)
+
+    async def _create_asyncio_job(
+        self,
+        job_id: str,
+        profile: CompanyProfile,
+        doc_session_id: Optional[str],
+        user_id: Optional[str],
+        company_id: Optional[str],
+    ) -> None:
         job = _Job(
             job_id=job_id, profile=profile, doc_session_id=doc_session_id,
             user_id=user_id, company_id=company_id,
         )
         self._jobs[job_id] = job
-        from services.report_store import save_profile
-        save_profile(job_id, profile.model_dump())
-        await _db_upsert_job(job_id, "pending", user_id=user_id, company_id=company_id)
         asyncio.create_task(self._run_pipeline(job))
-        return job_id
+
+    # ── Status ────────────────────────────────────────────────────────────────
 
     def get_status(self, job_id: str) -> Optional[StatusResponse]:
+        """Sync status check — asyncio mode only (in-memory dict)."""
         job = self._jobs.get(job_id)
         if job:
             return job.to_status_response()
-        # Not in memory — check disk then DB (sync wrapper used here)
         from services.report_store import exists
         if exists(job_id):
             return StatusResponse(
@@ -188,11 +246,63 @@ class JobManager:
         return None
 
     async def get_status_async(self, job_id: str) -> Optional[StatusResponse]:
-        """Async version — checks DB when not in memory."""
+        """Async status — checks Redis (Celery mode) or in-memory (asyncio mode), then DB."""
+        if self._celery_mode:
+            return await self._status_from_redis(job_id) or await _db_get_status(job_id)
         result = self.get_status(job_id)
         if result:
             return result
         return await _db_get_status(job_id)
+
+    async def _status_from_redis(self, job_id: str) -> Optional[StatusResponse]:
+        try:
+            from services.redis_store import get_job_state
+            state = await get_job_state(job_id)
+            if not state:
+                # Not in Redis — check disk (fast path for completed jobs)
+                from services.report_store import exists
+                if exists(job_id):
+                    return StatusResponse(
+                        job_id=job_id, status=JobStatus.COMPLETED,
+                        current_step=None, steps=[], error=None,
+                    )
+                return None
+
+            status_str = state.get("status", "pending")
+            try:
+                status = JobStatus(status_str)
+            except ValueError:
+                status = JobStatus.PENDING
+
+            step_str = state.get("current_step")
+            try:
+                current_step = AnalysisStep(step_str) if step_str else None
+            except ValueError:
+                current_step = None
+
+            raw_steps = state.get("_steps", [])
+            steps = []
+            for s in raw_steps:
+                try:
+                    steps.append(StepProgress(
+                        step=AnalysisStep(s["step"]),
+                        status=JobStatus(s.get("status", "running")),
+                    ))
+                except (ValueError, KeyError):
+                    pass
+
+            return StatusResponse(
+                job_id=job_id,
+                status=status,
+                current_step=current_step,
+                steps=steps,
+                error=state.get("error"),
+            )
+        except Exception as exc:
+            logger.warning("job_manager: redis status check failed for %s: %s", job_id, exc)
+            return None
+
+    # ── Report ────────────────────────────────────────────────────────────────
 
     def get_report(self, job_id: str) -> Optional[ComplianceReport]:
         job = self._jobs.get(job_id)
@@ -252,23 +362,25 @@ class JobManager:
     async def _cleanup_loop(self) -> None:
         while True:
             await asyncio.sleep(300)
-            cutoff = datetime.now(timezone.utc).timestamp() - self._ttl
-            expired = [
-                jid for jid, j in self._jobs.items()
-                if j.created_at.timestamp() < cutoff
-            ]
-            for jid in expired:
-                job = self._jobs.pop(jid)
-                try:
-                    from rag.company_ingest import delete_company_docs
-                    delete_company_docs(jid)
-                except Exception:
-                    pass
-                # NOTE: uploaded documents are NOT cleared here — they use their own TTL
-                # (DOCUMENT_TTL_SECONDS, default 7 days) so users can re-run analysis
-                # without re-uploading. See document_store.purge_expired() below.
 
-            # Purge expired document sessions (separate from job TTL)
+            if not self._celery_mode:
+                # asyncio mode: evict expired in-memory jobs
+                cutoff = datetime.now(timezone.utc).timestamp() - self._ttl
+                expired = [
+                    jid for jid, j in self._jobs.items()
+                    if j.created_at.timestamp() < cutoff
+                ]
+                for jid in expired:
+                    self._jobs.pop(jid)
+                    try:
+                        from rag.company_ingest import delete_company_docs
+                        delete_company_docs(jid)
+                    except Exception:
+                        pass
+                # In Celery mode, Redis TTL handles expiry automatically.
+                # Company doc ChromaDB cleanup is handled per-job in tasks.py.
+
+            # Purge expired document sessions (both modes, separate TTL)
             try:
                 from config import settings as _s
                 from services.document_store import document_store
