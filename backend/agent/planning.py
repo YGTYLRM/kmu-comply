@@ -23,7 +23,7 @@ from models.compliance_report import (
 from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
 from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
-from rag.retrieval import deduplicate, retrieve
+from rag.retrieval import deduplicate, retrieve, rerank_cross_encoder
 from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
@@ -97,9 +97,11 @@ def retrieve_regulatory_context(
             )
 
         deduped = deduplicate(raw)
-        top = deduped[:5]
-        all_chunks.extend(_to_models(top))
-        logger.debug("step 3: %s — %d chunks selected", reg_key, len(top))
+        # Cross-encoder reranking: re-scores (query, passage) pairs and re-sorts.
+        # Falls back to dense+BM25 order if the model is not available.
+        reranked = rerank_cross_encoder(query, deduped, top_n=5)
+        all_chunks.extend(_to_models(reranked))
+        logger.debug("step 3: %s — %d chunks selected (cross-encoder reranked)", reg_key, len(reranked))
 
     return all_chunks, empty_regulations
 

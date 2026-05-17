@@ -171,6 +171,52 @@ def deduplicate(chunks: list[dict]) -> list[dict]:
     return sorted(best.values(), key=lambda x: x["score"], reverse=True)
 
 
+@lru_cache(maxsize=1)
+def _cross_encoder():
+    """Load a multilingual cross-encoder for reranking. Cached after first load (~30s)."""
+    try:
+        from sentence_transformers import CrossEncoder
+        model_name = settings.reranker_model
+        model = CrossEncoder(model_name, max_length=512)
+        logger.info("retrieval: cross-encoder loaded: %s", model_name)
+        return model
+    except Exception as exc:
+        logger.warning("retrieval: cross-encoder not available (%s), rerank disabled", exc)
+        return None
+
+
+def rerank_cross_encoder(
+    query: str,
+    chunks: list[dict],
+    top_n: int | None = None,
+) -> list[dict]:
+    """Cross-encoder reranking: score each (query, passage) pair and re-sort.
+
+    Uses a local multilingual cross-encoder (no API cost). Falls back to the
+    existing dense+BM25 order if the model is unavailable.
+    The cross-encoder is loaded lazily and cached — first call takes ~30s.
+    """
+    if not chunks:
+        return chunks
+
+    model = _cross_encoder()
+    if model is None:
+        return chunks[:top_n] if top_n else chunks
+
+    pairs = [(query, c.get("text", "")[:512]) for c in chunks]
+    try:
+        scores = model.predict(pairs)
+    except Exception as exc:
+        logger.warning("retrieval: cross-encoder predict failed (%s), using score order", exc)
+        return chunks[:top_n] if top_n else chunks
+
+    for chunk, score in zip(chunks, scores):
+        chunk["rerank_score"] = float(score)
+
+    reranked = sorted(chunks, key=lambda x: x.get("rerank_score", 0.0), reverse=True)
+    return reranked[:top_n] if top_n else reranked
+
+
 def rerank(query: str, chunks: list[dict], top_n: int = 20) -> list[dict]:
     """LLM-based reranking. Falls back to score order if the API call fails."""
     if not chunks:
