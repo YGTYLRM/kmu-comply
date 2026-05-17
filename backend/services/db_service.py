@@ -99,6 +99,8 @@ async def upsert_company(user_id: str, profile: CompanyProfile) -> str:
             "updated_at": datetime.now(timezone.utc),
         }
 
+        old_profile_raw = company.profile_raw if company else None
+
         if company:
             for k, v in fields.items():
                 setattr(company, k, v)
@@ -108,7 +110,86 @@ async def upsert_company(user_id: str, profile: CompanyProfile) -> str:
 
         await db.commit()
         await db.refresh(company)
-        return company.id
+        company_id = company.id
+
+    # Threshold change detection — compare old vs new applicability (outside DB session)
+    if old_profile_raw:
+        try:
+            await _notify_threshold_changes(user_id, company_id, old_profile_raw, profile)
+        except Exception as exc:
+            logger.warning("db_service: threshold change detection failed: %s", exc)
+
+    return company_id
+
+
+async def _notify_threshold_changes(
+    user_id: str,
+    company_id: str,
+    old_profile_raw: dict,
+    new_profile: CompanyProfile,
+) -> None:
+    """
+    Compare old vs new CompanyProfile applicability and notify the user if
+    any regulations newly apply or are no longer applicable.
+
+    Only fires when the profile has a meaningful change that crosses a threshold
+    (e.g., employee_count goes from 45 → 55, triggering HinSchG).
+    Silent no-op when no regulations change applicability.
+    """
+    from models.company_profile import EnrichedCompanyProfile
+    from services.threshold_engine import determine_applicable_regulations
+
+    try:
+        old_p = CompanyProfile(**old_profile_raw)
+    except Exception:
+        return  # old profile invalid — skip silently
+
+    old_enriched = EnrichedCompanyProfile(**old_p.model_dump())
+    new_enriched = EnrichedCompanyProfile(**new_profile.model_dump())
+
+    old_applicable = {a.regulation for a in determine_applicable_regulations(old_enriched) if a.applies}
+    new_applicable = {a.regulation for a in determine_applicable_regulations(new_enriched) if a.applies}
+
+    newly_triggered = new_applicable - old_applicable
+    no_longer_applies = old_applicable - new_applicable
+
+    if not newly_triggered and not no_longer_applies:
+        return  # no threshold changes — nothing to notify
+
+    # Build message
+    parts: list[str] = []
+    if newly_triggered:
+        reg_names = ", ".join(r.value.upper().replace("_", " ") for r in sorted(newly_triggered, key=lambda x: x.value))
+        parts.append(f"Newly applicable: {reg_names}")
+    if no_longer_applies:
+        reg_names = ", ".join(r.value.upper().replace("_", " ") for r in sorted(no_longer_applies, key=lambda x: x.value))
+        parts.append(f"No longer applicable: {reg_names}")
+
+    title = f"Regulatory profile change detected for {new_profile.company_name}"
+    message = (
+        f"Your company profile update crossed one or more regulation thresholds. "
+        + " | ".join(parts)
+        + f". Run a new compliance analysis to get an updated assessment."
+    )
+    logger.info(
+        "db_service: threshold change for user %s — %s",
+        user_id, " | ".join(parts),
+    )
+
+    try:
+        from db.database import AsyncSessionLocal
+        from db.models import Notification
+        async with AsyncSessionLocal() as db:
+            notif = Notification(
+                user_id=user_id,
+                type="threshold_change",
+                title=title,
+                message=message,
+            )
+            db.add(notif)
+            await db.commit()
+    except Exception as exc:
+        logger.warning("db_service: could not save threshold change notification: %s", exc)
 
 
 async def save_report_to_db(
