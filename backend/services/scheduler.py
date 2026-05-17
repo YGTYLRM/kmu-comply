@@ -327,12 +327,189 @@ def start_scheduler() -> AsyncIOScheduler:
         max_instances=1,
     )
 
+    # Weekly on Monday at 05:00 UTC — document ageing check
+    # Alerts companies whose last report uses a KB version older than the current one
+    _scheduler.add_job(
+        document_ageing_check,
+        trigger="cron",
+        day_of_week="mon",
+        hour=5,
+        minute=0,
+        id="document_ageing_check",
+        replace_existing=True,
+        max_instances=1,
+    )
+
     _scheduler.start()
     logger.info(
         "scheduler: started — regulation check 03:00 UTC daily, "
-        "re-assessments 04:00 UTC daily, official fetch 02:00 UTC Sundays"
+        "re-assessments 04:00 UTC daily, official fetch 02:00 UTC Sundays, "
+        "document ageing check 05:00 UTC Mondays"
     )
     return _scheduler
+
+
+async def document_ageing_check() -> None:
+    """
+    Weekly job: alert users whose compliance knowledge base has been updated
+    since their last report was generated.
+
+    Logic:
+      1. Load the current KB ingestion dates from ChromaDB metadata.
+      2. For each company that has a saved report, compare report.generated_at
+         against the KB fetched_at for the regulations in that report.
+      3. If any regulation was re-ingested AFTER the report was generated,
+         the report may be based on outdated legal text — send a notification.
+
+    Only fires if the gap is at least 7 days (avoids spurious alerts from
+    same-day ingest + report runs during onboarding).
+    """
+    logger.info("scheduler: running document ageing check")
+    try:
+        from config import settings
+        if not settings.database_url:
+            logger.info("scheduler: document ageing check skipped — no database")
+            return
+
+        from db.database import AsyncSessionLocal
+        from db.models import Report as ReportRow, Company, Profile
+        from sqlalchemy import select
+        from datetime import datetime, timezone, timedelta
+        import chromadb
+        from rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS, OFFICIAL_URLS
+
+        # Build current KB ingest dates from ChromaDB metadata
+        kb_dates: dict[str, datetime] = {}
+        try:
+            client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+            for reg_key, col_name in REGULATION_COLLECTIONS.items():
+                try:
+                    col = client.get_collection(col_name)
+                    results = col.get(limit=1, include=["metadatas"])
+                    meta = (results["metadatas"] or [{}])[0]
+                    fetched_str = meta.get("fetched_at", "")
+                    if fetched_str:
+                        kb_dates[reg_key] = datetime.fromisoformat(
+                            fetched_str.replace("Z", "+00:00")
+                        )
+                except Exception:
+                    pass
+        except Exception as exc:
+            logger.warning("scheduler: ageing check could not read KB dates: %s", exc)
+            return
+
+        if not kb_dates:
+            logger.info("scheduler: ageing check — no KB dates found, skipping")
+            return
+
+        stale_count = 0
+        async with AsyncSessionLocal() as db:
+            # Get latest report per company with user info
+            reports = (await db.execute(
+                select(ReportRow, Company, Profile)
+                .join(Company, ReportRow.company_id == Company.id)
+                .join(Profile, Company.user_id == Profile.id)
+                .where(ReportRow.raw_json.isnot(None))
+                .order_by(ReportRow.created_at.desc())
+            )).all()
+
+            seen_companies: set[str] = set()
+            for row, company, user in reports:
+                if company.id in seen_companies:
+                    continue
+                seen_companies.add(company.id)
+
+                report_date = row.created_at
+                if report_date.tzinfo is None:
+                    report_date = report_date.replace(tzinfo=timezone.utc)
+
+                raw = row.raw_json or {}
+                kb_versions = raw.get("knowledge_base_versions", {})
+
+                stale_regs: list[str] = []
+                for reg_key, meta in kb_versions.items():
+                    fetched_str = meta.get("fetched_at", "")
+                    if not fetched_str or fetched_str == "unknown":
+                        continue
+                    try:
+                        kb_fetched = datetime.fromisoformat(
+                            fetched_str.replace("Z", "+00:00")
+                        )
+                    except ValueError:
+                        continue
+                    # Only alert if KB is meaningfully newer (>7 days after report)
+                    gap = kb_fetched - report_date
+                    if gap > timedelta(days=7):
+                        stale_regs.append(reg_key)
+
+                if stale_regs:
+                    stale_count += 1
+                    reg_names = ", ".join(r.upper() for r in stale_regs[:4])
+                    logger.info(
+                        "scheduler: company %s has stale report — %d regulation(s) updated since: %s",
+                        company.name, len(stale_regs), reg_names,
+                    )
+                    await _queue_document_ageing_notification(
+                        user_id=user.id,
+                        user_email=user.email or "",
+                        company_name=company.name,
+                        stale_regulations=stale_regs,
+                        report_date=report_date,
+                    )
+
+        logger.info("scheduler: document ageing check complete — %d company(ies) need review", stale_count)
+
+    except Exception as exc:
+        logger.error("scheduler: document ageing check failed: %s", exc)
+
+
+async def _queue_document_ageing_notification(
+    user_id: str,
+    user_email: str,
+    company_name: str,
+    stale_regulations: list[str],
+    report_date: "datetime",
+) -> None:
+    """Create and send a document-ageing notification."""
+    try:
+        from db.database import AsyncSessionLocal
+        from db.models import Notification
+
+        reg_list = ", ".join(r.upper() for r in stale_regulations[:5])
+        if len(stale_regulations) > 5:
+            reg_list += f" and {len(stale_regulations) - 5} more"
+
+        title = f"Your compliance report for {company_name} may be outdated"
+        message = (
+            f"The following regulations have been updated in the Complio knowledge base since "
+            f"your last report ({report_date.strftime('%d %b %Y')}): {reg_list}. "
+            f"We recommend re-running the compliance analysis to ensure your report reflects "
+            f"the latest legal text. No action is required if no amendments affect your business."
+        )
+
+        async with AsyncSessionLocal() as db:
+            notif = Notification(
+                user_id=user_id,
+                type="document_ageing",
+                title=title,
+                message=message,
+            )
+            db.add(notif)
+            await db.commit()
+            await db.refresh(notif)
+            notif_id = notif.id
+
+        if user_email:
+            from services.notification_service import send_notification_email
+            await send_notification_email(
+                notification_id=notif_id,
+                user_email=user_email,
+                company_name=company_name,
+                report=None,
+                triggered_by="document_ageing",
+            )
+    except Exception as exc:
+        logger.error("scheduler: document ageing notification failed: %s", exc)
 
 
 async def _fetch_official_updates() -> None:

@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     # Embedding
     embedding_model: str = "intfloat/multilingual-e5-large"
     embedding_fallback: str = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+    reranker_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
 
     # API
     api_host: str = "0.0.0.0"
