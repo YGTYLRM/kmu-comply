@@ -23,7 +23,7 @@ _TRACKER_DOMAINS: frozenset[str] = frozenset({
     "google-analytics.com", "googletagmanager.com", "googleadservices.com",
     "googlesyndication.com", "doubleclick.net", "google.com/ads",
     # Meta / Facebook
-    "facebook.com", "facebook.net", "connect.facebook.net",
+    "facebook.com", "facebook.net",
     # Microsoft
     "clarity.ms", "bing.com",
     # HubSpot
