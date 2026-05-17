@@ -2,17 +2,20 @@ from enum import Enum
 
 
 class Regulation(str, Enum):
-    GDPR    = "gdpr_dsgvo"
-    LKSG    = "lksg"
-    ENEFG   = "enefg"
-    CSRD    = "csrd"
-    BDSG    = "bdsg"
-    NIS2    = "nis2"
-    AI_ACT  = "eu_ai_act"
-    HINSCHG = "hinschg"
-    ARBSCHG = "workplace_law"
-    AGG     = "agg"
-    MILOG   = "milog"
+    GDPR         = "gdpr_dsgvo"
+    LKSG         = "lksg"
+    ENEFG        = "enefg"
+    CSRD         = "csrd"
+    BDSG         = "bdsg"
+    NIS2         = "nis2"
+    AI_ACT       = "eu_ai_act"
+    HINSCHG      = "hinschg"
+    ARBSCHG      = "workplace_law"
+    AGG          = "agg"
+    MILOG        = "milog"
+    TTDSG        = "ttdsg"
+    GWG          = "gwg"
+    EU_DATA_ACT  = "eu_data_act"
 
 
 class Industry(str, Enum):
@@ -21,6 +24,7 @@ class Industry(str, Enum):
     HEALTHCARE = "healthcare"
     RETAIL = "retail"
     FINANCE = "finance"
+    REAL_ESTATE = "real_estate"
     LOGISTICS = "logistics"
     CONSTRUCTION = "construction"
     ENERGY = "energy"

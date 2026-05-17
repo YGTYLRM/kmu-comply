@@ -55,17 +55,20 @@ def determine_applicability(
 def retrieve_regulatory_context(
     profile: EnrichedCompanyProfile,
     applicability: list[RegulationApplicability],
-) -> list[RegulatoryChunk]:
+) -> tuple[list[RegulatoryChunk], list[str]]:
     """RAG retrieval for each applicable regulation, deduplicated and capped per-regulation.
 
-    Each applicable regulation is retrieved and capped independently so that
-    no single regulation can crowd out others during a global rerank step.
+    Returns (chunks, empty_regulations) where empty_regulations is a list of
+    regulation keys that returned zero chunks after both retrieval attempts.
+    These must be treated as CANNOT_ASSESS — never pass to the LLM for gap analysis
+    without this information, as it will produce ungrounded findings.
     """
     applicable = [a for a in applicability if a.applies]
     if not applicable:
-        return []
+        return [], []
 
     all_chunks: list[RegulatoryChunk] = []
+    empty_regulations: list[str] = []
 
     for reg_app in applicable:
         reg_key = reg_app.regulation.value
@@ -75,18 +78,30 @@ def retrieve_regulatory_context(
         if len(raw) < 5:
             broader = f"{reg_key} compliance obligations requirements Germany SME"
             raw = retrieve(broader, [reg_key], top_k=15)
-            if len(raw) < 5:
-                logger.warning(
-                    "step 3: only %d chunks for %s after retry (expected >= 5)",
-                    len(raw), reg_key,
-                )
+
+        if len(raw) == 0:
+            # Zero chunks = knowledge base not populated for this regulation.
+            # Do NOT pass to LLM — it will hallucinate legal citations.
+            # Caller must add CANNOT_ASSESS findings for this regulation.
+            logger.warning(
+                "step 3: ZERO chunks for %s — knowledge base not populated. "
+                "Marking as CANNOT_ASSESS, bypassing LLM gap analysis for this regulation.",
+                reg_key,
+            )
+            empty_regulations.append(reg_key)
+            continue
+        elif len(raw) < 5:
+            logger.warning(
+                "step 3: only %d chunks for %s after retry (expected >= 5)",
+                len(raw), reg_key,
+            )
 
         deduped = deduplicate(raw)
         top = deduped[:5]
         all_chunks.extend(_to_models(top))
         logger.debug("step 3: %s — %d chunks selected", reg_key, len(top))
 
-    return all_chunks
+    return all_chunks, empty_regulations
 
 
 # ── Step 4 ────────────────────────────────────────────────────────────────────
@@ -96,8 +111,13 @@ def run_gap_analysis(
     chunks: list[RegulatoryChunk],
     failures: list[str],
     job_id: str = "",
+    empty_regulations: list[str] | None = None,
 ) -> list[ComplianceGap]:
-    """LLM gap analysis, processed per regulation. Includes company doc evidence when available."""
+    """LLM gap analysis, processed per regulation. Includes company doc evidence when available.
+
+    Regulations in empty_regulations had zero KB chunks — they receive a hard CANNOT_ASSESS
+    finding without calling the LLM, preventing ungrounded legal citation hallucination.
+    """
     by_reg: dict[str, list[RegulatoryChunk]] = {}
     for chunk in chunks:
         by_reg.setdefault(chunk.regulation.value, []).append(chunk)
@@ -105,10 +125,31 @@ def run_gap_analysis(
     profile_json = profile.model_dump_json(indent=2)
     all_gaps: list[ComplianceGap] = []
 
+    # Hard CANNOT_ASSESS for regulations with empty knowledge base — never delegate to LLM
+    for reg_key in (empty_regulations or []):
+        logger.info("step 4: %s has empty KB — adding CANNOT_ASSESS without LLM call", reg_key)
+        all_gaps.append(ComplianceGap(
+            regulation=_reg_from_key(reg_key),
+            article_number="KB-EMPTY",
+            article_title="Knowledge base not populated",
+            status=ComplianceStatus.CANNOT_ASSESS,
+            priority=Priority.MEDIUM,
+            evidence=(
+                f"The regulatory knowledge base for {reg_key} has not been indexed. "
+                f"Gap analysis requires retrieved legal text to produce article-level findings — "
+                f"generating findings without source text would risk hallucinated citations. "
+                f"Run the ingestion pipeline to populate this regulation's collection, "
+                f"then re-run this analysis."
+            ),
+            deficiency_description=(
+                f"Compliance screening for {reg_key} is incomplete. "
+                f"Rerun analysis after knowledge base ingestion."
+            ),
+        ))
+
     for reg_key, reg_chunks in by_reg.items():
         chunks_json = _chunks_to_json(reg_chunks)
 
-        # Retrieve company doc evidence for this regulation
         company_docs_json = ""
         if job_id:
             query = _build_query(profile, _reg_from_key(reg_key))

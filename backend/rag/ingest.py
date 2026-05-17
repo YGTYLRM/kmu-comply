@@ -57,6 +57,9 @@ REGULATION_COLLECTIONS: dict[str, str] = {
     "arbschg":          "workplace_law",  # alias: collection renamed from arbschg
     "agg":              "agg",
     "milog":            "milog",
+    "ttdsg":            "ttdsg",
+    "gwg":              "gwg",
+    "eu_data_act":      "eu_data_act",
 }
 
 OFFICIAL_URLS: dict[str, str] = {
@@ -73,6 +76,9 @@ OFFICIAL_URLS: dict[str, str] = {
     "arbschg":          "https://www.gesetze-im-internet.de/arbschg/",
     "agg":              "https://www.gesetze-im-internet.de/agg/",
     "milog":            "https://www.gesetze-im-internet.de/milog/",
+    "ttdsg":            "https://www.gesetze-im-internet.de/ttdsg/",
+    "gwg":              "https://www.gesetze-im-internet.de/gwg_2017/",
+    "eu_data_act":      "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202302854",
 }
 
 # ---------------------------------------------------------------------------
@@ -423,12 +429,12 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     if "_expanded" in path.stem:
         chunks = _chunk_separator_blocks(text, regulation, name, url)
 
-    elif regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "workplace_law", "agg", "milog") and path.suffix == ".txt":
+    elif regulation in ("bdsg", "lksg", "enefg", "hinschg", "arbschg", "workplace_law", "agg", "milog", "ttdsg", "gwg") and path.suffix == ".txt":
         chunks = _chunk_german_law(text, regulation, name, url)
         if not chunks:
             chunks = _chunk_guidance(text, regulation, name, url)
 
-    elif regulation in ("gdpr", "csrd", "nis2", "eu_ai_act"):
+    elif regulation in ("gdpr", "csrd", "nis2", "eu_ai_act", "eu_data_act"):
         chunks = _chunk_eu_law(text, regulation, name, url)
         if not chunks:
             chunks = _chunk_guidance(text, regulation, name, url)
