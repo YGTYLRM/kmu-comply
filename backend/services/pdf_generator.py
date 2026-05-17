@@ -15,7 +15,33 @@ from models.enums import ComplianceStatus, Priority
 
 logger = logging.getLogger(__name__)
 
-LOGO_PATH = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
+LOGO_PATH  = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
+FONTS_DIR  = Path(__file__).parent.parent / "assets" / "fonts"
+_FONT_WEIGHTS = [400, 500, 600, 700, 800, 900]
+
+
+def _build_font_css() -> str:
+    """Build @font-face CSS from local WOFF2 files (no CDN dependency).
+
+    Falls back to a silent empty string if font files haven't been downloaded yet —
+    Playwright will then use the browser's default sans-serif font (Arial/Helvetica).
+    Run scripts/download_fonts.py once to populate backend/assets/fonts/.
+    """
+    rules: list[str] = []
+    for weight in _FONT_WEIGHTS:
+        font_file = FONTS_DIR / f"inter-{weight}-latin.woff2"
+        if not font_file.exists():
+            return ""  # font files not downloaded — fall back to system font
+        b64 = base64.b64encode(font_file.read_bytes()).decode()
+        rules.append(
+            f"@font-face{{font-family:'Inter';font-style:normal;font-weight:{weight};"
+            f"font-display:swap;"
+            f"src:url('data:font/woff2;base64,{b64}') format('woff2');}}"
+        )
+    return "\n".join(rules)
+
+
+_FONT_CSS = _build_font_css()
 
 REGULATION_LABELS: dict[str, str] = {
     "gdpr_dsgvo":    "GDPR / DSGVO",
@@ -620,9 +646,7 @@ def generate_pdf(report: ComplianceReport) -> bytes:
 
     html = (
         '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
-        '<link rel="preconnect" href="https://fonts.googleapis.com">'
-        '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">'
-        '<style>'
+        f'<style>{_FONT_CSS}'
         '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}'
         "body{font-family:'Inter',Arial,sans-serif;font-size:9.5pt;color:#0f172a;background:#fff;"
         '-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
@@ -641,7 +665,7 @@ def generate_pdf(report: ComplianceReport) -> bytes:
         browser = pw.chromium.launch()
         pg      = browser.new_page()
         pg.set_viewport_size({"width": 794, "height": 1123})
-        pg.set_content(html, wait_until="networkidle")
+        pg.set_content(html, wait_until="load")
         pdf_bytes = pg.pdf(
             format="A4",
             print_background=True,
