@@ -66,7 +66,11 @@ class TestApplicability:
         enriched = enrich_profile(profile_large_listed)
         result = determine_applicability(enriched)
         regs = {r.regulation for r in result if r.applies}
-        assert regs == {Regulation.GDPR, Regulation.LKSG, Regulation.ENEFG, Regulation.CSRD, Regulation.BDSG}
+        # Large listed manufacturer must trigger every size-threshold regulation
+        for reg in (Regulation.GDPR, Regulation.BDSG, Regulation.LKSG,
+                    Regulation.ENEFG, Regulation.CSRD, Regulation.ARBSCHG,
+                    Regulation.AGG, Regulation.MILOG, Regulation.TTDSG):
+            assert reg in regs, f"{reg} must apply for a 1500-employee listed manufacturer"
 
     def test_it_agency_gdpr_bdsg_only(self, profile_it_agency):
         enriched = enrich_profile(profile_it_agency)

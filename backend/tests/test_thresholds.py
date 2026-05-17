@@ -146,8 +146,15 @@ class TestLkSG:
     def test_applies_to_large_listed(self, profile_large_listed):
         assert check_lksg(profile_large_listed).applies is True
 
-    def test_does_not_apply_to_manufacturer_500(self, profile_manufacturer):
-        assert check_lksg(profile_manufacturer).applies is False
+    def test_does_not_apply_to_manufacturer_500(self):
+        profile = CompanyProfile(
+            company_name="SmallMfg GmbH",
+            industry="manufacturing",
+            employee_count=500,
+            processes_personal_data=False,
+            has_supply_chain_abroad=True,
+        )
+        assert check_lksg(profile).applies is False
 
     def test_reason_cites_paragraph(self):
         profile = CompanyProfile(
@@ -197,12 +204,15 @@ class TestEnEfG:
         assert result.edl_g_audit_required is True
 
     def test_energy_management_required_at_7500_mwh(self):
-        # Must be non-SME (>=250 employees) for EnEfG energy management to apply
+        # EnEfG §8(1): "mehr als 7,5 Gigawattstunden" — strictly greater than 7.5 GWh.
+        # 7,500 MWh = exactly 7.5 GWh → does NOT trigger (threshold is >7.5, not >=7.5).
+        # 7,501 MWh > 7.5 GWh → triggers. Test uses 7,501 to reflect the actual law text.
+        # Also: EnEfG §8(1) applies to ANY company >7.5 GWh, not just non-SMEs.
         profile = CompanyProfile(
             company_name="Energy Corp",
             industry="manufacturing",
             employee_count=300,
-            annual_energy_consumption_mwh=7500,
+            annual_energy_consumption_mwh=7501,
             processes_personal_data=False,
         )
         result = check_enefg(profile)
@@ -254,6 +264,21 @@ class TestEnEfG:
     def test_it_agency_does_not_apply(self, profile_it_agency):
         result = check_enefg(profile_it_agency)
         assert result.applies is False
+
+    def test_sme_with_high_energy_triggers_enefg_8(self):
+        # EnEfG §8(1) applies to ANY company >7.5 GWh — not just non-SMEs.
+        # Previous code incorrectly excluded SMEs from this obligation.
+        profile = CompanyProfile(
+            company_name="Energy-Intensive SME",
+            industry="manufacturing",
+            employee_count=80,  # SME: <250 employees
+            annual_energy_consumption_mwh=10_000,  # 10 GWh > 7.5 GWh
+            processes_personal_data=False,
+        )
+        result = check_enefg(profile)
+        assert result.applies is True
+        assert result.energy_management_required is True  # EnEfG §8(1) triggered
+        assert result.edl_g_audit_required is False  # EDL-G §8 only for non-SMEs
 
 
 # ── CSRD ──────────────────────────────────────────────────────────────────────
@@ -364,14 +389,15 @@ class TestBDSG:
 # ── Integration: determine_applicable_regulations ────────────────────────────
 
 class TestDetermineApplicableRegulations:
-    def test_returns_all_eleven_regulations(self, profile_it_agency):
+    def test_returns_all_regulations(self, profile_it_agency):
         results = determine_applicable_regulations(profile_it_agency)
-        assert len(results) == 11
+        assert len(results) == 14
         regs = {r.regulation for r in results}
         assert regs == {
             Regulation.GDPR, Regulation.LKSG, Regulation.ENEFG, Regulation.CSRD,
             Regulation.BDSG, Regulation.NIS2, Regulation.AI_ACT, Regulation.HINSCHG,
             Regulation.ARBSCHG, Regulation.AGG, Regulation.MILOG,
+            Regulation.TTDSG, Regulation.GWG, Regulation.EU_DATA_ACT,
         }
 
     def test_it_agency_only_gdpr_and_bdsg_apply(self, profile_it_agency):

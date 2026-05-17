@@ -15,8 +15,11 @@ Run from backend/:  python scripts/fetch_supplementary_docs.py [--regulation <na
 import argparse
 import html as html_module
 import re
+import sys
 import urllib.request
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 BASE_DIR = Path(__file__).parent.parent / "data" / "regulations"
 HEADERS = {
@@ -137,15 +140,6 @@ TASKS: list[dict] = [
 
     # BSIG — German BSI Act (national cybersecurity authority law, NIS2 transposition basis).
     # Contains obligations for KRITIS operators and digital infrastructure providers.
-    {
-        "regulation": "nis2",
-        "name": "BSIG (BSI-Gesetz — German BSI Act)",
-        "type": "gesetze",
-        "prefix": "bsig_2009",
-        "filename": "bsig_text.txt",
-        "label": "BSIG — BSI-Gesetz (Gesetz über das Bundesamt für Sicherheit in der Informationstechnik)",
-    },
-
     # ESRS 1 — General requirements (cross-cutting, applies to all CSRD reporters).
     # Defines materiality assessment, disclosure architecture, and reporting principles.
     {
@@ -170,35 +164,9 @@ TASKS: list[dict] = [
         "lang": "EN",
     },
 
-    # LkSG implementing regulation — defines reporting format and audit requirements.
-    {
-        "regulation": "lksg",
-        "name": "LkSG-Sorgfaltspflichtenverordnung",
-        "type": "gesetze",
-        "prefix": "lksgsorgfpflv",
-        "filename": "lksg_sorgfpflv_text.txt",
-        "label": "LkSG-Sorgfaltspflichtenverordnung — Durchführungsverordnung zum LkSG",
-    },
-
-    # EnEG — predecessor energy savings framework act, still referenced by EnEfG for definitions.
-    {
-        "regulation": "enefg",
-        "name": "EnEG (Energieeinsparungsgesetz)",
-        "type": "gesetze",
-        "prefix": "eneg",
-        "filename": "eneg_text.txt",
-        "label": "EnEG — Gesetz zur Einsparung von Energie und zur Nutzung erneuerbarer Energien zur Wärme- und Kälteerzeugung in Gebäuden",
-    },
-
-    # HINSCHG implementing regulation — reporting channel technical requirements.
-    {
-        "regulation": "hinschg",
-        "name": "HinSchG-Meldestellen details (BMWK guidance)",
-        "type": "gesetze",
-        "prefix": "hinschgmeldv",
-        "filename": "hinschg_meldv_text.txt",
-        "label": "HinSchG-Meldestellenverordnung — Verordnung über interne Meldestellen",
-    },
+    # NOTE: BSIG (bsig_2009), LkSG-Sorgfaltspflichtenverordnung, EnEG, and
+    # HinSchG-Meldestellenverordnung are not yet published on gesetze-im-internet.de.
+    # Add tasks here once official URLs become available.
 ]
 
 
@@ -233,7 +201,7 @@ def main():
     results = []
     for task in tasks:
         print(f"\n{'='*60}")
-        print(f"{task['name']}  →  {task['regulation']}/")
+        print(f"{task['name']}  ->  {task['regulation']}/")
         dest_dir = BASE_DIR / task["regulation"]
 
         if task["type"] == "gesetze":
