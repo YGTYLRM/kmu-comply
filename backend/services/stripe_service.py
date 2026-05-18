@@ -26,7 +26,7 @@ PLAN_CONFIG = {
         "reassessment_days": 30,   # monthly auto re-assessment
         "features": [
             "1 company profile",
-            "11 regulations checked",
+            "14 regulations checked",
             "Full gap analysis & action plan",
             "PDF report export",
             "Monthly automatic re-assessment",
@@ -42,7 +42,7 @@ PLAN_CONFIG = {
         "reassessment_days": 7,    # weekly re-assessment
         "features": [
             "Up to 5 company profiles",
-            "11 regulations checked per company",
+            "14 regulations checked per company",
             "Full gap analysis & action plan",
             "PDF report export",
             "Weekly automatic re-assessment",
@@ -77,7 +77,7 @@ PLAN_CONFIG = {
         "reassessment_days": 30,
         "features": [
             "1 company profile",
-            "11 regulations checked",
+            "14 regulations checked",
             "Full gap analysis & action plan",
             "PDF report export",
             "Monthly automatic re-assessment",
@@ -94,7 +94,7 @@ PLAN_CONFIG = {
         "reassessment_days": 7,
         "features": [
             "Up to 5 company profiles",
-            "11 regulations checked per company",
+            "14 regulations checked per company",
             "Document template generation",
             "Expert review access",
             "Weekly automatic re-assessment",
@@ -113,7 +113,7 @@ PLAN_CONFIG = {
         "reassessment_days": 0,    # no re-assessment
         "features": [
             "1 compliance screening",
-            "11 regulations checked",
+            "14 regulations checked",
             "Full gap analysis & action plan",
             "PDF report export",
             "No subscription required",
@@ -267,7 +267,7 @@ async def handle_webhook(payload: bytes, signature: str) -> None:
         event = stripe.Webhook.construct_event(payload, signature, settings.stripe_webhook_secret)
     except Exception as exc:
         logger.warning("stripe: invalid webhook signature: %s", exc)
-        raise
+        raise ValueError(f"Invalid signature: {exc}") from exc
 
     etype = event["type"]
     logger.info("stripe: event %s", etype)

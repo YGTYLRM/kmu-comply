@@ -40,7 +40,7 @@ function OnboardingEmpty() {
       icon: <ShieldCheck className="h-5 w-5 text-brand-400" />,
       number: "02",
       title: "Get your compliance report",
-      desc: "Complio checks 11 German and EU regulations automatically — GDPR, NIS2, AI Act, EnEfG, and more. You get a scored report with a prioritized action plan.",
+      desc: "Complio checks 14 German and EU regulations automatically — GDPR, NIS2, AI Act, GwG, TTDSG, and more. You get a scored report with a prioritized action plan.",
     },
     {
       icon: <Bell className="h-5 w-5 text-brand-400" />,

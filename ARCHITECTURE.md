@@ -7,7 +7,7 @@
 
 ## 1. System Purpose and Scope
 
-Complio is an autonomous compliance screening agent for German small and medium-sized enterprises (SMEs). Given a company profile submitted through a web interface, the system determines which of 11 German and EU regulations apply to that company, retrieves the relevant legal obligations from a local vector knowledge base, runs a large language model (LLM) gap analysis comparing the company's stated measures against those obligations, and produces a scored compliance report in both interactive web and PDF form.
+Complio is an autonomous compliance screening agent for German small and medium-sized enterprises (SMEs). Given a company profile submitted through a web interface, the system determines which of 14 German and EU regulations apply to that company, retrieves the relevant legal obligations from a local vector knowledge base, runs a large language model (LLM) gap analysis comparing the company's stated measures against those obligations, and produces a scored compliance report in both interactive web and PDF form.
 
 The system is not a legal audit tool. Every report carries an explicit disclaimer to this effect and is positioned as a preliminary screening instrument. The primary design constraint that flows from this is: **the LLM is never permitted to determine whether a regulation applies, or what its thresholds are.** All applicability decisions are made by deterministic, statute-cited code. The LLM is restricted to interpreting legal text in context of a specific company profile and producing structured output.
 
@@ -58,6 +58,15 @@ The system runs as three distinct OS-level processes:
 │  ├── 03:00 UTC daily — regulation change detection        │
 │  └── 04:00 UTC daily — re-assessment cycle check          │
 └────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│  Process 3: Celery Worker (optional, production)           │
+│  celery -A celery_app worker --loglevel=info               │
+│                                                            │
+│  Activated when REDIS_URL is set in environment            │
+│  Tasks: run_analysis_task, scan_website_task               │
+│  Dev fallback: asyncio in-process (no Redis required)      │
+└────────────────────────────────────────────────────────────┘
 ```
 
 The web server and worker are intentionally separate processes. The worker runs long-running re-ingest and re-analysis tasks that would block the web server's event loop. Both processes share the same ChromaDB directory on disk and the same PostgreSQL database.
@@ -85,7 +94,7 @@ Configuration is managed by **pydantic-settings** (`config.py`). A single `Setti
 | Setting | Default | Purpose |
 |---------|---------|---------|
 | `llm_api_key` | — | Anthropic API key |
-| `llm_model` | `gpt-4o` | Model ID (overridden to `claude-sonnet-4-6` in `.env`) |
+| `llm_model` | `claude-sonnet-4-6` | Model ID for all compliance LLM calls |
 | `llm_temperature` | `0.0` | Applied to all compliance LLM calls |
 | `llm_max_retries` | `4` | Retry count for failed LLM calls (5 total attempts) |
 | `llm_timeout_seconds` | `120` | API timeout |
@@ -209,6 +218,13 @@ The pipeline is implemented in `agent/compliance_agent.py` (orchestration), `age
 ### Step 2 — Applicability Determination (`services/threshold_engine.py`)
 
 **Design principle:** This step never calls an LLM. All threshold logic is hardcoded Python with inline statute citations. The output of this step is the authoritative source of truth for which regulations apply. The gap analysis step is explicitly forbidden from re-deriving applicability.
+
+**Rule Engine (`agent/rule_engine.py`):** Runs alongside `threshold_engine.py`. Adds required-field tracking and confidence grading per regulation:
+- `required_fields`: the `CompanyProfile` attributes needed to make each decision
+- `missing_fields`: which are `None`/unset for a given profile
+- Confidence grading: `HIGH` (all fields present), `MEDIUM` (some missing), `LOW` (key fields absent)
+- Results logged for observability; `RULE_ENGINE_VERSION = "v1.0.0"` stamped on every report
+- `compute_overall_deterministic_score()` uses missing_fields count as an additional score penalty
 
 Each regulation has a dedicated check function returning a typed frozen dataclass:
 
@@ -467,7 +483,7 @@ Format B is chosen when it produces more than twice as many valid body matches a
 
 ### 5.4 Retrieval Quality
 
-Evaluated against `backend/data/retrieval_eval.json`: 48 test cases covering all 11 regulations. Each test case specifies a natural-language question, the target regulation collection, and one or more expected article numbers.
+Evaluated against `backend/data/retrieval_eval.json`: 48 test cases covering all 14 regulations. Each test case specifies a natural-language question, the target regulation collection, and one or more expected article numbers.
 
 Matching uses prefix normalization: "§ 12(1)" and "§ 12" are treated as equivalent; regulation prefixes ("arbschg §5" → "§5") are stripped.
 
@@ -810,6 +826,19 @@ PDF export is not hard-blocked (users may still export for debugging) but the ac
 - `X-Frame-Options: DENY`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: geolocation=(), microphone=(), camera=()`
+- `Content-Security-Policy`: set via `SecurityHeadersMiddleware` in `main.py`
+- `Strict-Transport-Security`: max-age=31536000 in production
+
+### 11.9 Additional Security Controls (implemented session 5)
+- **Magic bytes validation** (`services/document_store.py`): PDF files must start with `%PDF`; txt/md must be valid UTF-8. Blocks disguised binary uploads.
+- **SSRF guard** (`services/website_scanner.py`): Rejects targets resolving to RFC1918 (10.x.x.x, 172.16-31.x.x, 192.168.x.x) or loopback addresses before opening Playwright.
+- **Playwright PDF network isolation** (`services/pdf_generator.py`): All network requests blocked via `route.abort()` during PDF rendering — prevents exfiltration via CSS/image URLs in report content.
+- **ChromaDB reset disabled** (`docker-compose.yml`): `ALLOW_RESET=false` prevents accidental or malicious collection wipes.
+- **Injection scan coverage** (`services/injection_guard.py`): Scans beginning, middle, and end of file (up to 48KB total) rather than only the start — catches injections buried mid-document.
+- **HMAC admin key fingerprint** (`routes/admin.py`): Audit trail stores HMAC fingerprint of the admin key, not a raw prefix — prevents key reconstruction from logs.
+- **Proxy headers middleware** (`main.py`): `ProxyHeadersMiddleware` ensures correct client IP is used for rate limiting behind load balancers.
+- **Unicode normalization** (`rag/prompts.py`): `unicodedata.normalize("NFKC")` in `_sanitize()` neutralizes homoglyph injection attacks.
+- **Health endpoint data minimization** (`routes/misc.py`): In production, returns only `{"status":"ok/degraded"}` — no subsystem details exposed to unauthenticated callers.
 
 ---
 
@@ -861,13 +890,21 @@ All database operations in the main analysis pipeline are wrapped in try/except 
 | `profile_freelancer` | 1 | Minimal obligations, occasional processing |
 | `profile_healthcare` | 50 | Special category data, NIS2-adjacent |
 
-**`test_thresholds.py`:** Unit tests for every regulation's applicability threshold, boundary conditions, and reason string content. Deterministic — no LLM required.
+**`test_thresholds.py`:** Unit tests for all 14 regulation applicability thresholds, boundary conditions, and reason string content. Deterministic — no LLM required.
+
+**`test_golden_profiles.py`:** 6 canonical company profiles × deterministic assertions = 53 tests. Regression suite for the threshold engine.
+
+**`test_rule_engine.py`:** 32/32 tests for the `RuleEngine` — applicability, confidence grading, missing field detection, and `get_all_missing_fields()` across all 14 regulations. Uses `tests/golden_profiles/profiles.json` (30 profiles with `expected_applicable`/`expected_not_applicable`).
+
+**`test_retrieval_eval.py`:** 42 CI retrieval quality cases (261 full cases with `-m retrieval_eval`). Validates the RAG pipeline returns correct article numbers for each regulation.
+
+**`test_celery_integration.py`:** 12 tests for Redis job state via `services/redis_store.py` — create, update, status routing, TTL, ownership.
 
 **`test_models.py`:** Pydantic model validation tests — required fields, type coercion, validator behavior.
 
-**`test_rag.py`:** ChromaDB retrieval tests — requires a populated ChromaDB instance.
+**`test_pipeline.py`:** Integration tests running Steps 1–5 against live ChromaDB (no LLM). Marked `@pytest.mark.e2e` for full pipeline tests that require an API key.
 
-**`test_pipeline.py`:** Integration tests running the full 6-step pipeline. Marked `@pytest.mark.integration` — require a live LLM API key and populated ChromaDB. Separated from unit tests to allow CI to run units only.
+**CI command:** `python -m pytest tests/ -v --tb=short -k "not e2e"` — runs all non-LLM tests (currently 151 passed, 2 skipped).
 
 ---
 
@@ -877,7 +914,7 @@ All database operations in the main analysis pipeline are wrapped in try/except 
 
 New users are redirected to `/welcome` after registration. This page shows:
 - A 3-step guide: fill profile → get report → stay current
-- What regulations are covered (all 11)
+- What regulations are covered (all 14)
 - Feature list: gap analysis, action plan, PDF export, automatic re-assessment, regulation alerts
 - CTA to start the first screening
 

@@ -10,6 +10,7 @@ Sends alert emails via Resend when:
 Notifications are saved to the DB first, then this service
 sends the email and marks them as sent.
 """
+import html as html_mod
 import logging
 from datetime import datetime, timezone
 
@@ -76,6 +77,7 @@ def _build_email_html(
     changed_sections: list[str] | None = None,
 ) -> tuple[str, str]:
     """Returns (subject, html_body)."""
+    company_name = html_mod.escape(company_name)
     # Document ageing alerts have no associated report
     if triggered_by == "document_ageing" or report is None:
         subject = f"Action required: compliance report for {company_name} may be outdated"

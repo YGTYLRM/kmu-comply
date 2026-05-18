@@ -13,6 +13,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, field_validator
 
+from dependencies import check_endpoint_rate_limit
 from services.auth_service import get_current_user
 from services.website_scanner import WebScanResult, scan_website
 
@@ -94,6 +95,7 @@ async def scan_website_endpoint(
     body: ScanRequest,
     current_user: dict = Depends(get_current_user),
 ):
+    await check_endpoint_rate_limit(current_user["id"], "scan_website", limit=10)
     try:
         result = await asyncio.wait_for(scan_website(body.url), timeout=45.0)
     except asyncio.TimeoutError:

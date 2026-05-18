@@ -111,7 +111,7 @@ class Company(Base):
     profile_raw: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     user: Mapped["Profile"] = relationship(back_populates="companies")
     reports: Mapped[list["Report"]] = relationship(back_populates="company", cascade="all, delete-orphan")

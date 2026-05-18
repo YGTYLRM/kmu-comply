@@ -18,7 +18,8 @@ from models.compliance_report import (
     RegulatoryChunk,
 )
 from models.enums import ComplianceStatus, Priority, Regulation
-from rag.prompts import SYSTEM_PERSONA, executive_summary_prompt
+from rag.prompts import SYSTEM_PERSONA, executive_summary_prompt, PROMPT_VERSION
+from agent.rule_engine import RULE_ENGINE_VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -211,11 +212,11 @@ def _compute_completeness(profile: "EnrichedCompanyProfile") -> dict:
 
 
 @lru_cache(maxsize=1)
-def _llm_client() -> anthropic.Anthropic:
-    return anthropic.Anthropic(api_key=settings.llm_api_key)
+def _async_llm_client() -> anthropic.AsyncAnthropic:
+    return anthropic.AsyncAnthropic(api_key=settings.llm_api_key)
 
 
-def assemble_report(
+async def assemble_report(
     job_id: str,
     profile: EnrichedCompanyProfile,
     applicability: list[RegulationApplicability],
@@ -234,7 +235,7 @@ def assemble_report(
     completeness = _compute_completeness(profile)
     applicable_count = sum(1 for a in applicability if a.applies)
 
-    summary = _executive_summary(
+    summary = await _executive_summary(
         profile.company_name,
         applicable_count,
         len(applicability),
@@ -261,6 +262,8 @@ def assemble_report(
         requires_manual_review=list(failures),
         profile_completeness=completeness,
         knowledge_base_versions=kb_versions,
+        rule_engine_version=RULE_ENGINE_VERSION,
+        prompt_version=PROMPT_VERSION,
     )
 
 
@@ -330,7 +333,7 @@ def _critical_findings(
     return findings
 
 
-def _executive_summary(
+async def _executive_summary(
     company_name: str,
     applicable_count: int,
     total_regs: int,
@@ -338,6 +341,7 @@ def _executive_summary(
     critical_findings: list[str],
     failures: list[str],
 ) -> str:
+    import asyncio
     fallback = (
         f"Compliance assessment for {company_name} completed. "
         f"{applicable_count} of {total_regs} regulations apply. "
@@ -349,12 +353,11 @@ def _executive_summary(
     prompt = executive_summary_prompt(
         company_name, applicable_count, total_regs, overall_score, critical_findings
     )
-    import time
     last_exc: Exception | None = None
     max_attempts = settings.llm_max_retries + 1
     for attempt in range(max_attempts):
         try:
-            resp = _llm_client().messages.create(
+            resp = await _async_llm_client().messages.create(
                 model=settings.llm_model,
                 max_tokens=512,
                 temperature=0,
@@ -369,7 +372,7 @@ def _executive_summary(
             logger.warning("actions: summary error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         if attempt < max_attempts - 1:
-            time.sleep(2 ** attempt)
+            await asyncio.sleep(2 ** attempt)
 
     logger.error("actions: summary failed after retries (%s), using fallback", last_exc)
     failures.append("executive_summary")

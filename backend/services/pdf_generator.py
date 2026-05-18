@@ -6,14 +6,55 @@ from __future__ import annotations
 import base64
 import logging
 import re
+import threading
 from pathlib import Path
-
-from playwright.sync_api import sync_playwright
 
 from models.compliance_report import ComplianceReport
 from models.enums import ComplianceStatus, Priority
 
 logger = logging.getLogger(__name__)
+
+# Persistent Playwright browser — launched once at startup, reused for all PDF requests.
+# A semaphore limits concurrency to avoid overwhelming Chromium under load.
+_pw = None
+_browser = None
+_browser_lock = threading.Lock()
+
+from config import settings as _settings
+_pdf_semaphore = threading.Semaphore(getattr(_settings, "pdf_concurrency", 3))
+
+
+def init_browser() -> None:
+    """Pre-launch the Playwright Chromium browser. Called from the app lifespan."""
+    global _pw, _browser
+    try:
+        from playwright.sync_api import sync_playwright
+        with _browser_lock:
+            if _browser is None:
+                _pw = sync_playwright().start()
+                _browser = _pw.chromium.launch()
+                logger.info("pdf_generator: Playwright browser launched")
+    except Exception as exc:
+        logger.warning("pdf_generator: could not pre-launch browser (%s) — will cold-start per request", exc)
+
+
+def close_browser() -> None:
+    """Shut down the Playwright browser. Called from the app lifespan on shutdown."""
+    global _pw, _browser
+    with _browser_lock:
+        if _browser:
+            try:
+                _browser.close()
+            except Exception:
+                pass
+            _browser = None
+        if _pw:
+            try:
+                _pw.stop()
+            except Exception:
+                pass
+            _pw = None
+        logger.info("pdf_generator: Playwright browser closed")
 
 LOGO_PATH  = Path(__file__).parent.parent / "assets" / "logo-dark-bg.png"
 FONTS_DIR  = Path(__file__).parent.parent / "assets" / "fonts"
@@ -619,12 +660,25 @@ _REG_DISPLAY: dict[str, str] = {
 
 
 def _kb_versions_table(report: ComplianceReport) -> str:
-    """Render a compact audit-trail table showing which KB version each finding used."""
-    versions = report.knowledge_base_versions
-    if not versions:
-        return ""
+    """Render a compact audit-trail table showing which KB version each finding used,
+    with Rule Engine Version and Prompt Version rows at the top."""
+    versions = report.knowledge_base_versions or {}
 
-    rows = ""
+    # Version rows at the top (Rule Engine + Prompt)
+    engine_ver = _esc(report.rule_engine_version or "—")
+    prompt_ver = _esc(report.prompt_version or "—")
+    version_rows = (
+        f'<tr style="border-bottom:0.5pt solid #f1f5f9;background:#f0f9ff;">'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Rule Engine Version</td>'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#0369a1;font-family:monospace;" colspan="3">{engine_ver}</td>'
+        f'</tr>'
+        f'<tr style="border-bottom:0.5pt solid #f1f5f9;background:#f0f9ff;">'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Prompt Version</td>'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#0369a1;font-family:monospace;" colspan="3">{prompt_ver}</td>'
+        f'</tr>'
+    )
+
+    kb_rows = ""
     for reg_key, meta in sorted(versions.items()):
         fetched = meta.get("fetched_at", "unknown")[:10]  # date part only
         src_hash = meta.get("source_file_hash", "")
@@ -636,7 +690,7 @@ def _kb_versions_table(report: ComplianceReport) -> str:
             f'official text</a>'
             if src_url else "—"
         )
-        rows += (
+        kb_rows += (
             f'<tr style="border-bottom:0.5pt solid #f1f5f9;">'
             f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:600;color:#334155;">{_esc(label)}</td>'
             f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#64748b;font-family:monospace;">{_esc(fetched)}</td>'
@@ -645,21 +699,86 @@ def _kb_versions_table(report: ComplianceReport) -> str:
             f'</tr>'
         )
 
+    all_rows = version_rows + kb_rows
+
     return (
         f'<div style="margin-top:8mm;">'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Knowledge Base Audit Trail</div>'
         f'<table style="width:100%;border-collapse:collapse;border:1pt solid #e8edf2;border-radius:6pt;overflow:hidden;">'
         f'<thead><tr style="background:#f8fafc;">'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Regulation</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Ingested</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Component / Regulation</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Ingested / Version</th>'
         f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source Hash</th>'
         f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source</th>'
         f'</tr></thead>'
-        f'<tbody>{rows}</tbody>'
+        f'<tbody>{all_rows}</tbody>'
         f'</table>'
         f'</div>'
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Input Assumptions box
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _input_assumptions(report: ComplianceReport) -> str:
+    """Render a box listing the key profile fields used in the assessment."""
+    # Extract applicable_regulations list — the profile fields are embedded in the report
+    # We reconstruct key fields from what's stored on the report itself.
+    regs = report.applicable_regulations or []
+    applicable_reg_names = [
+        r.regulation.value for r in regs if r.applies
+    ]
+
+    def _val(v: object) -> str:
+        if v is None:
+            return '<em style="color:#94a3b8;">Not provided</em>'
+        if isinstance(v, bool):
+            return "Yes" if v else "No"
+        return _esc(str(v))
+
+    # We can only access what's on the report; the raw profile fields are not
+    # stored on ComplianceReport. We show what we know: company name, applicable regs.
+    # For richer assumptions the caller can pass extra context. Here we show
+    # the inferred_characteristics and inferred_assumptions that are stored.
+    chars = report.inferred_characteristics or []
+    assumptions = report.inferred_assumptions or []
+
+    char_rows = "".join(
+        f'<li style="{FONT}font-size:8pt;color:#334155;margin-bottom:1.5mm;">{_esc(c)}</li>'
+        for c in chars
+    ) if chars else f'<li style="{FONT}font-size:8pt;color:#94a3b8;font-style:italic;">None recorded</li>'
+
+    assumption_rows = "".join(
+        f'<li style="{FONT}font-size:8pt;color:#334155;margin-bottom:1.5mm;">{_esc(a)}</li>'
+        for a in assumptions
+    ) if assumptions else ""
+
+    reg_list = ", ".join(r.upper() for r in applicable_reg_names) or "None determined"
+
+    html = (
+        f'<div style="margin-top:8mm;padding:5mm 6mm;background:#fafafa;border:1pt solid #e8edf2;'
+        f'border-radius:8pt;box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:3mm;">Input Assumptions Used in This Assessment</div>'
+        f'<table style="width:100%;border-collapse:collapse;">'
+        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;width:45%;">Company</td>'
+        f'<td style="{FONT}font-size:8pt;color:#334155;padding:1.5mm 0;">{_esc(report.company_name)}</td></tr>'
+        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;">Applicable Regulations</td>'
+        f'<td style="{FONT}font-size:8pt;color:#334155;padding:1.5mm 0;">{_esc(reg_list)}</td></tr>'
+        f'</table>'
+        f'<div style="{FONT}font-size:7.5pt;font-weight:600;color:#64748b;margin-top:3mm;margin-bottom:1.5mm;">Inferred Characteristics</div>'
+        f'<ul style="margin:0;padding-left:4mm;">{char_rows}</ul>'
+    )
+    if assumption_rows:
+        html += (
+            f'<div style="{FONT}font-size:7.5pt;font-weight:600;color:#e67e22;margin-top:3mm;margin-bottom:1.5mm;">'
+            f'Inferred Assumptions (not confirmed by user — verify before acting)</div>'
+            f'<ul style="margin:0;padding-left:4mm;">{assumption_rows}</ul>'
+        )
+    html += '</div>'
+    return html
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -690,7 +809,8 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         f'{_sec_title("Section 06", "Next Steps")}'
         f'{_sec_sub("You know where you stand now. Here is what to do next.")}'
         f'<div style="margin-top:2mm;">{items}</div>'
-        f'<div style="margin-top:8mm;">'
+        + _input_assumptions(report)
+        + f'<div style="margin-top:8mm;">'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Legal Disclaimer</div>'
         f'<div style="{FONT}padding:6mm 7mm;background:#f8fafc;border:1pt solid #e8edf2;'
         f'border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;'
@@ -728,15 +848,35 @@ def generate_pdf(report: ComplianceReport) -> bytes:
         + '</body></html>'
     )
 
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch()
-        pg      = browser.new_page()
-        pg.set_viewport_size({"width": 794, "height": 1123})
-        pg.set_content(html, wait_until="load")
-        pdf_bytes = pg.pdf(
-            format="A4",
-            print_background=True,
-            margin={"top":"0","bottom":"0","left":"0","right":"0"},
-        )
-        browser.close()
-    return pdf_bytes
+    with _pdf_semaphore:
+        browser = _browser
+        if browser is None:
+            # Fallback: cold-start if init_browser() was never called or failed
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as pw:
+                cold_browser = pw.chromium.launch()
+                pg = cold_browser.new_page()
+                pg.route("**/*", lambda route: route.abort())
+                pg.set_viewport_size({"width": 794, "height": 1123})
+                pg.set_content(html, wait_until="load")
+                pdf_bytes = pg.pdf(
+                    format="A4",
+                    print_background=True,
+                    margin={"top": "0", "bottom": "0", "left": "0", "right": "0"},
+                )
+                cold_browser.close()
+            return pdf_bytes
+
+        pg = browser.new_page()
+        try:
+            # Block all network requests — the PDF is self-contained (fonts/images as data URIs)
+            pg.route("**/*", lambda route: route.abort())
+            pg.set_viewport_size({"width": 794, "height": 1123})
+            pg.set_content(html, wait_until="load")
+            return pg.pdf(
+                format="A4",
+                print_background=True,
+                margin={"top": "0", "bottom": "0", "left": "0", "right": "0"},
+            )
+        finally:
+            pg.close()

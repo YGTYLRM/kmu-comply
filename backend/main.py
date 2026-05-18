@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 from contextlib import asynccontextmanager
@@ -5,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from config import settings
 from routes.admin import router as admin_router
@@ -69,14 +71,35 @@ def _cleanup_orphaned_chroma_collections() -> None:
     try:
         import chromadb
         from rag.ingest import CHROMA_DIR
+        from state import job_manager
         client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        orphans = [c.name for c in client.list_collections() if c.name.startswith("job_")]
+        candidates = [c.name for c in client.list_collections() if c.name.startswith("job_")]
+        orphans = []
+        for name in candidates:
+            job_id = name[len("job_"):]
+            # Skip collections whose job is still active in memory
+            if job_id in job_manager._jobs:
+                continue
+            orphans.append(name)
         for name in orphans:
             client.delete_collection(name)
         if orphans:
             logger.info("startup: deleted %d orphaned job collections: %s", len(orphans), orphans)
     except Exception as exc:
         logger.warning("startup: orphan cleanup failed: %s", exc)
+
+
+async def _document_purge_loop():
+    """Periodically purge expired document sessions (runs every hour)."""
+    from services.document_store import document_store
+    while True:
+        await asyncio.sleep(3600)
+        try:
+            purged = document_store.purge_expired(settings.document_ttl_seconds)
+            if purged:
+                logger.info("document purge: cleaned %d expired session(s)", purged)
+        except Exception as exc:
+            logger.warning("document purge failed: %s", exc)
 
 
 @asynccontextmanager
@@ -86,9 +109,20 @@ async def lifespan(app: FastAPI):
     if settings.database_url:
         from db.database import init_db
         await init_db()
+    from services.pdf_generator import init_browser, close_browser
+    from services.document_store import document_store
+    document_store.recover_sessions()
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, init_browser)
+    # Pre-load the cross-encoder reranker so the first user request isn't slow
+    from rag.retrieval import _cross_encoder
+    await loop.run_in_executor(None, _cross_encoder)
     await job_manager.start()
+    purge_task = asyncio.create_task(_document_purge_loop())
     yield
+    purge_task.cancel()
     await job_manager.stop()
+    await loop.run_in_executor(None, close_browser)
 
 
 app = FastAPI(
@@ -120,10 +154,34 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "font-src 'self' data:; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "frame-ancestors 'none';"
+        )
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
         return response
 
 
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        import asyncio
+        try:
+            return await asyncio.wait_for(call_next(request), timeout=60.0)
+        except asyncio.TimeoutError:
+            from fastapi.responses import JSONResponse
+            return JSONResponse({"detail": "Request timed out"}, status_code=504)
+
+
+app.add_middleware(TimeoutMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
+# Correctly extract real client IP from X-Forwarded-For when behind a reverse proxy
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 app.include_router(analysis_router)
 app.include_router(companies_router)

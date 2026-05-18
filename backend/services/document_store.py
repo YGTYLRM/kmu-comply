@@ -38,7 +38,10 @@ def _fernet():
         except Exception:
             logger.warning("document_store: invalid DOCUMENT_ENCRYPTION_KEY — generating ephemeral key")
     ephemeral = Fernet.generate_key()
-    logger.info("document_store: using ephemeral encryption key (set DOCUMENT_ENCRYPTION_KEY for persistence)")
+    logger.warning(
+        "document_store: ⚠ EPHEMERAL encryption key in use — uploaded documents "
+        "will be LOST on process restart. Set DOCUMENT_ENCRYPTION_KEY in .env for persistence."
+    )
     return Fernet(ephemeral)
 
 
@@ -72,15 +75,26 @@ class DocumentStore:
             logger.info("document_store: recovered %d session(s) from disk", count)
         return count
 
-    def create_session(self) -> str:
+    def create_session(self, user_id: str) -> str:
         session_id = str(uuid.uuid4())
         session_dir = _store_root() / session_id
         session_dir.mkdir(parents=True, exist_ok=True)
-        meta = {"created_at": time.time(), "session_id": session_id}
+        meta = {"created_at": time.time(), "session_id": session_id, "user_id": user_id}
         (session_dir / "meta.json").write_text(json.dumps(meta), encoding="utf-8")
         self._sessions[session_id] = session_dir
         logger.debug("document session created: %s", session_id)
         return session_id
+
+    def get_session_owner(self, session_id: str) -> str | None:
+        """Return the user_id that created this session, or None if unknown."""
+        session_dir = self._sessions.get(session_id) or _store_root() / session_id
+        meta_path = session_dir / "meta.json"
+        if not meta_path.exists():
+            return None
+        try:
+            return json.loads(meta_path.read_text(encoding="utf-8")).get("user_id")
+        except Exception:
+            return None
 
     def save_file(self, session_id: str, filename: str, content: bytes) -> str:
         """Encrypt and save one file. Returns the sanitised filename."""
@@ -95,6 +109,15 @@ class DocumentStore:
             raise ValueError(
                 f"File type '{suffix}' is not supported. Upload PDF or TXT files."
             )
+        # Magic bytes check — extension alone is not trustworthy
+        if suffix == ".pdf":
+            if not content.startswith(b"%PDF"):
+                raise ValueError(f"File '{filename}' does not appear to be a valid PDF.")
+        elif suffix in (".txt", ".md"):
+            try:
+                content.decode("utf-8")
+            except UnicodeDecodeError:
+                raise ValueError(f"File '{filename}' is not valid UTF-8 text.")
 
         enc_files = [f for f in session_dir.iterdir() if f.suffix == ".enc"]
         total = sum(f.stat().st_size for f in enc_files)

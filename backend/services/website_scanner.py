@@ -8,13 +8,38 @@ block the async event loop. Hard timeout: 45 seconds total per scan.
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import logging
 import re
+import socket
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from urllib.parse import urljoin, urlparse
 
 logger = logging.getLogger(__name__)
+
+_PRIVATE_NETWORKS = [
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+]
+
+
+def _is_ssrf_target(hostname: str) -> bool:
+    """Return True if the hostname resolves to a private/loopback address."""
+    try:
+        infos = socket.getaddrinfo(hostname, None)
+        for _family, _type, _proto, _canonname, sockaddr in infos:
+            ip = ipaddress.ip_address(sockaddr[0])
+            if any(ip in net for net in _PRIVATE_NETWORKS):
+                return True
+    except Exception:
+        pass
+    return False
 
 # ── Known tracker domains (loaded before consent = §25 TTDSG violation) ───────
 
@@ -136,6 +161,15 @@ def _scan_sync(raw_url: str) -> WebScanResult:
     parsed = urlparse(raw_url)
     base_url = f"{parsed.scheme}://{parsed.netloc}"
     is_https = parsed.scheme == "https"
+
+    # SSRF guard — reject private/loopback targets
+    if _is_ssrf_target(parsed.hostname or ""):
+        return _build_result(
+            raw_url, start, 0.0, is_https,
+            False, None, False, None,
+            False, None, [],
+            "Scan target resolves to a private or loopback address and was blocked.",
+        )
 
     trackers: list[str] = []
     has_banner = False

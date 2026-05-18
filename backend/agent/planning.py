@@ -5,6 +5,7 @@ Steps 2-5 of the analysis pipeline.
   retrieve_regulatory_context(profile, applicability)  — Step 3: RAG per regulation
   run_gap_analysis(profile, chunks, failures)          — Step 4: LLM gap analysis
   generate_action_plan(profile, gaps, failures)        — Step 5: LLM action plan
+  compute_deterministic_score(gaps, missing_fields)    — deterministic score formula
 """
 import json
 import logging
@@ -36,9 +37,62 @@ _PRIORITY_ORDER = {
 }
 
 
+# ── Deterministic score formula ───────────────────────────────────────────────
+
+def compute_deterministic_score(
+    gaps: list[ComplianceGap],
+    missing_required_fields: int = 0,
+) -> float:
+    """
+    Deterministic compliance score starting at 100, deducting for each gap.
+
+    Deductions:
+      CRITICAL + NON_COMPLIANT:           -20
+      HIGH + NON_COMPLIANT:               -12
+      MEDIUM + NON_COMPLIANT:             -6
+      LOW + NON_COMPLIANT:                -2
+      Any NON_COMPLIANT + LOW confidence: extra -3
+      CANNOT_ASSESS (genuine, not missing-field): -4
+      Each missing_required_field (capped at 5): -5
+
+    Floor: 0.
+    """
+    _deduct_by_priority = {
+        Priority.CRITICAL: 20,
+        Priority.HIGH: 12,
+        Priority.MEDIUM: 6,
+        Priority.LOW: 2,
+    }
+
+    score = 100.0
+    for gap in gaps:
+        if gap.status == ComplianceStatus.NON_COMPLIANT:
+            deduction = _deduct_by_priority.get(gap.priority, 6)
+            score -= deduction
+            # Extra penalty for low confidence — indicates the finding may understate the problem
+            if getattr(gap, "confidence", "HIGH") == "LOW":
+                score -= 3
+        elif gap.status == ComplianceStatus.CANNOT_ASSESS:
+            score -= 4
+
+    # Missing required fields — each one means we couldn't fully assess a regulation
+    capped_missing = min(missing_required_fields, 5)
+    score -= capped_missing * 5
+
+    return max(0.0, round(score, 1))
+
+
+def compute_regulation_deterministic_score(
+    regulation_gaps: list[ComplianceGap],
+    missing_required_fields: int = 0,
+) -> float:
+    """Same formula applied to a single regulation's gaps."""
+    return compute_deterministic_score(regulation_gaps, missing_required_fields)
+
+
 @lru_cache(maxsize=1)
-def _llm_client() -> anthropic.Anthropic:
-    return anthropic.Anthropic(api_key=settings.llm_api_key)
+def _async_llm_client() -> anthropic.AsyncAnthropic:
+    return anthropic.AsyncAnthropic(api_key=settings.llm_api_key)
 
 
 # ── Step 2 ────────────────────────────────────────────────────────────────────
@@ -46,8 +100,97 @@ def _llm_client() -> anthropic.Anthropic:
 def determine_applicability(
     profile: EnrichedCompanyProfile,
 ) -> list[RegulationApplicability]:
-    """Deterministic regulation applicability — never delegates to an LLM."""
+    """Deterministic regulation applicability — never delegates to an LLM.
+
+    Runs the RuleEngine first to collect per-regulation applicability results,
+    missing fields, and confidence grades.  The rule results are logged for
+    audit purposes; the threshold_engine's RegulationApplicability list is
+    returned so the rest of the pipeline remains unchanged.
+    """
+    from agent.rule_engine import RuleEngine, RULE_ENGINE_VERSION
+
+    engine = RuleEngine()
+    rule_results = engine.check_all(profile)
+
+    # Log rule engine results for observability
+    for reg_key, result in rule_results.items():
+        if result.missing_fields:
+            logger.info(
+                "rule_engine (%s) %s: applies=%s confidence=%s missing=%s",
+                RULE_ENGINE_VERSION,
+                reg_key,
+                result.applies,
+                result.confidence,
+                result.missing_fields,
+            )
+        else:
+            logger.debug(
+                "rule_engine (%s) %s: applies=%s confidence=%s",
+                RULE_ENGINE_VERSION,
+                reg_key,
+                result.applies,
+                result.confidence,
+            )
+
     return determine_applicable_regulations(profile)
+
+
+# ── Deterministic overall score with missing-field penalty ────────────────────
+
+def compute_overall_deterministic_score(
+    profile: EnrichedCompanyProfile,
+    gaps: list[ComplianceGap],
+) -> float:
+    """
+    Compute the overall compliance score using the deterministic formula in
+    compute_deterministic_score(), incorporating missing required fields from
+    the rule engine as an additional penalty.
+
+    Call this in place of any LLM-computed or simple average score to ensure
+    reproducible results.
+    """
+    from agent.rule_engine import RuleEngine
+
+    engine = RuleEngine()
+    rule_results = engine.check_all(profile)
+
+    total_missing = sum(
+        len(r.missing_fields)
+        for r in rule_results.values()
+        if r.applies
+    )
+
+    return compute_deterministic_score(gaps, missing_required_fields=total_missing)
+
+
+# ── Missing info summary ───────────────────────────────────────────────────────
+
+def missing_info_summary(profile: EnrichedCompanyProfile) -> list[str]:
+    """
+    Return a human-readable list of missing profile fields and the regulations
+    they affect.  Used to populate the "Missing Information" section of the report.
+
+    Each entry is a string like:
+      "annual_energy_consumption_mwh is missing — affects: enefg"
+    """
+    from agent.rule_engine import RuleEngine
+
+    engine = RuleEngine()
+    missing_by_reg = engine.get_all_missing_fields(profile)
+
+    # Invert: field -> [regulation, ...]
+    field_to_regs: dict[str, list[str]] = {}
+    for reg_key, fields in missing_by_reg.items():
+        for f in fields:
+            field_to_regs.setdefault(f, []).append(reg_key)
+
+    summary: list[str] = []
+    for field_name in sorted(field_to_regs):
+        regs = ", ".join(sorted(field_to_regs[field_name]))
+        summary.append(
+            f"{field_name} is missing — affects: {regs}"
+        )
+    return summary
 
 
 # ── Step 3 ────────────────────────────────────────────────────────────────────
@@ -55,20 +198,20 @@ def determine_applicability(
 def retrieve_regulatory_context(
     profile: EnrichedCompanyProfile,
     applicability: list[RegulationApplicability],
-) -> tuple[list[RegulatoryChunk], list[str]]:
+) -> tuple[list[RegulatoryChunk], list[str], list[str]]:
     """RAG retrieval for each applicable regulation, deduplicated and capped per-regulation.
 
-    Returns (chunks, empty_regulations) where empty_regulations is a list of
-    regulation keys that returned zero chunks after both retrieval attempts.
-    These must be treated as CANNOT_ASSESS — never pass to the LLM for gap analysis
-    without this information, as it will produce ungrounded findings.
+    Returns (chunks, empty_regulations, low_confidence_regulations) where:
+      - empty_regulations: zero chunks after both attempts → CANNOT_ASSESS
+      - low_confidence_regulations: 1-4 chunks → analysis proceeds but flagged for manual review
     """
     applicable = [a for a in applicability if a.applies]
     if not applicable:
-        return [], []
+        return [], [], []
 
     all_chunks: list[RegulatoryChunk] = []
     empty_regulations: list[str] = []
+    low_confidence_regulations: list[str] = []
 
     for reg_app in applicable:
         reg_key = reg_app.regulation.value
@@ -80,9 +223,6 @@ def retrieve_regulatory_context(
             raw = retrieve(broader, [reg_key], top_k=15)
 
         if len(raw) == 0:
-            # Zero chunks = knowledge base not populated for this regulation.
-            # Do NOT pass to LLM — it will hallucinate legal citations.
-            # Caller must add CANNOT_ASSESS findings for this regulation.
             logger.warning(
                 "step 3: ZERO chunks for %s — knowledge base not populated. "
                 "Marking as CANNOT_ASSESS, bypassing LLM gap analysis for this regulation.",
@@ -92,23 +232,23 @@ def retrieve_regulatory_context(
             continue
         elif len(raw) < 5:
             logger.warning(
-                "step 3: only %d chunks for %s after retry (expected >= 5)",
+                "step 3: only %d chunks for %s after retry (expected >= 5) — "
+                "flagging for manual review",
                 len(raw), reg_key,
             )
+            low_confidence_regulations.append(reg_key)
 
         deduped = deduplicate(raw)
-        # Cross-encoder reranking: re-scores (query, passage) pairs and re-sorts.
-        # Falls back to dense+BM25 order if the model is not available.
         reranked = rerank_cross_encoder(query, deduped, top_n=5)
         all_chunks.extend(_to_models(reranked))
         logger.debug("step 3: %s — %d chunks selected (cross-encoder reranked)", reg_key, len(reranked))
 
-    return all_chunks, empty_regulations
+    return all_chunks, empty_regulations, low_confidence_regulations
 
 
 # ── Step 4 ────────────────────────────────────────────────────────────────────
 
-def run_gap_analysis(
+async def run_gap_analysis(
     profile: EnrichedCompanyProfile,
     chunks: list[RegulatoryChunk],
     failures: list[str],
@@ -163,7 +303,7 @@ def run_gap_analysis(
             profile_json, chunks_json, company_docs_json,
             inferred_assumptions=getattr(profile, "inferred_assumptions", []),
         )
-        gaps = _llm_call(
+        gaps = await _async_llm_call(
             prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures,
             tool=_TOOL_GAP_ANALYSIS, tool_result_key="gaps",
         )
@@ -174,7 +314,11 @@ def run_gap_analysis(
 
 # ── Step 5 ────────────────────────────────────────────────────────────────────
 
-def generate_action_plan(
+_ACTION_PLAN_BATCH_SIZE = 50
+_ACTION_PLAN_TOKEN_LIMIT = 50_000  # ~200k chars; above this we batch
+
+
+async def generate_action_plan(
     profile: EnrichedCompanyProfile,
     gaps: list[ComplianceGap],
     failures: list[str],
@@ -189,8 +333,27 @@ def generate_action_plan(
 
     profile_json = profile.model_dump_json(indent=2)
     gaps_json = json.dumps([g.model_dump() for g in actionable], indent=2, default=str)
+
+    # Estimate token count (~4 chars/token). Batch if prompt would be too large.
+    if len(gaps_json) // 4 > _ACTION_PLAN_TOKEN_LIMIT:
+        logger.info(
+            "generate_action_plan: %d gaps exceeds token limit — batching in groups of %d",
+            len(actionable), _ACTION_PLAN_BATCH_SIZE,
+        )
+        all_actions: list[ActionItem] = []
+        for i in range(0, len(actionable), _ACTION_PLAN_BATCH_SIZE):
+            batch = actionable[i : i + _ACTION_PLAN_BATCH_SIZE]
+            batch_json = json.dumps([g.model_dump() for g in batch], indent=2, default=str)
+            prompt = action_plan_prompt(profile_json, batch_json)
+            batch_actions = await _async_llm_call(
+                prompt, _parse_actions, f"action_plan_batch_{i}", failures, max_tokens=8192,
+                tool=_TOOL_ACTION_PLAN, tool_result_key="actions",
+            )
+            all_actions.extend(batch_actions)
+        return sorted(all_actions, key=lambda a: _PRIORITY_ORDER.get(a.priority, 4))
+
     prompt = action_plan_prompt(profile_json, gaps_json)
-    actions = _llm_call(
+    actions = await _async_llm_call(
         prompt, _parse_actions, "action_plan", failures, max_tokens=8192,
         tool=_TOOL_ACTION_PLAN, tool_result_key="actions",
     )
@@ -294,7 +457,8 @@ def _reg_from_key(reg_key: str) -> Regulation:
     try:
         return Regulation(reg_key)
     except ValueError:
-        return Regulation.GDPR  # safe fallback
+        logger.warning("_reg_from_key: unknown regulation key %r — falling back to GDPR", reg_key)
+        return Regulation.GDPR
 
 
 def _doc_chunks_to_json(chunks: list[dict]) -> str:
@@ -393,7 +557,7 @@ _TOOL_ACTION_PLAN = {
 }
 
 
-def _llm_call(
+async def _async_llm_call(
     prompt: str,
     parse_fn,
     step_name: str,
@@ -403,7 +567,7 @@ def _llm_call(
     tool_result_key: str | None = None,
 ) -> list:
     """
-    Call the LLM and parse structured output.
+    Async LLM call with structured output parsing.
 
     When `tool` is provided the call uses Anthropic tool use — the model is
     forced to return data matching the tool's JSON schema, eliminating manual
@@ -411,7 +575,7 @@ def _llm_call(
     `tool_result_key` is serialised back to a JSON string so that `parse_fn`
     (which expects a JSON string) remains unchanged.
     """
-    import time
+    import asyncio
     if not settings.llm_api_key:
         logger.warning("%s: no LLM API key configured, skipping", step_name)
         failures.append(step_name)
@@ -432,10 +596,9 @@ def _llm_call(
                 kwargs["tools"] = [tool]
                 kwargs["tool_choice"] = {"type": "tool", "name": tool["name"]}
 
-            response = _llm_client().messages.create(**kwargs)
+            response = await _async_llm_client().messages.create(**kwargs)
 
             if tool and tool_result_key:
-                # Extract structured output from tool use block
                 tool_block = next(
                     (b for b in response.content if b.type == "tool_use"),
                     None,
@@ -445,8 +608,6 @@ def _llm_call(
                 raw_list = tool_block.input.get(tool_result_key, [])
                 return parse_fn(json.dumps(raw_list))
             else:
-                # Text mode fallback (executive summary path never reaches here,
-                # but kept for safety)
                 text = response.content[0].text.strip()
                 if text.startswith("```"):
                     lines = text.splitlines()
@@ -467,7 +628,7 @@ def _llm_call(
         if attempt < max_attempts - 1:
             backoff = 2 ** attempt
             logger.info("%s: retrying in %ds", step_name, backoff)
-            time.sleep(backoff)
+            await asyncio.sleep(backoff)
 
     logger.error("%s: all %d attempts failed (%s)", step_name, max_attempts, last_exc)
     failures.append(step_name)
@@ -486,6 +647,7 @@ def _parse_gaps(text: str) -> list[ComplianceGap]:
             status=ComplianceStatus(item["status"]),
             evidence=item["evidence"],
             deficiency_description=item.get("deficiency_description"),
+            priority=Priority(item.get("priority", "MEDIUM")),
         )
         for item in data
     ]

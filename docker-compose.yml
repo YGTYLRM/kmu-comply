@@ -6,7 +6,7 @@ services:
     volumes:
       - chroma_data:/chroma/chroma
     environment:
-      - ALLOW_RESET=true
+      - ALLOW_RESET=false
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
       interval: 10s

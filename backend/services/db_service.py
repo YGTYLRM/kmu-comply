@@ -410,7 +410,13 @@ async def get_job_owner(job_id: str) -> str | None:
 
 
 def _company_to_profile(company) -> dict:
-    """Convert a Company ORM object back to a CompanyProfile-compatible dict."""
+    """Convert a Company ORM object back to a CompanyProfile-compatible dict.
+    Prefers profile_raw (written on every upsert) as the single source of truth.
+    Falls back to individual columns only for rows written before profile_raw was added.
+    """
+    if company.profile_raw:
+        return company.profile_raw
+    # Legacy fallback for rows without profile_raw
     return {
         "company_name": company.name,
         "industry": company.industry or "Other",
