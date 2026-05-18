@@ -13,11 +13,8 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   try {
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
-    // getUser() validates the token server-side; getSession() only reads localStorage
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return {};
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return {};
     return { Authorization: `Bearer ${session.access_token}` };
   } catch {
     return {};
@@ -80,8 +77,18 @@ export const api = {
   getReport: (jobId: string) =>
     request<ComplianceReport>(`/api/report/${jobId}`),
 
-  downloadPdf: (jobId: string) =>
-    request<Blob>(`/api/report/${jobId}/pdf`, { method: "POST" }),
+  downloadPdf: async (jobId: string): Promise<Blob> => {
+    const authHeader = await getAuthHeader();
+    const res = await fetch(`${BASE}/api/report/${jobId}/pdf`, {
+      method: "POST",
+      headers: authHeader,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail ?? `HTTP ${res.status}`);
+    }
+    return res.blob();
+  },
 
   listReports: () =>
     request<{ reports: ReportSummary[] }>("/api/reports"),

@@ -30,10 +30,16 @@ def _url() -> str:
 
 # ── Async helpers (FastAPI context) ───────────────────────────────────────────
 
+_pool = None
+
+
 def _async_redis():
-    """Return an async Redis client (connection-pool backed, not yet connected)."""
-    from redis.asyncio import Redis
-    return Redis.from_url(_url(), decode_responses=True)
+    """Return an async Redis client backed by a shared connection pool."""
+    global _pool
+    from redis.asyncio import ConnectionPool, Redis
+    if _pool is None:
+        _pool = ConnectionPool.from_url(_url(), decode_responses=True, max_connections=20)
+    return Redis(connection_pool=_pool)
 
 
 async def set_job_initial(
@@ -56,7 +62,7 @@ async def set_job_initial(
     except Exception as exc:
         logger.warning("redis_store: set_job_initial failed: %s", exc)
     finally:
-        await r.aclose()
+        await r.close()
 
 
 async def set_job_status(
@@ -77,7 +83,7 @@ async def set_job_status(
     except Exception as exc:
         logger.warning("redis_store: set_job_status failed: %s", exc)
     finally:
-        await r.aclose()
+        await r.close()
 
 
 async def append_step(job_id: str, step_name: str, step_status: str) -> None:
@@ -90,7 +96,7 @@ async def append_step(job_id: str, step_name: str, step_status: str) -> None:
     except Exception as exc:
         logger.warning("redis_store: append_step failed: %s", exc)
     finally:
-        await r.aclose()
+        await r.close()
 
 
 async def get_job_state(job_id: str) -> Optional[dict]:
@@ -106,7 +112,7 @@ async def get_job_state(job_id: str) -> Optional[dict]:
         logger.warning("redis_store: get_job_state failed: %s", exc)
         return None
     finally:
-        await r.aclose()
+        await r.close()
 
 
 async def get_job_owner(job_id: str) -> Optional[str]:
@@ -117,7 +123,7 @@ async def get_job_owner(job_id: str) -> Optional[str]:
         logger.warning("redis_store: get_job_owner failed: %s", exc)
         return None
     finally:
-        await r.aclose()
+        await r.close()
 
 
 async def set_job_owner(job_id: str, user_id: str) -> None:
@@ -127,7 +133,7 @@ async def set_job_owner(job_id: str, user_id: str) -> None:
     except Exception as exc:
         logger.warning("redis_store: set_job_owner failed: %s", exc)
     finally:
-        await r.aclose()
+        await r.close()
 
 
 # ── Sync helpers (Celery task context — called inside asyncio.run()) ──────────

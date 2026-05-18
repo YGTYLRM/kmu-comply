@@ -17,9 +17,23 @@ logger = logging.getLogger(__name__)
 REPORTS_DIR = Path(__file__).parent.parent / "data" / "reports"
 
 
+_MIN_DISK_SPACE_MB = 100
+
+
 def save(report: ComplianceReport, user_id: str | None = None) -> None:
     """Write report to disk as a resilience backup. DB write is handled by job_manager."""
+    import shutil
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        free_mb = shutil.disk_usage(REPORTS_DIR).free / (1024 * 1024)
+        if free_mb < _MIN_DISK_SPACE_MB:
+            logger.error(
+                "report_store: disk space critically low (%.0f MB free) — skipping disk backup for %s",
+                free_mb, report.job_id,
+            )
+            return
+    except OSError:
+        pass
     path = REPORTS_DIR / f"{report.job_id}.json"
     try:
         data = json.loads(report.model_dump_json())
@@ -32,24 +46,7 @@ def save(report: ComplianceReport, user_id: str | None = None) -> None:
 
 
 def load(job_id: str) -> ComplianceReport | None:
-    """Load report — DB first, disk fallback."""
-    from config import settings
-    if settings.database_url:
-        import asyncio
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    raw = pool.submit(asyncio.run, _load_from_db(job_id)).result()
-            else:
-                raw = loop.run_until_complete(_load_from_db(job_id))
-            if raw:
-                raw.pop("_user_id", None)
-                return ComplianceReport.model_validate(raw)
-        except Exception as exc:
-            logger.warning("report_store: DB load failed for %s, trying disk: %s", job_id, exc)
-
+    """Disk-only load — use load_async() in async contexts (avoids event-loop conflicts)."""
     return _load_from_disk(job_id)
 
 
@@ -113,23 +110,7 @@ def save_profile(job_id: str, profile: dict) -> None:
 
 
 def load_profile(job_id: str) -> dict | None:
-    """Load company profile — DB first (via job→report→company), disk fallback."""
-    from config import settings
-    if settings.database_url:
-        try:
-            import asyncio
-            import concurrent.futures
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    result = pool.submit(asyncio.run, _load_profile_from_db(job_id)).result()
-            else:
-                result = loop.run_until_complete(_load_profile_from_db(job_id))
-            if result:
-                return result
-        except Exception as exc:
-            logger.warning("report_store: DB profile load failed for %s, trying disk: %s", job_id, exc)
-
+    """Disk-only profile load — use load_profile_async() in async contexts."""
     path = REPORTS_DIR / f"{job_id}_profile.json"
     if not path.exists():
         return None
@@ -138,6 +119,19 @@ def load_profile(job_id: str) -> dict | None:
     except Exception as exc:
         logger.error("report_store: failed to load profile %s: %s", job_id, exc)
         return None
+
+
+async def load_profile_async(job_id: str) -> dict | None:
+    """Load company profile — DB first, disk fallback."""
+    from config import settings
+    if settings.database_url:
+        try:
+            result = await _load_profile_from_db(job_id)
+            if result:
+                return result
+        except Exception as exc:
+            logger.warning("report_store: DB profile load failed for %s, trying disk: %s", job_id, exc)
+    return load_profile(job_id)
 
 
 async def _load_profile_from_db(job_id: str) -> dict | None:
@@ -159,26 +153,7 @@ async def _load_profile_from_db(job_id: str) -> dict | None:
 
 
 def list_recent(limit: int = 50, user_id: str | None = None) -> list[dict]:
-    """
-    Return report summaries. Uses DB query (O(1)) when DATABASE_URL is set,
-    falls back to filesystem scan otherwise.
-    """
-    from config import settings
-    if settings.database_url and user_id:
-        import asyncio
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    return pool.submit(
-                        asyncio.run, _list_from_db(user_id, limit)
-                    ).result()
-            else:
-                return loop.run_until_complete(_list_from_db(user_id, limit))
-        except Exception as exc:
-            logger.warning("report_store: DB list failed, falling back to disk: %s", exc)
-
+    """Disk-only list — use list_recent_async() in async contexts."""
     return _list_from_disk(limit=limit, user_id=user_id)
 
 

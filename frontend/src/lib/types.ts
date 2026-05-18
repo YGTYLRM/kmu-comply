@@ -3,11 +3,14 @@
 
 export type Regulation =
   | "gdpr_dsgvo" | "lksg" | "enefg" | "csrd" | "bdsg"
-  | "nis2" | "eu_ai_act" | "hinschg" | "workplace_law" | "arbschg" | "agg" | "milog";
+  | "nis2" | "eu_ai_act" | "hinschg" | "workplace_law" | "arbschg" | "agg" | "milog"
+  | "ttdsg" | "gwg" | "eu_data_act";
 export type Industry =
   | "it_software" | "manufacturing" | "healthcare" | "retail"
   | "finance" | "logistics" | "construction" | "energy"
-  | "food_beverage" | "consulting" | "other";
+  | "food_beverage" | "consulting" | "real_estate" | "chemicals"
+  | "transport" | "water" | "digital" | "government" | "space"
+  | "waste" | "research" | "gambling" | "crypto" | "other";
 export type ObligationType = "MUST" | "SHOULD" | "MAY";
 export type ComplianceStatus = "COMPLIANT" | "PARTIALLY_COMPLIANT" | "NON_COMPLIANT" | "CANNOT_ASSESS";
 export type Priority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
@@ -78,6 +81,19 @@ export interface CompanyProfile {
   has_supplier_code_of_conduct?: boolean;
   has_supplier_risk_assessment?: boolean;
   has_lksg_complaints_procedure?: boolean;
+  // TTDSG / TDDDG
+  has_website?: boolean;
+  has_cookie_banner?: boolean;
+  has_cookie_policy?: boolean;
+  // GwG
+  is_aml_obligated_sector?: boolean;
+  has_aml_risk_analysis?: boolean;
+  has_aml_officer?: boolean;
+  has_kyc_procedures?: boolean;
+  // EU Data Act
+  produces_connected_products?: boolean;
+  provides_data_processing_services?: boolean;
+  has_data_access_mechanism?: boolean;
   existing_compliance_notes?: string;
 }
 

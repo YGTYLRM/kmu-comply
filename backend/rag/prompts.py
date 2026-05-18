@@ -1,8 +1,11 @@
 """All LLM prompt templates. No inline prompts anywhere else in the codebase."""
 import re
+import unicodedata
 from datetime import date as _date
 
 import json as _json
+
+PROMPT_VERSION = "v1.2.0"
 
 
 def _sanitize_profile_json(profile_json: str) -> str:
@@ -23,6 +26,8 @@ def _sanitize(text: str | None, max_len: int = 2000) -> str:
         return ""
     # Truncate
     text = text[:max_len]
+    # Normalize Unicode to defeat homoglyph injection (e.g. Cyrillic і instead of Latin i)
+    text = unicodedata.normalize("NFKC", text)
     # Remove XML/HTML tags that could break prompt structure
     text = re.sub(r"<[^>]{0,100}>", "", text)
     # Collapse injection keywords (case-insensitive)

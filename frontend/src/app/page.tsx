@@ -34,13 +34,16 @@ const REGULATIONS = [
   { name: "ArbSchG",      desc: "Occupational safety" },
   { name: "AGG",          desc: "Equal treatment" },
   { name: "MiLoG",        desc: "Minimum wage" },
+  { name: "TTDSG",        desc: "Cookie consent" },
+  { name: "GwG",          desc: "Anti-money laundering" },
+  { name: "EU Data Act",  desc: "Data access & sharing" },
 ];
 
 const STATS = [
-  { value: "11",   label: "German and EU regulations covered" },
+  { value: "14",   label: "German and EU regulations covered" },
   { value: "3min", label: "Average time to receive results" },
   { value: "100%", label: "Automated, no manual input needed" },
-  { value: "1K+",  label: "Regulation articles in our knowledge base" },
+  { value: "3K+",  label: "Regulation articles in our knowledge base" },
 ];
 
 const WHO_FOR = [
@@ -61,7 +64,7 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "11 German and EU regulations screened in a single run — GDPR, NIS2, AI Act, LkSG, CSRD and more." },
+  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "14 German and EU regulations screened in a single run — GDPR, NIS2, AI Act, LkSG, CSRD, GwG and more." },
   { icon: Zap,           color: "text-amber-400",   bg: "bg-amber-500/10",   title: "Results in minutes",       desc: "Automated screening. A solid starting point before engaging a legal consultant." },
   { icon: ListChecks,    color: "text-emerald-400", bg: "bg-emerald-500/10", title: "Concrete action plan",     desc: "Each gap comes with a prioritised action from CRITICAL to LOW, with effort and deadline." },
   { icon: BarChart3,     color: "text-purple-400",  bg: "bg-purple-500/10",  title: "Per-regulation scoring",   desc: "Compliance score per regulation so you know exactly where to focus first." },
@@ -79,7 +82,7 @@ const PLANS = [
     cta: "Request a Demo",
     features: [
       "Single compliance screening",
-      "All 11 regulations covered",
+      "All 14 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -95,7 +98,7 @@ const PLANS = [
     cta: "Request a Demo",
     features: [
       "Unlimited screenings",
-      "All 11 regulations covered",
+      "All 14 regulations covered",
       "Full gap analysis",
       "Prioritised action plan",
       "PDF report download",
@@ -130,7 +133,7 @@ const FAQS = [
   },
   {
     q: "Which regulations does Complio cover?",
-    a: "Currently 11: GDPR/DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU AI Act, HinSchG (whistleblower protection), ArbSchG (workplace safety), AGG (anti-discrimination), and MiLoG (minimum wage). Each regulation is applied only where your company meets the relevant thresholds. Coverage continues to expand.",
+    a: "Currently 14: GDPR/DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU AI Act, HinSchG (whistleblower protection), ArbSchG (workplace safety), AGG (anti-discrimination), MiLoG (minimum wage), TTDSG/TDDDG (cookie consent), GwG (anti-money laundering), and EU Data Act. Each regulation is applied only where your company meets the relevant thresholds.",
   },
   {
     q: "How accurate are the results?",
@@ -378,7 +381,7 @@ export default function HomePage() {
             <motion.div variants={fadeUp}>
               <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-semibold text-brand-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse-slow" />
-                11 German and EU regulations covered
+                14 German and EU regulations covered
               </span>
             </motion.div>
 
@@ -404,7 +407,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-              {["Reply within 1 business day", "Results in minutes", "11 regulations in one report"].map((t) => (
+              {["Reply within 1 business day", "Results in minutes", "14 regulations in one report"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   {t}
@@ -704,7 +707,7 @@ export default function HomePage() {
               compliance gaps?
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-lg">
-              Get a detailed compliance screening across 11 German and EU regulations. Not a substitute for legal advice.
+              Get a detailed compliance screening across 14 German and EU regulations. Not a substitute for legal advice.
             </p>
             <Link href="/contact" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
               Request a Demo
@@ -724,6 +727,8 @@ export default function HomePage() {
               <a href="#features"     className="hover:text-slate-400 transition-colors">Features</a>
               <a href="#pricing"      className="hover:text-slate-400 transition-colors">Pricing</a>
               <Link href="/contact"   className="hover:text-slate-400 transition-colors">Contact</Link>
+              <Link href="/impressum" className="hover:text-slate-400 transition-colors">Impressum</Link>
+              <Link href="/privacy"   className="hover:text-slate-400 transition-colors">Privacy Policy</Link>
             </div>
             <p className="text-xs text-slate-600">Not legal advice. For informational purposes only.</p>
           </div>

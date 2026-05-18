@@ -72,5 +72,8 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = 120
     llm_max_retries: int = 4
 
+    # PDF generation concurrency limit
+    pdf_concurrency: int = 3
+
 
 settings = Settings()

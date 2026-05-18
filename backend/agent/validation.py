@@ -17,17 +17,19 @@ logger = logging.getLogger(__name__)
 
 _DATA_PROTECTION_REGS = {Regulation.GDPR, Regulation.BDSG}
 
-_NORM_RE = re.compile(r"[^0-9a-z]")  # keep only digits and lowercase letters
+_PRIMARY_NUM_RE = re.compile(r"(\d+)")
 
 
 def _norm_article(s: str) -> str:
-    """Normalise an article number for loose comparison.
+    """Extract the primary article/section number for comparison.
 
-    "Art. 32(1)(a)" → "3210a" is intentionally lossy — the goal is to catch
-    completely hallucinated numbers (e.g. "Art. 99" when only Arts. 5-38 were
-    retrieved), not to validate sub-paragraph granularity.
+    "Art. 32(1)(a)" → "32", "§ 5" → "5", "Art. 9(1)" → "9".
+    The goal is to catch completely hallucinated numbers (e.g. "Art. 99" when
+    only Arts. 5-38 were retrieved) without false-matching across articles
+    (e.g. "Art. 3" should not validate "Art. 32").
     """
-    return _NORM_RE.sub("", s.lower())
+    m = _PRIMARY_NUM_RE.search(s)
+    return m.group(1) if m else ""
 
 
 def verify_gap_citations(
@@ -63,12 +65,13 @@ def verify_gap_citations(
         if not norm:
             continue
 
-        # Check if this normalised number partially matches any retrieved article.
-        # We do a substring match both ways to handle "3210a" ⊆ "3210a1b" etc.
+        # Check if the primary article number matches any retrieved article.
+        # Exact match on the leading number (e.g. "32" == "32") so that
+        # Art. 3 doesn't falsely validate Art. 32.
         matched = any(
-            norm in known_art or known_art in norm
+            norm == known_art
             for known_art in known
-            if known_art  # skip empty strings
+            if known_art
         )
         if not matched:
             msg = (

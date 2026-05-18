@@ -298,9 +298,11 @@ async def approve_update(update_id: str, approver_identity: str = "admin", appro
             row.second_approved_by = approver_identity
             row.second_approved_at = now
 
-        staging = Path(row.staging_path)
+        staging = Path(row.staging_path).resolve()
+        if not staging.is_relative_to(STAGING_DIR.resolve()):
+            raise ValueError("Staging path is outside the permitted staging directory.")
         if not staging.exists():
-            raise FileNotFoundError(f"Staging file missing: {staging}")
+            raise FileNotFoundError("Staging file missing.")
 
         src = next((s for s in REGULATION_SOURCES if s["regulation"] == row.regulation), None)
         if not src:
