@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
 from pathlib import Path
 
 import chromadb
@@ -20,6 +21,10 @@ logger = logging.getLogger(__name__)
 
 _MAX_CHUNK_CHARS = 1_200
 _MIN_CHUNK_CHARS = 60
+
+# SQLite (embedded ChromaDB) is single-writer. Serialize writes when not using
+# the HTTP server, otherwise concurrent jobs corrupt the database.
+_chroma_write_lock = threading.Semaphore(1)
 
 
 def collection_name(job_id: str) -> str:
@@ -68,12 +73,20 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
             texts = [c["text"] for c in chunks]
             embeddings = embed_passages(texts)
             ids = [f"{col_name}_{Path(original_name).stem}_{i}" for i in range(len(chunks))]
-            collection.upsert(
-                ids=ids,
-                embeddings=embeddings,
-                documents=texts,
-                metadatas=[c["metadata"] for c in chunks],
-            )
+            from config import settings
+            _lock = _chroma_write_lock if not settings.chroma_server_url else None
+            if _lock:
+                _lock.acquire()
+            try:
+                collection.upsert(
+                    ids=ids,
+                    embeddings=embeddings,
+                    documents=texts,
+                    metadatas=[c["metadata"] for c in chunks],
+                )
+            finally:
+                if _lock:
+                    _lock.release()
             logger.info("company doc %s: %d chunks", original_name, len(chunks))
             total += len(chunks)
         except Exception as exc:

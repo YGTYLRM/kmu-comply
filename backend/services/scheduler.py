@@ -22,6 +22,15 @@ logger = logging.getLogger(__name__)
 
 _scheduler: AsyncIOScheduler | None = None
 
+
+def _create_supervised_task(coro, label: str) -> "asyncio.Task":
+    task = asyncio.create_task(coro)
+    def _on_done(t: "asyncio.Task") -> None:
+        if not t.cancelled() and t.exception():
+            logger.error("scheduler: %s task crashed: %s", label, t.exception())
+    task.add_done_callback(_on_done)
+    return task
+
 # Where regulation text files live
 _REG_DIR = Path(__file__).parent.parent / "data" / "regulations"
 _HASH_FILE = Path(__file__).parent.parent / "data" / "reg_hashes.json"
@@ -112,13 +121,14 @@ async def daily_regulation_check() -> None:
             companies = await get_companies_for_regulation(reg_name)
             logger.info("scheduler: %s changed — queuing %d companies", reg_name, len(companies))
             for c in companies:
-                asyncio.create_task(
+                _create_supervised_task(
                     _run_scheduled_analysis(
                         c,
                         triggered_by="reg_change",
                         reason=f"{reg_name} updated: {summary}",
                         changed_sections=changed_sections,
-                    )
+                    ),
+                    label=f"reg_change:{reg_name}:{c.get('company_name','?')}",
                 )
         except Exception as exc:
             logger.error("scheduler: error processing regulation %s: %s", reg_name, exc)
@@ -149,8 +159,9 @@ async def monthly_reassessment() -> None:
                         continue
 
                 logger.info("scheduler: queuing %s (interval=%dd)", c["company_name"], interval_days)
-                asyncio.create_task(
-                    _run_scheduled_analysis(c, triggered_by="scheduled", reason=f"{interval_days}d cycle")
+                _create_supervised_task(
+                    _run_scheduled_analysis(c, triggered_by="scheduled", reason=f"{interval_days}d cycle"),
+                    label=f"scheduled:{c['company_name']}",
                 )
     except Exception as exc:
         logger.error("scheduler: monthly re-assessment error: %s", exc)

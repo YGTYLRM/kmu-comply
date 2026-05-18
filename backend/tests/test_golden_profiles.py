@@ -281,7 +281,7 @@ e2e = pytest.mark.skipif(
 
 
 @e2e
-def test_e2e_fully_compliant_profile():
+async def test_e2e_fully_compliant_profile():
     """A company with ALL compliance measures in place must not be rated NON_COMPLIANT."""
     from agent.planning import determine_applicability, retrieve_regulatory_context, run_gap_analysis
     from agent.profiling import enrich_profile
@@ -318,10 +318,10 @@ def test_e2e_fully_compliant_profile():
         has_working_time_records=True,
     )
 
-    enriched = enrich_profile(profile)
+    enriched = await enrich_profile(profile)
     applicability = determine_applicability(enriched)
     chunks = retrieve_regulatory_context(enriched, applicability)
-    gaps = run_gap_analysis(enriched, chunks, [])
+    gaps = await run_gap_analysis(enriched, chunks, [])
 
     non_compliant = [
         g for g in gaps if g.status == ComplianceStatus.NON_COMPLIANT
@@ -333,7 +333,7 @@ def test_e2e_fully_compliant_profile():
 
 
 @e2e
-def test_e2e_bare_minimum_profile():
+async def test_e2e_bare_minimum_profile():
     """A company with NO compliance measures must not be rated COMPLIANT for core regulations."""
     from agent.planning import determine_applicability, retrieve_regulatory_context, run_gap_analysis
     from agent.profiling import enrich_profile
@@ -358,10 +358,10 @@ def test_e2e_bare_minimum_profile():
         has_working_time_records=False,
     )
 
-    enriched = enrich_profile(profile)
+    enriched = await enrich_profile(profile)
     applicability = determine_applicability(enriched)
     chunks = retrieve_regulatory_context(enriched, applicability)
-    gaps = run_gap_analysis(enriched, chunks, [])
+    gaps = await run_gap_analysis(enriched, chunks, [])
 
     compliant_gaps = [
         g for g in gaps if g.status == ComplianceStatus.COMPLIANT

@@ -64,7 +64,7 @@ export default function ReportsPage() {
               <h3 className="text-base font-bold text-white mb-1">No reports yet</h3>
               <p className="text-sm text-slate-500 leading-relaxed">
                 Run a compliance screening to generate your first report.
-                It covers 11 German and EU regulations and takes about 2 minutes.
+                It covers 14 German and EU regulations and takes about 2 minutes.
               </p>
             </div>
             <div className="flex flex-col gap-2 w-full">

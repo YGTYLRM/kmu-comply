@@ -302,6 +302,7 @@ const REG_DISPLAY: Record<string, string> = {
   gdpr_dsgvo: "GDPR / DSGVO", bdsg: "BDSG", nis2: "NIS2", eu_ai_act: "EU AI Act",
   hinschg: "HinSchG", workplace_law: "Employment & Workplace Law", agg: "AGG",
   milog: "MiLoG", lksg: "LkSG", enefg: "EnEfG / EDL-G", csrd: "CSRD",
+  ttdsg: "TTDSG / TDDDG", gwg: "GwG", eu_data_act: "EU Data Act",
 };
 
 function KnowledgeBaseVersions({ versions }: { versions: Record<string, { fetched_at: string; source_file_hash: string; source_url: string }> }) {

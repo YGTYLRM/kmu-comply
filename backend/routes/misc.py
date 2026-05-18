@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from config import settings
+from dependencies import check_endpoint_rate_limit
 from models import RegulationsListResponse
 from models.api_responses import RegulationInfo
 from services.auth_service import get_current_user
@@ -51,13 +52,33 @@ async def health():
     else:
         checks["database"] = "not_configured"
 
-    checks["llm"] = "configured" if settings.llm_api_key else "not_configured"
+    if settings.llm_api_key:
+        checks["llm"] = "configured (not tested — call is expensive)"
+    else:
+        checks["llm"] = "not_configured"
+
+    if settings.redis_url:
+        try:
+            from redis.asyncio import Redis
+            r = Redis.from_url(settings.redis_url, decode_responses=True)
+            try:
+                await r.ping()
+                checks["redis"] = "ok"
+            finally:
+                await r.aclose()
+        except Exception as exc:
+            checks["redis"] = f"error: {exc}"
+    else:
+        checks["redis"] = "not_configured"
 
     overall = (
         "ok"
-        if all(v in ("ok", "configured", "not_configured") for v in checks.values())
+        if all(v.startswith("ok") or "not_configured" in v or "not tested" in v for v in checks.values())
         else "degraded"
     )
+    # In production, return only the overall status — detailed checks leak infrastructure info
+    if settings.environment == "production":
+        return {"status": overall}
     return {
         "status": overall,
         "environment": settings.environment,
@@ -138,6 +159,7 @@ async def generate_template(
 ):
     from dependencies import assert_owns_job
     await assert_owns_job(job_id, current_user["id"])
+    await check_endpoint_rate_limit(current_user["id"], "templates", limit=30)
 
     if settings.stripe_enabled:
         from services.stripe_service import check_feature_access
@@ -145,19 +167,19 @@ async def generate_template(
         if not allowed:
             raise HTTPException(status_code=402, detail=reason)
 
-    from services.report_store import load_profile
+    from services.report_store import load_profile_async
     from services.template_generator import generate_template as _gen
 
-    profile = load_profile(job_id)
+    profile = await load_profile_async(job_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Company profile not found for this report.")
 
     try:
         content = _gen(template_id, json.dumps(profile, indent=2))
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid template or template parameters.")
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="Template generation temporarily unavailable.")
 
     return {"template_id": template_id, "content": content}
 

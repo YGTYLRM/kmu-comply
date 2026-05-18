@@ -85,11 +85,15 @@ async def stripe_webhook(
 ):
     if not settings.stripe_webhook_secret:
         raise HTTPException(status_code=503, detail="Webhook not configured.")
+    if not stripe_signature:
+        raise HTTPException(status_code=400, detail="Missing Stripe-Signature header.")
     payload = await request.body()
     from services.stripe_service import handle_webhook
 
     try:
-        await handle_webhook(payload, stripe_signature or "")
-    except Exception:
+        await handle_webhook(payload, stripe_signature)
+    except ValueError:
         raise HTTPException(status_code=400, detail="Invalid webhook signature.")
-    return {"received": True}
+    except Exception as exc:
+        logger.error("stripe webhook processing error: %s", exc)
+        raise HTTPException(status_code=500, detail="Webhook processing failed.")

@@ -304,12 +304,12 @@ class JobManager:
 
     # ── Report ────────────────────────────────────────────────────────────────
 
-    def get_report(self, job_id: str) -> Optional[ComplianceReport]:
+    async def get_report(self, job_id: str) -> Optional[ComplianceReport]:
         job = self._jobs.get(job_id)
         if job and job.status in (JobStatus.COMPLETED, JobStatus.PARTIAL):
             return job.report
-        from services.report_store import load
-        return load(job_id)
+        from services.report_store import load_async
+        return await load_async(job_id)
 
     async def _run_pipeline(self, job: _Job) -> None:
         from agent.compliance_agent import run_analysis

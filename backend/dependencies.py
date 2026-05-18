@@ -2,6 +2,8 @@
 Shared FastAPI dependencies and request-guard helpers.
 """
 import logging
+import secrets
+from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 from time import time
 
@@ -14,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 ANALYZE_LIMIT = 10
 ANALYZE_WINDOW = 3600  # seconds
+
+# In-memory fallback for generic endpoint rate limits (used when DATABASE_URL is not set)
+_endpoint_calls: dict[str, list[float]] = defaultdict(list)
 
 
 async def check_rate_limit(user_id: str) -> None:
@@ -75,10 +80,13 @@ async def check_rate_limit(user_id: str) -> None:
 
 
 async def assert_owns_job(job_id: str, user_id: str) -> None:
-    owner = job_owners.get(job_id)
-    if owner is None and settings.redis_url:
+    # In Celery mode (Redis configured), skip the in-memory dict — it's per-replica
+    # and will be empty on replicas that didn't create the job. Go to Redis first.
+    if settings.redis_url:
         from services.redis_store import get_job_owner as redis_get_owner
         owner = await redis_get_owner(job_id)
+    else:
+        owner = job_owners.get(job_id)
     if owner is None and settings.database_url:
         from services.db_service import get_job_owner
         owner = await get_job_owner(job_id)
@@ -91,6 +99,47 @@ def validate_redirect_url(url: str, allowed_origins: list[str]) -> None:
         raise HTTPException(status_code=400, detail="Invalid redirect URL.")
 
 
+async def check_endpoint_rate_limit(user_id: str, endpoint: str, limit: int, window: int = 3600) -> None:
+    """Generic per-user per-endpoint rate limiter. Uses DB when available, falls back to in-memory."""
+    if settings.database_url:
+        from db.database import AsyncSessionLocal
+        from db.models import RateLimitEvent
+        from sqlalchemy import select, func
+
+        now_dt = datetime.now(timezone.utc)
+        window_start = now_dt - timedelta(seconds=window)
+        async with AsyncSessionLocal() as db:
+            count = (await db.execute(
+                select(func.count()).where(
+                    RateLimitEvent.user_id == user_id,
+                    RateLimitEvent.endpoint == endpoint,
+                    RateLimitEvent.called_at >= window_start,
+                )
+            )).scalar_one()
+            if count >= limit:
+                raise HTTPException(
+                    status_code=429,
+                    detail="Rate limit exceeded — try again later.",
+                    headers={"Retry-After": str(window)},
+                )
+            db.add(RateLimitEvent(user_id=user_id, endpoint=endpoint))
+            await db.commit()
+    else:
+        key = f"{user_id}:{endpoint}"
+        now = time()
+        calls = [t for t in _endpoint_calls[key] if now - t < window]
+        if len(calls) >= limit:
+            raise HTTPException(
+                status_code=429,
+                detail="Rate limit exceeded — try again later.",
+                headers={"Retry-After": str(window)},
+            )
+        calls.append(now)
+        _endpoint_calls[key] = calls
+
+
 def require_admin(x_admin_key: str = Header(None)) -> None:
-    if not settings.admin_api_key or x_admin_key != settings.admin_api_key:
+    if not settings.admin_api_key or not x_admin_key:
+        raise HTTPException(status_code=403, detail="Admin access required.")
+    if not secrets.compare_digest(x_admin_key, settings.admin_api_key):
         raise HTTPException(status_code=403, detail="Admin access required.")

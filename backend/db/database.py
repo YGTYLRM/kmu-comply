@@ -16,6 +16,12 @@ async def get_db() -> AsyncSession:
 
 
 async def init_db() -> None:
-    from db.models import Profile, Company, Report, GapItem, ActionItem, Notification  # noqa: F401
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Apply any pending Alembic migrations at startup (idempotent — no-op if already at head)."""
+    import asyncio
+    import os
+    from alembic.config import Config
+    from alembic import command
+
+    alembic_ini = os.path.join(os.path.dirname(os.path.dirname(__file__)), "alembic.ini")
+    cfg = Config(alembic_ini)
+    await asyncio.get_event_loop().run_in_executor(None, command.upgrade, cfg, "head")

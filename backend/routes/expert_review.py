@@ -35,8 +35,8 @@ async def request_expert_review(
         if not allowed:
             raise HTTPException(status_code=402, detail=reason)
 
-    from services.report_store import load_profile
-    profile = load_profile(req.job_id)
+    from services.report_store import load_profile_async
+    profile = await load_profile_async(req.job_id)
     company_name = profile.get("company_name", "Unknown") if profile else "Unknown"
 
     from db.database import AsyncSessionLocal

@@ -34,8 +34,8 @@ _OPTIONAL_FIELDS: list[tuple[str, str]] = [
 
 
 @lru_cache(maxsize=1)
-def _llm_client() -> anthropic.Anthropic:
-    return anthropic.Anthropic(api_key=settings.llm_api_key)
+def _async_llm_client() -> anthropic.AsyncAnthropic:
+    return anthropic.AsyncAnthropic(api_key=settings.llm_api_key)
 
 
 def _deterministic_enrichment(
@@ -51,7 +51,7 @@ def _deterministic_enrichment(
     return missing, warnings
 
 
-def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
+async def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
     """
     Enrich a validated CompanyProfile with inferred characteristics.
 
@@ -87,11 +87,11 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
     prompt = profile_enrichment_prompt(profile.model_dump_json(indent=2))
     last_exc: Exception | None = None
 
-    import time
+    import asyncio
     max_attempts = settings.llm_max_retries + 1
     for attempt in range(max_attempts):
         try:
-            response = _llm_client().messages.create(
+            response = await _async_llm_client().messages.create(
                 model=settings.llm_model,
                 max_tokens=4096,
                 temperature=0,
@@ -133,7 +133,7 @@ def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
             logger.warning("profiling: unexpected error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
         if attempt < max_attempts - 1:
-            time.sleep(2 ** attempt)
+            await asyncio.sleep(2 ** attempt)
 
     logger.error("profiling: all %d attempts failed (%s), returning deterministic enrichment", max_attempts, last_exc)
     return EnrichedCompanyProfile(

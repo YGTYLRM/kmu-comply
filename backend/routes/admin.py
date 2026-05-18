@@ -3,6 +3,8 @@ Admin endpoints: regulation update approval workflow.
 All routes require a valid X-Admin-Key header.
 """
 import asyncio
+import hashlib
+import hmac
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -51,7 +53,11 @@ async def approve_regulation_update(
     from services.regulation_updater import approve_update
 
     approver_ip = request.client.host if request.client else "unknown"
-    approver_id = (x_admin_key[:8] + "...") if x_admin_key else "unknown"
+    # Store a short HMAC fingerprint — never the raw key prefix
+    approver_id = (
+        hmac.new(b"audit", x_admin_key.encode(), hashlib.sha256).hexdigest()[:16]
+        if x_admin_key else "unknown"
+    )
     try:
         result = await approve_update(
             update_id,

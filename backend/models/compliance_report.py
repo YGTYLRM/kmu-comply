@@ -101,6 +101,10 @@ class ComplianceReport(BaseModel):
     # Knowledge base versioning — maps regulation → {fetched_at, source_file_hash, source_url}
     knowledge_base_versions: Optional[dict] = None
 
+    # Analysis versioning — for reproducibility and audit trail
+    rule_engine_version: Optional[str] = None
+    prompt_version: Optional[str] = None
+
     # Meta
     disclaimer: str = Field(
         default=(

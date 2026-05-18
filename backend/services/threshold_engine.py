@@ -167,11 +167,21 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
         profile.employee_count >= 20
         and not profile.processing_is_occasional
     )
+    # Flag borderline cases where the heuristic may overstate the obligation
+    _MANUAL_HEAVY_INDUSTRIES = {"manufacturing", "construction", "food_beverage", "logistics", "energy", "waste"}
+    dpo_borderline = (
+        dpo_required
+        and 20 <= profile.employee_count <= 50
+        and profile.industry in _MANUAL_HEAVY_INDUSTRIES
+    )
     dpo_reason = (
         f"DPO likely required: {profile.employee_count} employees regularly processing "
         f"personal data automatically (BDSG §38(1) — ≥20 persons constantly in automated "
         f"processing). Note: exact applicability depends on how many staff are constantly "
         f"engaged in automated processing, not just total headcount."
+        + (" ⚠ BORDERLINE: in manual-processing-heavy industries, fewer than 20 staff "
+           "may actually be constantly engaged in automated processing — verify with counsel."
+           if dpo_borderline else "")
         if dpo_required
         else (
             f"DPO not required: {profile.employee_count} employees < 20 threshold or "

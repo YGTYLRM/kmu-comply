@@ -17,6 +17,7 @@ import { Step7Privacy } from "@/components/profile-form/step7-privacy";
 import { Step8Security } from "@/components/profile-form/step8-security";
 import { Step9Workplace } from "@/components/profile-form/step9-workplace";
 import { Step6Documents } from "@/components/profile-form/step6-documents";
+import { Step10Digital } from "@/components/profile-form/step10-digital";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
@@ -90,16 +91,29 @@ const schema = z.object({
   has_supplier_code_of_conduct:         optBool,
   has_supplier_risk_assessment:         optBool,
   has_lksg_complaints_procedure:        optBool,
+  // TTDSG / TDDDG
+  has_website:                          optBool,
+  has_cookie_banner:                    optBool,
+  has_cookie_policy:                    optBool,
+  // GwG
+  is_aml_obligated_sector:              optBool,
+  has_aml_risk_analysis:                optBool,
+  has_aml_officer:                      optBool,
+  has_kyc_procedures:                   optBool,
+  // EU Data Act
+  produces_connected_products:          optBool,
+  provides_data_processing_services:    optBool,
+  has_data_access_mechanism:            optBool,
   existing_compliance_notes:            z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof schema>;
 
-const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Policies", "Security", "Workplace", "Documents"];
+const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Policies", "Security", "Workplace", "Digital & AML", "Documents"];
 
 const STEP_FIELDS: (keyof ProfileFormData)[][] = [
   ["company_name", "industry", "employee_count"],
-  [], [], [], [], [], [], [], [],
+  [], [], [], [], [], [], [], [], [],
 ];
 
 function toProfile(data: ProfileFormData): CompanyProfile {
@@ -162,11 +176,24 @@ function toProfile(data: ProfileFormData): CompanyProfile {
     has_supplier_code_of_conduct:         data.has_supplier_code_of_conduct,
     has_supplier_risk_assessment:         data.has_supplier_risk_assessment,
     has_lksg_complaints_procedure:        data.has_lksg_complaints_procedure,
+    // TTDSG
+    has_website:                          data.has_website,
+    has_cookie_banner:                    data.has_cookie_banner,
+    has_cookie_policy:                    data.has_cookie_policy,
+    // GwG
+    is_aml_obligated_sector:             data.is_aml_obligated_sector,
+    has_aml_risk_analysis:               data.has_aml_risk_analysis,
+    has_aml_officer:                     data.has_aml_officer,
+    has_kyc_procedures:                  data.has_kyc_procedures,
+    // EU Data Act
+    produces_connected_products:          data.produces_connected_products,
+    provides_data_processing_services:    data.provides_data_processing_services,
+    has_data_access_mechanism:            data.has_data_access_mechanism,
     existing_compliance_notes:            data.existing_compliance_notes || undefined,
   };
 }
 
-const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Documents"];
+const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Digital & AML", "Documents"];
 
 function AnalyzeInner() {
   const router       = useRouter();
@@ -246,6 +273,16 @@ function AnalyzeInner() {
           has_supplier_code_of_conduct:         p.has_supplier_code_of_conduct,
           has_supplier_risk_assessment:         p.has_supplier_risk_assessment,
           has_lksg_complaints_procedure:        p.has_lksg_complaints_procedure,
+          has_website:                          p.has_website,
+          has_cookie_banner:                    p.has_cookie_banner,
+          has_cookie_policy:                    p.has_cookie_policy,
+          is_aml_obligated_sector:              p.is_aml_obligated_sector,
+          has_aml_risk_analysis:                p.has_aml_risk_analysis,
+          has_aml_officer:                      p.has_aml_officer,
+          has_kyc_procedures:                   p.has_kyc_procedures,
+          produces_connected_products:          p.produces_connected_products,
+          provides_data_processing_services:    p.provides_data_processing_services,
+          has_data_access_mechanism:            p.has_data_access_mechanism,
           existing_compliance_notes:            p.existing_compliance_notes ?? "",
         });
       })
@@ -297,7 +334,7 @@ function AnalyzeInner() {
               {fromJobId ? "Re-run Screening" : "Company Profile"}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              {prefilling ? "Loading previous profile…" : `Step ${step} of 9: ${STEP_TITLES[step - 1]}`}
+              {prefilling ? "Loading previous profile…" : `Step ${step} of 10: ${STEP_TITLES[step - 1]}`}
             </p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
@@ -324,7 +361,8 @@ function AnalyzeInner() {
                   {step === 6 && <Step7Privacy      form={form} />}
                   {step === 7 && <Step8Security     form={form} />}
                   {step === 8 && <Step9Workplace    form={form} />}
-                  {step === 9 && <Step6Documents    files={files} onChange={setFiles} />}
+                  {step === 9 && <Step10Digital     form={form} />}
+                  {step === 10 && <Step6Documents   files={files} onChange={setFiles} />}
 
                   {submitError && (
                     <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
@@ -350,7 +388,7 @@ function AnalyzeInner() {
                     ) : (
                       <div />
                     )}
-                    {step < 9 ? (
+                    {step < 10 ? (
                       <Button type="button" onClick={advance} size="md">
                         Continue →
                       </Button>

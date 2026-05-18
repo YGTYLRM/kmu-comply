@@ -16,6 +16,17 @@ const INDUSTRIES = [
   { value: "energy", label: "Energy" },
   { value: "food_beverage", label: "Food & Beverage" },
   { value: "consulting", label: "Consulting" },
+  { value: "real_estate", label: "Real Estate" },
+  { value: "chemicals", label: "Chemicals" },
+  { value: "transport", label: "Transport" },
+  { value: "water", label: "Water & Utilities" },
+  { value: "digital", label: "Digital Services" },
+  { value: "government", label: "Government / Public Sector" },
+  { value: "space", label: "Space / Aerospace" },
+  { value: "waste", label: "Waste Management" },
+  { value: "research", label: "Research & Education" },
+  { value: "gambling", label: "Gambling" },
+  { value: "crypto", label: "Crypto / Blockchain" },
   { value: "other", label: "Other" },
 ];
 

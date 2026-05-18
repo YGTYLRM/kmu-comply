@@ -43,6 +43,9 @@ _INJECTION_KEYWORDS = [
     "ignore previous", "ignore all", "disregard", "forget instructions",
     "new instructions", "you are now", "system prompt", "override",
     "as an ai", "pretend you are", "act as", "jailbreak",
+    # German equivalents
+    "ignoriere vorherige", "ignoriere alle", "vergiss die anweisungen",
+    "neue anweisungen", "du bist jetzt", "tu so als ob",
 ]
 
 
