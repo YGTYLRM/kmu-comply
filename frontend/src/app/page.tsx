@@ -23,133 +23,133 @@ const stagger = (delay = 0) => ({
 });
 
 const REGULATIONS = [
-  { name: "GDPR / DSGVO", desc: "Data protection" },
-  { name: "BDSG",         desc: "German data privacy" },
-  { name: "LkSG",         desc: "Supply chain" },
-  { name: "EnEfG",        desc: "Energy efficiency" },
-  { name: "CSRD",         desc: "Sustainability reporting" },
-  { name: "NIS2",         desc: "Cybersecurity" },
-  { name: "EU AI Act",    desc: "Artificial intelligence" },
-  { name: "HinSchG",      desc: "Whistleblower protection" },
-  { name: "ArbSchG",      desc: "Occupational safety" },
-  { name: "AGG",          desc: "Equal treatment" },
-  { name: "MiLoG",        desc: "Minimum wage" },
-  { name: "TTDSG",        desc: "Cookie consent" },
-  { name: "GwG",          desc: "Anti-money laundering" },
-  { name: "EU Data Act",  desc: "Data access & sharing" },
+  { name: "GDPR / DSGVO", desc: "Datenschutz" },
+  { name: "BDSG",         desc: "Bundesdatenschutz" },
+  { name: "LkSG",         desc: "Lieferkettensorgfalt" },
+  { name: "EnEfG",        desc: "Energieeffizienz" },
+  { name: "CSRD",         desc: "Nachhaltigkeitsberichte" },
+  { name: "NIS2",         desc: "Cybersicherheit" },
+  { name: "EU AI Act",    desc: "Künstliche Intelligenz" },
+  { name: "HinSchG",      desc: "Hinweisgeberschutz" },
+  { name: "ArbSchG",      desc: "Arbeitsschutz" },
+  { name: "AGG",          desc: "Gleichbehandlung" },
+  { name: "MiLoG",        desc: "Mindestlohn" },
+  { name: "TTDSG",        desc: "Cookie-Einwilligung" },
+  { name: "GwG",          desc: "Geldwäscheprävention" },
+  { name: "EU Data Act",  desc: "Datenzugang & -teilung" },
 ];
 
 const STATS = [
-  { value: "14",   label: "German and EU regulations covered" },
-  { value: "3min", label: "Average time to receive results" },
-  { value: "100%", label: "Automated, no manual input needed" },
-  { value: "3K+",  label: "Regulation articles in our knowledge base" },
+  { value: "14",   label: "deutsche und EU-Vorschriften abgedeckt" },
+  { value: "3min", label: "durchschnittliche Zeit bis zum Ergebnis" },
+  { value: "100%", label: "automatisiert, kein manueller Aufwand" },
+  { value: "3K+",  label: "Rechtsartikel in unserer Wissensdatenbank" },
 ];
 
 const WHO_FOR = [
-  { icon: Building2,   title: "IT and Software",        desc: "GDPR and BDSG compliance is critical for any company handling personal data." },
-  { icon: Factory,     title: "Manufacturing",           desc: "LkSG and EnEfG obligations apply across industrial supply chains." },
-  { icon: Truck,       title: "Logistics",               desc: "Cross-border supply chains trigger LkSG due diligence requirements." },
-  { icon: Stethoscope, title: "Healthcare",              desc: "Special category data under GDPR and BDSG demands rigorous compliance." },
-  { icon: ShoppingBag, title: "Retail and E-commerce",  desc: "Consumer data practices face strict GDPR scrutiny in every EU market." },
-  { icon: Briefcase,   title: "Professional Services",  desc: "Client data handling and reporting obligations span multiple regulations." },
+  { icon: Building2,   title: "IT und Software",          desc: "DSGVO- und BDSG-Compliance ist für jedes Unternehmen, das personenbezogene Daten verarbeitet, verpflichtend." },
+  { icon: Factory,     title: "Produktion",                desc: "LkSG- und EnEfG-Pflichten gelten entlang industrieller Lieferketten." },
+  { icon: Truck,       title: "Logistik",                  desc: "Grenzüberschreitende Lieferketten lösen LkSG-Sorgfaltspflichten aus." },
+  { icon: Stethoscope, title: "Gesundheitswesen",          desc: "Besondere Datenkategorien nach DSGVO und BDSG erfordern erhöhte Sorgfalt." },
+  { icon: ShoppingBag, title: "Handel und E-Commerce",     desc: "Kundendaten unterliegen strenger DSGVO-Prüfung auf allen EU-Märkten." },
+  { icon: Briefcase,   title: "Beratung und Dienstleister", desc: "Mandantendaten und Berichtspflichten erstrecken sich über viele Vorschriften." },
 ];
 
 const STEPS = [
-  { n: "01", title: "Enter your profile",      desc: "Five short steps covering company basics, finances, data practices, supply chain, and governance." },
-  { n: "02", title: "AI analyses your data",   desc: "Relevant regulation articles are retrieved and assessed against your company profile." },
-  { n: "03", title: "Gaps are identified",     desc: "Each requirement is checked as compliant, partial, or non-compliant with full evidence." },
-  { n: "04", title: "Actions are prioritised", desc: "Every gap becomes a concrete action item with effort estimate and deadline guidance." },
-  { n: "05", title: "Review your screening",   desc: "A scored preliminary screening report by regulation and priority, with suggested next steps." },
+  { n: "01", title: "Profil ausfüllen",              desc: "Fünf kurze Schritte zu Unternehmensgröße, Finanzen, Datenpraktiken, Lieferkette und Governance." },
+  { n: "02", title: "KI analysiert Ihre Daten",      desc: "Relevante Rechtsartikel werden abgerufen und mit Ihrem Unternehmensprofil abgeglichen." },
+  { n: "03", title: "Lücken werden identifiziert",   desc: "Jede Anforderung wird als konform, teilweise konform oder nicht konform mit vollständiger Begründung bewertet." },
+  { n: "04", title: "Maßnahmen werden priorisiert",  desc: "Jede Lücke wird zu einem konkreten Handlungsschritt mit Aufwandsschätzung und Fristhinweis." },
+  { n: "05", title: "Screening-Bericht prüfen",      desc: "Ein bewerteter Vorabbericht nach Vorschrift und Priorität mit konkreten nächsten Schritten." },
 ];
 
 const FEATURES = [
-  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Full regulation coverage", desc: "14 German and EU regulations screened in a single run — GDPR, NIS2, AI Act, LkSG, CSRD, GwG and more." },
-  { icon: Zap,           color: "text-amber-400",   bg: "bg-amber-500/10",   title: "Results in minutes",       desc: "Automated screening. A solid starting point before engaging a legal consultant." },
-  { icon: ListChecks,    color: "text-emerald-400", bg: "bg-emerald-500/10", title: "Concrete action plan",     desc: "Each gap comes with a prioritised action from CRITICAL to LOW, with effort and deadline." },
-  { icon: BarChart3,     color: "text-purple-400",  bg: "bg-purple-500/10",  title: "Per-regulation scoring",   desc: "Compliance score per regulation so you know exactly where to focus first." },
-  { icon: ShieldCheck,   color: "text-rose-400",    bg: "bg-rose-500/10",    title: "Grounded in law",          desc: "Screening cites specific article numbers from official regulation texts, not generic checklists." },
-  { icon: AlertTriangle, color: "text-orange-400",  bg: "bg-orange-500/10",  title: "Flags manual review",      desc: "When confidence is low, the report explicitly marks items for human legal review." },
+  { icon: FileSearch,    color: "text-blue-400",    bg: "bg-blue-500/10",    title: "Vollständige Abdeckung",     desc: "14 deutsche und EU-Vorschriften in einem Durchlauf — DSGVO, NIS2, KI-Act, LkSG, CSRD, GwG und mehr." },
+  { icon: Zap,           color: "text-amber-400",   bg: "bg-amber-500/10",   title: "Ergebnisse in Minuten",       desc: "Automatisiertes Screening. Solide Grundlage vor dem Gang zum Rechtsanwalt." },
+  { icon: ListChecks,    color: "text-emerald-400", bg: "bg-emerald-500/10", title: "Konkreter Maßnahmenplan",     desc: "Jede Lücke erhält eine priorisierte Maßnahme von KRITISCH bis NIEDRIG mit Aufwand und Frist." },
+  { icon: BarChart3,     color: "text-purple-400",  bg: "bg-purple-500/10",  title: "Bewertung je Vorschrift",     desc: "Compliance-Score pro Gesetz, damit Sie genau wissen, wo Sie zuerst ansetzen müssen." },
+  { icon: ShieldCheck,   color: "text-rose-400",    bg: "bg-rose-500/10",    title: "Rechtlich fundiert",          desc: "Das Screening zitiert spezifische Artikel aus offiziellen Gesetzestexten, keine generischen Checklisten." },
+  { icon: AlertTriangle, color: "text-orange-400",  bg: "bg-orange-500/10",  title: "Kennzeichnet manuellen Prüfbedarf", desc: "Bei niedriger Konfidenz markiert der Bericht Punkte ausdrücklich zur rechtlichen Überprüfung." },
 ];
 
 const PLANS = [
   {
     name: "Starter",
     price: "€79",
-    period: "per report",
-    desc: "One-off screening for companies that need an occasional compliance check.",
+    period: "pro Bericht",
+    desc: "Einmaliges Screening für Unternehmen, die gelegentlich eine Compliance-Prüfung benötigen.",
     highlight: false,
-    cta: "Request a Demo",
+    cta: "Demo anfordern",
     features: [
-      "Single compliance screening",
-      "All 14 regulations covered",
-      "Full gap analysis",
-      "Prioritised action plan",
-      "PDF report download",
-      "30-day result access",
+      "Einzelnes Compliance-Screening",
+      "Alle 14 Vorschriften abgedeckt",
+      "Vollständige Lückenanalyse",
+      "Priorisierter Maßnahmenplan",
+      "PDF-Bericht zum Download",
+      "30 Tage Ergebniszugriff",
     ],
   },
   {
     name: "Professional",
     price: "€149",
-    period: "per month",
-    desc: "Unlimited screenings for teams that need to track compliance over time.",
+    period: "pro Monat",
+    desc: "Unbegrenzte Screenings für Teams, die Compliance kontinuierlich verfolgen.",
     highlight: true,
-    cta: "Request a Demo",
+    cta: "Demo anfordern",
     features: [
-      "Unlimited screenings",
-      "All 14 regulations covered",
-      "Full gap analysis",
-      "Prioritised action plan",
-      "PDF report download",
-      "Historical report archive",
-      "Priority processing",
-      "Email support",
+      "Unbegrenzte Screenings",
+      "Alle 14 Vorschriften abgedeckt",
+      "Vollständige Lückenanalyse",
+      "Priorisierter Maßnahmenplan",
+      "PDF-Bericht zum Download",
+      "Historisches Berichtsarchiv",
+      "Bevorzugte Verarbeitung",
+      "E-Mail-Support",
     ],
   },
   {
     name: "Enterprise",
-    price: "Custom",
-    period: "tailored to you",
-    desc: "For larger organisations with complex needs, multiple entities, or API access.",
+    price: "Individuell",
+    period: "auf Sie zugeschnitten",
+    desc: "Für größere Organisationen mit komplexen Anforderungen, mehreren Einheiten oder API-Zugang.",
     highlight: false,
-    cta: "Contact us",
+    cta: "Kontakt aufnehmen",
     features: [
-      "Everything in Professional",
-      "Multi-entity management",
-      "API access",
-      "Custom regulation scope",
-      "White-label option",
-      "Dedicated account manager",
-      "SLA guarantee",
+      "Alles aus Professional",
+      "Multi-Einheiten-Management",
+      "API-Zugang",
+      "Angepasster Regelungsumfang",
+      "White-Label-Option",
+      "Fester Ansprechpartner",
+      "SLA-Garantie",
     ],
   },
 ];
 
 const FAQS = [
   {
-    q: "What exactly is a preliminary compliance screening?",
-    a: "It is an automated first-pass assessment of your company against relevant German and EU regulations. The report identifies likely gaps, assigns a compliance score, and suggests concrete next steps. It is not a legal audit and does not replace qualified legal counsel.",
+    q: "Was genau ist ein vorläufiges Compliance-Screening?",
+    a: "Es ist eine automatisierte Ersteinschätzung Ihres Unternehmens gegenüber relevanten deutschen und EU-Vorschriften. Der Bericht identifiziert wahrscheinliche Lücken, vergibt einen Compliance-Score und schlägt konkrete nächste Schritte vor. Es handelt sich nicht um eine Rechtsberatung und ersetzt keine qualifizierte juristische Beratung.",
   },
   {
-    q: "Which regulations does Complio cover?",
-    a: "Currently 14: GDPR/DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU AI Act, HinSchG (whistleblower protection), ArbSchG (workplace safety), AGG (anti-discrimination), MiLoG (minimum wage), TTDSG/TDDDG (cookie consent), GwG (anti-money laundering), and EU Data Act. Each regulation is applied only where your company meets the relevant thresholds.",
+    q: "Welche Vorschriften deckt Complio ab?",
+    a: "Aktuell 14: DSGVO, BDSG, LkSG, EnEfG, CSRD, NIS2, EU-KI-Act, HinSchG (Hinweisgeberschutz), ArbSchG (Arbeitsschutz), AGG (Antidiskriminierung), MiLoG (Mindestlohn), TTDSG/TDDDG (Cookie-Einwilligung), GwG (Geldwäsche) und EU Data Act. Jede Vorschrift wird nur angewendet, wenn Ihr Unternehmen die jeweiligen Schwellenwerte erfüllt.",
   },
   {
-    q: "How accurate are the results?",
-    a: "Results are based on your answers and are only as complete as the information you provide. The AI cites specific regulation articles and applies threshold logic built from official guidance. All low-confidence items are explicitly flagged for human review.",
+    q: "Wie genau sind die Ergebnisse?",
+    a: "Die Ergebnisse basieren auf Ihren Angaben und sind nur so vollständig wie die bereitgestellten Informationen. Die KI zitiert spezifische Gesetzesartikel und wendet Schwellenwertlogik aus offiziellen Quellen an. Alle Punkte mit geringer Konfidenz werden ausdrücklich zur menschlichen Prüfung markiert.",
   },
   {
-    q: "Can I use this report as legal proof of compliance?",
-    a: "No. This is a preliminary screening tool designed to help you understand your exposure before engaging a legal specialist. It is not a certified audit and does not constitute legal advice.",
+    q: "Kann ich den Bericht als Rechtsnachweis verwenden?",
+    a: "Nein. Dieses Tool dient als Vorscreening, um Ihre Risikoexposition vor dem Gang zum Rechtsanwalt zu verstehen. Es handelt sich nicht um ein zertifiziertes Audit und stellt keine Rechtsberatung dar.",
   },
   {
-    q: "What information do I need to provide?",
-    a: "Basic company details: industry, employee count, revenue, whether you process personal data, supply chain presence, energy consumption, and governance practices. The form takes roughly 3 minutes to complete.",
+    q: "Welche Informationen muss ich angeben?",
+    a: "Grundlegende Unternehmensdaten: Branche, Mitarbeiterzahl, Umsatz, ob Sie personenbezogene Daten verarbeiten, Lieferkettenpräsenz, Energieverbrauch und Governance-Praktiken. Das Formular dauert ca. 3 Minuten.",
   },
   {
-    q: "Is my data stored or shared?",
-    a: "Report data is stored securely and is only accessible via your unique report link. We do not share your data with third parties. Enterprise customers can request data residency and deletion guarantees.",
+    q: "Werden meine Daten gespeichert oder weitergegeben?",
+    a: "Berichtsdaten werden sicher gespeichert und sind nur über Ihren einzigartigen Berichtslink zugänglich. Wir geben Ihre Daten nicht an Dritte weiter. Enterprise-Kunden können Datenlokalisierung und Löschgarantien anfragen.",
   },
 ];
 
@@ -381,33 +381,33 @@ export default function HomePage() {
             <motion.div variants={fadeUp}>
               <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-semibold text-brand-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse-slow" />
-                14 German and EU regulations covered
+                14 deutsche und EU-Vorschriften abgedeckt
               </span>
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.04]">
-              Know your{" "}
-              <span className="shimmer-text">compliance gaps</span>
+              Kennen Sie Ihre{" "}
+              <span className="shimmer-text">Compliance-Lücken</span>
               <br />
-              before they know you.
+              bevor sie Sie finden.
             </motion.h1>
 
             <motion.p variants={fadeUp} className="max-w-2xl text-base sm:text-lg text-slate-400 leading-relaxed px-2 sm:px-0">
-              Submit your company profile and receive a detailed compliance screening across German and EU law in minutes. A solid foundation before any legal consultation.
+              Geben Sie Ihr Unternehmensprofil ein und erhalten Sie in Minuten ein detailliertes Compliance-Screening nach deutschem und EU-Recht. Die solide Grundlage vor jedem Rechtsanwaltsgespräch.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3">
               <Link href="/contact" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
-                Request a Demo
+                Demo anfordern
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
               </Link>
               <a href="#pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-7 py-4 text-base font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-200">
-                See pricing
+                Preise ansehen
               </a>
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-              {["Reply within 1 business day", "Results in minutes", "14 regulations in one report"].map((t) => (
+              {["Antwort innerhalb 1 Werktag", "Ergebnisse in Minuten", "14 Vorschriften in einem Bericht"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   {t}
@@ -457,7 +457,7 @@ export default function HomePage() {
       >
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="text-xs font-medium text-slate-600 mr-1">Regulations covered</span>
+            <span className="text-xs font-medium text-slate-600 mr-1">Abgedeckte Vorschriften</span>
             {REGULATIONS.map((r) => (
               <div key={r.name} className="flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
@@ -472,9 +472,9 @@ export default function HomePage() {
       {/* ── Who it's for ──────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-28">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Who it is for</p>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Built for German SMEs across every sector</h2>
-          <p className="text-slate-500 max-w-xl mx-auto">Any company operating in Germany or the EU faces a web of overlapping regulations. Complio cuts through the complexity in minutes.</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Für wen es gemacht ist</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Entwickelt für deutsche KMU in allen Branchen</h2>
+          <p className="text-slate-500 max-w-xl mx-auto">Jedes Unternehmen, das in Deutschland oder der EU tätig ist, sieht sich einem Geflecht überschneidender Vorschriften gegenüber. Complio bringt in Minuten Klarheit.</p>
         </motion.div>
 
         <motion.div
@@ -506,8 +506,8 @@ export default function HomePage() {
       <section id="how-it-works" className="border-t border-white/[0.05] bg-dark-900/40 py-16 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">How it works</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">From profile to report in five steps</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">So funktioniert es</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Vom Profil zum Bericht in fünf Schritten</h2>
           </motion.div>
 
           <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-0">
@@ -538,21 +538,21 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease }}
             >
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Document upload</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Dokument-Upload</p>
               <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight mb-6">
-                Upload your documents.<br />Get real verdicts.
+                Dokumente hochladen.<br />Echte Befunde erhalten.
               </h2>
               <p className="text-slate-400 leading-relaxed mb-8">
-                Profile answers give a solid baseline. Attach your actual company documents and Complio reads them directly, citing specific passages as evidence. Items that would otherwise be uncertain become concrete findings.
+                Profilantworten geben eine solide Basis. Hängen Sie Ihre tatsächlichen Unternehmensdokumente an, und Complio liest sie direkt — mit Zitat konkreter Passagen als Belege. Was sonst unsicher bliebe, wird zu konkreten Befunden.
               </p>
 
               <div className="space-y-3 mb-10">
                 {[
-                  "Privacy policy and cookie notice",
-                  "Data processing agreements",
-                  "IT and information security policy",
-                  "HR handbook and employment contracts",
-                  "Energy audit or environmental reports",
+                  "Datenschutzerklärung und Cookie-Hinweis",
+                  "Auftragsverarbeitungsverträge (AVV)",
+                  "Informationssicherheitsrichtlinie / ISMS",
+                  "Personalhandbuch und Arbeitsverträge",
+                  "Energieaudit oder Umweltberichte",
                 ].map((doc) => (
                   <div key={doc} className="flex items-center gap-3 text-sm text-slate-400">
                     <FileText className="h-4 w-4 flex-shrink-0 text-brand-400" />
@@ -565,7 +565,7 @@ export default function HomePage() {
                 href="/contact"
                 className="group inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300"
               >
-                Request a Demo
+                Demo anfordern
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
               </Link>
             </motion.div>
@@ -587,8 +587,8 @@ export default function HomePage() {
       <section id="features" className="border-t border-white/[0.05] py-16 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">What you get</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Everything in one report</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Was Sie erhalten</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Alles in einem Bericht</h2>
           </motion.div>
 
           <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -615,9 +615,9 @@ export default function HomePage() {
       <section id="pricing" className="border-t border-white/[0.05] bg-dark-900/40 py-16 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Pricing</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Simple, transparent pricing</h2>
-            <p className="text-slate-500 max-w-lg mx-auto">Pay per screening or subscribe for ongoing monitoring. No hidden fees, no long-term lock-in.</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Preise</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">Einfache, transparente Preise</h2>
+            <p className="text-slate-500 max-w-lg mx-auto">Zahlen Sie pro Screening oder abonnieren Sie für laufendes Monitoring. Keine versteckten Kosten, keine Mindestlaufzeit.</p>
           </motion.div>
 
           <motion.div
@@ -641,7 +641,7 @@ export default function HomePage() {
                 {plan.highlight && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-brand-600 px-3 py-1 text-[11px] font-bold text-white shadow-glow-blue-sm">
-                      Most popular
+                      Beliebteste Wahl
                     </span>
                   </div>
                 )}
@@ -675,8 +675,8 @@ export default function HomePage() {
       <section className="border-t border-white/[0.05] py-16 sm:py-28">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-10 sm:mb-14 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">FAQ</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Common questions</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Häufige Fragen</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Ihre Fragen, unsere Antworten</h2>
           </motion.div>
 
           <motion.div
@@ -702,15 +702,15 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 py-20 sm:py-32 flex flex-col items-center text-center gap-8">
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }} className="flex flex-col items-center gap-6">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Ready to find your
+              Bereit, Ihre
               <br />
-              compliance gaps?
+              Compliance-Lücken zu finden?
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-lg">
-              Get a detailed compliance screening across 14 German and EU regulations. Not a substitute for legal advice.
+              Detailliertes Compliance-Screening über 14 deutsche und EU-Vorschriften. Kein Ersatz für Rechtsberatung.
             </p>
             <Link href="/contact" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
-              Request a Demo
+              Demo anfordern
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
             </Link>
           </motion.div>

@@ -181,6 +181,29 @@ def _build_kb_versions(applicability: list) -> dict:
         return {}
 
 
+def _build_regulation_coverage(chunks: list[RegulatoryChunk]) -> dict:
+    """Build per-regulation source coverage summary for display in reports.
+
+    Returns {regulation_key: {law_chunks, guidance_chunks, total_chunks, unique_articles}}
+    so users can see how well-grounded each regulation's analysis is.
+    """
+    coverage: dict = {}
+    for chunk in chunks:
+        reg_key = chunk.regulation.value
+        if reg_key not in coverage:
+            coverage[reg_key] = {"law_chunks": 0, "guidance_chunks": 0, "total_chunks": 0, "unique_articles": set()}
+        coverage[reg_key]["total_chunks"] += 1
+        coverage[reg_key]["unique_articles"].add(chunk.article_number)
+        if chunk.document_type == "guidance":
+            coverage[reg_key]["guidance_chunks"] += 1
+        else:
+            coverage[reg_key]["law_chunks"] += 1
+    # Convert sets to counts for JSON serialisation
+    for reg_key in coverage:
+        coverage[reg_key]["unique_articles"] = len(coverage[reg_key]["unique_articles"])
+    return coverage
+
+
 def _stamp_source_urls(gaps: list, actions: list) -> None:
     """Add the official regulation source URL to every gap and action in-place."""
     for gap in gaps:
@@ -228,11 +251,12 @@ async def assemble_report(
     """Assemble all pipeline outputs into a final ComplianceReport."""
     _assign_gap_confidence(gaps, profile)
     _stamp_source_urls(gaps, actions)
-    kb_versions  = _build_kb_versions(applicability)
-    reg_scores   = _compute_scores(applicability, gaps)
-    overall      = _weighted_score(reg_scores)
-    critical     = _critical_findings(actions, gaps)
-    completeness = _compute_completeness(profile)
+    kb_versions   = _build_kb_versions(applicability)
+    reg_coverage  = _build_regulation_coverage(chunks)
+    reg_scores    = _compute_scores(applicability, gaps)
+    overall       = _weighted_score(reg_scores)
+    critical      = _critical_findings(actions, gaps)
+    completeness  = _compute_completeness(profile)
     applicable_count = sum(1 for a in applicability if a.applies)
 
     summary = await _executive_summary(
@@ -262,6 +286,7 @@ async def assemble_report(
         requires_manual_review=list(failures),
         profile_completeness=completeness,
         knowledge_base_versions=kb_versions,
+        regulation_coverage=reg_coverage,
         rule_engine_version=RULE_ENGINE_VERSION,
         prompt_version=PROMPT_VERSION,
     )
