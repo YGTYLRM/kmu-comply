@@ -1,10 +1,12 @@
 """
-Company and report history endpoints.
+Company and report history endpoints, including data deletion (GDPR Art. 17).
 """
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 
 from services.auth_service import get_current_user
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -110,3 +112,88 @@ async def get_company(company_id: str, current_user: dict = Depends(get_current_
             for r in reports
         ],
     }
+
+
+@router.delete("/api/companies/{company_id}")
+async def delete_company(company_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a company and all its reports (GDPR Art. 17 right to erasure)."""
+    from db.database import AsyncSessionLocal
+    from db.models import Company, Report
+    from sqlalchemy import select, delete
+
+    user_id = current_user["id"]
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            select(Company).where(Company.id == company_id, Company.user_id == user_id)
+        )
+        company = result.scalar_one_or_none()
+        if not company:
+            raise HTTPException(status_code=404, detail="Company not found.")
+
+        await db.execute(delete(Report).where(Report.company_id == company_id))
+        await db.execute(delete(Company).where(Company.id == company_id))
+        await db.commit()
+
+    logger.info("user %s deleted company %s and all its reports", user_id, company_id)
+    return {"deleted": True, "company_id": company_id}
+
+
+@router.delete("/api/reports/{job_id}")
+async def delete_report(job_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a single report by job_id (GDPR Art. 17)."""
+    from db.database import AsyncSessionLocal
+    from db.models import Report
+    from sqlalchemy import select, delete
+
+    user_id = current_user["id"]
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            select(Report).where(Report.job_id == job_id, Report.user_id == user_id)
+        )
+        report = result.scalar_one_or_none()
+        if not report:
+            raise HTTPException(status_code=404, detail="Report not found.")
+
+        await db.execute(delete(Report).where(Report.job_id == job_id))
+        await db.commit()
+
+    logger.info("user %s deleted report %s", user_id, job_id)
+    return {"deleted": True, "job_id": job_id}
+
+
+@router.delete("/api/account")
+async def delete_account(current_user: dict = Depends(get_current_user)):
+    """Delete the user's account and all associated data (GDPR Art. 17).
+
+    Deletes: companies, reports, notifications, action_completions, subscriptions.
+    The Supabase auth user is deleted separately via supabase.auth.admin.deleteUser().
+    """
+    from db.database import AsyncSessionLocal
+    from db.models import Company, Report, Notification, Subscription
+    from sqlalchemy import select, delete
+
+    user_id = current_user["id"]
+    async with AsyncSessionLocal() as db:
+        # Get all company IDs for this user
+        companies = (await db.execute(
+            select(Company.id).where(Company.user_id == user_id)
+        )).scalars().all()
+        company_ids = [str(c) for c in companies]
+
+        # Delete reports for all companies
+        if company_ids:
+            await db.execute(delete(Report).where(Report.company_id.in_(company_ids)))
+
+        # Delete companies
+        await db.execute(delete(Company).where(Company.user_id == user_id))
+
+        # Delete notifications
+        await db.execute(delete(Notification).where(Notification.user_id == user_id))
+
+        # Delete subscription
+        await db.execute(delete(Subscription).where(Subscription.user_id == user_id))
+
+        await db.commit()
+
+    logger.info("user %s deleted their account and all associated data", user_id)
+    return {"deleted": True, "message": "Account and all data deleted successfully."}
