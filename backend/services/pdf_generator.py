@@ -93,23 +93,23 @@ REGULATION_LABELS: dict[str, str] = {
     "nis2":          "NIS2",
     "eu_ai_act":     "EU AI Act",
     "hinschg":       "HinSchG",
-    "workplace_law": "Employment & Workplace Law",
+    "workplace_law": "Arbeitsrecht",
     "agg":           "AGG",
     "milog":         "MiLoG",
 }
 
 STATUS_STYLES: dict[ComplianceStatus, dict[str, str]] = {
-    ComplianceStatus.COMPLIANT:           {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Compliant"},
-    ComplianceStatus.PARTIALLY_COMPLIANT: {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Partial"},
-    ComplianceStatus.NON_COMPLIANT:       {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Non-Compliant"},
-    ComplianceStatus.CANNOT_ASSESS:       {"c": "#64748b", "bg": "#f8fafc", "br": "#e2e8f0", "label": "Cannot Assess"},
+    ComplianceStatus.COMPLIANT:           {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Konform"},
+    ComplianceStatus.PARTIALLY_COMPLIANT: {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Teilweise"},
+    ComplianceStatus.NON_COMPLIANT:       {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Nicht konform"},
+    ComplianceStatus.CANNOT_ASSESS:       {"c": "#64748b", "bg": "#f8fafc", "br": "#e2e8f0", "label": "Nicht bewertbar"},
 }
 
 PRIORITY_STYLES: dict[Priority, dict[str, str]] = {
-    Priority.CRITICAL: {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Critical"},
-    Priority.HIGH:     {"c": "#ea580c", "bg": "#fff7ed", "br": "#fed7aa", "label": "High"},
-    Priority.MEDIUM:   {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Medium"},
-    Priority.LOW:      {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Low"},
+    Priority.CRITICAL: {"c": "#dc2626", "bg": "#fef2f2", "br": "#fecaca", "label": "Kritisch"},
+    Priority.HIGH:     {"c": "#ea580c", "bg": "#fff7ed", "br": "#fed7aa", "label": "Hoch"},
+    Priority.MEDIUM:   {"c": "#b45309", "bg": "#fffbeb", "br": "#fde68a", "label": "Mittel"},
+    Priority.LOW:      {"c": "#16a34a", "bg": "#f0fdf4", "br": "#bbf7d0", "label": "Niedrig"},
 }
 
 
@@ -264,13 +264,13 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'{logo_el}'
         f'<div style="{FONT}font-size:6.5pt;font-weight:600;letter-spacing:1.8pt;text-transform:uppercase;'
         f'color:#93c5fd;border:1pt solid rgba(147,197,253,.25);padding:3.5pt 10pt;border-radius:20pt;">'
-        f'Regulatory Compliance Assessment</div></div>'
+        f'Regulatorisches Compliance-Screening</div></div>'
 
         f'<div style="flex:1;padding:10mm {PAGE_MARGIN} 5mm;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">'
-        f'<div style="{FONT}font-size:7pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;color:{BLUE};margin-bottom:4mm;">Autonomous AI Compliance Agent</div>'
+        f'<div style="{FONT}font-size:7pt;font-weight:700;letter-spacing:2.2pt;text-transform:uppercase;color:{BLUE};margin-bottom:4mm;">Automatisierter KI-Compliance-Agent</div>'
         f'<div style="{FONT}font-size:34pt;font-weight:800;color:#f8fafc;line-height:1.08;'
         f'letter-spacing:-.8pt;margin-bottom:3mm;max-width:155mm;">{_esc(report.company_name)}</div>'
-        f'<div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Report issued {_esc(date)}</div>'
+        f'<div style="{FONT}font-size:8.5pt;color:#475569;margin-bottom:9mm;font-weight:500;">Bericht erstellt am {_esc(date)}</div>'
 
         f'<div style="display:flex;align-items:center;gap:0;">'
         f'<div style="position:relative;margin-right:7mm;flex-shrink:0;">'
@@ -282,13 +282,13 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'<div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>'
         f'</div></div>'
-        f'{divider}{stat(n_app,"Regulations")}{divider}{stat(n_gaps,"Gaps")}'
-        f'{divider}{stat(n_act,"Actions")}{divider}{stat(n_crit,"Critical","#f87171")}'
+        f'{divider}{stat(n_app,"Vorschriften")}{divider}{stat(n_gaps,"Lücken")}'
+        f'{divider}{stat(n_act,"Maßnahmen")}{divider}{stat(n_crit,"Kritisch","#f87171")}'
         f'</div></div>'
 
         f'<div style="padding:0 {PAGE_MARGIN} 9mm;position:relative;z-index:1;">'
         f'<div style="height:1pt;background:linear-gradient(90deg,rgba(255,255,255,0.1) 0%,transparent 100%);margin-bottom:5mm;"></div>'
-        f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;color:#475569;margin-bottom:3.5mm;">Applicable Regulations</div>'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;letter-spacing:1.5pt;text-transform:uppercase;color:#475569;margin-bottom:3.5mm;">Anwendbare Vorschriften</div>'
         f'<div style="line-height:1;">{chips}</div>'
 
         # Completeness warning on cover (only shown when < 70%)
@@ -296,10 +296,10 @@ def _cover(report: ComplianceReport, logo: str) -> str:
             f'<div style="margin-top:4mm;padding:4mm 6mm;'
             f'background:rgba(251,146,60,0.10);border:1pt solid rgba(251,146,60,0.30);border-radius:6pt;">'
             f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#fb923c;margin-bottom:1.5mm;">'
-            f'Low data completeness &nbsp;&mdash;&nbsp; {report.profile_completeness["score_percent"]:.0f}%</div>'
+            f'Niedrige Datenvollständigkeit &nbsp;&mdash;&nbsp; {report.profile_completeness["score_percent"]:.0f}%</div>'
             f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.6;">'
-            f'{report.profile_completeness["unanswered_count"]} compliance-relevant fields were not provided. '
-            f'Some findings may rely on assumptions. Re-run with a complete profile for higher accuracy.'
+            f'{report.profile_completeness["unanswered_count"]} compliance-relevante Felder wurden nicht ausgefüllt. '
+            f'Einige Befunde können auf Annahmen basieren. Für höhere Genauigkeit Profil vervollständigen und erneut ausführen.'
             f'</div></div>'
             if (report.profile_completeness and report.profile_completeness.get("score_percent", 100) < 70)
             else ""
@@ -309,9 +309,9 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         + f'<div style="margin-top:4mm;padding:4mm 6mm;'
         f'background:rgba(245,158,11,0.08);border:1pt solid rgba(245,158,11,0.25);border-radius:6pt;">'
         f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#f59e0b;margin-bottom:1.5mm;">'
-        f'Preliminary screening only &nbsp;&mdash;&nbsp; Not legal advice</div>'
+        f'Nur vorläufiges Screening &nbsp;&mdash;&nbsp; Keine Rechtsberatung</div>'
         f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.6;">'
-        f'{_esc(report.disclaimer) if report.disclaimer else "This report is a preliminary AI-generated compliance screening. It does not constitute legal advice and does not replace a qualified legal review. Always consult a licensed attorney before taking compliance decisions."}'
+        f'{_esc(report.disclaimer) if report.disclaimer else "Dieser Bericht ist ein vorläufiges KI-gestütztes Compliance-Screening. Er stellt keine Rechtsberatung dar und ersetzt keine qualifizierte rechtliche Prüfung. Konsultieren Sie vor Compliance-Entscheidungen stets einen zugelassenen Rechtsanwalt."}'
         f'</div></div>'
 
         f'</div></div>'
@@ -323,7 +323,7 @@ def _cover(report: ComplianceReport, logo: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
-    summary = _esc(_clean(report.executive_summary)) or "No executive summary available."
+    summary = _esc(_clean(report.executive_summary)) or "Keine Zusammenfassung verfügbar."
 
     warns = ""
     if report.validation_warnings:
@@ -352,20 +352,20 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
 
     return (
         f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-        f'{_hbar(report.company_name, "Executive Summary", logo)}'
+        f'{_hbar(report.company_name, "Zusammenfassung", logo)}'
         f'{_body_open()}'
-        f'{_sec_title("Section 01", "Executive Summary")}'
+        f'{_sec_title("Abschnitt 01", "Zusammenfassung")}'
         f'{_sec_sub(summary)}'
         f'{warns}'
         f'<div style="margin-top:8mm;">'
-        f'{_sec_title("Section 02", "Regulation Applicability")}'
-        f'{_sec_sub("Which regulations apply to your company, based on your size, industry, and how you operate.")}'
+        f'{_sec_title("Abschnitt 02", "Anwendbarkeit der Vorschriften")}'
+        f'{_sec_sub("Welche Vorschriften auf Ihr Unternehmen zutreffen – basierend auf Größe, Branche und Betrieb.")}'
         f'<div style="border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">'
         f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">'
         f'<thead><tr>'
-        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:22%;border-bottom:2pt solid #bfdbfe;">Regulation</th>'
-        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:center;width:12%;border-bottom:2pt solid #bfdbfe;">Applies</th>'
-        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:66%;border-bottom:2pt solid #bfdbfe;">Reason</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:22%;border-bottom:2pt solid #bfdbfe;">Vorschrift</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:center;width:12%;border-bottom:2pt solid #bfdbfe;">Anwendbar</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7.5pt;font-weight:700;padding:6pt 9pt;text-align:left;width:66%;border-bottom:2pt solid #bfdbfe;">Begründung</th>'
         f'</tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
         f'</div>'
@@ -417,9 +417,9 @@ def _scores(report: ComplianceReport, logo: str) -> str:
 
     return (
         f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-        f'{_hbar(report.company_name, "Score Breakdown", logo)}'
+        f'{_hbar(report.company_name, "Score-Übersicht", logo)}'
         f'{_body_open()}'
-        f'{_sec_title("Section 03", "Score Breakdown")}'
+        f'{_sec_title("Abschnitt 03", "Score-Übersicht")}'
         f'<div style="background:{sbg};border:1.5pt solid {sbr};border-radius:10pt;'
         f'padding:7mm 9mm;margin-bottom:6mm;display:flex;align-items:center;gap:9mm;'
         f'box-shadow:0 2pt 10pt rgba(0,0,0,0.06);">'
@@ -430,27 +430,27 @@ def _scores(report: ComplianceReport, logo: str) -> str:
         f'<div style="{FONT}font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.9pt;color:{sc};opacity:.8;margin-top:2pt;">Score</div>'
         f'</div>'
         f'<div>'
-        f'<div style="{FONT}font-size:11pt;font-weight:700;color:{NAVY};margin-bottom:2.5mm;">Overall Compliance Score</div>'
+        f'<div style="{FONT}font-size:11pt;font-weight:700;color:{NAVY};margin-bottom:2.5mm;">Gesamt-Compliance-Score</div>'
         f'<div style="{FONT}font-size:8pt;color:#64748b;line-height:1.7;">'
-        f'{len(report.regulation_scores)} regulations checked &nbsp;&middot;&nbsp; '
-        f'{n_t} requirements assessed &nbsp;&middot;&nbsp; '
-        f'{len(report.gap_analysis)} gaps found</div>'
+        f'{len(report.regulation_scores)} Vorschriften geprüft &nbsp;&middot;&nbsp; '
+        f'{n_t} Anforderungen bewertet &nbsp;&middot;&nbsp; '
+        f'{len(report.gap_analysis)} Lücken gefunden</div>'
         f'</div></div>'
         f'<table style="width:100%;border-collapse:collapse;margin-bottom:6mm;table-layout:fixed;">'
-        f'<tr>{sbox(n_c,"Compliant","#16a34a")}{sbox(n_p,"Partial","#b45309")}{sbox(n_n,"Non-Compliant","#dc2626")}{sbox(n_t,"Total Checked",NAVY)}</tr>'
+        f'<tr>{sbox(n_c,"Konform","#16a34a")}{sbox(n_p,"Teilweise","#b45309")}{sbox(n_n,"Nicht konform","#dc2626")}{sbox(n_t,"Gesamt geprüft",NAVY)}</tr>'
         f'</table>'
         f'<div style="border-radius:8pt;overflow:hidden;box-shadow:0 1pt 6pt rgba(0,0,0,0.06);">'
         f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;word-break:break-word;">'
         f'<thead><tr>'
-        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:left;width:28%;border-bottom:2pt solid #bfdbfe;">Regulation</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:left;width:28%;border-bottom:2pt solid #bfdbfe;">Vorschrift</th>'
         f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;text-align:center;width:10%;border-bottom:2pt solid #bfdbfe;">Score</th>'
-        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;width:38%;border-bottom:2pt solid #bfdbfe;">Progress</th>'
+        f'<th style="{FONT}background:#dbeafe;color:#1e40af;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;padding:5pt 8pt;width:38%;border-bottom:2pt solid #bfdbfe;">Fortschritt</th>'
         f'<th style="{FONT}background:#dbeafe;color:#16a34a;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">C</th>'
         f'<th style="{FONT}background:#dbeafe;color:#b45309;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">P</th>'
         f'<th style="{FONT}background:#dbeafe;color:#dc2626;font-size:7pt;font-weight:700;padding:5pt 8pt;text-align:center;width:8%;border-bottom:2pt solid #bfdbfe;">NC</th>'
         f'</tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
-        f'<div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:3mm;">C = Compliant &nbsp;&nbsp; P = Partially Compliant &nbsp;&nbsp; NC = Non-Compliant</div>'
+        f'<div style="{FONT}font-size:7pt;color:#94a3b8;margin-top:3mm;">K = Konform &nbsp;&nbsp; T = Teilweise konform &nbsp;&nbsp; NK = Nicht konform</div>'
         f'{_body_close()}</div>'
     )
 
@@ -472,7 +472,7 @@ def _gap_card(g) -> str:
             f'<div style="margin-top:6pt;padding:6pt 9pt;'
             f'border-left:3.5pt solid #dc2626;background:#fef2f2;border-radius:0 5pt 5pt 0;">'
             f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;'
-            f'letter-spacing:1.1pt;color:#dc2626;margin-bottom:2.5pt;">What needs to change</div>'
+            f'letter-spacing:1.1pt;color:#dc2626;margin-bottom:2.5pt;">Was muss sich ändern</div>'
             f'<div style="{FONT}font-size:8.5pt;color:#7f1d1d;line-height:1.65;">{defic}</div>'
             f'</div>'
         )
@@ -490,7 +490,7 @@ def _gap_card(g) -> str:
         conf_badge = (
             f'<span style="{FONT}display:inline-block;font-size:6.5pt;font-weight:700;'
             f'padding:2pt 7pt;border-radius:20pt;{conf_style}margin-right:4pt;">'
-            f'{_esc(conf)} confidence</span>'
+            f'{_esc(conf)} Konfidenz</span>'
         )
 
     return (
@@ -539,8 +539,8 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
     if not report.gap_analysis:
         return (
             f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-            f'{_hbar(report.company_name, "Gap Analysis", logo)}'
-            f'{_body_open()}{_sec_title("Section 04","Gap Analysis")}<p>No gaps found.</p>{_body_close()}'
+            f'{_hbar(report.company_name, "Lückenanalyse", logo)}'
+            f'{_body_open()}{_sec_title("Abschnitt 04","Lückenanalyse")}<p>Keine Compliance-Lücken gefunden.</p>{_body_close()}'
             f'</div>'
         )
 
@@ -561,10 +561,10 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
 
     return (
         f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-        f'{_hbar(report.company_name, "Gap Analysis", logo)}'
+        f'{_hbar(report.company_name, "Lückenanalyse", logo)}'
         f'{_body_open()}'
-        f'{_sec_title("Section 04", "Gap Analysis")}'
-        f'{_sec_sub("Every requirement we checked, grouped by regulation. Exactly why each one passed or failed, and what needs to change.")}'
+        f'{_sec_title("Abschnitt 04", "Lückenanalyse")}'
+        f'{_sec_sub("Jede geprüfte Anforderung, nach Vorschrift gruppiert. Warum jede Anforderung bestanden oder nicht bestanden wurde und was sich ändern muss.")}'
         f'{body}'
         f'{_body_close()}</div>'
     )
@@ -576,7 +576,7 @@ def _gaps(report: ComplianceReport, logo: str) -> str:
 
 def _action_card(a) -> str:
     pm  = PRIORITY_STYLES.get(a.priority, PRIORITY_STYLES[Priority.LOW])
-    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Deadline:</b> {_esc(_clean(a.deadline))}" if a.deadline else ""
+    dl  = f"&nbsp;&nbsp;<b style='color:#374151;'>Frist:</b> {_esc(_clean(a.deadline))}" if a.deadline else ""
     return (
         f'<div style="border:1pt solid #e8edf2;border-radius:8pt;'
         f'margin-bottom:8mm;overflow:hidden;page-break-inside:avoid;'
@@ -592,7 +592,7 @@ def _action_card(a) -> str:
         f'<div style="padding:7pt 10pt 8pt;background:#fff;">'
         f'<div style="{FONT}font-size:8.5pt;color:#1a202c;line-height:1.65;margin-bottom:4.5pt;">{_esc(_clean(a.action))}</div>'
         f'<div style="{FONT}font-size:7.5pt;color:#64748b;">'
-        f'<b style="color:#374151;">Effort:</b> {_esc(_clean(a.estimated_effort))}{dl}'
+        f'<b style="color:#374151;">Aufwand:</b> {_esc(_clean(a.estimated_effort))}{dl}'
         f'</div></div></div>'
     )
 
@@ -601,8 +601,8 @@ def _actions(report: ComplianceReport, logo: str) -> str:
     if not report.action_plan:
         return (
             f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-            f'{_hbar(report.company_name, "Action Plan", logo)}'
-            f'{_body_open()}{_sec_title("Section 05","Action Plan")}<p>No actions required.</p>{_body_close()}'
+            f'{_hbar(report.company_name, "Maßnahmenplan", logo)}'
+            f'{_body_open()}{_sec_title("Abschnitt 05","Maßnahmenplan")}<p>Keine Maßnahmen erforderlich.</p>{_body_close()}'
             f'</div>'
         )
 
@@ -628,10 +628,10 @@ def _actions(report: ComplianceReport, logo: str) -> str:
 
     return (
         f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-        f'{_hbar(report.company_name, "Action Plan", logo)}'
+        f'{_hbar(report.company_name, "Maßnahmenplan", logo)}'
         f'{_body_open()}'
-        f'{_sec_title("Section 05", "Action Plan")}'
-        f'{_sec_sub("A concrete to-do list for closing your compliance gaps. Start with Critical and High items.")}'
+        f'{_sec_title("Abschnitt 05", "Maßnahmenplan")}'
+        f'{_sec_sub("Eine konkrete Aufgabenliste zum Schließen Ihrer Compliance-Lücken. Beginnen Sie mit kritischen und hohen Maßnahmen.")}'
         f'{body}'
         f'{_body_close()}</div>'
     )
@@ -669,11 +669,11 @@ def _kb_versions_table(report: ComplianceReport) -> str:
     prompt_ver = _esc(report.prompt_version or "—")
     version_rows = (
         f'<tr style="border-bottom:0.5pt solid #f1f5f9;background:#f0f9ff;">'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Rule Engine Version</td>'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Regelmodul-Version</td>'
         f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#0369a1;font-family:monospace;" colspan="3">{engine_ver}</td>'
         f'</tr>'
         f'<tr style="border-bottom:0.5pt solid #f1f5f9;background:#f0f9ff;">'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Prompt Version</td>'
+        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#0369a1;">Prompt-Version</td>'
         f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#0369a1;font-family:monospace;" colspan="3">{prompt_ver}</td>'
         f'</tr>'
     )
@@ -687,7 +687,7 @@ def _kb_versions_table(report: ComplianceReport) -> str:
         label = _REG_DISPLAY.get(reg_key, reg_key.upper())
         url_html = (
             f'<a href="{_esc(src_url)}" style="color:{BLUE};text-decoration:none;">'
-            f'official text</a>'
+            f'Gesetzestext</a>'
             if src_url else "—"
         )
         kb_rows += (
@@ -704,13 +704,13 @@ def _kb_versions_table(report: ComplianceReport) -> str:
     return (
         f'<div style="margin-top:8mm;">'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
-        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Knowledge Base Audit Trail</div>'
+        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Wissensdatenbank-Prüfpfad</div>'
         f'<table style="width:100%;border-collapse:collapse;border:1pt solid #e8edf2;border-radius:6pt;overflow:hidden;">'
         f'<thead><tr style="background:#f8fafc;">'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Component / Regulation</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Ingested / Version</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source Hash</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Source</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Komponente / Vorschrift</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Eingelesen / Version</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Quelldatei-Hash</th>'
+        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:#64748b;text-align:left;">Quelle</th>'
         f'</tr></thead>'
         f'<tbody>{all_rows}</tbody>'
         f'</table>'
@@ -761,20 +761,20 @@ def _input_assumptions(report: ComplianceReport) -> str:
         f'<div style="margin-top:8mm;padding:5mm 6mm;background:#fafafa;border:1pt solid #e8edf2;'
         f'border-radius:8pt;box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">'
         f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
-        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:3mm;">Input Assumptions Used in This Assessment</div>'
+        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:3mm;">Eingabeannahmen für dieses Screening</div>'
         f'<table style="width:100%;border-collapse:collapse;">'
-        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;width:45%;">Company</td>'
+        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;width:45%;">Unternehmen</td>'
         f'<td style="{FONT}font-size:8pt;color:#334155;padding:1.5mm 0;">{_esc(report.company_name)}</td></tr>'
-        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;">Applicable Regulations</td>'
+        f'<tr><td style="{FONT}font-size:8pt;font-weight:600;color:#64748b;padding:1.5mm 0;">Anwendbare Vorschriften</td>'
         f'<td style="{FONT}font-size:8pt;color:#334155;padding:1.5mm 0;">{_esc(reg_list)}</td></tr>'
         f'</table>'
-        f'<div style="{FONT}font-size:7.5pt;font-weight:600;color:#64748b;margin-top:3mm;margin-bottom:1.5mm;">Inferred Characteristics</div>'
+        f'<div style="{FONT}font-size:7.5pt;font-weight:600;color:#64748b;margin-top:3mm;margin-bottom:1.5mm;">Abgeleitete Merkmale</div>'
         f'<ul style="margin:0;padding-left:4mm;">{char_rows}</ul>'
     )
     if assumption_rows:
         html += (
             f'<div style="{FONT}font-size:7.5pt;font-weight:600;color:#e67e22;margin-top:3mm;margin-bottom:1.5mm;">'
-            f'Inferred Assumptions (not confirmed by user — verify before acting)</div>'
+            f'Abgeleitete Annahmen (nicht vom Nutzer bestätigt — vor Maßnahmen prüfen)</div>'
             f'<ul style="margin:0;padding-left:4mm;">{assumption_rows}</ul>'
         )
     html += '</div>'
@@ -787,11 +787,11 @@ def _input_assumptions(report: ComplianceReport) -> str:
 
 def _closing(report: ComplianceReport, logo: str) -> str:
     steps = [
-        "Start with <b>Critical</b> and <b>High</b> priority items. These are your live legal risks right now.",
-        "Give every action an owner and a deadline. Without that, nothing gets done.",
-        "Keep written records of everything you implement. Regulators will ask for proof.",
-        "Run this assessment again after you make changes. You will see the score move.",
-        "For anything you are unsure about, talk to a lawyer before acting on it.",
+        "Beginnen Sie mit Maßnahmen der Priorität <b>Kritisch</b> und <b>Hoch</b>. Das sind Ihre aktuellen rechtlichen Risiken.",
+        "Weisen Sie jeder Maßnahme eine verantwortliche Person und eine Frist zu. Ohne das passiert nichts.",
+        "Halten Sie alles, was Sie umsetzen, schriftlich fest. Behörden werden Nachweise verlangen.",
+        "Führen Sie dieses Screening erneut durch, nachdem Sie Änderungen vorgenommen haben. Der Score wird sich verbessern.",
+        "Bei allem, worüber Sie unsicher sind, sprechen Sie vor einer Entscheidung mit einem Rechtsanwalt.",
     ]
     items = "".join(
         f'<div style="display:flex;align-items:flex-start;gap:8pt;margin-bottom:5mm;">'
@@ -804,14 +804,14 @@ def _closing(report: ComplianceReport, logo: str) -> str:
     )
     return (
         f'<div style="page-break-before:always;border-left:3.5pt solid {BLUE};">'
-        f'{_hbar(report.company_name, "Next Steps", logo)}'
+        f'{_hbar(report.company_name, "Nächste Schritte", logo)}'
         f'{_body_open()}'
-        f'{_sec_title("Section 06", "Next Steps")}'
-        f'{_sec_sub("You know where you stand now. Here is what to do next.")}'
+        f'{_sec_title("Abschnitt 06", "Nächste Schritte")}'
+        f'{_sec_sub("Sie kennen jetzt Ihren Stand. Das sind die nächsten Schritte.")}'
         f'<div style="margin-top:2mm;">{items}</div>'
         + _input_assumptions(report)
         + f'<div style="margin-top:8mm;">'
-        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Legal Disclaimer</div>'
+        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Rechtlicher Hinweis</div>'
         f'<div style="{FONT}padding:6mm 7mm;background:#f8fafc;border:1pt solid #e8edf2;'
         f'border-radius:8pt;font-size:8pt;color:#64748b;line-height:1.75;font-style:italic;'
         f'box-shadow:0 1pt 4pt rgba(0,0,0,0.04);">{_esc(report.disclaimer)}</div>'
@@ -819,8 +819,8 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         + _kb_versions_table(report)
         + f'<div style="margin-top:8mm;padding-top:5mm;border-top:1pt solid #f1f5f9;'
         f'text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">'
-        f'<strong style="color:{NAVY};">Complio</strong> &nbsp;&middot;&nbsp; Autonomous Regulatory Compliance for German SMEs<br>'
-        f'<span style="font-size:7pt;">Produced by an AI agent. Not a certified legal audit. Not legal advice.</span>'
+        f'<strong style="color:{NAVY};">Complio</strong> &nbsp;&middot;&nbsp; Automatisiertes Compliance-Screening für deutsche KMU<br>'
+        f'<span style="font-size:7pt;">Erstellt von einem KI-System. Kein zertifiziertes Audit. Keine Rechtsberatung.</span>'
         f'</div>'
         f'{_body_close()}</div>'
     )
@@ -832,7 +832,7 @@ def generate_pdf(report: ComplianceReport) -> bytes:
     logo = _logo_data_uri()
 
     html = (
-        '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+        '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">'
         f'<style>{_FONT_CSS}'
         '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}'
         "body{font-family:'Inter',Arial,sans-serif;font-size:9.5pt;color:#0f172a;background:#fff;"
