@@ -69,6 +69,51 @@ async def list_companies(current_user: dict = Depends(get_current_user)):
     ]}
 
 
+@router.get("/api/dashboard/summary")
+async def dashboard_summary(current_user: dict = Depends(get_current_user)):
+    from db.database import AsyncSessionLocal
+    from db.models import Company, Report, Notification
+    from sqlalchemy import select, func
+
+    user_id = current_user["id"]
+    async with AsyncSessionLocal() as db:
+        company_count = (await db.execute(
+            select(func.count()).where(Company.user_id == user_id)
+        )).scalar_one()
+
+        report_stats = (await db.execute(
+            select(func.count(), func.avg(Report.overall_score_percent))
+            .join(Company, Report.company_id == Company.id)
+            .where(Company.user_id == user_id)
+        )).one()
+
+        notifications = (await db.execute(
+            select(Notification)
+            .where(Notification.user_id == user_id)
+            .order_by(Notification.created_at.desc())
+            .limit(5)
+        )).scalars().all()
+
+    avg_score = float(report_stats[1]) if report_stats[1] is not None else None
+
+    return {
+        "company_count": company_count,
+        "report_count": report_stats[0],
+        "avg_score": round(avg_score, 1) if avg_score is not None else None,
+        "recent_notifications": [
+            {
+                "id": n.id,
+                "type": n.type,
+                "title": n.title,
+                "message": n.message,
+                "read": n.read_at is not None,
+                "created_at": n.created_at.isoformat() if n.created_at else None,
+            }
+            for n in notifications
+        ],
+    }
+
+
 @router.get("/api/companies/{company_id}")
 async def get_company(company_id: str, current_user: dict = Depends(get_current_user)):
     from db.database import AsyncSessionLocal

@@ -34,8 +34,8 @@ export default function ReportsPage() {
     <div className="min-h-screen bg-dark-950 pt-24">
       <div className="border-b border-white/[0.06] bg-dark-900/60 px-4 sm:px-6 py-6">
         <div className="mx-auto max-w-3xl">
-          <h1 className="text-xl font-bold text-white tracking-tight">Recent Reports</h1>
-          <p className="text-sm text-slate-500 mt-1">All screenings run on this server</p>
+          <h1 className="text-xl font-bold text-white tracking-tight">Berichte</h1>
+          <p className="text-sm text-slate-500 mt-1">Alle durchgeführten Screenings</p>
         </div>
       </div>
 
@@ -61,10 +61,10 @@ export default function ReportsPage() {
               <FileText className="h-6 w-6 text-brand-400" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white mb-1">No reports yet</h3>
+              <h3 className="text-base font-bold text-white mb-1">Noch keine Berichte</h3>
               <p className="text-sm text-slate-500 leading-relaxed">
-                Run a compliance screening to generate your first report.
-                It covers 14 German and EU regulations and takes about 2 minutes.
+                Führen Sie ein Compliance-Screening durch, um Ihren ersten Bericht zu erstellen.
+                14 Gesetze, fertig in ca. 2 Minuten.
               </p>
             </div>
             <div className="flex flex-col gap-2 w-full">
@@ -72,13 +72,13 @@ export default function ReportsPage() {
                 href="/analyze"
                 className="w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-500 transition-colors text-center"
               >
-                Start a screening
+                Screening starten
               </Link>
               <Link
                 href="/dashboard"
                 className="w-full rounded-xl border border-white/[0.08] px-5 py-3 text-sm font-medium text-slate-400 hover:text-white hover:border-white/20 transition-colors text-center"
               >
-                Go to dashboard
+                Zum Dashboard
               </Link>
             </div>
           </motion.div>
@@ -111,11 +111,11 @@ export default function ReportsPage() {
                         {r.company_name}
                       </p>
                       <p className="text-xs text-slate-600 mt-0.5">
-                        {new Date(r.generated_at).toLocaleDateString("en-GB", {
+                        {new Date(r.generated_at).toLocaleDateString("de-DE", {
                           day: "numeric", month: "short", year: "numeric",
                         })}
                         {" · "}
-                        {r.applicable_regulation_count} regulation{r.applicable_regulation_count !== 1 ? "s" : ""}
+                        {r.applicable_regulation_count} {r.applicable_regulation_count !== 1 ? "Vorschriften" : "Vorschrift"}
                       </p>
                     </div>
                   </div>

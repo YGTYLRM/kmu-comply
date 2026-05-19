@@ -36,6 +36,14 @@ class ComplianceGap(BaseModel):
     status: ComplianceStatus
     evidence: str = Field(..., description="Explanation of WHY this status was assigned")
     deficiency_description: Optional[str] = None
+    evidence_quote: Optional[str] = Field(
+        None,
+        description=(
+            "For VERIFIED findings: a verbatim sentence from the retrieved chunk that "
+            "directly supports this finding. Makes hallucination visible — if the LLM "
+            "cannot quote the chunk, the finding is suspect."
+        ),
+    )
     confidence: str = "HIGH"          # HIGH | MEDIUM | LOW
     confidence_reason: Optional[str] = None
     source_url: Optional[str] = None  # official source URL for this regulation

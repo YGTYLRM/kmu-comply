@@ -73,7 +73,9 @@ class Settings(BaseSettings):
     llm_max_retries: int = 4
 
     # PDF generation concurrency limit
-    pdf_concurrency: int = 3
+    # 2 is the safe default for an 8GB VPS: each Playwright/Chromium render uses ~2GB RAM.
+    # 3 concurrent renders = ~6GB, leaving only 2GB for the rest of the stack.
+    pdf_concurrency: int = 2
 
 
 settings = Settings()

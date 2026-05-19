@@ -166,6 +166,12 @@ export interface ComplianceReport {
     source_url: string;
   }>;
   inferred_assumptions?: string[];
+  regulation_coverage?: Record<string, {
+    law_chunks: number;
+    guidance_chunks: number;
+    total_chunks: number;
+    unique_articles: number;
+  }>;
 }
 
 export interface StepProgress {

@@ -299,10 +299,11 @@ Output ONLY a valid JSON array:
   {{
     "regulation": "gdpr_dsgvo",
     "article_number": "Art. 30",
-    "article_title": "Records of processing activities",
+    "article_title": "Verzeichnis von Verarbeitungstätigkeiten",
     "status": "NON_COMPLIANT",
-    "evidence": "The company does not maintain Records of Processing Activities. With non-occasional processing and over 20 staff regularly handling personal data, Art. 30(1) GDPR records are mandatory and the SME exception does not apply.",
-    "deficiency_description": "No Records of Processing Activities (Verarbeitungsverzeichnis) in place. Must document all processing operations including purpose, data categories, and retention periods."
+    "evidence": "Das Unternehmen führt kein Verzeichnis von Verarbeitungstätigkeiten. Bei nicht gelegentlicher Verarbeitung und über 20 Mitarbeitern, die regelmäßig personenbezogene Daten verarbeiten, ist das Verzeichnis nach Art. 30 Abs. 1 DSGVO verpflichtend — die KMU-Ausnahme greift nicht.",
+    "deficiency_description": "Kein Verarbeitungsverzeichnis vorhanden. Alle Verarbeitungstätigkeiten inklusive Zweck, Datenkategorien, Empfänger und Aufbewahrungsfristen müssen dokumentiert werden.",
+    "evidence_quote": "\"Controllers shall maintain a record of processing activities under their responsibility.\" (Art. 30(1) GDPR, retrieved chunk)"
   }}
 ]
 
@@ -321,6 +322,7 @@ Constraints:
 - CANNOT_ASSESS evidence MUSS eine konkrete Frage enthalten, die das Unternehmen beantworten muss
 - Konsistenz: gleiche Profilfakten ergeben gleichen Status
 - CANNOT_ASSESS ist akzeptabel wenn wirklich nötig — keinen Status erzwingen wenn Daten fehlen
+- evidence_quote: Bei VERIFIED-Befunden (gestützt auf abgerufenen Gesetzestext) zitieren Sie einen exakten Satz aus dem Quelltext in evidence_quote. Bei SELF-REPORTED oder CANNOT_ASSESS weglassen. Ein fehlendes Zitat bei VERIFIED-Befunden signalisiert eine möglicherweise halluzinierte Quelle.
 </instructions>"""
 
 

@@ -519,6 +519,7 @@ _TOOL_GAP_ANALYSIS = {
                         "status":                 {"type": "string", "enum": ["COMPLIANT","PARTIALLY_COMPLIANT","NON_COMPLIANT","CANNOT_ASSESS"]},
                         "evidence":               {"type": "string"},
                         "deficiency_description": {"type": "string"},
+                        "evidence_quote":         {"type": "string", "description": "For VERIFIED findings: verbatim sentence from the retrieved chunk supporting this finding. Omit for SELF-REPORTED or CANNOT_ASSESS findings."},
                     },
                     "required": ["regulation","article_number","article_title","status","evidence"],
                 },

@@ -69,7 +69,7 @@ export default function PrintPage() {
     </div>
   );
 
-  const date = new Date(report.generated_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const date = new Date(report.generated_at).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
   const applicable = report.applicable_regulations.filter(r => r.applies);
   const notApplicable = report.applicable_regulations.filter(r => !r.applies);
   const scored = report.regulation_scores.filter(s => s.total_requirements > 0);

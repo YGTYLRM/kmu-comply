@@ -154,7 +154,12 @@ class TestComplianceReportModels:
             regulation_scores=[],
             overall_score_percent=0.0,
         )
-        assert "not constitute legal advice" in report.disclaimer
+        assert report.disclaimer  # non-empty disclaimer is required
+        assert any(phrase in report.disclaimer for phrase in [
+            "not constitute legal advice",       # English disclaimer
+            "keine Rechtsberatung",              # German disclaimer
+            "stellt keine Rechtsberatung dar",   # German disclaimer variant
+        ]), f"Disclaimer does not contain a legal advice caveat: {report.disclaimer[:200]}"
 
 
 class TestCitationVerification:

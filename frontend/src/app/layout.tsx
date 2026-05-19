@@ -7,19 +7,19 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Complio: Regulatory Compliance Screening for German SMEs",
-  description: "Preliminary compliance screening for German SMEs. Find which regulations apply to your company and where your gaps are, in minutes.",
+  title: "Complio: Compliance-Screening für deutsche Unternehmen",
+  description: "Automatisiertes Compliance-Screening für deutsche KMU. In Minuten wissen, welche Gesetze gelten und wo Lücken bestehen.",
   openGraph: {
-    title: "Complio — Compliance Screening for German SMEs",
-    description: "Automated regulatory screening covering 14 German and EU laws. Know your obligations in minutes, not months.",
+    title: "Complio — Compliance-Screening für deutsche Unternehmen",
+    description: "14 deutsche und EU-Vorschriften automatisch geprüft. Compliance-Pflichten kennen — in Minuten, nicht Monaten.",
     type: "website",
     locale: "de_DE",
     siteName: "Complio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Complio — Compliance Screening for German SMEs",
-    description: "Automated regulatory screening covering 14 German and EU laws.",
+    title: "Complio — Compliance-Screening für deutsche Unternehmen",
+    description: "14 deutsche und EU-Vorschriften automatisch geprüft. Compliance-Pflichten kennen — in Minuten, nicht Monaten.",
   },
 };
 

@@ -1,127 +1,254 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AGB — Complio",
+  title: "Allgemeine Geschäftsbedingungen — Complio",
 };
 
 export default function AGBPage() {
   return (
     <main className="min-h-screen pt-32 pb-20">
       <div className="mx-auto max-w-2xl px-6">
-        <h1 className="text-3xl font-bold text-white mb-2">Allgemeine Geschäftsbedingungen (AGB)</h1>
-        <p className="text-xs text-slate-600 mb-8">Stand: [Datum eintragen]</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Allgemeine Geschäftsbedingungen</h1>
+        <p className="text-xs text-slate-500 mb-10">Stand: Mai 2026</p>
 
-        <div className="space-y-8 text-sm text-slate-400 leading-relaxed">
+        <div className="space-y-10 text-sm text-slate-400 leading-relaxed">
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 1 Geltungsbereich und Vertragspartner</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 1 Geltungsbereich</h2>
             <p>
-              Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge zwischen [Firma] (&ldquo;Complio&rdquo;,
-              &ldquo;wir&rdquo;, &ldquo;uns&rdquo;) und gewerblichen Kunden (&ldquo;Nutzer&rdquo;) über die Nutzung der
-              Complio-Plattform. Complio richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB. Die Nutzung
-              durch Verbraucher (§ 13 BGB) ist ausgeschlossen.
+              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen Complio,
+              Darmstadt (&ldquo;Complio&rdquo;, &ldquo;Anbieter&rdquo;) und seinen Kunden
+              (&ldquo;Nutzer&rdquo;, &ldquo;Kunde&rdquo;) über die Nutzung der Complio-Plattform
+              unter complio.de sowie aller zugehörigen Dienste.
+            </p>
+            <p className="mt-3">
+              Complio richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB — juristische
+              Personen des öffentlichen oder privaten Rechts sowie natürliche Personen, die in Ausübung
+              ihrer gewerblichen oder selbstständigen beruflichen Tätigkeit handeln. Die Nutzung durch
+              Verbraucher im Sinne des § 13 BGB ist ausgeschlossen.
+            </p>
+            <p className="mt-3">
+              Abweichende, entgegenstehende oder ergänzende Allgemeine Geschäftsbedingungen des Nutzers
+              werden nicht Vertragsbestandteil, es sei denn, ihrer Geltung wird ausdrücklich
+              schriftlich zugestimmt.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 2 Leistungsbeschreibung</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 2 Leistungsgegenstand</h2>
             <p>
-              Complio ist eine SaaS-Plattform für automatisierte Compliance-Screenings. Der Dienst analysiert das
-              eingereichte Unternehmensprofil gegen 14 deutsche und europäische Rechtsvorschriften und erstellt einen
-              vorläufigen Compliance-Bericht mit Gap-Analyse und priorisierten Handlungsempfehlungen.
+              Complio ist eine Software-as-a-Service-Plattform (SaaS) für automatisierte
+              Compliance-Screenings. Der Dienst verarbeitet das vom Nutzer eingegebene
+              Unternehmensprofil und erstellt auf dieser Grundlage einen vorläufigen Compliance-Bericht
+              (Gap-Analyse) gegenüber ausgewählten deutschen und europäischen Rechtsvorschriften,
+              einschließlich priorisierter Handlungsempfehlungen.
             </p>
-            <p className="mt-2 font-semibold text-amber-400">
-              Wichtiger Hinweis: Complio-Berichte sind vorläufige Screening-Ergebnisse und stellen keine Rechtsberatung
-              dar. Sie ersetzen nicht die Beratung durch einen qualifizierten Rechtsanwalt. Complio haftet nicht für
-              Entscheidungen, die allein auf Basis der Screening-Ergebnisse getroffen werden.
+            <p className="mt-3">
+              Der aktuelle Regelungsumfang umfasst 14 Vorschriften, darunter DSGVO, BDSG, NIS2,
+              EU AI Act, LkSG, EnEfG, CSRD, HinSchG, ArbSchG, AGG, MiLoG, TTDSG/TDDDG, GwG und
+              EU Data Act. Complio behält sich vor, den Umfang der analysierten Vorschriften
+              anzupassen und wird wesentliche Änderungen rechtzeitig ankündigen.
+            </p>
+            <p className="mt-3 text-amber-400/90 font-medium">
+              Complio-Berichte sind automatisierte Ersteinschätzungen auf Basis der eingegebenen
+              Unternehmensdaten. Sie stellen keine Rechtsberatung im Sinne des
+              Rechtsdienstleistungsgesetzes (RDG) dar, begründen kein Mandatsverhältnis und ersetzen
+              nicht die Beratung durch einen zugelassenen Rechtsanwalt. Der Nutzer ist verpflichtet,
+              die Ergebnisse eigenverantwortlich zu prüfen und gegebenenfalls rechtlichen Rat einzuholen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 3 Vertragsschluss und Laufzeit</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 3 Vertragsschluss</h2>
             <p>
-              Der Vertrag kommt durch Abschluss des Bestellprozesses (Registrierung und Auswahl eines Tarifs) zustande.
-              Abonnements laufen monatlich oder jährlich und verlängern sich automatisch, sofern sie nicht rechtzeitig
-              gekündigt werden. Die Kündigungsfrist beträgt 30 Tage zum Ende der jeweiligen Laufzeit.
+              Der Nutzungsvertrag kommt durch Abschluss des digitalen Registrierungs- und
+              Bestellprozesses auf complio.de zustande. Mit Absenden der Bestellung gibt der Nutzer
+              ein verbindliches Angebot ab; der Vertrag wird durch Bestätigung per E-Mail oder
+              durch Freischaltung des Dienstes durch Complio angenommen.
+            </p>
+            <p className="mt-3">
+              Für den Starter-Tarif (Einzelbericht) gilt die Bestellung als einmaliger Auftrag ohne
+              automatische Verlängerung. Abonnement-Tarife (Professional, Enterprise) laufen für die
+              vereinbarte Laufzeit und verlängern sich automatisch um einen weiteren Monat, sofern
+              keine Kündigung erfolgt.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 4 Preise und Zahlung</h2>
-            <p>
-              Die aktuellen Preise sind auf der Website unter /pricing einsehbar. Alle Preise verstehen sich zuzüglich
-              der gesetzlichen Mehrwertsteuer. Zahlungen erfolgen im Voraus über Stripe. Bei Zahlungsverzug behalten
-              wir uns vor, den Zugang zum Dienst zu sperren.
+            <h2 className="text-white font-semibold text-base mb-4">§ 4 Tarife, Preise und Zahlung</h2>
+            <p>Die nachfolgenden Tarife sind zum Zeitpunkt des Vertragsschlusses maßgeblich:</p>
+            <div className="mt-4 rounded-lg border border-white/[0.07] overflow-hidden">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-white/[0.07] bg-white/[0.02]">
+                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Tarif</th>
+                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Preis (netto)</th>
+                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Leistungsumfang</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.05]">
+                  <tr>
+                    <td className="py-3 px-4 text-slate-300 font-medium">Starter</td>
+                    <td className="py-3 px-4">€ 129,00 / Einzelbericht</td>
+                    <td className="py-3 px-4">Einmaliges Screening, alle 14 Vorschriften, PDF-Bericht, 60 Tage Zugriff</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 text-slate-300 font-medium">Professional</td>
+                    <td className="py-3 px-4">€ 249,00 / Monat</td>
+                    <td className="py-3 px-4">Unbegrenzte Screenings, alle 14 Vorschriften, Berichtshistorie, E-Mail-Support</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 text-slate-300 font-medium">Enterprise</td>
+                    <td className="py-3 px-4">Individuell vereinbart</td>
+                    <td className="py-3 px-4">Multi-Einheiten, API-Zugang, individueller Umfang, SLA, Ansprechpartner</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4">
+              Alle Preise verstehen sich zuzüglich der gesetzlichen Umsatzsteuer. Die Abrechnung
+              erfolgt im Voraus. Zahlungen werden über Stripe Inc. abgewickelt. Bei Zahlungsverzug
+              ist Complio berechtigt, den Zugang zum Dienst nach vorheriger Ankündigung zu sperren.
+              Complio behält sich das Recht vor, Preise mit einer Ankündigungsfrist von 30 Tagen
+              zu ändern; bestehende Abonnements sind bis zum Ende der laufenden Abrechnungsperiode
+              nicht betroffen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 5 Nutzungsrechte und Verbote</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 5 Pflichten und Obliegenheiten des Nutzers</h2>
+            <p>Der Nutzer ist verpflichtet:</p>
+            <ul className="mt-3 space-y-2 list-disc list-inside">
+              <li>vollständige und zutreffende Angaben im Unternehmensprofil zu machen, da die Qualität der Berichte unmittelbar von der Datenqualität abhängt;</li>
+              <li>Zugangsdaten vertraulich zu behandeln und Dritten nicht zugänglich zu machen;</li>
+              <li>Complio unverzüglich zu informieren, sofern ein Missbrauch des Zugangs festgestellt wird;</li>
+              <li>die Plattform ausschließlich für eigene Compliance-Zwecke und nicht für Zwecke Dritter zu nutzen, sofern der gebuchte Tarif keine Mehrfachnutzung vorsieht;</li>
+              <li>die Ergebnisse nicht als Rechtsberatung gegenüber Dritten darzustellen oder zu verwenden.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-white font-semibold text-base mb-4">§ 6 Nutzungsrechte</h2>
             <p>
-              Der Nutzer erhält ein nicht-ausschließliches, nicht übertragbares Recht zur Nutzung der Plattform für
-              eigene Compliance-Zwecke. Verboten ist insbesondere: (a) die Weitergabe von Zugangsdaten an Dritte,
-              (b) die Nutzung für mehr Unternehmen als im gebuchten Tarif vorgesehen, (c) das automatisierte Abfragen
-              der API ohne ausdrückliche Genehmigung, (d) die Verwendung der Berichte als Rechtsberatung gegenüber
-              Dritten ohne entsprechende Qualifikation.
+              Complio räumt dem Nutzer für die Dauer des Vertragsverhältnisses ein einfaches,
+              nicht übertragbares und nicht unterlizenzierbares Recht zur Nutzung der Plattform
+              und der erstellten Berichte für interne Compliance-Zwecke ein. Die Berichte dürfen
+              intern weitergegeben werden; eine Weitergabe an Dritte gegen Entgelt oder als
+              vermeintliche Rechtsberatung ist untersagt.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 6 Datenschutz und Vertraulichkeit</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 7 Verfügbarkeit und Wartung</h2>
             <p>
-              Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung. Der Nutzer
-              versichert, dass er berechtigt ist, die hochgeladenen Unternehmensdaten und Dokumente für die Nutzung
-              des Dienstes einzureichen.
+              Complio strebt eine Verfügbarkeit des Dienstes von 99 % im Jahresdurchschnitt an,
+              ausgenommen geplante Wartungsfenster, höhere Gewalt und Umstände außerhalb des
+              Einflussbereichs von Complio (z. B. Ausfälle von Drittanbietern). Ein Anspruch auf
+              ununterbrochene Verfügbarkeit besteht nicht, sofern kein gesondertes SLA vereinbart
+              ist.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 7 Haftungsbeschränkung</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 8 Datenschutz und Vertraulichkeit</h2>
             <p>
-              Complio haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie für Schäden aus der Verletzung
-              des Lebens, des Körpers oder der Gesundheit. Bei leichter Fahrlässigkeit haftet Complio nur bei Verletzung
-              wesentlicher Vertragspflichten, und zwar der Höhe nach beschränkt auf den typischerweise vorhersehbaren
-              Schaden. In jedem Fall ist die Haftung auf die Summe der in den letzten 12 Monaten gezahlten
-              Abonnementgebühren begrenzt.
+              Die Verarbeitung personenbezogener Daten erfolgt gemäß der{" "}
+              <a href="/datenschutz" className="text-brand-400 hover:text-brand-300 transition-colors">
+                Datenschutzerklärung von Complio
+              </a>
+              , die Bestandteil dieser AGB ist. Der Nutzer versichert, dass er berechtigt ist, die
+              im Rahmen des Dienstes übermittelten Unternehmensdaten und Dokumente einzureichen,
+              und stellt Complio von Ansprüchen Dritter frei, die aus einer unberechtigten
+              Dateneinreichung entstehen.
             </p>
-            <p className="mt-2">
-              Complio übernimmt keine Haftung dafür, dass die Berichte für die spezifische Situation des Nutzers
-              vollständig oder rechtlich zutreffend sind. Behördliche Bußgelder oder Strafen, die aus einer Nutzung
-              der Plattform resultieren, sind nicht erstattungsfähig.
+            <p className="mt-3">
+              Complio verpflichtet sich, alle vom Nutzer bereitgestellten Informationen vertraulich
+              zu behandeln und nicht an unbefugte Dritte weiterzugeben.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 8 Kündigung und Datenlöschung</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 9 Gewährleistung und Haftung</h2>
             <p>
-              Nach Vertragsende werden Nutzerdaten innerhalb von 30 Tagen gelöscht, sofern keine gesetzlichen
-              Aufbewahrungspflichten entgegenstehen. Der Nutzer kann sein Konto und seine Daten jederzeit über die
-              Kontoeinstellungen löschen.
+              Complio haftet unbeschränkt für Schäden, die auf Vorsatz oder grober Fahrlässigkeit
+              von Complio oder seinen Erfüllungsgehilfen beruhen, sowie für Schäden aus der
+              Verletzung des Lebens, des Körpers oder der Gesundheit.
+            </p>
+            <p className="mt-3">
+              Bei einfacher Fahrlässigkeit haftet Complio nur bei Verletzung einer wesentlichen
+              Vertragspflicht (Kardinalpflicht), deren Erfüllung die ordnungsgemäße Durchführung
+              des Vertrags überhaupt erst ermöglicht und auf deren Einhaltung der Nutzer regelmäßig
+              vertrauen darf. In diesem Fall ist die Haftung auf den typischerweise vorhersehbaren
+              Schaden begrenzt, höchstens jedoch auf die Summe der in den letzten zwölf Monaten
+              tatsächlich entrichteten Entgelte.
+            </p>
+            <p className="mt-3">
+              Complio übernimmt keine Haftung dafür, dass die erstellten Berichte für die
+              konkrete rechtliche Situation des Nutzers vollständig oder abschließend zutreffend
+              sind. Behördliche Bußgelder, Sanktionen oder sonstige hoheitliche Maßnahmen, die
+              trotz oder aufgrund einer Complio-Nutzung verhängt werden, begründen keinen
+              Erstattungsanspruch gegenüber Complio.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 9 Anwendbares Recht und Gerichtsstand</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 10 Laufzeit und Kündigung</h2>
             <p>
-              Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG). Gerichtsstand
-              für alle Streitigkeiten ist [Ort des Firmensitzes], soweit der Nutzer Kaufmann ist.
+              Abonnements (Professional, Enterprise) laufen auf unbestimmte Zeit und können von
+              beiden Parteien mit einer Frist von 30 Tagen zum Ende des jeweiligen
+              Abrechnungsmonats ordentlich gekündigt werden. Die Kündigung ist per E-Mail an{" "}
+              <a href="mailto:hellocomplio@gmail.com" className="text-brand-400 hover:text-brand-300 transition-colors">
+                hellocomplio@gmail.com
+              </a>{" "}
+              oder über die Kontoeinstellungen möglich.
+            </p>
+            <p className="mt-3">
+              Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt.
+              Ein wichtiger Grund liegt für Complio insbesondere vor, wenn der Nutzer gegen
+              wesentliche Nutzungspflichten aus § 5 dieser AGB verstößt.
+            </p>
+            <p className="mt-3">
+              Nach Vertragsende werden Nutzerdaten innerhalb von 30 Tagen gelöscht, sofern
+              keine gesetzlichen Aufbewahrungspflichten entgegenstehen (§ 147 AO für
+              Rechnungsdaten: 10 Jahre). Der Nutzer kann Daten und Berichte vor Vertragsende
+              eigenständig exportieren oder löschen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">§ 10 Schlussbestimmungen</h2>
+            <h2 className="text-white font-semibold text-base mb-4">§ 11 Änderungen der AGB</h2>
             <p>
-              Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen
-              unberührt. Änderungen dieser AGB werden dem Nutzer per E-Mail angekündigt und gelten als genehmigt, sofern
-              nicht innerhalb von 30 Tagen widersprochen wird.
+              Complio ist berechtigt, diese AGB mit einer Ankündigungsfrist von mindestens 30 Tagen
+              vor Inkrafttreten zu ändern. Die Ankündigung erfolgt per E-Mail an die im Nutzerkonto
+              hinterlegte Adresse. Widerspricht der Nutzer nicht innerhalb von 30 Tagen nach
+              Zugang der Änderungsmitteilung, gelten die geänderten AGB als angenommen. Auf die
+              Bedeutung des Schweigens wird in der Ankündigungs-E-Mail gesondert hingewiesen.
             </p>
           </section>
+
+          <section>
+            <h2 className="text-white font-semibold text-base mb-4">§ 12 Anwendbares Recht und Gerichtsstand</h2>
+            <p>
+              Es gilt ausschließlich das Recht der Bundesrepublik Deutschland unter Ausschluss des
+              Einheitlichen UN-Kaufrechts (CISG). Gerichtsstand für alle Streitigkeiten aus oder
+              im Zusammenhang mit diesem Vertrag ist Darmstadt, sofern der Nutzer Kaufmann,
+              juristische Person des öffentlichen Rechts oder öffentlich-rechtliches
+              Sondervermögen ist.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-white font-semibold text-base mb-4">§ 13 Salvatorische Klausel</h2>
+            <p>
+              Sollten einzelne Bestimmungen dieser AGB ganz oder teilweise unwirksam oder
+              undurchführbar sein oder werden, berührt dies die Wirksamkeit der übrigen
+              Bestimmungen nicht. Anstelle der unwirksamen oder undurchführbaren Bestimmung gilt
+              diejenige wirksame und durchführbare Regelung als vereinbart, die dem wirtschaftlichen
+              Zweck der unwirksamen Bestimmung am nächsten kommt.
+            </p>
+          </section>
+
         </div>
-
-        <p className="mt-12 text-xs text-slate-600">
-          Diese AGB sind ein Entwurf und müssen vor der Veröffentlichung durch einen auf IT-/Vertragsrecht
-          spezialisierten Rechtsanwalt geprüft werden.
-        </p>
       </div>
     </main>
   );

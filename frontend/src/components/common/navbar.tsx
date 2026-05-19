@@ -66,7 +66,7 @@ export function Navbar() {
         <div
           className="rounded-[20px] border border-white/[0.10] shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
           style={{
-            background: "rgba(14, 21, 40, 0.92)",
+            background: "rgba(6, 14, 48, 0.94)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
           }}

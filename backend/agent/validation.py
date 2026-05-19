@@ -92,6 +92,37 @@ def verify_gap_citations(
     return warnings
 
 
+def check_evidence_quotes(gaps: list[ComplianceGap]) -> list[str]:
+    """Warn when VERIFIED gaps lack an evidence_quote.
+
+    A VERIFIED finding claims to be backed by a retrieved chunk. If the LLM
+    did not include a verbatim quote, it may have fabricated the citation or
+    the confidence label. This function emits warnings so downstream consumers
+    (PDF, API response) can flag these gaps for manual review.
+
+    Returns a list of warning strings. Does NOT modify the gaps — it is the
+    caller's responsibility to act on warnings (e.g. downgrade confidence).
+    """
+    warnings: list[str] = []
+    for gap in gaps:
+        if gap.status == ComplianceStatus.CANNOT_ASSESS:
+            continue
+        if gap.confidence == "HIGH" and not getattr(gap, "evidence_quote", None):
+            msg = (
+                f"missing evidence_quote: {gap.regulation.value} {gap.article_number} "
+                f"is marked HIGH confidence but provides no verbatim chunk quote — "
+                f"downgrading confidence to MEDIUM"
+            )
+            logger.warning("validation: %s", msg)
+            warnings.append(msg)
+            gap.confidence = "MEDIUM"
+            gap.confidence_reason = (
+                "No verbatim source quote provided — HIGH confidence requires "
+                "a direct quotation from the retrieved regulatory text"
+            )
+    return warnings
+
+
 def validate_report(report: ComplianceReport) -> list[str]:
     issues: list[str] = []
 
