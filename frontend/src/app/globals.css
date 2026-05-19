@@ -9,8 +9,8 @@
   }
 
   body {
-    background-color: #03071a;
-    color: #f8fafc;
+    background-color: #050f25;
+    color: #f0f4ff;
   }
 }
 
@@ -22,16 +22,16 @@
     @apply bg-gradient-to-r from-brand-400 to-cyan-400 bg-clip-text text-transparent;
   }
   .glass {
-    background: rgba(10, 22, 40, 0.7);
+    background: rgba(6, 15, 50, 0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
   .glass-light {
-    background: rgba(15, 31, 56, 0.55);
+    background: rgba(10, 22, 60, 0.55);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.07);
   }
   .glow-text {
     text-shadow: 0 0 24px rgba(59, 130, 246, 0.55);

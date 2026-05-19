@@ -16,7 +16,7 @@ from agent.planning import (
     run_gap_analysis,
 )
 from agent.profiling import enrich_profile
-from agent.validation import validate_report, verify_gap_citations
+from agent.validation import check_evidence_quotes, validate_report, verify_gap_citations
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
 from models.enums import AnalysisStep
@@ -99,6 +99,14 @@ async def run_analysis(
         logger.warning(
             "job %s: %d unverified citation(s) — confidence downgraded, flagged for review",
             job_id, len(citation_warnings),
+        )
+
+    # Step 4c — evidence quote check (VERIFIED findings without verbatim quotes get downgraded)
+    quote_warnings = check_evidence_quotes(gaps)
+    if quote_warnings:
+        logger.warning(
+            "job %s: %d gap(s) missing evidence_quote — confidence downgraded to MEDIUM",
+            job_id, len(quote_warnings),
         )
 
     # Step 5 — action plan

@@ -29,7 +29,7 @@ function LoginInner() {
 
     if (authError) {
       // Generic message — don't reveal whether email or password was wrong
-      setError("Invalid email or password.");
+      setError("E-Mail oder Passwort ungültig.");
       setLoading(false);
       return;
     }
@@ -53,14 +53,14 @@ function LoginInner() {
           <Link href="/">
             <img src="/logo-dark-bg.png" alt="Complio" className="h-10 w-auto mx-auto mb-6" />
           </Link>
-          <h1 className="text-2xl font-black text-white tracking-tight">Welcome back</h1>
-          <p className="text-sm text-slate-500 mt-1">Sign in to your Complio account</p>
+          <h1 className="text-2xl font-black text-white tracking-tight">Willkommen zurück</h1>
+          <p className="text-sm text-slate-500 mt-1">In Ihr Complio-Konto anmelden</p>
         </div>
 
         <form onSubmit={handleSubmit} className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-7 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
-              <Mail className="h-3.5 w-3.5" /> Email
+              <Mail className="h-3.5 w-3.5" /> E-Mail
             </label>
             <input
               type="email"
@@ -75,7 +75,7 @@ function LoginInner() {
 
           <div className="flex flex-col gap-1.5">
             <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
-              <Lock className="h-3.5 w-3.5" /> Password
+              <Lock className="h-3.5 w-3.5" /> Passwort
             </label>
             <input
               type="password"
@@ -101,13 +101,13 @@ function LoginInner() {
             className="mt-1 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-500 transition-colors shadow-glow-blue-sm hover:shadow-glow-blue disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Anmelden…" : "Anmelden"}
           </button>
 
           <p className="text-center text-xs text-slate-600">
-            No account?{" "}
+            Noch kein Konto?{" "}
             <Link href="/register" className="text-brand-400 hover:text-brand-300 transition-colors">
-              Request access
+              Registrieren
             </Link>
           </p>
         </form>
