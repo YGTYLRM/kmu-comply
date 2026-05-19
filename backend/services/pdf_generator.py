@@ -856,9 +856,10 @@ def generate_pdf(report: ComplianceReport) -> bytes:
             with sync_playwright() as pw:
                 cold_browser = pw.chromium.launch()
                 pg = cold_browser.new_page()
+                pg.set_default_timeout(30_000)
                 pg.route("**/*", lambda route: route.abort())
                 pg.set_viewport_size({"width": 794, "height": 1123})
-                pg.set_content(html, wait_until="load")
+                pg.set_content(html, wait_until="load", timeout=30_000)
                 pdf_bytes = pg.pdf(
                     format="A4",
                     print_background=True,
@@ -869,10 +870,11 @@ def generate_pdf(report: ComplianceReport) -> bytes:
 
         pg = browser.new_page()
         try:
+            pg.set_default_timeout(30_000)
             # Block all network requests — the PDF is self-contained (fonts/images as data URIs)
             pg.route("**/*", lambda route: route.abort())
             pg.set_viewport_size({"width": 794, "height": 1123})
-            pg.set_content(html, wait_until="load")
+            pg.set_content(html, wait_until="load", timeout=30_000)
             return pg.pdf(
                 format="A4",
                 print_background=True,

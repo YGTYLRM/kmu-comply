@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, Bell, LayoutDashboard, CreditCard } from "lucide-react";
+import { Menu, X, LogOut, Bell, LayoutDashboard, CreditCard, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { api } from "@/lib/api";
 
@@ -88,19 +88,19 @@ export function Navbar() {
             {/* Desktop nav links */}
             <nav className="hidden md:flex items-center gap-0.5 ml-3">
               <a href="/#how-it-works" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                How it works
+                So funktioniert es
               </a>
               <a href="/#features" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                Features
+                Funktionen
               </a>
               <a href="/#pricing" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                Pricing
+                Preise
               </a>
               <Link href="/contact" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                Contact
+                Kontakt
               </Link>
               <Link href="/reports" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                Reports
+                Berichte
               </Link>
             </nav>
 
@@ -119,7 +119,13 @@ export function Navbar() {
                   className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                 >
                   <CreditCard className="h-3.5 w-3.5" />
-                  Billing
+                  Abrechnung
+                </Link>
+                <Link href="/account/settings"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  Einstellungen
                 </Link>
                 <Link href="/dashboard"
                   onClick={() => api.markNotificationsRead().catch(() => {})}
@@ -143,13 +149,13 @@ export function Navbar() {
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  Sign in
+                  Anmelden
                 </Link>
                 <Link
                   href="/contact"
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm text-white font-semibold hover:bg-brand-500 transition-all duration-200 shadow-glow-blue-sm hover:shadow-glow-blue"
                 >
-                  Request a Demo
+                  Demo anfordern
                 </Link>
               </div>
             )}
@@ -189,7 +195,7 @@ export function Navbar() {
                     onClick={() => { setMobileOpen(false); handleLogout(); }}
                     className="mt-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 font-semibold text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
                   >
-                    <LogOut className="h-4 w-4" /> Sign out
+                    <LogOut className="h-4 w-4" /> Abmelden
                   </button>
                 ) : (
                   <>
