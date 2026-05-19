@@ -5,7 +5,7 @@ from datetime import date as _date
 
 import json as _json
 
-PROMPT_VERSION = "v1.2.0"
+PROMPT_VERSION = "v1.3.0"
 
 
 def _sanitize_profile_json(profile_json: str) -> str:
@@ -38,37 +38,38 @@ def _sanitize(text: str | None, max_len: int = 2000) -> str:
     text = _INJECTIONS.sub("[removed]", text)
     return text.strip()
 
-SYSTEM_PERSONA = """You are a Senior Regulatory Compliance Consultant specializing in German SME law.
-You are producing a PRELIMINARY COMPLIANCE SCREENING, not a legal opinion or audit.
-All outputs must be clearly understood as a screening tool — not as legal certification or advice.
+SYSTEM_PERSONA = """Sie sind ein leitender Regulatory-Compliance-Consultant mit Spezialisierung auf deutsches KMU-Recht.
+Sie erstellen ein VORLÄUFIGES COMPLIANCE-SCREENING, keine Rechtsberatung oder Prüfung.
+Alle Ausgaben müssen klar als Screening-Werkzeug erkennbar sein — keine Rechtsberatung, keine Zertifizierung.
 
-Your role:
-- Speak in clear, plain language (B2 German level / professional English — no legalese)
-- Always cite specific regulatory articles (e.g., "Art. 30 DSGVO", not "GDPR requires documentation")
-- Give concrete, specific advice — never vague guidance like "you should consider..."
-- Distinguish between MUST (legal obligation), SHOULD (best practice), and MAY (optional)
-- Acknowledge uncertainty explicitly: state "this likely applies, but legal review recommended" when unsure
-- Provide realistic effort estimates for every recommendation
-- Never hallucinate legal requirements — every claim must trace to a specific article in the knowledge base
-- CRITICAL: If no regulatory text was retrieved for a regulation, output CANNOT_ASSESS — never invent findings
+Ihre Aufgabe:
+- Schreiben Sie auf Deutsch in klarer, verständlicher Sprache (B2-Niveau, kein Juristenjargon)
+- Zitieren Sie immer konkrete Rechtsartikel (z. B. "Art. 30 DSGVO", nicht "DSGVO verlangt Dokumentation")
+- Geben Sie konkrete, spezifische Empfehlungen — kein vages "Sie sollten erwägen..."
+- Unterscheiden Sie zwischen MUSS (rechtliche Pflicht), SOLLTE (Best Practice) und KANN (optional)
+- Benennen Sie Unsicherheiten explizit: "gilt wahrscheinlich, rechtliche Überprüfung empfohlen"
+- Geben Sie realistische Aufwandsschätzungen für jede Empfehlung an
+- Erfinden Sie keine Rechtsanforderungen — jeder Befund muss auf einen konkreten Artikel in der Wissensdatenbank zurückgehen
+- KRITISCH: Wenn für eine Vorschrift keine Rechtstexte abgerufen wurden, geben Sie CANNOT_ASSESS aus — erfinden Sie keine Befunde
 
-Evidence confidence labeling — always apply:
-  VERIFIED: finding based on retrieved official law text (highest confidence)
-  SELF-REPORTED: finding based on profile fields answered by the company (medium confidence)
-  CANNOT_ASSESS: insufficient evidence — state what information is needed
+Konfidenz-Kennzeichnung — immer anwenden:
+  VERIFIED: Befund basiert auf abgerufenem offiziellen Gesetzestext (höchste Konfidenz)
+  SELF-REPORTED: Befund basiert auf Profilfeldern, die das Unternehmen ausgefüllt hat (mittlere Konfidenz)
+  CANNOT_ASSESS: unzureichende Belege — stellen Sie die konkrete Frage, die beantwortet werden muss
 
-Screening disclaimer — always reflect in your language:
-  This output is a preliminary compliance screening based on self-reported profile data and
-  AI analysis of official regulatory texts. It is NOT a legal opinion, compliance certificate,
-  or audit. It does not establish attorney-client privilege. Companies should verify all
-  findings with a qualified Rechtsanwalt before making compliance decisions or representations
-  to regulators. Complio accepts no liability for decisions made based solely on this screening.
+Screening-Disclaimer — immer in Ihrer Sprache berücksichtigen:
+  Diese Ausgabe ist ein vorläufiges Compliance-Screening auf Basis selbst angegebener Profildaten und
+  KI-Analyse amtlicher Rechtstexte. Es handelt sich NICHT um eine Rechtsberatung, ein
+  Compliance-Zertifikat oder eine Prüfung. Es begründet kein Mandatsverhältnis. Unternehmen sollten
+  alle Befunde mit einem qualifizierten Rechtsanwalt prüfen, bevor Compliance-Entscheidungen getroffen
+  oder Aussagen gegenüber Behörden gemacht werden. Complio haftet nicht für Entscheidungen, die
+  ausschließlich auf diesem Screening beruhen.
 
-Source authority hierarchy — always respect this order when sources conflict:
-  Level 1 — Official law text (binding): the authoritative legal source; always takes precedence
-  Level 2 — Regulatory guidance (authoritative interpretation): explains how authorities apply the law; follow unless Level 1 says otherwise
-  Level 3 — Company documents (evidence only): evidence of what the company does; never overrides legal obligations
-A company document saying "we comply" does not override a Level 1 requirement showing they must do X."""
+Quellenautoritätshierarchie — bei Konflikten immer einhalten:
+  Level 1 — Amtlicher Gesetzestext (bindend): maßgebliche Rechtsquelle; hat immer Vorrang
+  Level 2 — Behördliche Leitlinien (autoritative Auslegung): erklärt Behördenanwendung; gilt, wenn nicht Level 1 widerspricht
+  Level 3 — Unternehmensdokumente (nur Belege): zeigt, was das Unternehmen tut; überschreibt keine Rechtspflichten
+Ein Unternehmensdokument mit "wir sind konform" überschreibt keine Level-1-Anforderung, die X vorschreibt."""
 
 
 def profile_enrichment_prompt(profile_json: str) -> str:
@@ -305,29 +306,29 @@ Output ONLY a valid JSON array:
   }}
 ]
 
-CRITICAL LANGUAGE RULES — apply to every evidence and deficiency_description field:
-- Write in plain English that any business owner with no legal background can understand.
-- Never write JSON field names (e.g. never write has_dpo, has_processing_records, employee_count=62, =true, =false, etc.)
-- Describe the compliance situation in human terms: "The company has no Data Protection Officer" not "has_dpo=false"
-- State what the requirement actually means in practice before saying whether it is met.
-- For deficiency_description: explain WHY this is a problem and what could go wrong if it stays unresolved.
-- Evidence should read like a short paragraph a consultant would write, not a log entry.
+KRITISCHE SPRACHREGELN — gelten für alle evidence- und deficiency_description-Felder:
+- Schreiben Sie auf DEUTSCH in klarer Sprache, die jeder Unternehmer ohne Rechtskenntnisse versteht.
+- Schreiben Sie niemals JSON-Feldnamen (z. B. niemals has_dpo, has_processing_records, employee_count=62, =true, =false usw.)
+- Beschreiben Sie die Compliance-Situation in menschlichen Begriffen: "Das Unternehmen hat keinen Datenschutzbeauftragten" — nicht "has_dpo=false"
+- Erklären Sie zuerst, was die Anforderung in der Praxis bedeutet, bevor Sie angeben, ob sie erfüllt ist.
+- Für deficiency_description: erklären Sie, WARUM das ein Problem ist und was passieren könnte, wenn es ungelöst bleibt.
+- Evidence soll wie ein kurzer Absatz eines Beraters klingen, kein Protokolleintrag.
 
 Constraints:
-- Every assessment MUST have a non-empty evidence field in plain English
-- Only assess articles applicable to this company based on its profile
-- deficiency_description: required only for PARTIALLY_COMPLIANT and NON_COMPLIANT
-- CANNOT_ASSESS evidence field MUST contain a specific question for the company to answer
-- Be consistent: same profile facts produce the same status
-- CANNOT_ASSESS is acceptable when genuinely needed — do not force a status when data is missing
+- Jede Bewertung MUSS ein nicht-leeres evidence-Feld auf Deutsch enthalten
+- Nur Artikel bewerten, die auf dieses Unternehmen anwendbar sind
+- deficiency_description: nur bei PARTIALLY_COMPLIANT und NON_COMPLIANT
+- CANNOT_ASSESS evidence MUSS eine konkrete Frage enthalten, die das Unternehmen beantworten muss
+- Konsistenz: gleiche Profilfakten ergeben gleichen Status
+- CANNOT_ASSESS ist akzeptabel wenn wirklich nötig — keinen Status erzwingen wenn Daten fehlen
 </instructions>"""
 
 
 def action_plan_prompt(profile_json: str, gap_analysis_json: str) -> str:
     profile_json = _sanitize_profile_json(profile_json)
     return f"""<task>
-Generate a prioritized action plan to address all compliance gaps below.
-Every NON_COMPLIANT and PARTIALLY_COMPLIANT gap must have at least one action item.
+Erstellen Sie einen priorisierten Maßnahmenplan auf DEUTSCH, um alle unten aufgeführten Compliance-Lücken zu schließen.
+Jede NON_COMPLIANT- und PARTIALLY_COMPLIANT-Lücke muss mindestens einen Maßnahmenpunkt haben.
 </task>
 
 <company_profile>
@@ -350,7 +351,7 @@ Output ONLY a valid JSON array:
   {{
     "regulation": "gdpr_dsgvo",
     "article_number": "Art. 30",
-    "action": "Create a Verarbeitungsverzeichnis (Record of Processing Activities) listing all processing activities, data categories, recipients, retention periods, and technical measures as required by Art. 30(1) GDPR.",
+    "action": "Erstellen Sie ein Verarbeitungsverzeichnis (Art. 30 Abs. 1 DSGVO) mit allen Verarbeitungstätigkeiten, Datenkategorien, Empfängern, Aufbewahrungsfristen und technischen Maßnahmen.",
     "priority": "HIGH",
     "estimated_effort": "4-8 hours",
     "deadline": null,
@@ -360,11 +361,12 @@ Output ONLY a valid JSON array:
 ]
 
 Constraints:
-- Only generate actions for NON_COMPLIANT and PARTIALLY_COMPLIANT gaps
-- Actions must be concrete and specific — not "document your data processing" but exactly what document to create, what it must contain, and which article requires it
-- gap_reference format: "regulation:article_number"
-- deadline: ISO date string if a statutory deadline exists, null otherwise
-- Every action must map to exactly one gap via gap_reference
+- Nur für NON_COMPLIANT- und PARTIALLY_COMPLIANT-Lücken Maßnahmen generieren
+- Maßnahmen müssen konkret und spezifisch sein — nicht "dokumentieren Sie Ihre Datenverarbeitung", sondern genau welches Dokument erstellt werden muss, was es enthalten muss und welcher Artikel es verlangt
+- Alle Maßnahmen auf DEUTSCH schreiben
+- gap_reference-Format: "regulation:article_number"
+- deadline: ISO-Datumsstring, wenn gesetzliche Frist existiert, sonst null
+- Jede Maßnahme muss genau einer Lücke über gap_reference zugeordnet sein
 </instructions>"""
 
 
@@ -377,27 +379,27 @@ def executive_summary_prompt(
 ) -> str:
     findings_text = "\n".join(f"- {f}" for f in critical_findings[:3])
     return f"""<task>
-Write a professional executive summary for this compliance assessment report.
+Schreiben Sie eine professionelle Zusammenfassung (Kurzübersicht) für diesen Compliance-Screening-Bericht auf DEUTSCH.
 </task>
 
 <report_data>
-Company: {company_name}
-Regulations assessed: {total_regs} total, {applicable_count} applicable
-Overall compliance score: {overall_score:.1f}%
-Top critical findings:
-{findings_text if findings_text else "No critical findings."}
+Unternehmen: {company_name}
+Geprüfte Vorschriften: {total_regs} gesamt, {applicable_count} anwendbar
+Gesamt-Compliance-Score: {overall_score:.1f}%
+Wichtigste kritische Befunde:
+{findings_text if findings_text else "Keine kritischen Befunde."}
 </report_data>
 
 <instructions>
-Write an executive summary of maximum 300 words.
-Structure:
-1. One sentence: company name and what was assessed
-2. Two to three sentences: applicable regulations and overall compliance score with brief interpretation
-3. Two to three sentences: the most critical findings and their implications
-4. One sentence: the single most urgent next step
+Schreiben Sie eine Zusammenfassung von maximal 300 Wörtern auf DEUTSCH.
+Struktur:
+1. Ein Satz: Unternehmensname und was bewertet wurde
+2. Zwei bis drei Sätze: anwendbare Vorschriften und Gesamt-Compliance-Score mit kurzer Interpretation
+3. Zwei bis drei Sätze: wichtigste kritische Befunde und deren Bedeutung
+4. Ein Satz: der dringendste nächste Schritt
 
-Style: plain professional English, no legalese, no bullet points, flowing prose.
-Tone: factual and direct — this is a professional report, not a sales document.
+Stil: klares professionelles Deutsch, kein Juristenjargon, keine Aufzählungspunkte, fließender Prosatext.
+Ton: sachlich und direkt — das ist ein professioneller Bericht, kein Werbedokument.
 
-Output ONLY the summary text. No JSON, no headers, no labels.
+Ausgabe NUR den Zusammenfassungstext. Kein JSON, keine Überschriften, keine Labels.
 </instructions>"""
