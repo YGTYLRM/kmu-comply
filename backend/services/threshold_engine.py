@@ -907,10 +907,11 @@ def check_milog(profile: CompanyProfile) -> MiLoGResult:
       → Applies to ALL employers (domestic or foreign) with employees working
         in Germany. No size threshold.
 
-    Current minimum wage — MiLoG §1(2) + MiLoG-VO:
-      EUR 12.82/hour (effective 1 January 2025).
+    Current minimum wage — MiLoG §1(2) + 4. MiLoGV (Mindestlohnverordnung):
+      EUR 13.90/hour (effective 1 January 2026).
+      EUR 14.60/hour (effective 1 January 2027) — announced by Mindestlohnkommission.
       ⚠ This changes periodically via Mindestlohnkommission recommendation.
-        Verify current rate at: gesetze-im-internet.de/milog/__1.html
+        Verify current rate at: bmas.de or gesetze-im-internet.de/milog/__1.html
 
     Working time documentation — MiLoG §17(1):
       Required for employees earning ≤ EUR 2,000/month gross AND in covered sectors
@@ -923,7 +924,7 @@ def check_milog(profile: CompanyProfile) -> MiLoGResult:
     applies = profile.employee_count >= 1
     reason = (
         f"MiLoG applies to all employers: {profile.employee_count} employees. "
-        f"Current statutory minimum wage is EUR 12.82/hour (§1 MiLoG, 2025). "
+        f"Current statutory minimum wage is EUR 13.90/hour (§1 MiLoG, effective 1 January 2026; rises to EUR 14.60/hour from 1 January 2027). "
         f"Working time records required for employees earning < EUR 2,000/month (§17 MiLoG)."
         if applies
         else "MiLoG does not apply: no employees reported."
