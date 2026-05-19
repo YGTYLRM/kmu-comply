@@ -77,3 +77,4 @@ backend/data/reports/
 # Downloaded font files (run scripts/download_fonts.py to regenerate)
 backend/assets/fonts/*.woff2
 backend/assets/fonts/inter_css.py
+backend/backend/
