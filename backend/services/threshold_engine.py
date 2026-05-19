@@ -473,10 +473,27 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
         )
     elif is_large:
         wave, first_fy = 2, 2027
+        # Add Omnibus caveat for companies that meet the original 2/3 criteria but fall below
+        # the proposed Omnibus thresholds (>1,000 emp AND >€450M). These companies are
+        # overcounted by the current threshold until formal Omnibus adoption.
+        _below_omnibus = (
+            profile.employee_count <= 1000
+            or profile.annual_revenue_eur is None
+            or profile.annual_revenue_eur <= 450_000_000
+        )
+        _omnibus_note = (
+            " ⚠ OMNIBUS CAVEAT: The EU Omnibus package (Council agreement Feb 2026) proposes "
+            "narrowing CSRD scope to >1,000 employees AND >€450M net turnover. Formal EU adoption "
+            "and German transposition are pending as of May 2026. This company meets the original "
+            "2/3 criteria but does NOT meet the proposed Omnibus thresholds — it may fall outside "
+            "CSRD scope once adopted. Verify current status with legal counsel before starting "
+            "any CSRD reporting programme."
+            if _below_omnibus else ""
+        )
         reason = (
             f"CSRD applies as Wave 2: {criteria_met}/3 size criteria met ({'; '.join(met_list)}) "
             f"(EU Directive 2022/2464, Art. 5). First reporting year: FY 2027 (report 2028) "
-            f"per Directive (EU) 2025/794 stop-the-clock. Verify your specific wave with your auditor."
+            f"per Directive (EU) 2025/794 stop-the-clock.{_omnibus_note}"
         )
     else:
         wave, first_fy = 3, 2028

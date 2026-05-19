@@ -23,9 +23,14 @@ async function getAuthHeader(): Promise<Record<string, string>> {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const authHeader = await getAuthHeader();
+  const { headers: extraHeaders, ...restInit } = init ?? {};
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...authHeader },
-    ...init,
+    ...restInit,
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+      ...(extraHeaders as Record<string, string> | undefined),
+    },
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -110,6 +115,30 @@ export const api = {
 
   markNotificationsRead: () =>
     request<{ ok: boolean }>("/api/notifications/mark-read", { method: "POST" }),
+
+  dashboardSummary: () =>
+    request<DashboardSummary>("/api/dashboard/summary"),
+
+  adminListExpertReviews: (adminKey: string, status?: string) =>
+    request<{ reviews: AdminExpertReview[] }>(
+      `/api/admin/expert-reviews${status ? `?status=${status}` : ""}`,
+      { headers: { "X-Admin-Key": adminKey } as Record<string, string> }
+    ),
+
+  adminUpdateExpertReviewStatus: (adminKey: string, reviewId: string, status: string) =>
+    request<{ ok: boolean; id: string; status: string }>(
+      `/api/admin/expert-reviews/${reviewId}/status`,
+      {
+        method: "PATCH",
+        headers: { "X-Admin-Key": adminKey } as Record<string, string>,
+        body: JSON.stringify({ status }),
+      }
+    ),
+
+  adminListRegulationUpdates: (adminKey: string) =>
+    request<{ updates: AdminRegulationUpdate[] }>("/api/admin/regulation-updates", {
+      headers: { "X-Admin-Key": adminKey } as Record<string, string>,
+    }),
 };
 
 export interface CompanySummary {
@@ -156,4 +185,36 @@ export interface ReportSummary {
   generated_at: string;
   overall_score_percent: number;
   applicable_regulation_count: number;
+}
+
+export interface DashboardSummary {
+  company_count: number;
+  report_count: number;
+  avg_score: number | null;
+  recent_notifications: NotificationItem[];
+}
+
+export interface AdminExpertReview {
+  id: string;
+  user_id: string;
+  job_id: string;
+  company_name: string;
+  user_email: string | null;
+  focus_items: { regulation: string; article_number: string }[] | null;
+  message: string | null;
+  status: string;
+  created_at: string | null;
+  reviewed_at: string | null;
+}
+
+export interface AdminRegulationUpdate {
+  id: string;
+  regulation: string;
+  source_url: string;
+  fetched_at: string | null;
+  status: string;
+  change_summary: string | null;
+  new_hash: string;
+  previous_hash: string | null;
+  reviewed_at: string | null;
 }

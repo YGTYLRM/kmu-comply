@@ -193,7 +193,7 @@ function toProfile(data: ProfileFormData): CompanyProfile {
   };
 }
 
-const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Digital & AML", "Documents"];
+const STEP_TITLES = ["Unternehmen", "Finanzen", "Datenschutz", "Lieferkette & Energie", "Governance", "Datenschutz & Richtlinien", "Sicherheit & Technologie", "Personal & HR", "Digital & AML", "Dokumente"];
 
 function AnalyzeInner() {
   const router       = useRouter();
@@ -331,10 +331,10 @@ function AnalyzeInner() {
             className="text-center"
           >
             <h1 className="text-xl font-bold text-white tracking-tight">
-              {fromJobId ? "Re-run Screening" : "Company Profile"}
+              {fromJobId ? "Screening wiederholen" : "Unternehmensprofil"}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              {prefilling ? "Loading previous profile…" : `Step ${step} of 10: ${STEP_TITLES[step - 1]}`}
+              {prefilling ? "Vorheriges Profil wird geladen…" : `Schritt ${step} von 10: ${STEP_TITLES[step - 1]}`}
             </p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
@@ -416,7 +416,7 @@ export default function AnalyzePage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-slate-500 text-sm">Loading…</div>
+        <div className="text-slate-500 text-sm">Wird geladen…</div>
       </div>
     }>
       <AnalyzeInner />

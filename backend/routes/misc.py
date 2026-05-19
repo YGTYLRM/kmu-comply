@@ -25,6 +25,183 @@ _CONTACT_LIMIT = 5
 _CONTACT_WINDOW = 3600  # seconds
 
 
+_KB_EXPECTED_MIN_CHUNKS: dict[str, int] = {
+    "gdpr_dsgvo":       50,
+    "bdsg":             15,
+    "lksg":             15,
+    "enefg":            10,
+    "csrd":             80,
+    "compliance_guides": 500,
+    "nis2":             40,
+    "eu_ai_act":        70,
+    "hinschg":          30,
+    "workplace_law":    150,
+    "agg":              40,
+    "milog":            20,
+    "ttdsg":            15,
+    "gwg":              40,
+    "eu_data_act":      30,
+}
+
+
+@router.get("/api/health/deep")
+async def health_deep():
+    """Extended health check that validates ChromaDB collection contents.
+
+    The shallow /api/health only checks ChromaDB connectivity. A successful
+    connection with empty collections still looks healthy but the pipeline will
+    silently return CANNOT_ASSESS for every regulation. This endpoint validates
+    actual chunk counts against expected minimums so empty-KB failures are
+    caught before they affect customers.
+    """
+    def _deep_chroma_check() -> dict[str, object]:
+        try:
+            from rag.ingest import _chroma_client
+            client = _chroma_client()
+            collections = {c.name: c.count() for c in client.list_collections()}
+            results: dict[str, object] = {}
+            total_chunks = 0
+            failed: list[str] = []
+            for name, min_count in _KB_EXPECTED_MIN_CHUNKS.items():
+                actual = collections.get(name, 0)
+                total_chunks += actual
+                ok = actual >= min_count
+                results[name] = {"chunks": actual, "min_expected": min_count, "ok": ok}
+                if not ok:
+                    failed.append(f"{name}:{actual}<{min_count}")
+            return {
+                "ok": len(failed) == 0,
+                "total_chunks": total_chunks,
+                "collections": results,
+                "failed_collections": failed,
+            }
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+
+    loop = asyncio.get_event_loop()
+    kb = await loop.run_in_executor(None, _deep_chroma_check)
+    status = "ok" if kb.get("ok") else "degraded"
+    # In production, suppress per-collection details to avoid leaking infra info
+    if settings.environment == "production":
+        return {"status": status, "total_chunks": kb.get("total_chunks", 0), "failed_collections": kb.get("failed_collections", [])}
+    return {"status": status, **kb}
+
+
+@router.post("/api/quick-check")
+async def quick_check(request: Request):
+    """Free applicability check — runs the deterministic threshold engine only.
+
+    No LLM calls, no API credits, no authentication required.
+    Accepts a minimal company snapshot and returns which of the 14 regulations apply
+    and why. This is the top-of-funnel feature: let prospects see the value of the
+    threshold engine before paying for the full gap analysis.
+
+    Rate-limited to 20 requests per hour per IP.
+    """
+    from time import time as _time
+
+    RATE_LIMIT = 20
+    WINDOW = 3600
+
+    ip = request.client.host if request.client else "unknown"
+    now = _time()
+    # Reuse the existing contact_calls store since it has the same pattern
+    recent = [t for t in contact_calls[ip] if now - t < WINDOW]
+    if len(recent) >= RATE_LIMIT:
+        raise HTTPException(status_code=429, detail="Zu viele Anfragen. Bitte versuchen Sie es später erneut.")
+
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body.")
+
+    try:
+        employee_count = max(1, int(body.get("employee_count", 1)))
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="employee_count must be a positive integer.")
+
+    from models.company_profile import CompanyProfile
+    from services.threshold_engine import determine_applicable_regulations
+
+    # Build a minimal CompanyProfile from the quick-check request.
+    # Fields not provided default to the conservative/safe choice (avoids false negatives).
+    industry_raw = str(body.get("industry", "other")).lower()
+
+    def _opt_float(key: str) -> float | None:
+        val = body.get(key)
+        if val is None:
+            return None
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return None
+
+    profile = CompanyProfile(
+        company_name="Vorprüfung",
+        employee_count=employee_count,
+        industry=industry_raw,
+        country="DE",
+        annual_revenue_eur=_opt_float("annual_revenue_eur"),
+        balance_sheet_total_eur=_opt_float("balance_sheet_total_eur"),
+        annual_energy_consumption_mwh=_opt_float("annual_energy_consumption_mwh"),
+        processes_personal_data=bool(body.get("processes_personal_data", True)),
+        has_website=bool(body.get("has_website", True)),
+        processing_is_occasional=bool(body.get("processing_is_occasional", False)),
+        processes_special_category_data=bool(body.get("processes_special_category_data", False)),
+        is_listed_company=bool(body.get("is_listed_company", False)),
+        is_aml_obligated_sector=bool(body.get("is_aml_obligated_sector", False)),
+        uses_ai_systems=bool(body.get("uses_ai_systems", False)),
+        ai_systems_are_high_risk=body.get("ai_systems_are_high_risk"),
+        has_supply_chain_abroad=bool(body.get("has_supply_chain_abroad", False)),
+        supply_chain_countries=body.get("supply_chain_countries") or [],
+        is_critical_infrastructure_sector=bool(body.get("is_critical_infrastructure_sector", False)),
+    )
+
+    contact_calls[ip].append(now)
+
+    _REG_DISPLAY_NAMES = {
+        "gdpr_dsgvo": "GDPR / DSGVO",
+        "bdsg": "BDSG",
+        "lksg": "LkSG",
+        "enefg": "EnEfG",
+        "csrd": "CSRD",
+        "nis2": "NIS2",
+        "eu_ai_act": "EU AI Act",
+        "hinschg": "HinSchG",
+        "workplace_law": "ArbSchG",
+        "agg": "AGG",
+        "milog": "MiLoG",
+        "ttdsg": "TTDSG / TDDDG",
+        "gwg": "GwG",
+        "eu_data_act": "EU Data Act",
+    }
+
+    applicability = determine_applicable_regulations(profile)
+    applicable = [
+        {
+            "regulation": a.regulation.value,
+            "name": _REG_DISPLAY_NAMES.get(a.regulation.value, a.regulation.value),
+            "reason": a.reason,
+        }
+        for a in applicability if a.applies
+    ]
+    not_applicable = [
+        {
+            "regulation": a.regulation.value,
+            "name": _REG_DISPLAY_NAMES.get(a.regulation.value, a.regulation.value),
+            "reason": a.reason,
+        }
+        for a in applicability if not a.applies
+    ]
+
+    return {
+        "applicable_count": len(applicable),
+        "applicable": applicable,
+        "not_applicable": not_applicable,
+        "disclaimer": "Vorläufige Einschätzung auf Basis der eingegebenen Daten. Keine Rechtsberatung.",
+    }
+
+
 @router.get("/api/health")
 async def health():
     checks: dict[str, str] = {}

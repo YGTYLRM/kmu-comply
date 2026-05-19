@@ -1,13 +1,15 @@
 """
-Admin endpoints: regulation update approval workflow.
+Admin endpoints: regulation update approval workflow + expert review management.
 All routes require a valid X-Admin-Key header.
 """
 import asyncio
 import hashlib
 import hmac
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from pydantic import BaseModel
 
 from dependencies import require_admin
 
@@ -89,3 +91,61 @@ async def trigger_regulation_fetch():
         "ok": True,
         "message": "Fetch started in background — check /api/admin/regulation-updates for results.",
     }
+
+
+# ─── Expert review management ────────────────────────────────────────────────
+
+class UpdateExpertReviewBody(BaseModel):
+    status: str  # in_review | completed
+    notes: Optional[str] = None
+
+
+@router.get("/expert-reviews")
+async def list_expert_reviews_admin(status: Optional[str] = None):
+    from db.database import AsyncSessionLocal
+    from db.models import ExpertReviewRequest
+    from sqlalchemy import select
+
+    async with AsyncSessionLocal() as db:
+        stmt = select(ExpertReviewRequest).order_by(ExpertReviewRequest.created_at.desc()).limit(200)
+        if status:
+            stmt = stmt.where(ExpertReviewRequest.status == status)
+        rows = (await db.execute(stmt)).scalars().all()
+
+    return {"reviews": [
+        {
+            "id": r.id,
+            "user_id": r.user_id,
+            "job_id": r.job_id,
+            "company_name": r.company_name,
+            "user_email": r.user_email,
+            "focus_items": r.focus_items,
+            "message": r.message,
+            "status": r.status,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "reviewed_at": r.reviewed_at.isoformat() if r.reviewed_at else None,
+        }
+        for r in rows
+    ]}
+
+
+@router.patch("/expert-reviews/{review_id}/status")
+async def update_expert_review_status(review_id: str, body: UpdateExpertReviewBody):
+    if body.status not in ("in_review", "completed"):
+        raise HTTPException(status_code=400, detail="status must be 'in_review' or 'completed'")
+
+    from db.database import AsyncSessionLocal
+    from db.models import ExpertReviewRequest
+    from sqlalchemy import select
+
+    async with AsyncSessionLocal() as db:
+        row = (await db.execute(
+            select(ExpertReviewRequest).where(ExpertReviewRequest.id == review_id)
+        )).scalar_one_or_none()
+        if not row:
+            raise HTTPException(status_code=404, detail="Expert review request not found.")
+        row.status = body.status
+        row.reviewed_at = datetime.now(timezone.utc)
+        await db.commit()
+
+    return {"ok": True, "id": review_id, "status": body.status}

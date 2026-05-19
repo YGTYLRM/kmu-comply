@@ -5,14 +5,30 @@
 
 ---
 
+## Minimum server requirements
+
+| Component | Minimum | Why |
+|-----------|---------|-----|
+| vCPU | 4 | Celery + FastAPI + embedding model (multilingual-e5-large) |
+| RAM | 8 GB | 2× Playwright renders (~2 GB each) + ChromaDB + FastAPI workers |
+| Disk | 20 GB SSD | ChromaDB (~3 GB) + model cache (~2 GB) + logs |
+| OS | Ubuntu 22.04+ | Playwright Chromium dependency |
+
+Playwright semaphore is set to 2 concurrent renders by default (`PDF_CONCURRENCY=2`).
+Raising it above 2 on an 8 GB instance will cause OOM kills under load.
+
+---
+
 ## Prerequisites
 
-- [ ] Supabase project created (free tier is fine to start)
+- [ ] Supabase project on a **paid plan** (free tier caps at 500 MB database + 2 GB bandwidth — a single traffic spike will hit this before you can react)
 - [ ] Anthropic API key with credits
 - [ ] Stripe account (test mode is fine for initial deploy)
 - [ ] Resend account with a verified sending domain
 - [ ] Sentry account (optional but recommended)
 - [ ] A domain name pointed at your hosting provider
+- [ ] Anthropic DPA signed — required before processing customer data (self-service at console.anthropic.com → Settings → Data Usage)
+- [ ] Supabase DPA confirmed — Supabase provides a standard GDPR DPA; verify it is in place for your project (app.supabase.com → project settings → Legal)
 
 ---
 
@@ -94,6 +110,16 @@ NEXT_PUBLIC_STRIPE_ENABLED=true   # when Stripe is configured
 In Railway settings, add volumes:
 - `/app/backend/data/chroma_db` — ChromaDB (persists knowledge base)
 - `/app/backend/data/reports` — Report JSON files
+
+**IMPORTANT:** If the ChromaDB volume is not mounted or mounts to the wrong path, the
+knowledge base will be empty after every deploy. The pipeline will return CANNOT_ASSESS
+for all regulations silently. Verify after first deploy:
+
+```bash
+curl https://api.yourdomain.com/api/health/deep
+# Expected: {"status":"ok","total_chunks":3019,...}
+# If total_chunks=0 or any collection has 0 chunks: volume is not mounted correctly
+```
 
 ### 4c — Set all environment variables from Step 1
 
@@ -204,16 +230,27 @@ celery -A celery_app worker --loglevel=info --concurrency=2
 
 ## Checklist before first user
 
+### Technical
 - [ ] Alembic migrations applied (`alembic upgrade head`)
 - [ ] RLS policies applied (`scripts/apply_rls.py`)
 - [ ] KB populated (`scripts/kb_health.py` shows 15/15)
-- [ ] Impressum, Datenschutz, AGB pages filled in
+- [ ] Deep health check passes (`curl /api/health/deep` → `"status":"ok"`)
 - [ ] Stripe webhook configured and tested
 - [ ] HTTPS working
 - [ ] `ENVIRONMENT=production` set (enables startup checks)
 - [ ] All secrets rotated from dev values
 - [ ] Sentry DSN set and verified error capture works
 - [ ] Worker process running
+
+### Legal (BLOCKING — do not accept paying customers without these)
+- [ ] Impressum complete with **real** street address + postcode (§ 5 DDG)
+- [ ] Datenschutz page reviewed — fill in any remaining placeholder values
+- [ ] AGB reviewed by a German lawyer or qualified legal advisor
+- [ ] Anthropic DPA signed (console.anthropic.com → Settings → Data Usage)
+- [ ] Supabase DPA confirmed (app.supabase.com → project settings → Legal)
+- [ ] Cookie/consent banner active if using any analytics or non-essential scripts
+- [ ] CSRD Omnibus status verified with legal counsel before issuing CSRD findings
+- [ ] Threshold engine reviewed by a Rechtsanwalt for at least GDPR + NIS2 + LkSG
 
 ---
 

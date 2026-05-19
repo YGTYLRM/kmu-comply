@@ -21,7 +21,7 @@ function ScoreTrendChart({ reports }: { reports: CompanyReport[] }) {
   if (points.length < 2) {
     return (
       <div className="flex h-40 items-center justify-center text-sm text-slate-600">
-        Run at least 2 screenings to see a trend.
+        Mindestens 2 Screenings erforderlich, um einen Trend anzuzeigen.
       </div>
     );
   }
@@ -70,7 +70,7 @@ function ScoreTrendChart({ reports }: { reports: CompanyReport[] }) {
             <circle cx={toX(i)} cy={toY(p.score as number)} r="4"
               fill={scoreColor(p.score as number)} stroke="#03071a" strokeWidth="2" />
             <text x={toX(i)} y={H - 4} textAnchor="middle" fontSize="9" fill="#475569">
-              {p.created_at ? new Date(p.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}
+              {p.created_at ? new Date(p.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "short" }) : ""}
             </text>
           </g>
         ))}
@@ -94,15 +94,15 @@ function ReportRow({ report, prev }: { report: CompanyReport; prev: CompanyRepor
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-white font-medium">
-          {report.triggered_by === "reg_change" ? "Regulation update re-assessment"
-            : report.triggered_by === "scheduled" ? "Monthly screening"
-            : "Manual screening"}
+          {report.triggered_by === "reg_change" ? "Neu-Screening nach Gesetzesänderung"
+            : report.triggered_by === "scheduled" ? "Monatliches Screening"
+            : "Manuelles Screening"}
         </p>
         <p className="text-xs text-slate-600 mt-0.5 flex items-center gap-1">
           <Calendar className="h-3 w-3" />
-          {report.created_at ? new Date(report.created_at).toLocaleDateString("en-GB", {
+          {report.created_at ? new Date(report.created_at).toLocaleDateString("de-DE", {
             day: "numeric", month: "long", year: "numeric"
-          }) : "Unknown date"}
+          }) : "Unbekanntes Datum"}
         </p>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
@@ -120,7 +120,7 @@ function ReportRow({ report, prev }: { report: CompanyReport; prev: CompanyRepor
         {report.job_id && (
           <Link href={`/report/${report.job_id}`}
             className="text-xs text-brand-400 hover:text-brand-300 transition-colors underline underline-offset-2">
-            View
+            Ansehen
           </Link>
         )}
       </div>
@@ -139,7 +139,7 @@ function NotifRow({ notif }: { notif: NotificationItem }) {
           {notif.title && <p className="text-sm font-medium text-white">{notif.title}</p>}
           <p className="text-xs text-slate-500 mt-0.5">{notif.message}</p>
           <p className="text-xs text-slate-700 mt-1">
-            {notif.created_at ? new Date(notif.created_at).toLocaleDateString("en-GB", {
+            {notif.created_at ? new Date(notif.created_at).toLocaleDateString("de-DE", {
               day: "numeric", month: "short", year: "numeric"
             }) : ""}
           </p>
@@ -178,7 +178,7 @@ export default function CompanyDetailPage() {
           n.message?.includes(companyData.company.name)
         ));
       })
-      .catch(() => setError("Failed to load company data."))
+      .catch(() => setError("Unternehmensdaten konnten nicht geladen werden."))
       .finally(() => setLoading(false));
   }, [companyId]);
 
@@ -191,7 +191,7 @@ export default function CompanyDetailPage() {
   if (error || !company) return (
     <main className="bg-dark-950 min-h-screen flex items-center justify-center px-4">
       <div className="flex items-center gap-3 rounded-xl border border-red-500/25 bg-red-500/10 px-5 py-4 text-sm text-red-400">
-        <AlertCircle className="h-4 w-4" /> {error ?? "Company not found."}
+        <AlertCircle className="h-4 w-4" /> {error ?? "Unternehmen nicht gefunden."}
       </div>
     </main>
   );
@@ -202,9 +202,9 @@ export default function CompanyDetailPage() {
     : latestScore >= 75 ? "#10b981" : latestScore >= 50 ? "#f59e0b" : "#ef4444";
 
   const TABS: { id: Tab; label: string }[] = [
-    { id: "overview",      label: "Overview" },
-    { id: "history",       label: `History (${reports.length})` },
-    { id: "notifications", label: `Alerts (${notifs.filter(n => !n.read).length} new)` },
+    { id: "overview",      label: "Übersicht" },
+    { id: "history",       label: `Verlauf (${reports.length})` },
+    { id: "notifications", label: `Benachrichtigungen (${notifs.filter(n => !n.read).length} neu)` },
   ];
 
   return (
@@ -213,7 +213,7 @@ export default function CompanyDetailPage() {
 
         {/* Back */}
         <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-white transition-colors mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> All companies
+          <ArrowLeft className="h-3.5 w-3.5" /> Alle Unternehmen
         </Link>
 
         {/* Company header */}
@@ -221,7 +221,7 @@ export default function CompanyDetailPage() {
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">{company.name}</h1>
             <p className="text-sm text-slate-500 mt-1">
-              {[company.industry, company.employee_count ? `${company.employee_count} employees` : null, company.country]
+              {[company.industry, company.employee_count ? `${company.employee_count} Mitarbeiter` : null, company.country]
                 .filter(Boolean).join(" · ")}
             </p>
           </div>
@@ -229,7 +229,7 @@ export default function CompanyDetailPage() {
             href={`/analyze?from=${latestReport?.job_id ?? ""}`}
             className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-500 transition-all shadow-glow-blue-sm"
           >
-            <Plus className="h-4 w-4" /> Re-run screening
+            <Plus className="h-4 w-4" /> Neu-Screening starten
           </Link>
         </div>
 
@@ -239,15 +239,15 @@ export default function CompanyDetailPage() {
             <p className="text-2xl font-black" style={{ color: scoreColor }}>
               {latestScore !== null ? `${latestScore.toFixed(1)}%` : "—"}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Current score</p>
+            <p className="text-xs text-slate-500 mt-1">Aktueller Score</p>
           </div>
           <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-4 text-center">
             <p className="text-2xl font-black text-white">{reports.length}</p>
-            <p className="text-xs text-slate-500 mt-1">Total screenings</p>
+            <p className="text-xs text-slate-500 mt-1">Screenings gesamt</p>
           </div>
           <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-4 text-center">
             <p className="text-2xl font-black text-white">{notifs.filter(n => !n.read).length}</p>
-            <p className="text-xs text-slate-500 mt-1">Unread alerts</p>
+            <p className="text-xs text-slate-500 mt-1">Ungelesene Meldungen</p>
           </div>
         </div>
 
@@ -274,12 +274,12 @@ export default function CompanyDetailPage() {
           {tab === "overview" && (
             <div className="flex flex-col gap-5">
               <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Score trend</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Score-Verlauf</p>
                 <ScoreTrendChart reports={reports} />
               </div>
               {latestReport && (
                 <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Latest screening</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Letztes Screening</p>
                   <ReportRow report={latestReport} prev={reports[1]} />
                 </div>
               )}
@@ -289,7 +289,7 @@ export default function CompanyDetailPage() {
           {tab === "history" && (
             <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5">
               {reports.length === 0
-                ? <p className="text-sm text-slate-600 py-8 text-center">No reports yet.</p>
+                ? <p className="text-sm text-slate-600 py-8 text-center">Noch keine Berichte.</p>
                 : reports.map((r, i) => <ReportRow key={r.id} report={r} prev={reports[i + 1]} />)
               }
             </div>
@@ -298,7 +298,7 @@ export default function CompanyDetailPage() {
           {tab === "notifications" && (
             <div className="rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5">
               {notifs.length === 0
-                ? <p className="text-sm text-slate-600 py-8 text-center">No alerts for this company yet.</p>
+                ? <p className="text-sm text-slate-600 py-8 text-center">Noch keine Meldungen für dieses Unternehmen.</p>
                 : notifs.map(n => <NotifRow key={n.id} notif={n} />)
               }
             </div>
