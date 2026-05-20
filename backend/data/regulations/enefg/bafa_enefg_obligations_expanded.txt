@@ -1,0 +1,40 @@
+BAFA — EnEfG and EDL-G Supplementary Obligations and Enforcement Guidance
+Bundesamt für Wirtschaft und Ausfuhrkontrolle (BAFA) enforcement guidance for companies
+subject to energy efficiency obligations under EnEfG and EDL-G.
+Source: https://www.bafa.de/DE/Energie/Energieeffizienz/energieeffizienz_node.html
+
+---
+
+enefg EnEfG §9 Implementation Plans
+Title: EnEfG §9 — mandatory energy-saving implementation plans for companies >7,500 MWh
+Obligation: MUST
+Threshold: Companies consuming more than 7,500 MWh/year that are required to operate an energy or environmental management system under EnEfG §8(1)
+Text: Companies subject to the EnEfG §8(1) energy management system obligation (>7,500 MWh annual consumption) must also establish and implement energy-saving implementation plans under EnEfG §9. These plans must be derived from the findings of the energy management system and must contain concrete, time-bound measures to improve energy efficiency. The implementation plan must identify all economically viable energy efficiency measures — defined as measures with a positive net present value over their expected lifetime using a discount rate appropriate for the company. Each measure must include: a technical description; expected annual energy savings in kWh; estimated investment cost; expected payback period; planned implementation date; responsible person or department. The implementation plan must be updated at minimum when the energy management system is recertified (every 3 years for ISO 50001). Companies must document the reasons for not implementing any identified economically viable measure. BAFA has the authority to request and review implementation plans during enforcement inspections. Failure to establish, maintain, or implement energy-saving plans constitutes a violation of §9 EnEfG and may be subject to administrative fines.
+Keywords: EnEfG §9, implementation plans, Umsetzungsplaene, energy savings measures, BAFA, economically viable, payback period, enforcement, recertification
+
+---
+
+enefg EnEfG §16 Waste Heat
+Title: EnEfG §16 — waste heat assessment and reporting for non-SME companies
+Obligation: MUST
+Threshold: Non-SME companies with technically usable waste heat of 200 kW or more
+Text: Under EnEfG §16 (formerly §15 before the 2024 renumbering), non-SME companies that generate technically usable waste heat of 200 kW or more at any single location must conduct a waste heat assessment and report to BAFA. Technically usable waste heat includes heat from industrial processes, data centres, cooling systems, compressed air systems, and combined heat and power installations that could technically be recovered and used. The assessment must include: quantification of waste heat by source, temperature level, and temporal profile; evaluation of internal use potential (process integration, space heating, preheating); evaluation of external use potential (district heating networks, neighbouring facilities); technical feasibility of waste heat recovery for each identified opportunity; economic assessment of recovery measures. Companies must report their waste heat data to the waste heat register maintained by BAFA. The waste heat data is made available through a public platform to enable matching between waste heat producers and potential consumers (e.g. district heating operators). Non-SME status is assessed using the same EU SME criteria as for EDL-G §8 (≥250 employees OR >€50M revenue OR >€43M balance sheet total, applying affiliated enterprise aggregation rules). Failure to conduct the assessment or report to BAFA constitutes a violation.
+Keywords: EnEfG §16, waste heat, Abwaerme, 200 kW threshold, waste heat register, BAFA reporting, district heating, non-SME, waste heat assessment, heat recovery
+
+---
+
+enefg EDL-G Penalties
+Title: EDL-G and EnEfG enforcement — penalties and BAFA inspection process
+Obligation: MUST
+Threshold: All companies subject to EDL-G or EnEfG obligations
+Text: BAFA is the enforcement authority for both the EDL-G energy audit obligation and the EnEfG energy management system and implementation plan obligations. BAFA conducts enforcement through: proactive audits based on random sampling of registered companies; reactive investigations triggered by complaints, tips, or media reports; targeted campaigns focusing on specific sectors or company size categories. Penalties for non-compliance: failure to conduct the 4-year energy audit under EDL-G §8 can result in administrative fines (Bußgeld) of up to €50,000 per violation; failure to implement an energy management system under EnEfG §8(1) when required can result in fines and regulatory orders; failure to establish energy-saving implementation plans under EnEfG §9 is separately sanctionable; failure to report waste heat data under EnEfG §16 is also subject to fines. BAFA enforcement has been increasing since 2019, with particular focus on: companies that have never registered in the BAFA portal; companies that registered but never submitted an audit report; companies whose previous audit has expired without renewal; companies crossing the 7,500 MWh threshold without implementing an EnMS. Companies should note that BAFA cross-references company registration data with Handelsregister (commercial register) data and energy consumption data from energy suppliers to identify non-compliant enterprises.
+Keywords: EDL-G penalties, EnEfG enforcement, BAFA inspection, Bußgeld, €50,000 fine, audit registration, compliance, energy audit, administrative fine, enforcement campaign
+
+---
+
+enefg Energy Data Centre Obligations
+Title: EnEfG §11-12 — special obligations for data centres
+Obligation: MUST
+Threshold: Data centres in Germany with a rated IT power demand of 300 kW or more
+Text: The EnEfG contains special obligations for data centres that go beyond the general non-SME energy efficiency requirements. Data centres with a rated IT power demand of 300 kW or more must: (1) introduce an energy management system or environmental management system (EnEfG §12(1)); (2) achieve minimum power usage effectiveness (PUE) targets — PUE of 1.5 from 1 July 2027 for new data centres and PUE of 1.3 from 1 July 2030 for all data centres (EnEfG §11(1)); (3) report energy consumption, PUE, and waste heat utilisation data to BAFA annually (EnEfG §12(3)); (4) use waste heat where technically feasible and economically reasonable (EnEfG §11(2)); (5) source a minimum share of electricity from renewable sources — 50% from 2024, 100% from 2027 for new data centres (EnEfG §11(3)). These obligations apply regardless of the company's SME/non-SME classification — a small company operating a large data centre is fully subject to these requirements. Existing data centres that were operational before 1 July 2026 have transition periods for PUE compliance. New data centres (commencing operations after 1 July 2026) must meet the targets from day one.
+Keywords: data centre, EnEfG §11, EnEfG §12, PUE, power usage effectiveness, energy efficiency, renewable energy, waste heat, BAFA reporting, 300 kW threshold

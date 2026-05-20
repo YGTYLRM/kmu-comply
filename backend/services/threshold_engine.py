@@ -1215,7 +1215,7 @@ def determine_applicable_regulations(
             regulation=Regulation.MILOG,
             applies=milog.applies,
             reason=milog.reason,
-            key_threshold="All employers, EUR 12.82/hour minimum (§1 MiLoG)",
+            key_threshold="All employers, EUR 13.90/hour minimum (§1 MiLoG, effective Jan 2026)",
         ),
         RegulationApplicability(
             regulation=Regulation.TTDSG,

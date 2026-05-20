@@ -1,4 +1,4 @@
-TTDSG — Telekommunikation-Telemedien-Datenschutzgesetz (Cookie/ePrivacy Act)
+TDDDG (TTDSG) — Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz
 Source: https://www.gesetze-im-internet.de/ttdsg/BJNR198210021.html
 
 TDDDG - Gesetz �ber den Datenschutz und den Schutz der Privatsph�re in der Telekommunikation und bei digitalen Diensten *
@@ -20,7 +20,7 @@ TDDDG - Gesetz �ber den Datenschutz und den Schutz der Privatsph�re in der T
 
  
 Gesetz über den Datenschutz und den Schutz der Privatsphäre in der Telekommunikation und bei digitalen Diensten*  (Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz - TDDDG)
-
+Nichtamtliches Inhaltsverzeichnis
 TDDDG
 
 Ausfertigungsdatum: 23.06.2021
@@ -49,7 +49,7 @@ Das G wurde als Artikel 1 des G v. 23.6.2021 I 1982 vom Bundestag mit Zustimmung
 
 Überschrift, Kurzbezeichnung u. Buchstabenabkürzung: IdF d. Art. 8 Nr. 1 Buchst. a bis c G v. 6.5.2024 I Nr. 149 mWv 14.5.2024
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 Inhaltsübersicht 
  
 
@@ -271,7 +271,7 @@ Straf- und Bußgeldvorschriften und Aufsicht
 Teil 1
 Allgemeine Vorschriften
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 1 Anwendungsbereich des Gesetzes
  
 
@@ -296,7 +296,7 @@ die Aufsichtsbehörden und die Aufsicht im Hinblick auf den Datenschutz und den 
 
 (3) Diesem Gesetz unterliegen alle Unternehmen und Personen, die im Geltungsbereich dieses Gesetzes eine Niederlassung haben oder Dienstleistungen erbringen oder daran mitwirken oder Waren auf dem Markt bereitstellen. § 3 des Digitale-Dienste-Gesetzes bleibt unberührt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 2 Begriffsbestimmungen
  
 
@@ -327,7 +327,7 @@ Datenschutz und Schutz der Privatsphäre in der Telekommunikation
 Kapitel 1
 Vertraulichkeit der Kommunikation
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 3 Vertraulichkeit der Kommunikation – Fernmeldegeheimnis
  
 
@@ -351,13 +351,13 @@ Fußnote
 
 (+++ § 3 Abs. 4: Zur Geltung vgl. § 5 Abs. 2 Satz 2 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 4 Rechte des Erben des Endnutzers und anderer berechtigter Personen
  
 
 Das Fernmeldegeheimnis steht der Wahrnehmung von Rechten gegenüber dem Anbieter des Telekommunikationsdienstes nicht entgegen, wenn diese Rechte statt durch den betroffenen Endnutzer durch seinen Erben oder eine andere berechtigte Person, die zur Wahrnehmung der Rechte des Endnutzers befugt ist, wahrgenommen werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5 Abhörverbot, Geheimhaltungspflicht der Betreiber von Funkanlagen
  
 
@@ -367,7 +367,7 @@ Das Fernmeldegeheimnis steht der Wahrnehmung von Rechten gegenüber dem Anbieter
 
 (3) Das Abhören oder die in vergleichbarer Weise erfolgende Kenntnisnahme und die Weitergabe von Nachrichten aufgrund besonderer gesetzlicher Ermächtigung bleiben unberührt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 6 Nachrichtenübermittlung mit Zwischenspeicherung
  
 
@@ -387,7 +387,7 @@ Nachrichteninhalte nur entsprechend dem mit dem Endnutzer geschlossenen Vertrag 
 
 (2) Nach § 3 Absatz 2 Satz 1 Nummer 1 und 2 Verpflichtete haben die erforderlichen technischen und organisatorischen Maßnahmen zu treffen, um Fehlübermittlungen und das unbefugte Offenbaren von Nachrichteninhalten innerhalb des Unternehmens des Anbieters und an Dritte auszuschließen. Erforderlich sind Maßnahmen nur, wenn ihr Aufwand in einem angemessenen Verhältnis zu dem angestrebten Schutzzweck steht. Soweit es im Hinblick auf den angestrebten Schutzzweck erforderlich ist, sind die Maßnahmen dem jeweiligen Stand der Technik anzupassen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 7 Verlangen eines amtlichen Ausweises
  
 
@@ -397,7 +397,7 @@ Nachrichteninhalte nur entsprechend dem mit dem Endnutzer geschlossenen Vertrag 
 
 (3) Von dem Ausweis darf eine Kopie erstellt werden. Die Kopie ist unverzüglich nach Feststellung der für den Vertragsabschluss erforderlichen Angaben des Endnutzers zu vernichten. Andere als die für den Vertragsabschluss erforderlichen Daten dürfen dabei nicht verarbeitet werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8 Missbrauch von Telekommunikationsanlagen
  
 
@@ -434,7 +434,7 @@ die glaubhafte Darlegung, dass der Erwerber die Telekommunikationsanlage ausschl
 Kapitel 2
 Verkehrsdaten, Standortdaten
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 9 Verarbeitung von Verkehrsdaten
  
 
@@ -452,7 +452,7 @@ Im Übrigen sind Verkehrsdaten von den nach § 3 Absatz 2 Satz 1 Verpflichteten 
 
 (2) Teilnehmerbezogene Verkehrsdaten nach Absatz 1 dürfen vom Anbieter des Telekommunikationsdienstes zum Zweck der Vermarktung von Telekommunikationsdiensten, zur bedarfsgerechten Gestaltung von Telekommunikationsdiensten oder zur Bereitstellung von Diensten mit Zusatznutzen im dazu erforderlichen Maß und im dazu erforderlichen Zeitraum nur verwendet werden, wenn der Endnutzer in diese Verwendung gemäß der Verordnung (EU) 2016/679 eingewilligt hat. Die Daten anderer Endnutzer sind unverzüglich zu anonymisieren. Eine zielnummernbezogene Verwendung der Verkehrsdaten zu den in Satz 1 genannten Zwecken ist nur zulässig, wenn der Endnutzer gemäß der Verordnung (EU) 2016/679 informiert wurde und er eingewilligt hat. Hierbei sind die Daten anderer Endnutzer unverzüglich zu anonymisieren. Außerdem ist der Endnutzer darauf hinzuweisen, dass er die Einwilligung nach den Sätzen 1 und 3 jederzeit widerrufen kann.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 10 Entgeltermittlung und Entgeltabrechnung
  
 
@@ -464,7 +464,7 @@ Im Übrigen sind Verkehrsdaten von den nach § 3 Absatz 2 Satz 1 Verpflichteten 
 
 (4) Ziehen der Anbieter und mitwirkende Personen nach § 3 Absatz 2 Satz 1 Nummer 1 und 2 mit der Rechnung Entgelte für Leistungen eines Dritten ein, die dieser im Zusammenhang mit der Erbringung von Telekommunikationsdiensten erbracht hat, so dürfen dem Dritten Verkehrsdaten nach § 9 Absatz 1 Satz 1 Nummer 1 bis 3 und 5 übermittelt werden, soweit diese im Einzelfall für die Durchsetzung der Forderungen des Dritten gegenüber seinem Endnutzer erforderlich sind.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 11 Einzelverbindungsnachweis
  
 
@@ -483,7 +483,7 @@ die die Bundesnetzagentur für Elektrizität, Gas, Telekommunikation, Post und E
 
 (6) Der Beratung im Sinne des Absatzes 5 Nummer 1 dienen neben den in § 203 Absatz 1 Nummer 4 und 5 des Strafgesetzbuches genannten Personengruppen insbesondere die Telefonseelsorge und die Gesundheitsberatung. Die Bundesnetzagentur nimmt die Inhaber der Anschlüsse auf Antrag in die Liste auf, wenn sie die Aufgabenbestimmung nach Absatz 5 Nummer 1 durch Bescheinigung einer Behörde oder Körperschaft, Anstalt oder Stiftung des öffentlichen Rechts nachgewiesen haben. Die Liste wird zum Abruf im automatisierten Verfahren bereitgestellt. Die Verpflichteten nach § 3 Absatz 2 Satz 1, die Einzelverbindungsnachweise erstellen, haben die Liste quartalsweise abzufragen und Änderungen unverzüglich in ihren Abrechnungsverfahren anzuwenden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 12 Störungen von Telekommunikationsanlagen und Missbrauch von Telekommunikationsdiensten
  
 
@@ -495,7 +495,7 @@ die die Bundesnetzagentur für Elektrizität, Gas, Telekommunikation, Post und E
 
 (4) Wenn tatsächliche Anhaltspunkte für die rechtswidrige Inanspruchnahme eines Telekommunikationsnetzes oder Telekommunikationsdienstes vorliegen, insbesondere für eine Leistungserschleichung oder einen Betrug oder eine unzumutbare Belästigung nach § 7 des Gesetzes gegen den unlauteren Wettbewerb, darf der Verpflichtete nach § 3 Absatz 2 Satz 1 zur Sicherung seines Entgeltanspruchs sowie zum Schutz der Endnutzer vor der rechtswidrigen Inanspruchnahme des Telekommunikationsdienstes oder des Telekommunikationsnetzes Verkehrsdaten verarbeiten, die erforderlich sind, um die rechtswidrige Inanspruchnahme des Telekommunikationsnetzes oder Telekommunikationsdienstes aufzudecken und zu unterbinden. Die Anhaltspunkte für die rechtwidrige Inanspruchnahme des Telekommunikationsnetzes oder Telekommunikationsdienstes hat der nach § 3 Absatz 2 Satz 1 Verpflichtete zu dokumentieren. Der nach § 3 Absatz 2 Satz 1 Verpflichtete darf aus den Verkehrsdaten nach Satz 1 einen pseudonymisierten Gesamtdatenbestand bilden, der Aufschluss über die von einzelnen Endnutzern erzielten Umsätze gibt und unter Zugrundelegung geeigneter Kriterien das Auffinden solcher Verbindungen des Netzes ermöglicht, bei denen der Verdacht einer rechtswidrigen Inanspruchnahme besteht. Die Verkehrsdaten anderer Verbindungen sind unverzüglich zu löschen. Die Aufsichtsbehörde ist über Einführung und Änderung eines Verfahrens nach Satz 1 unverzüglich in Kenntnis zu setzen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 13 Standortdaten
  
 
@@ -510,7 +510,7 @@ die die Bundesnetzagentur für Elektrizität, Gas, Telekommunikation, Post und E
 Kapitel 3
 Mitteilen ankommender Verbindungen, Rufnummernanzeige und -unterdrückung, automatische Anrufweiterschaltung
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 14 Mitteilen ankommender Verbindungen
  
 
@@ -524,7 +524,7 @@ Mitteilen ankommender Verbindungen, Rufnummernanzeige und -unterdrückung, autom
 
 (5) Die Aufsichtsbehörde ist über die Einführung und Änderungen des Verfahrens zur Einhaltung der Anforderungen der Absätze 1 bis 4 unverzüglich in Kenntnis zu setzen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 15 Rufnummernanzeige und -unterdrückung
  
 
@@ -538,7 +538,7 @@ Mitteilen ankommender Verbindungen, Rufnummernanzeige und -unterdrückung, autom
 
 (5) Die Absätze 1 bis 4 gelten auch für Anrufe in das Ausland und für aus dem Ausland kommende Anrufe, soweit sie Anrufende oder Angerufene im Inland betreffen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 16 Automatische Anrufweiterschaltung
  
 
@@ -547,7 +547,7 @@ Anbieter von Sprachkommunikationsdiensten sind verpflichtet, ihren Endnutzern di
 Kapitel 4
 Endnutzerverzeichnisse, Bereitstellen von Endnutzerdaten
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 17 Endnutzerverzeichnisse
  
 
@@ -559,7 +559,7 @@ Endnutzerverzeichnisse, Bereitstellen von Endnutzerdaten
 
 (4) Anbieter von Auskunfts- und Verzeichnismedien sind verpflichtet, die gemäß § 18 Absatz 1 übermittelten Daten zu veröffentlichen sowie unrichtige oder gelöschte Daten aus den Verzeichnissen zu entfernen und Berichtigungen vorzunehmen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 18 Bereitstellen von Endnutzerdaten
  
 
@@ -577,7 +577,7 @@ Datenschutz bei digitalen Diensten, Endeinrichtungen
 Kapitel 1
 Technische und organisatorische Vorkehrungen, Verarbeitung von Daten zum Zweck des Jugendschutzes und zur Auskunftserteilung
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 19 Technische und organisatorische Vorkehrungen
  
 
@@ -596,13 +596,13 @@ kein unerlaubter Zugriff auf die technischen Einrichtungen, die sie für das Ang
 die technischen Einrichtungen nach Nummer 1 gesichert sind gegen Störungen, auch gegen solche, die durch äußere Angriffe bedingt sind.
 Vorkehrungen nach Satz 1 müssen den Stand der Technik berücksichtigen. Eine Vorkehrung nach Satz 1 ist insbesondere die Anwendung eines als sicher anerkannten Verschlüsselungsverfahrens. Anordnungen des Bundesamtes für Sicherheit in der Informationstechnik nach § 17 Satz 1 des BSI-Gesetzes bleiben unberührt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 20 Verarbeitung personenbezogener Daten Minderjähriger
  
 
 Hat ein Anbieter von digitalen Diensten zur Wahrung des Jugendschutzes personenbezogene Daten von Minderjährigen erhoben, etwa durch Mittel zur Altersverifikation oder andere technische Maßnahmen, oder anderweitig gewonnen, so darf er diese Daten nicht für kommerzielle Zwecke verarbeiten.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 21 Bestandsdaten
  
 
@@ -614,7 +614,7 @@ Hat ein Anbieter von digitalen Diensten zur Wahrung des Jugendschutzes personenb
 
 (4) Der Anbieter von digitalen Diensten ist als Beteiligter zu dem Verfahren nach Absatz 3 hinzuzuziehen. Er darf den Nutzer über die Einleitung des Verfahrens unterrichten.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 22 Auskunftsverfahren bei Bestandsdaten
  
 
@@ -782,7 +782,7 @@ zur Früherkennung von aus dem Ausland drohenden Gefahren von internationaler Be
 
 (6) Wer geschäftsmäßig digitale Dienste erbringt oder daran mitwirkt, hat die in seinem Verantwortungsbereich für die Auskunftserteilung erforderlichen Vorkehrungen auf seine Kosten zu treffen. Jedes Auskunftsverlangen ist durch eine verantwortliche Fachkraft auf Einhaltung der in Absatz 2 genannten formalen Voraussetzungen zu prüfen. Die weitere Bearbeitung des Auskunftsverlangens darf erst nach einem positiven Prüfergebnis freigegeben werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 23 Auskunftsverfahren bei Passwörtern und anderen Zugangsdaten
  
 
@@ -798,7 +798,7 @@ An andere öffentliche und nichtöffentliche Stellen dürfen Daten nach Absatz 1
 
 (4) Wer geschäftsmäßig digitale Dienste erbringt oder daran mitwirkt, hat die in seinem Verantwortungsbereich für die Auskunftserteilung erforderlichen Vorkehrungen auf seine Kosten zu treffen. Jedes Auskunftsverlangen ist durch eine verantwortliche Fachkraft auf Einhaltung der in Absatz 2 genannten formalen Voraussetzungen zu prüfen. Die weitere Bearbeitung des Auskunftsverlangens darf erst nach einem positiven Prüfergebnis freigegeben werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 24 Auskunftsverfahren bei Nutzungsdaten
  
 
@@ -860,7 +860,7 @@ der Früherkennung von aus dem Ausland drohenden Gefahren von internationaler Be
 Kapitel 2
 Endeinrichtungen
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 25 Schutz der Privatsphäre bei Endeinrichtungen
  
 
@@ -871,7 +871,7 @@ wenn der alleinige Zweck der Speicherung von Informationen in der Endeinrichtung
 2.
 wenn die Speicherung von Informationen in der Endeinrichtung des Endnutzers oder der Zugriff auf bereits in der Endeinrichtung des Endnutzers gespeicherte Informationen unbedingt erforderlich ist, damit der Anbieter eines digitalen Dienstes einen vom Nutzer ausdrücklich gewünschten digitalen Dienst zur Verfügung stellen kann.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 26 Anerkannte Dienste zur Einwilligungsverwaltung, Endnutzereinstellungen
  
 
@@ -910,7 +910,7 @@ Anbieter von digitalen Diensten bei der Verwaltung der von Endnutzern erteilten 
 Teil 4
 Straf- und Bußgeldvorschriften und Aufsicht
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 27 Strafvorschriften
  
 
@@ -923,7 +923,7 @@ entgegen § 8 Absatz 1 eine dort genannte Telekommunikationsanlage herstellt ode
 
 (2) Handelt der Täter in den Fällen des Absatzes 1 Nummer 3 fahrlässig, so ist die Strafe Freiheitsstrafe bis zu einem Jahr oder Geldstrafe.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 28 Bußgeldvorschriften
  
 
@@ -963,7 +963,7 @@ der Bundesbeauftragte oder die Bundesbeauftragte für den Datenschutz und die In
 
 (4) Gegen Behörden und sonstige öffentliche Stellen im Sinne des § 2 Absatz 1 oder Absatz 2 des Bundesdatenschutzgesetzes werden keine Geldbußen verhängt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 29 Zuständigkeit, Aufgaben und Befugnisse der oder des Bundesbeauftragten für den Datenschutz und die Informationsfreiheit
  
 
@@ -975,7 +975,7 @@ der Bundesbeauftragte oder die Bundesbeauftragte für den Datenschutz und die In
 
 (4) Das Fernmeldegeheimnis des Artikels 10 des Grundgesetzes wird eingeschränkt, soweit die Wahrnehmung der Befugnisse nach Absatz 3 dies erfordert.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 30 Zuständigkeit, Aufgaben und Befugnisse der Bundesnetzagentur
  
 

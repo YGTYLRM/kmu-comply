@@ -1,4 +1,4 @@
-EnEfG — Energieeffizienzgesetz (Energy Efficiency Act)
+EnEfG — Energieeffizienzgesetz
 Source: https://www.gesetze-im-internet.de/enefg/BJNR1350B0023.html
 
 EnEfG - Gesetz zur Steigerung der Energieeffizienz in Deutschland 1
@@ -127,8 +127,7 @@ Abschnitt 1
 Allgemeine Vorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 1
-Zweck des Gesetzes, Berichtspflicht
+§ 1 Zweck des Gesetzes, Berichtspflicht
  
 
 (1) Zweck dieses Gesetzes ist es, die Energieeffizienz zu steigern und dadurch zur Reduzierung des Primär- und des Endenergieverbrauchs sowie des Imports und Verbrauchs von fossilen Energien, zur Verbesserung der Versorgungssicherheit und zur Eindämmung des weltweiten Klimawandels beizutragen. Darüber hinaus ist Zweck des Gesetzes, die Erfüllung der nationalen Energieeffizienzziele und die Einhaltung der europäischen Zielvorgaben zu gewährleisten.
@@ -136,8 +135,7 @@ Zweck des Gesetzes, Berichtspflicht
 (2) Die Bundesregierung wird dem Deutschen Bundestag jeweils zu Beginn seiner Wahlperiode über die Wirkung dieses Gesetzes berichten.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 2
-Anwendungsbereich
+§ 2 Anwendungsbereich
  
 
 Dieses Gesetz regelt 1.
@@ -154,8 +152,7 @@ Energieeffizienz- und Abwärmeanforderungen sowie Informationspflichten für Bet
 die Vermeidung, Verwendung sowie Auskunft über Abwärme für Unternehmen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 3
-Begriffsbestimmungen
+§ 3 Begriffsbestimmungen
  
 
 Im Sinne dieses Gesetzes ist oder sind: 1.
@@ -238,8 +235,7 @@ Verteilnetzbetreiber: eine natürliche oder juristische Person oder rechtlich un
 2 Die Norm ist bei der Beuth Verlag GmbH, Berlin, erschienen und bei der Deutschen Nationalbibliothek archivmäßig gesichert niedergelegt.3 Die Norm ist bei der Beuth Verlag GmbH, Berlin, erschienen und bei der Deutschen Nationalbibliothek archivmäßig gesichert niedergelegt.4 Die Norm ist bei der Beuth Verlag GmbH, Berlin, erschienen und bei der Deutschen Nationalbibliothek archivmäßig gesichert niedergelegt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 4
-Energieeffizienzziele
+§ 4 Energieeffizienzziele
  
 
 (1) Ziel dieses Gesetzes ist es, 1.
@@ -257,8 +253,7 @@ Abschnitt 2
 Jährliche Endenergieeinsparverpflichtung des Bundes und der Länder sowie Verpflichtung öffentlicher Stellen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 5
-Einsparung von Endenergie
+§ 5 Einsparung von Endenergie
  
 
 (1) Der Bund bewirkt vom 1. Januar 2024 bis zum 31. Dezember 2030 mittels strategischer Maßnahmen jährlich neue Endenergieeinsparungen in Höhe von jeweils mindestens 45 Terawattstunden. Die strategischen Maßnahmen nach Satz 1 sollen die verschiedenen Sektoren in angemessener Weise berücksichtigen. Die Bundesregierung fasst die für die Erfüllung von Satz 1 geplanten strategischen Maßnahmen sektorspezifisch in der Aktualisierung des Energie- und Klimaplans nach Artikel 14 Absatz 2 der Verordnung (EU) 2018/1999 des Europäischen Parlaments und des Rates vom 11. Dezember 2018 über das Governance-System für die Energieunion und für den Klimaschutz, zur Änderung der Verordnungen (EG) Nr. 663/2009 und (EG) Nr. 715/2009 des Europäischen Parlaments und des Rates, der Richtlinien 94/22/EG, 98/70/EG, 2009/31/EG, 2009/73,/EG, 2010/31/EU, 2012/27/EU und 2013/30/EU des Europäischen Parlaments und des Rates, der Richtlinien 2009/119/EG und (EU) 2015/652 des Rates und zur Aufhebung der Verordnung (EU) Nr. 525/2013 des Europäischen Parlaments und des Rates (ABl. L 328 vom 21.12.2018, S. 1), die zuletzt durch die Verordnung (EU) 2021/1119 (ABl. L 243 vom 9.7.2021, S. 1) geändert worden ist, im Jahr 2024 zusammen.
@@ -272,8 +267,7 @@ Einsparung von Endenergie
 (5) Endenergieeinsparungen nach den Absätzen 1 und 2 können, soweit sie bis zum Jahr 2029 zu bewirken sind, bis zu einem Umfang von 10 Prozent der jährlich neu zu erbringenden Endenergieeinsparung im jeweiligen Folgejahr bereitgestellt werden. Darüber hinausgehende Mindererbringungen müssen im jeweiligen Folgejahr in 1,5-facher Höhe nachträglich erbracht werden. Werden über strategische Maßnahmen Einsparungen erzielt, die über die in den Absätzen 1 und 2 geforderten Endenergieeinsparungen hinausgehen, können diese bis zur Höhe des Überschusses im Folgejahr angerechnet werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 6
-Einsparverpflichtung öffentlicher Stellen; Verordnungsermächtigungen
+§ 6 Einsparverpflichtung öffentlicher Stellen; Verordnungsermächtigungen
  
 
 (1) Öffentliche Stellen mit einem jährlichen Gesamtendenergieverbrauch von 1 Gigawattstunde oder mehr sind zu jährlichen Einsparungen beim Endenergieverbrauch in Höhe von 2 Prozent pro Jahr bis zum Jahr 2045 verpflichtet. Als Referenz werden die Endenergieverbräuche aus dem jeweiligen Vorjahr herangezogen. Bei Verfehlung des Ziels muss die Menge der nicht erbrachten Einsparung in den zwei jeweiligen Folgejahren eingespart werden. Überschreiten die Einsparungen das Ziel in einem Jahr, können die zu viel erbrachten Einsparungen über bis zu fünf Folgejahre angerechnet werden. Öffentliche Stellen können sich zum Zweck der Erreichung des Endenergieeinsparziels nach Satz 1 durch schriftliche Vereinbarung zu einer Gemeinschaft zusammenschließen.
@@ -307,8 +301,7 @@ Endenergieverbrauch gegliedert nach Energieträgern.
 (11) Die Bundesregierung wird ermächtigt, durch Rechtsverordnung mit Zustimmung des Bundesrates eine höhere Einsparverpflichtung gegenüber der Höhe nach Absatz 1 Satz 1 für öffentliche Stellen festzulegen, sofern Tatsachen bekannt werden, die eine Senkung des durchschnittlichen jährlichen Gesamtendenergieverbrauchs aller öffentlichen Stellen in Höhe von mindestens 2 Prozent gegenüber dem Vorjahr als nicht erreichbar erscheinen lassen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 7
-Aufgaben der Bundesstelle für Energieeffizienz
+§ 7 Aufgaben der Bundesstelle für Energieeffizienz
  
 
 (1) Die der Bundesstelle für Energieeffizienz durch dieses Gesetz oder andere Rechtsvorschriften des Bundes auf dem Gebiet der Energieeffizienz zugewiesenen, in eigener Zuständigkeit durchzuführenden Aufgaben werden vom Bundesamt für Wirtschaft und Ausfuhrkontrolle wahrgenommen.
@@ -334,8 +327,7 @@ Abschnitt 3
 Energie- oder Umweltmanagementsysteme und Umsetzungspläne für Unternehmen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 8
-Einrichtung von Energie- oder Umweltmanagementsystemen
+§ 8 Einrichtung von Energie- oder Umweltmanagementsystemen
  
 
 (1) Unternehmen mit einem jährlichen durchschnittlichen Gesamtendenergieverbrauch innerhalb der letzten drei abgeschlossenen Kalenderjahre von mehr als 7,5 Gigawattstunden sind verpflichtet, ein Energie- oder Umweltmanagementsystem gemäß Absatz 2 Satz 1 oder Satz 2 einzurichten.
@@ -356,8 +348,7 @@ Fußnote
 § 8 Abs. 2 Satz 3 Kursivdruck: Wegen offensichtlicher Unrichtigkeit wird das Wort "Umweltmanagementsytems" durch das Wort "Umweltmanagementsystems" ersetzt
 
  Nichtamtliches Inhaltsverzeichnis
-§ 9
-Umsetzungspläne von Endenergieeinsparmaßnahmen
+§ 9 Umsetzungspläne von Endenergieeinsparmaßnahmen
  
 
 Unternehmen mit einem jährlichen durchschnittlichen Gesamtendenergieverbrauch innerhalb der letzten drei abgeschlossenen Kalenderjahre von mehr als 2,5 Gigawattstunden sind verpflichtet, spätestens binnen drei Jahren konkrete, durchführbare Umsetzungspläne zu erstellen und zu veröffentlichen für alle als wirtschaftlich identifizierten Endenergieeinsparmaßnahmen in den 1.
@@ -371,8 +362,7 @@ Eine Maßnahme gilt als wirtschaftlich, wenn sich bei der Wirtschaftlichkeitsbet
 6 Die Norm ist bei der Beuth Verlag GmbH, Berlin, erschienen und bei der Deutschen Nationalbibliothek archivmäßig gesichert niedergelegt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 10
-Stichprobenkontrolle hinsichtlich der Einrichtung von Energie- und Umweltmanagementsystemen und der Umsetzungspläne von Energieeinsparmaßnahmen
+§ 10 Stichprobenkontrolle hinsichtlich der Einrichtung von Energie- und Umweltmanagementsystemen und der Umsetzungspläne von Energieeinsparmaßnahmen
  
 
 Das Bundesamt für Wirtschaft und Ausfuhrkontrolle hat die Einrichtung und den Betrieb von Energie- und Umweltmanagementsystemen nach § 8 Absatz 1 und die Erstellung und Veröffentlichung von Umsetzungsplänen nach § 9 Absatz 1 durch Stichproben bei den Unternehmen zu kontrollieren. Das Bundesamt für Wirtschaft und Ausfuhrkontrolle ist berechtigt, zu dem in Satz 1 genannten Zweck von Unternehmen die Vorlage von Nachweisen nach der Anlage 2 innerhalb einer Frist von vier Wochen über eine elektronisch abrufbare Vorlage zu verlangen.
@@ -381,8 +371,7 @@ Abschnitt 4
 Energieeffizienz in Rechenzentren
 
  Nichtamtliches Inhaltsverzeichnis
-§ 11
-Klimaneutrale Rechenzentren
+§ 11 Klimaneutrale Rechenzentren
  
 
 (1) Rechenzentren, die vor dem 1. Juli 2026 den Betrieb aufnehmen oder aufgenommen haben, sind so zu errichten und zu betreiben, dass sie 1.
@@ -414,8 +403,7 @@ ab dem 1. Januar 2027 zu 100 Prozent durch Strom aus erneuerbaren Energien.
 7 Die Norm ist bei der Beuth Verlag GmbH, Berlin, erschienen und bei der Deutschen Nationalbibliothek archivmäßig gesichert niedergelegt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 12
-Energie- und Umweltmanagementsysteme in Rechenzentren
+§ 12 Energie- und Umweltmanagementsysteme in Rechenzentren
  
 
 (1) Unbeschadet von § 8 sind Betreiber von Rechenzentren verpflichtet, bis zum 1. Juli 2025 ein Energie- oder Umweltmanagementsystem einzurichten.
@@ -434,8 +422,7 @@ Maßnahmen zu ergreifen, die die Energieeffizienz des Rechenzentrums kontinuierl
 (6) Die Anforderungen nach den Absätzen 1, 2, 3 und 5 sind nicht anzuwenden auf Rechenzentren oder Informationstechnik, die plangemäß vor dem 1. Juli 2027 außer Betrieb gehen. Entsprechende Nachweise sind vom Betreiber des Rechenzentrums oder der Informationstechnik zu erbringen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 13
-Informationspflicht für Betreiber von Rechenzentren und für Betreiber von Informationstechnik; Verordnungsermächtigung
+§ 13 Informationspflicht für Betreiber von Rechenzentren und für Betreiber von Informationstechnik; Verordnungsermächtigung
  
 
 (1) Betreiber von Rechenzentren sind verpflichtet, bis zum Ablauf des 31. März eines jeden Jahres Informationen über ihr Rechenzentrum nach Maßgabe der Anlage 3 für das vorangegangene Kalenderjahr zu veröffentlichen und an den Bund zu übermitteln. Die Übermittlung soll in der vom Bund hierzu bereitgestellten elektronischen Vorlage erfolgen. Der Bund kann die elektronische Vorlage mit der elektronischen Vorlage nach § 17 Absatz 2 zu einer einheitlichen Vorlage verbinden.
@@ -443,15 +430,13 @@ Informationspflicht für Betreiber von Rechenzentren und für Betreiber von Info
 (2) Die Bundesregierung wird ermächtigt, durch Rechtsverordnung mit Zustimmung des Bundesrates zusätzliche Informationspflichten zu Absatz 1 festzulegen, soweit diese zum besseren Vergleich der Energieeffizienzleistung von Rechenzentren und Informationstechnik erforderlich sind.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 14
-Energieeffizienzregister für Rechenzentren
+§ 14 Energieeffizienzregister für Rechenzentren
  
 
 Die Bundesregierung errichtet ein Energieeffizienzregister für Rechenzentren, in dem die von den Rechenzentren nach § 13 Absatz 1 in Verbindung mit Anlage 3 übermittelten Informationen gespeichert und in eine europäische Datenbank über Rechenzentren übertragen werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 15
-Information und Beratung im Kundenverhältnis
+§ 15 Information und Beratung im Kundenverhältnis
  
 
 Bieten Betreiber von Rechenzentren Dienstleistungen für Dritte (Kunden) an, so sind die Betreiber ab dem 1. Januar 2024 dazu verpflichtet, die direkt den Kunden zuzuordnenden Energieverbräuche pro Jahr gegenüber diesen Kunden darzustellen.
@@ -460,8 +445,7 @@ Abschnitt 5
 Abwärme
 
  Nichtamtliches Inhaltsverzeichnis
-§ 16
-Vermeidung und Verwendung von Abwärme
+§ 16 Vermeidung und Verwendung von Abwärme
  
 
 (1) Unternehmen sind verpflichtet, die in ihrem Unternehmen entstehende Abwärme nach dem Stand der Technik zu vermeiden und die anfallende Abwärme auf den Anteil der technisch unvermeidbaren Abwärme zu reduzieren, soweit dies möglich und zumutbar ist. Im Rahmen der Zumutbarkeit sind technische, wirtschaftliche und betriebliche Belange zu berücksichtigen. Für die Bestimmung des Standes der Technik sind die Anforderungen aus den jeweils aktuell geltenden Schlussfolgerungen zu den besten verfügbaren Techniken gemäß der Richtlinie 2010/75/EU des Europäischen Parlaments und des Rates vom 24. November 2010 über Industrieemissionen (integrierte Vermeidung und Verminderung der Umweltverschmutzung) (ABl. L 334 vom 17.12.2010, S. 17; L 158 vom 19.6.2012, S. 25) in Bezug auf Abwärme zu berücksichtigen.
@@ -473,8 +457,7 @@ Vermeidung und Verwendung von Abwärme
 (4) Ausgenommen von der Pflicht zur Vermeidung von Abwärme nach Absatz 1 Satz 1 und der Pflicht zur Verwendung von Abwärme nach Absatz 2 Satz 1 sind Unternehmen, die einen jährlichen durchschnittlichen Gesamtendenergieverbrauch innerhalb der letzten drei abgeschlossenen Kalenderjahre Jahre von 2,5 Gigawattstunden oder weniger haben.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 17
-Plattform für Abwärme
+§ 17 Plattform für Abwärme
  
 
 (1) Unternehmen sind auf Anfrage von Betreibern von Wärmenetzen oder Fernwärmeversorgungsunternehmen und sonstigen potenziellen wärmeabnehmenden Unternehmen verpflichtet, Auskunft zu geben über die folgenden Informationen in Bezug auf die im Unternehmen anfallende unmittelbare Abwärme: 1.
@@ -500,8 +483,7 @@ Abschnitt 6
 Klimaneutrale Unternehmen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 18
-Klimaneutrale Unternehmen; Verordnungsermächtigung
+§ 18 Klimaneutrale Unternehmen; Verordnungsermächtigung
  
 
 Die Bundesregierung wird ermächtigt, durch Rechtsverordnung mit Zustimmung des Bundesrates Ausnahmen und Befreiungen von den Pflichten nach den §§ 11 bis 13 und 15 bis 17 für klimaneutrale Unternehmen vorzusehen. Die Rechtsverordnung nach Satz 1 regelt die näheren Einzelheiten 1.
@@ -519,8 +501,7 @@ Abschnitt 7
 Schlussvorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 19
-Bußgeldvorschriften
+§ 19 Bußgeldvorschriften
  
 
 (1) Ordnungswidrig handelt, wer vorsätzlich oder fahrlässig 1.
@@ -547,8 +528,7 @@ entgegen § 17 Absatz 2 Satz 1 eine Information nicht, nicht richtig, nicht voll
 (3) Verwaltungsbehörde im Sinne des § 36 Absatz 1 Nummer 1 des Gesetzes über Ordnungswidrigkeiten ist das Bundesamt für Wirtschaft und Ausfuhrkontrolle, ausgenommen hiervon ist Absatz 1 Nummer 7.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 20
-Übergangsvorschrift
+§ 20 Übergangsvorschrift
  
 
 (1) Die Länder sind verpflichtet, die Informationen nach § 6 Absatz 7 Satz 1 erstmals im Jahr 2024 und spätestens sechs Monate nach Bereitstellung der elektronischen Vorlage durch die zuständige Stelle nach § 7 Absatz 1 und 2 Nummer 2 und 3 zu übermitteln.
@@ -563,8 +543,7 @@ ab einer nicht redundanten Nennanschlussleistung von 200 Kilowatt bis unter 500 
 (4) Unternehmen sind verpflichtet, die Informationen nach § 17 Absatz 2 Satz 1 erstmals bis zum 1. Januar 2024 zu übermitteln.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 21
-Ausschluss
+§ 21 Ausschluss
  
 
 (1) Ausgenommen von den Vorgaben und Bestimmungen dieses Gesetzes sind: 1.

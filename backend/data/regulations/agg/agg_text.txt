@@ -48,15 +48,13 @@ Abschnitt 1
 Allgemeiner Teil
 
  Nichtamtliches Inhaltsverzeichnis
-§ 1
-Ziel des Gesetzes
+§ 1 Ziel des Gesetzes
  
 
 Ziel des Gesetzes ist, Benachteiligungen aus Gründen der Rasse oder wegen der ethnischen Herkunft, des Geschlechts, der Religion oder Weltanschauung, einer Behinderung, des Alters oder der sexuellen Identität zu verhindern oder zu beseitigen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 2
-Anwendungsbereich
+§ 2 Anwendungsbereich
  
 
 (1) Benachteiligungen aus einem in § 1 genannten Grund sind nach Maßgabe dieses Gesetzes unzulässig in Bezug auf: 1.
@@ -83,8 +81,7 @@ den Zugang zu und die Versorgung mit Gütern und Dienstleistungen, die der Öffe
 (4) Für Kündigungen gelten ausschließlich die Bestimmungen zum allgemeinen und besonderen Kündigungsschutz.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 3
-Begriffsbestimmungen
+§ 3 Begriffsbestimmungen
  
 
 (1) Eine unmittelbare Benachteiligung liegt vor, wenn eine Person wegen eines in § 1 genannten Grundes eine weniger günstige Behandlung erfährt, als eine andere Person in einer vergleichbaren Situation erfährt, erfahren hat oder erfahren würde. Eine unmittelbare Benachteiligung wegen des Geschlechts liegt in Bezug auf § 2 Abs. 1 Nr. 1 bis 4 auch im Falle einer ungünstigeren Behandlung einer Frau wegen Schwangerschaft oder Mutterschaft vor.
@@ -98,15 +95,13 @@ Begriffsbestimmungen
 (5) Die Anweisung zur Benachteiligung einer Person aus einem in § 1 genannten Grund gilt als Benachteiligung. Eine solche Anweisung liegt in Bezug auf § 2 Abs. 1 Nr. 1 bis 4 insbesondere vor, wenn jemand eine Person zu einem Verhalten bestimmt, das einen Beschäftigten oder eine Beschäftigte wegen eines in § 1 genannten Grundes benachteiligt oder benachteiligen kann.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 4
-Unterschiedliche Behandlung wegen mehrerer Gründe
+§ 4 Unterschiedliche Behandlung wegen mehrerer Gründe
  
 
 Erfolgt eine unterschiedliche Behandlung wegen mehrerer der in § 1 genannten Gründe, so kann diese unterschiedliche Behandlung nach den §§ 8 bis 10 und 20 nur gerechtfertigt werden, wenn sich die Rechtfertigung auf alle diese Gründe erstreckt, derentwegen die unterschiedliche Behandlung erfolgt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 5
-Positive Maßnahmen
+§ 5 Positive Maßnahmen
  
 
 Ungeachtet der in den §§ 8 bis 10 sowie in § 20 benannten Gründe ist eine unterschiedliche Behandlung auch zulässig, wenn durch geeignete und angemessene Maßnahmen bestehende Nachteile wegen eines in § 1 genannten Grundes verhindert oder ausgeglichen werden sollen.
@@ -118,8 +113,7 @@ Unterabschnitt 1
 Verbot der Benachteiligung
 
  Nichtamtliches Inhaltsverzeichnis
-§ 6
-Persönlicher Anwendungsbereich
+§ 6 Persönlicher Anwendungsbereich
  
 
 (1) Beschäftigte im Sinne dieses Gesetzes sind 1.
@@ -135,8 +129,7 @@ Als Beschäftigte gelten auch die Bewerberinnen und Bewerber für ein Beschäfti
 (3) Soweit es die Bedingungen für den Zugang zur Erwerbstätigkeit sowie den beruflichen Aufstieg betrifft, gelten die Vorschriften dieses Abschnitts für Selbstständige und Organmitglieder, insbesondere Geschäftsführer oder Geschäftsführerinnen und Vorstände, entsprechend.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 7
-Benachteiligungsverbot
+§ 7 Benachteiligungsverbot
  
 
 (1) Beschäftigte dürfen nicht wegen eines in § 1 genannten Grundes benachteiligt werden; dies gilt auch, wenn die Person, die die Benachteiligung begeht, das Vorliegen eines in § 1 genannten Grundes bei der Benachteiligung nur annimmt.
@@ -146,8 +139,7 @@ Benachteiligungsverbot
 (3) Eine Benachteiligung nach Absatz 1 durch Arbeitgeber oder Beschäftigte ist eine Verletzung vertraglicher Pflichten.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 8
-Zulässige unterschiedliche Behandlung wegen beruflicher Anforderungen
+§ 8 Zulässige unterschiedliche Behandlung wegen beruflicher Anforderungen
  
 
 (1) Eine unterschiedliche Behandlung wegen eines in § 1 genannten Grundes ist zulässig, wenn dieser Grund wegen der Art der auszuübenden Tätigkeit oder der Bedingungen ihrer Ausübung eine wesentliche und entscheidende berufliche Anforderung darstellt, sofern der Zweck rechtmäßig und die Anforderung angemessen ist.
@@ -155,8 +147,7 @@ Zulässige unterschiedliche Behandlung wegen beruflicher Anforderungen
 (2) Die Vereinbarung einer geringeren Vergütung für gleiche oder gleichwertige Arbeit wegen eines in § 1 genannten Grundes wird nicht dadurch gerechtfertigt, dass wegen eines in § 1 genannten Grundes besondere Schutzvorschriften gelten.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 9
-Zulässige unterschiedliche Behandlung wegen der Religion oder Weltanschauung
+§ 9 Zulässige unterschiedliche Behandlung wegen der Religion oder Weltanschauung
  
 
 (1) Ungeachtet des § 8 ist eine unterschiedliche Behandlung wegen der Religion oder der Weltanschauung bei der Beschäftigung durch Religionsgemeinschaften, die ihnen zugeordneten Einrichtungen ohne Rücksicht auf ihre Rechtsform oder durch Vereinigungen, die sich die gemeinschaftliche Pflege einer Religion oder Weltanschauung zur Aufgabe machen, auch zulässig, wenn eine bestimmte Religion oder Weltanschauung unter Beachtung des Selbstverständnisses der jeweiligen Religionsgemeinschaft oder Vereinigung im Hinblick auf ihr Selbstbestimmungsrecht oder nach der Art der Tätigkeit eine gerechtfertigte berufliche Anforderung darstellt.
@@ -164,8 +155,7 @@ Zulässige unterschiedliche Behandlung wegen der Religion oder Weltanschauung
 (2) Das Verbot unterschiedlicher Behandlung wegen der Religion oder der Weltanschauung berührt nicht das Recht der in Absatz 1 genannten Religionsgemeinschaften, der ihnen zugeordneten Einrichtungen ohne Rücksicht auf ihre Rechtsform oder der Vereinigungen, die sich die gemeinschaftliche Pflege einer Religion oder Weltanschauung zur Aufgabe machen, von ihren Beschäftigten ein loyales und aufrichtiges Verhalten im Sinne ihres jeweiligen Selbstverständnisses verlangen zu können.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 10
-Zulässige unterschiedliche Behandlung wegen des Alters
+§ 10 Zulässige unterschiedliche Behandlung wegen des Alters
  
 
 Ungeachtet des § 8 ist eine unterschiedliche Behandlung wegen des Alters auch zulässig, wenn sie objektiv und angemessen und durch ein legitimes Ziel gerechtfertigt ist. Die Mittel zur Erreichung dieses Ziels müssen angemessen und erforderlich sein. Derartige unterschiedliche Behandlungen können insbesondere Folgendes einschließen: 1.
@@ -185,15 +175,13 @@ Unterabschnitt 2
 Organisationspflichten des Arbeitgebers
 
  Nichtamtliches Inhaltsverzeichnis
-§ 11
-Ausschreibung
+§ 11 Ausschreibung
  
 
 Ein Arbeitsplatz darf nicht unter Verstoß gegen § 7 Abs. 1 ausgeschrieben werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 12
-Maßnahmen und Pflichten des Arbeitgebers
+§ 12 Maßnahmen und Pflichten des Arbeitgebers
  
 
 (1) Der Arbeitgeber ist verpflichtet, die erforderlichen Maßnahmen zum Schutz vor Benachteiligungen wegen eines in § 1 genannten Grundes zu treffen. Dieser Schutz umfasst auch vorbeugende Maßnahmen.
@@ -210,8 +198,7 @@ Unterabschnitt 3
 Rechte der Beschäftigten
 
  Nichtamtliches Inhaltsverzeichnis
-§ 13
-Beschwerderecht
+§ 13 Beschwerderecht
  
 
 (1) Die Beschäftigten haben das Recht, sich bei den zuständigen Stellen des Betriebs, des Unternehmens oder der Dienststelle zu beschweren, wenn sie sich im Zusammenhang mit ihrem Beschäftigungsverhältnis vom Arbeitgeber, von Vorgesetzten, anderen Beschäftigten oder Dritten wegen eines in § 1 genannten Grundes benachteiligt fühlen. Die Beschwerde ist zu prüfen und das Ergebnis der oder dem beschwerdeführenden Beschäftigten mitzuteilen.
@@ -219,15 +206,13 @@ Beschwerderecht
 (2) Die Rechte der Arbeitnehmervertretungen bleiben unberührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 14
-Leistungsverweigerungsrecht
+§ 14 Leistungsverweigerungsrecht
  
 
 Ergreift der Arbeitgeber keine oder offensichtlich ungeeignete Maßnahmen zur Unterbindung einer Belästigung oder sexuellen Belästigung am Arbeitsplatz, sind die betroffenen Beschäftigten berechtigt, ihre Tätigkeit ohne Verlust des Arbeitsentgelts einzustellen, soweit dies zu ihrem Schutz erforderlich ist. § 273 des Bürgerlichen Gesetzbuchs bleibt unberührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 15
-Entschädigung und Schadensersatz
+§ 15 Entschädigung und Schadensersatz
  
 
 (1) Bei einem Verstoß gegen das Benachteiligungsverbot ist der Arbeitgeber verpflichtet, den hierdurch entstandenen Schaden zu ersetzen. Dies gilt nicht, wenn der Arbeitgeber die Pflichtverletzung nicht zu vertreten hat.
@@ -243,8 +228,7 @@ Entschädigung und Schadensersatz
 (6) Ein Verstoß des Arbeitgebers gegen das Benachteiligungsverbot des § 7 Abs. 1 begründet keinen Anspruch auf Begründung eines Beschäftigungsverhältnisses, Berufsausbildungsverhältnisses oder einen beruflichen Aufstieg, es sei denn, ein solcher ergibt sich aus einem anderen Rechtsgrund.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 16
-Maßregelungsverbot
+§ 16 Maßregelungsverbot
  
 
 (1) Der Arbeitgeber darf Beschäftigte nicht wegen der Inanspruchnahme von Rechten nach diesem Abschnitt oder wegen der Weigerung, eine gegen diesen Abschnitt verstoßende Anweisung auszuführen, benachteiligen. Gleiches gilt für Personen, die den Beschäftigten hierbei unterstützen oder als Zeuginnen oder Zeugen aussagen.
@@ -257,8 +241,7 @@ Unterabschnitt 4
 Ergänzende Vorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 17
-Soziale Verantwortung der Beteiligten
+§ 17 Soziale Verantwortung der Beteiligten
  
 
 (1) Tarifvertragsparteien, Arbeitgeber, Beschäftigte und deren Vertretungen sind aufgefordert, im Rahmen ihrer Aufgaben und Handlungsmöglichkeiten an der Verwirklichung des in § 1 genannten Ziels mitzuwirken.
@@ -266,8 +249,7 @@ Soziale Verantwortung der Beteiligten
 (2) In Betrieben, in denen die Voraussetzungen des § 1 Abs. 1 Satz 1 des Betriebsverfassungsgesetzes vorliegen, können bei einem groben Verstoß des Arbeitgebers gegen Vorschriften aus diesem Abschnitt der Betriebsrat oder eine im Betrieb vertretene Gewerkschaft unter der Voraussetzung des § 23 Abs. 3 Satz 1 des Betriebsverfassungsgesetzes die dort genannten Rechte gerichtlich geltend machen; § 23 Abs. 3 Satz 2 bis 5 des Betriebsverfassungsgesetzes gilt entsprechend. Mit dem Antrag dürfen nicht Ansprüche des Benachteiligten geltend gemacht werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 18
-Mitgliedschaft in Vereinigungen
+§ 18 Mitgliedschaft in Vereinigungen
  
 
 (1) Die Vorschriften dieses Abschnitts gelten entsprechend für die Mitgliedschaft oder die Mitwirkung in einer 1.
@@ -282,8 +264,7 @@ Abschnitt 3
 Schutz vor Benachteiligung im Zivilrechtsverkehr
 
  Nichtamtliches Inhaltsverzeichnis
-§ 19
-Zivilrechtliches Benachteiligungsverbot
+§ 19 Zivilrechtliches Benachteiligungsverbot
  
 
 (1) Eine Benachteiligung aus Gründen der Rasse oder wegen der ethnischen Herkunft, wegen des Geschlechts, der Religion, einer Behinderung, des Alters oder der sexuellen Identität bei der Begründung, Durchführung und Beendigung zivilrechtlicher Schuldverhältnisse, die 1.
@@ -301,8 +282,7 @@ ist unzulässig.
 (5) Die Vorschriften dieses Abschnitts finden keine Anwendung auf zivilrechtliche Schuldverhältnisse, bei denen ein besonderes Nähe- oder Vertrauensverhältnis der Parteien oder ihrer Angehörigen begründet wird. Bei Mietverhältnissen kann dies insbesondere der Fall sein, wenn die Parteien oder ihre Angehörigen Wohnraum auf demselben Grundstück nutzen. Die Vermietung von Wohnraum zum nicht nur vorübergehenden Gebrauch ist in der Regel kein Geschäft im Sinne des Absatzes 1 Nr. 1, wenn der Vermieter insgesamt nicht mehr als 50 Wohnungen vermietet.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 20
-Zulässige unterschiedliche Behandlung
+§ 20 Zulässige unterschiedliche Behandlung
  
 
 (1) Eine Verletzung des Benachteiligungsverbots ist nicht gegeben, wenn für eine unterschiedliche Behandlung wegen der Religion, einer Behinderung, des Alters, der sexuellen Identität oder des Geschlechts ein sachlicher Grund vorliegt. Das kann insbesondere der Fall sein, wenn die unterschiedliche Behandlung 1.
@@ -317,8 +297,7 @@ an die Religion eines Menschen anknüpft und im Hinblick auf die Ausübung der R
 (2) Kosten im Zusammenhang mit Schwangerschaft und Mutterschaft dürfen auf keinen Fall zu unterschiedlichen Prämien oder Leistungen führen. Eine unterschiedliche Behandlung wegen der Religion, einer Behinderung, des Alters oder der sexuellen Identität ist im Falle des § 19 Abs. 1 Nr. 2 nur zulässig, wenn diese auf anerkannten Prinzipien risikoadäquater Kalkulation beruht, insbesondere auf einer versicherungsmathematisch ermittelten Risikobewertung unter Heranziehung statistischer Erhebungen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 21
-Ansprüche
+§ 21 Ansprüche
  
 
 (1) Der Benachteiligte kann bei einem Verstoß gegen das Benachteiligungsverbot unbeschadet weiterer Ansprüche die Beseitigung der Beeinträchtigung verlangen. Sind weitere Beeinträchtigungen zu besorgen, so kann er auf Unterlassung klagen.
@@ -335,15 +314,13 @@ Abschnitt 4
 Rechtsschutz
 
  Nichtamtliches Inhaltsverzeichnis
-§ 22
-Beweislast
+§ 22 Beweislast
  
 
 Wenn im Streitfall die eine Partei Indizien beweist, die eine Benachteiligung wegen eines in § 1 genannten Grundes vermuten lassen, trägt die andere Partei die Beweislast dafür, dass kein Verstoß gegen die Bestimmungen zum Schutz vor Benachteiligung vorgelegen hat.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 23
-Unterstützung durch Antidiskriminierungsverbände
+§ 23 Unterstützung durch Antidiskriminierungsverbände
  
 
 (1) Antidiskriminierungsverbände sind Personenzusammenschlüsse, die nicht gewerbsmäßig und nicht nur vorübergehend entsprechend ihrer Satzung die besonderen Interessen von benachteiligten Personen oder Personengruppen nach Maßgabe von § 1 wahrnehmen. Die Befugnisse nach den Absätzen 2 bis 4 stehen ihnen zu, wenn sie mindestens 75 Mitglieder haben oder einen Zusammenschluss aus mindestens sieben Verbänden bilden.
@@ -358,8 +335,7 @@ Abschnitt 5
 Sonderregelungen für öffentlich-rechtliche Dienstverhältnisse
 
  Nichtamtliches Inhaltsverzeichnis
-§ 24
-Sonderregelung für öffentlich-rechtliche Dienstverhältnisse
+§ 24 Sonderregelung für öffentlich-rechtliche Dienstverhältnisse
  
 
 Die Vorschriften dieses Gesetzes gelten unter Berücksichtigung ihrer besonderen Rechtsstellung entsprechend für 1.
@@ -373,8 +349,7 @@ Abschnitt 6
 Antidiskriminierungsstelle des Bundes und Unabhängige Bundesbeauftragte oder Unabhängiger Bundesbeauftragter für Antidiskriminierung
 
  Nichtamtliches Inhaltsverzeichnis
-§ 25
-Antidiskriminierungsstelle des Bundes
+§ 25 Antidiskriminierungsstelle des Bundes
  
 
 (1) Beim Bundesministerium für Familie, Senioren, Frauen und Jugend wird unbeschadet der Zuständigkeit der Beauftragten des Deutschen Bundestages oder der Bundesregierung die Stelle des Bundes zum Schutz vor Benachteiligungen wegen eines in § 1 genannten Grundes (Antidiskriminierungsstelle des Bundes) errichtet.
@@ -384,8 +359,7 @@ Antidiskriminierungsstelle des Bundes
 (3) Die Antidiskriminierungsstelle des Bundes wird von der oder dem Unabhängigen Bundesbeauftragten für Antidiskriminierung geleitet.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26
-Wahl der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung; Anforderungen
+§ 26 Wahl der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung; Anforderungen
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung wird auf Vorschlag der Bundesregierung vom Deutschen Bundestag gewählt.
@@ -397,8 +371,7 @@ Wahl der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung; Anf
 (4) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung muss zur Erfüllung ihrer oder seiner Aufgaben und zur Ausübung ihrer oder seiner Befugnisse über die erforderliche Qualifikation, Erfahrung und Sachkunde insbesondere im Bereich der Antidiskriminierung verfügen. Insbesondere muss sie oder er über durch einschlägige Berufserfahrung erworbene Kenntnisse des Antidiskriminierungsrechts verfügen und die Befähigung für die Laufbahn des höheren nichttechnischen Verwaltungsdienstes des Bundes haben.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26a
-Rechtsstellung der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26a Rechtsstellung der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung steht nach Maßgabe dieses Gesetzes in einem öffentlich-rechtlichen Amtsverhältnis zum Bund. Sie oder er ist bei der Ausübung ihres oder seines Amtes unabhängig und nur dem Gesetz unterworfen.
@@ -406,8 +379,7 @@ Rechtsstellung der oder des Unabhängigen Bundesbeauftragten für Antidiskrimini
 (2) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung untersteht der Rechtsaufsicht der Bundesregierung.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26b
-Amtszeit der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26b Amtszeit der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Die Amtszeit der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung beträgt fünf Jahre.
@@ -417,8 +389,7 @@ Amtszeit der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
 (3) Kommt vor Ende des Amtsverhältnisses eine Neuwahl nicht zustande, so führt die oder der bisherige Unabhängige Bundesbeauftragte für Antidiskriminierung auf Ersuchen der Bundespräsidentin oder des Bundespräsidenten die Geschäfte bis zur Neuwahl fort.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26c
-Beginn und Ende des Amtsverhältnisses der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung; Amtseid
+§ 26c Beginn und Ende des Amtsverhältnisses der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung; Amtseid
  
 
 (1) Die oder der nach § 26 Gewählte ist von der Bundespräsidentin oder dem Bundespräsidenten zu ernennen. Das Amtsverhältnis der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung beginnt mit der Aushändigung der Ernennungsurkunde.
@@ -439,8 +410,7 @@ Die Entlassung erfolgt durch die Bundespräsidentin oder den Bundespräsidenten.
 (5) Im Fall der Beendigung des Amtsverhältnisses vollzieht die Bundespräsidentin oder der Bundespräsident eine Urkunde. Die Entlassung wird mit der Aushändigung der Urkunde wirksam.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26d
-Unerlaubte Handlungen und Tätigkeiten der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26d Unerlaubte Handlungen und Tätigkeiten der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung darf keine Handlungen vornehmen, die mit den Aufgaben des Amtes nicht zu vereinbaren sind.
@@ -453,8 +423,7 @@ nicht dem Vorstand, Aufsichtsrat oder Verwaltungsrat eines auf Erwerb gerichtete
 nicht gegen Entgelt außergerichtliche Gutachten abgeben.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26e
-Verschwiegenheitspflicht der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26e Verschwiegenheitspflicht der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung ist verpflichtet, über die Angelegenheiten, die ihr oder ihm im Amt oder während einer anschließenden Geschäftsführung bekannt werden, Verschwiegenheit zu bewahren. Dies gilt nicht für Mitteilungen im dienstlichen Verkehr oder für Tatsachen, die offenkundig sind oder ihrer Bedeutung nach keiner Geheimhaltung bedürfen. Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung entscheidet nach pflichtgemäßem Ermessen, ob und inwieweit sie oder er über solche Angelegenheiten vor Gericht oder außergerichtlich aussagt oder Erklärungen abgibt.
@@ -464,8 +433,7 @@ Verschwiegenheitspflicht der oder des Unabhängigen Bundesbeauftragten für Anti
 (3) Unberührt bleibt die Pflicht, bei einer Gefährdung der freiheitlichen demokratischen Grundordnung für deren Erhaltung einzutreten und die gesetzlich begründete Pflicht, Straftaten anzuzeigen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26f
-Zeugnisverweigerungsrecht der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26f Zeugnisverweigerungsrecht der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung ist berechtigt, über Personen, die ihr oder ihm in ihrer oder seiner Eigenschaft als Leitung der Antidiskriminierungsstelle des Bundes Tatsachen anvertraut haben, sowie über diese Tatsachen selbst das Zeugnis zu verweigern. Soweit das Zeugnisverweigerungsrecht der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung reicht, darf von ihr oder ihm nicht gefordert werden, Akten oder andere Dokumente vorzulegen oder herauszugeben.
@@ -473,8 +441,7 @@ Zeugnisverweigerungsrecht der oder des Unabhängigen Bundesbeauftragten für Ant
 (2) Das Zeugnisverweigerungsrecht gilt auch für die der oder dem Unabhängigen Bundesbeauftragten für Antidiskriminierung zugewiesenen Beschäftigten mit der Maßgabe, dass über die Ausübung dieses Rechts die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung entscheidet.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26g
-Anspruch der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung auf Amtsbezüge, Versorgung und auf andere Leistungen
+§ 26g Anspruch der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung auf Amtsbezüge, Versorgung und auf andere Leistungen
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung erhält Amtsbezüge entsprechend dem Grundgehalt der Besoldungsgruppe B 6 und den Familienzuschlag entsprechend den §§ 39 bis 41 des Bundesbesoldungsgesetzes.
@@ -488,8 +455,7 @@ Anspruch der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung 
 (5) (weggefallen)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26h
-Verwendung der Geschenke an die Unabhängige Bundesbeauftragte oder den Unabhängigen Bundesbeauftragten für Antidiskriminierung
+§ 26h Verwendung der Geschenke an die Unabhängige Bundesbeauftragte oder den Unabhängigen Bundesbeauftragten für Antidiskriminierung
  
 
 (1) Erhält die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung ein Geschenk in Bezug auf das Amt, so muss sie oder er dies der Präsidentin oder dem Präsidenten des Deutschen Bundestages mitteilen.
@@ -497,15 +463,13 @@ Verwendung der Geschenke an die Unabhängige Bundesbeauftragte oder den Unabhän
 (2) Die Präsidentin oder der Präsident des Deutschen Bundestages entscheidet über die Verwendung des Geschenks. Sie oder er kann Verfahrensvorschriften erlassen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26i
-Berufsbeschränkung
+§ 26i Berufsbeschränkung
  
 
 Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung ist verpflichtet, eine beabsichtigte Erwerbstätigkeit oder sonstige entgeltliche Beschäftigung außerhalb des öffentlichen Dienstes, die innerhalb der ersten 18 Monate nach dem Ende der Amtszeit oder einer anschließenden Geschäftsführung aufgenommen werden soll, schriftlich oder elektronisch gegenüber der Präsidentin oder dem Präsidenten des Deutschen Bundestages anzuzeigen. Die Präsidentin oder der Präsident des Deutschen Bundestages kann der oder dem Unabhängigen Bundesbeauftragten für Antidiskriminierung die beabsichtigte Erwerbstätigkeit oder sonstige entgeltliche Beschäftigung untersagen, soweit zu besorgen ist, dass öffentliche Interessen beeinträchtigt werden. Von einer Beeinträchtigung ist insbesondere dann auszugehen, wenn die beabsichtigte Erwerbstätigkeit oder sonstige entgeltliche Beschäftigung in Angelegenheiten oder Bereichen ausgeführt werden soll, in denen die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung während der Amtszeit oder einer anschließenden Geschäftsführung tätig war. Eine Untersagung soll in der Regel die Dauer von einem Jahr nach dem Ende der Amtszeit oder einer anschließenden Geschäftsführung nicht überschreiten. In Fällen der schweren Beeinträchtigung öffentlicher Interessen kann eine Untersagung auch für die Dauer von bis zu 18 Monaten ausgesprochen werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 27
-Aufgaben der Antidiskriminierungsstelle des Bundes
+§ 27 Aufgaben der Antidiskriminierungsstelle des Bundes
  
 
 (1) Wer der Ansicht ist, wegen eines in § 1 genannten Grundes benachteiligt worden zu sein, kann sich an die Antidiskriminierungsstelle des Bundes wenden. An die Antidiskriminierungsstelle des Bundes können sich auch Beschäftigte wenden, die der Ansicht sind, benachteiligt worden zu sein auf Grund 1.
@@ -535,8 +499,7 @@ Durchführung wissenschaftlicher Untersuchungen zu diesen Benachteiligungen.
 (5) Die Antidiskriminierungsstelle des Bundes und die in ihrem Zuständigkeitsbereich betroffenen Beauftragten der Bundesregierung und des Deutschen Bundestages sollen bei Benachteiligungen aus mehreren der in § 1 genannten Gründe zusammenarbeiten.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 28
-Amtsbefugnisse der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung und Pflicht zur Unterstützung durch Bundesbehörden und öffentliche Stellen des Bundes
+§ 28 Amtsbefugnisse der oder des Unabhängigen Bundesbeauftragten für Antidiskriminierung und Pflicht zur Unterstützung durch Bundesbehörden und öffentliche Stellen des Bundes
  
 
 (1) Die oder der Unabhängige Bundesbeauftragte für Antidiskriminierung ist bei allen Vorhaben, die ihre oder seine Aufgaben berühren, zu beteiligen. Die Beteiligung soll möglichst frühzeitig erfolgen. Sie oder er kann der Bundesregierung Vorschläge machen und Stellungnahmen zuleiten.
@@ -548,15 +511,13 @@ Amtsbefugnisse der oder des Unabhängigen Bundesbeauftragten für Antidiskrimini
 (4) Alle Bundesministerien, sonstigen Bundesbehörden und öffentlichen Stellen im Bereich des Bundes sind verpflichtet, die Unabhängige Bundesbeauftragte oder den Unabhängigen Bundesbeauftragten für Antidiskriminierung bei der Erfüllung der Aufgaben zu unterstützen, insbesondere die erforderlichen Auskünfte zu erteilen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 29
-Zusammenarbeit der Antidiskriminierungsstelle des Bundes mit Nichtregierungsorganisationen und anderen Einrichtungen
+§ 29 Zusammenarbeit der Antidiskriminierungsstelle des Bundes mit Nichtregierungsorganisationen und anderen Einrichtungen
  
 
 Die Antidiskriminierungsstelle des Bundes soll bei ihrer Tätigkeit Nichtregierungsorganisationen sowie Einrichtungen, die auf europäischer, Bundes-, Landes- oder regionaler Ebene zum Schutz vor Benachteiligungen wegen eines in § 1 genannten Grundes tätig sind, in geeigneter Form einbeziehen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 30
-Beirat der Antidiskriminierungsstelle des Bundes
+§ 30 Beirat der Antidiskriminierungsstelle des Bundes
  
 
 (1) Zur Förderung des Dialogs mit gesellschaftlichen Gruppen und Organisationen, die sich den Schutz vor Benachteiligungen wegen eines in § 1 genannten Grundes zum Ziel gesetzt haben, wird der Antidiskriminierungsstelle des Bundes ein Beirat beigeordnet. Der Beirat berät die Antidiskriminierungsstelle des Bundes bei der Vorlage von Berichten und Empfehlungen an den Deutschen Bundestag nach § 27 Abs. 4 und kann hierzu sowie zu wissenschaftlichen Untersuchungen nach § 27 Abs. 3 Nr. 3 eigene Vorschläge unterbreiten.
@@ -571,22 +532,19 @@ Abschnitt 7
 Schlussvorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 31
-Unabdingbarkeit
+§ 31 Unabdingbarkeit
  
 
 Von den Vorschriften dieses Gesetzes kann nicht zu Ungunsten der geschützten Personen abgewichen werden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 32
-Schlussbestimmung
+§ 32 Schlussbestimmung
  
 
 Soweit in diesem Gesetz nicht Abweichendes bestimmt ist, gelten die allgemeinen Bestimmungen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 33
-Übergangsbestimmungen
+§ 33 Übergangsbestimmungen
  
 
 (1) Bei Benachteiligungen nach den §§ 611a, 611b und 612 Abs. 3 des Bürgerlichen Gesetzbuchs oder sexuellen Belästigungen nach dem Beschäftigtenschutzgesetz ist das vor dem 18. August 2006 maßgebliche Recht anzuwenden.
