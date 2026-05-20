@@ -19,11 +19,10 @@ export default function DatenschutzPage() {
               Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) und des
               Bundesdatenschutzgesetzes (BDSG) ist:
             </p>
-            {/* TODO BEFORE LAUNCH: Add real street + postcode (must match Impressum) */}
             <p className="mt-3 leading-7">
               Complio<br />
-              Musterstraße 1<br />
-              64283 Darmstadt<br />
+              Mathildenstraße 39<br />
+              64285 Darmstadt<br />
               Deutschland<br />
               E-Mail:{" "}
               <a href="mailto:hellocomplio@gmail.com" className="text-brand-400 hover:text-brand-300 transition-colors">

@@ -67,6 +67,10 @@ class Settings(BaseSettings):
     # CORS (comma-separated list of allowed origins)
     allowed_origins: str = "http://localhost:3000,http://localhost:3001"
 
+    # Reverse proxy trusted hosts (comma-separated IPs or "*" for dev)
+    # In production, set to your actual proxy IP(s) to prevent X-Forwarded-For spoofing
+    proxy_trusted_hosts: str = "*"
+
     # LLM
     llm_temperature: float = 0.0
     llm_timeout_seconds: int = 120

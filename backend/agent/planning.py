@@ -649,6 +649,7 @@ def _parse_gaps(text: str) -> list[ComplianceGap]:
             evidence=item["evidence"],
             deficiency_description=item.get("deficiency_description"),
             priority=Priority(item.get("priority", "MEDIUM")),
+            evidence_quote=item.get("evidence_quote"),
         )
         for item in data
     ]

@@ -47,8 +47,7 @@ Abschnitt 1
 Allgemeine Vorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 1
-Zielsetzung und persönlicher Anwendungsbereich
+§ 1 Zielsetzung und persönlicher Anwendungsbereich
  
 
 (1) Dieses Gesetz regelt den Schutz von natürlichen Personen, die im Zusammenhang mit ihrer beruflichen Tätigkeit oder im Vorfeld einer beruflichen Tätigkeit Informationen über Verstöße erlangt haben und diese an die nach diesem Gesetz vorgesehenen Meldestellen melden oder offenlegen (hinweisgebende Personen).
@@ -56,8 +55,7 @@ Zielsetzung und persönlicher Anwendungsbereich
 (2) Darüber hinaus werden Personen geschützt, die Gegenstand einer Meldung oder Offenlegung sind, sowie sonstige Personen, die von einer Meldung oder Offenlegung betroffen sind.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 2
-Sachlicher Anwendungsbereich
+§ 2 Sachlicher Anwendungsbereich
  
 
 (1) Dieses Gesetz gilt für die Meldung (§ 3 Absatz 4) und die Offenlegung (§ 3 Absatz 5) von Informationen über 1.
@@ -131,8 +129,7 @@ Fußnote
 § 2 Abs. 1 Nr. 3 Buchst. q Kursivdruck: Auf Grund offensichtlicher Unrichtigkeit werden die Angaben "Anhang 1 Nr. 6.1.4. oder Anhang 2 Nummern 6.1.1. oder 6.1.2" durch die Angaben "Anhang 1 Nr. 6.1.4 oder Anhang 2 Nummern 6.1.1 oder 6.1.2" ersetzt
 
  Nichtamtliches Inhaltsverzeichnis
-§ 3
-Begriffsbestimmungen
+§ 3 Begriffsbestimmungen
  
 
 (1) Für dieses Gesetz gelten die Begriffsbestimmungen der folgenden Absätze.
@@ -174,8 +171,7 @@ sonstige, nicht in den Nummern 1 und 2 genannte rechtsfähige Personenvereinigun
 (10) Private Beschäftigungsgeber sind Beschäftigungsgeber mit Ausnahme juristischer Personen des öffentlichen Rechts und solcher Beschäftigungsgeber, die im Eigentum oder unter der Kontrolle einer juristischen Person des öffentlichen Rechts stehen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 4
-Verhältnis zu sonstigen Bestimmungen
+§ 4 Verhältnis zu sonstigen Bestimmungen
  
 
 (1) Diesem Gesetz gehen spezifische Regelungen über die Mitteilung von Informationen über Verstöße in den folgenden Vorschriften vor: 1.
@@ -211,8 +207,7 @@ Soweit die spezifischen Regelungen in Satz 1 keine Vorgaben machen, gelten die B
 (4) Die Regelungen des Strafprozessrechts werden von den Vorgaben dieses Gesetzes nicht berührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 5
-Vorrang von Sicherheitsinteressen sowie Verschwiegenheits- und Geheimhaltungspflichten
+§ 5 Vorrang von Sicherheitsinteressen sowie Verschwiegenheits- und Geheimhaltungspflichten
  
 
 (1) Eine Meldung oder Offenlegung fällt nicht in den Anwendungsbereich dieses Gesetzes, wenn sie folgende Informationen beinhaltet: 1.
@@ -238,8 +233,7 @@ Fußnote
 (+++ § 5: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 6
-Verhältnis zu sonstigen Verschwiegenheits- und Geheimhaltungspflichten
+§ 6 Verhältnis zu sonstigen Verschwiegenheits- und Geheimhaltungspflichten
  
 
 (1) Beinhaltet eine interne oder eine externe Meldung oder eine Offenlegung ein Geschäftsgeheimnis im Sinne des § 2 Nummer 1 des Gesetzes zum Schutz von Geschäftsgeheimnissen, so ist die Weitergabe des Geschäftsgeheimnisses an eine zuständige Meldestelle oder dessen Offenlegung erlaubt, sofern 1.
@@ -272,8 +266,7 @@ Unterabschnitt 1
 Grundsätze
 
  Nichtamtliches Inhaltsverzeichnis
-§ 7
-Wahlrecht zwischen interner und externer Meldung
+§ 7 Wahlrecht zwischen interner und externer Meldung
  
 
 (1) Personen, die beabsichtigen, Informationen über einen Verstoß zu melden, können wählen, ob sie sich an eine interne Meldestelle (§ 12) oder eine externe Meldestelle (§§ 19 bis 24) wenden. Diese Personen sollten in den Fällen, in denen intern wirksam gegen den Verstoß vorgegangen werden kann und sie keine Repressalien befürchten, die Meldung an eine interne Meldestelle bevorzugen. Wenn einem intern gemeldeten Verstoß nicht abgeholfen wurde, bleibt es der hinweisgebenden Person unbenommen, sich an eine externe Meldestelle zu wenden.
@@ -287,8 +280,7 @@ Fußnote
 (+++ § 7: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 8
-Vertraulichkeitsgebot
+§ 8 Vertraulichkeitsgebot
  
 
 (1) Die Meldestellen haben die Vertraulichkeit der Identität der folgenden Personen zu wahren: 1.
@@ -306,8 +298,7 @@ Fußnote
 (+++ § 8: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 9
-Ausnahmen vom Vertraulichkeitsgebot
+§ 9 Ausnahmen vom Vertraulichkeitsgebot
  
 
 (1) Die Identität einer hinweisgebenden Person, die vorsätzlich oder grob fahrlässig unrichtige Informationen über Verstöße meldet, wird nicht nach diesem Gesetz geschützt.
@@ -352,8 +343,7 @@ Fußnote
 (+++ § 9: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 10
-Verarbeitung personenbezogener Daten
+§ 10 Verarbeitung personenbezogener Daten
  
 
 Die Meldestellen sind befugt, personenbezogene Daten zu verarbeiten, soweit dies zur Erfüllung ihrer in den §§ 13 und 24 bezeichneten Aufgaben erforderlich ist. Abweichend von Artikel 9 Absatz 1 der Verordnung (EU) 2016/679 ist die Verarbeitung besonderer Kategorien personenbezogener Daten durch eine Meldestelle zulässig, wenn dies zur Erfüllung ihrer Aufgaben erforderlich ist. In diesem Fall hat die Meldestelle spezifische und angemessene Maßnahmen zur Wahrung der Interessen der betroffenen Person vorzusehen; § 22 Absatz 2 Satz 2 des Bundesdatenschutzgesetzes ist entsprechend anzuwenden.
@@ -363,8 +353,7 @@ Fußnote
 (+++ § 10: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 11
-Dokumentation der Meldungen
+§ 11 Dokumentation der Meldungen
  
 
 (1) Die Personen, die in einer Meldestelle für die Entgegennahme von Meldungen zuständig sind, dokumentieren alle eingehenden Meldungen in dauerhaft abrufbarer Weise unter Beachtung des Vertraulichkeitsgebots (§ 8).
@@ -385,8 +374,7 @@ Unterabschnitt 2
 Interne Meldungen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 12
-Pflicht zur Einrichtung interner Meldestellen
+§ 12 Pflicht zur Einrichtung interner Meldestellen
  
 
 (1) Beschäftigungsgeber haben dafür zu sorgen, dass bei ihnen mindestens eine Stelle für interne Meldungen eingerichtet ist und betrieben wird, an die sich Beschäftigte wenden können (interne Meldestelle). Ist der Bund oder ein Land Beschäftigungsgeber, bestimmen die obersten Bundes- oder Landesbehörden Organisationseinheiten in Form von einzelnen oder mehreren Behörden, Verwaltungsstellen, Betrieben oder Gerichten. Die Pflicht nach Satz 1 gilt sodann für die Einrichtung und den Betrieb der internen Meldestelle bei den jeweiligen Organisationseinheiten. Für Gemeinden und Gemeindeverbände und solche Beschäftigungsgeber, die im Eigentum oder unter der Kontrolle von Gemeinden und Gemeindeverbänden stehen, gilt die Pflicht zur Einrichtung und zum Betrieb interner Meldestellen nach Maßgabe des jeweiligen Landesrechts.
@@ -415,8 +403,7 @@ Institute im Sinne des § 1 Absatz 3 des Zahlungsdiensteaufsichtsgesetzes.
 (4) Die nach Absatz 1 Satz 1 verpflichteten Beschäftigungsgeber erteilen der internen Meldestelle die notwendigen Befugnisse, um ihre Aufgaben wahrzunehmen, insbesondere, um Meldungen zu prüfen und Folgemaßnahmen zu ergreifen. Ist der Beschäftigungsgeber der Bund oder ein Land, gilt Satz 1 für die jeweiligen Organisationseinheiten entsprechend.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 13
-Aufgaben der internen Meldestellen
+§ 13 Aufgaben der internen Meldestellen
  
 
 (1) Die internen Meldestellen betreiben Meldekanäle nach § 16, führen das Verfahren nach § 17 und ergreifen Folgemaßnahmen nach § 18.
@@ -424,8 +411,7 @@ Aufgaben der internen Meldestellen
 (2) Die internen Meldestellen halten für Beschäftigte klare und leicht zugängliche Informationen über externe Meldeverfahren gemäß Unterabschnitt 3 und einschlägige Meldeverfahren von Organen, Einrichtungen oder sonstigen Stellen der Europäischen Union bereit.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 14
-Organisationsformen interner Meldestellen
+§ 14 Organisationsformen interner Meldestellen
  
 
 (1) Eine interne Meldestelle kann eingerichtet werden, indem eine bei dem jeweiligen Beschäftigungsgeber oder bei der jeweiligen Organisationseinheit beschäftigte Person, eine aus mehreren beschäftigten Personen bestehende Arbeitseinheit oder ein Dritter mit den Aufgaben einer internen Meldestelle betraut wird. Die Betrauung eines Dritten mit den Aufgaben einer internen Meldestelle entbindet den betrauenden Beschäftigungsgeber nicht von der Pflicht, selbst geeignete Maßnahmen zu ergreifen, um einen etwaigen Verstoß abzustellen. Ist der Beschäftigungsgeber der Bund oder ein Land, gilt Satz 2 für die jeweiligen Organisationseinheiten entsprechend.
@@ -433,8 +419,7 @@ Organisationsformen interner Meldestellen
 (2) Mehrere private Beschäftigungsgeber mit in der Regel 50 bis 249 Beschäftigten können für die Entgegennahme von Meldungen und für die weiteren nach diesem Gesetz vorgesehenen Maßnahmen eine gemeinsame Stelle einrichten und betreiben. Die Pflicht, Maßnahmen zu ergreifen, um den Verstoß abzustellen, und die Pflicht zur Rückmeldung an die hinweisgebende Person verbleiben bei dem einzelnen Beschäftigungsgeber.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 15
-Unabhängige Tätigkeit; notwendige Fachkunde
+§ 15 Unabhängige Tätigkeit; notwendige Fachkunde
  
 
 (1) Die mit den Aufgaben einer internen Meldestelle beauftragten Personen sind bei der Ausübung ihrer Tätigkeit unabhängig. Sie dürfen neben ihrer Tätigkeit für die interne Meldestelle andere Aufgaben und Pflichten wahrnehmen. Es ist dabei sicherzustellen, dass derartige Aufgaben und Pflichten nicht zu Interessenkonflikten führen.
@@ -442,8 +427,7 @@ Unabhängige Tätigkeit; notwendige Fachkunde
 (2) Beschäftigungsgeber tragen dafür Sorge, dass die mit den Aufgaben einer internen Meldestelle beauftragten Personen über die notwendige Fachkunde verfügen. Ist der Beschäftigungsgeber der Bund oder ein Land, gilt Satz 1 für die jeweiligen Organisationseinheiten entsprechend.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 16
-Meldekanäle für interne Meldestellen
+§ 16 Meldekanäle für interne Meldestellen
  
 
 (1) Nach § 12 zur Einrichtung interner Meldestellen verpflichtete Beschäftigungsgeber richten für diese Meldekanäle ein, über die sich Beschäftigte und dem Beschäftigungsgeber überlassene Leiharbeitnehmerinnen und Leiharbeitnehmer an die internen Meldestellen wenden können, um Informationen über Verstöße zu melden. Ist der Beschäftigungsgeber der Bund oder ein Land, gilt Satz 1 für die jeweiligen Organisationseinheiten entsprechend. Der interne Meldekanal kann so gestaltet werden, dass er darüber hinaus auch natürlichen Personen offensteht, die im Rahmen ihrer beruflichen Tätigkeiten mit dem jeweiligen zur Einrichtung der internen Meldestelle verpflichteten Beschäftigungsgeber oder mit der jeweiligen Organisationseinheit in Kontakt stehen. Die interne Meldestelle sollte auch anonym eingehende Meldungen bearbeiten. Es besteht allerdings keine Verpflichtung, die Meldekanäle so zu gestalten, dass sie die Abgabe anonymer Meldungen ermöglichen.
@@ -457,8 +441,7 @@ Fußnote
 (+++ § 16 Abs. 2: Zur Geltung vgl. § 27 Abs. 1 Satz 2 +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 17
-Verfahren bei internen Meldungen
+§ 17 Verfahren bei internen Meldungen
  
 
 (1) Die interne Meldestelle 1.
@@ -481,8 +464,7 @@ Fußnote
 (+++ § 17 Abs. 2 Satz 2 und 3: Zur Geltung vgl. § 28 Abs. 4 Satz 5 +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 18
-Folgemaßnahmen der internen Meldestelle
+§ 18 Folgemaßnahmen der internen Meldestelle
  
 
 Als Folgemaßnahmen kann die interne Meldestelle insbesondere 1.
@@ -501,8 +483,7 @@ Unterabschnitt 3
 Externe Meldestellen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 19
-Errichtung und Zuständigkeit einer externen Meldestelle des Bundes
+§ 19 Errichtung und Zuständigkeit einer externen Meldestelle des Bundes
  
 
 (1) Der Bund errichtet beim Bundesamt für Justiz eine Stelle für externe Meldungen (externe Meldestelle des Bundes). Die externe Meldestelle des Bundes ist organisatorisch vom übrigen Zuständigkeitsbereich des Bundesamts für Justiz getrennt.
@@ -514,15 +495,13 @@ Errichtung und Zuständigkeit einer externen Meldestelle des Bundes
 (4) Die externe Meldestelle des Bundes ist zuständig, soweit nicht eine externe Meldestelle nach den §§ 20 bis 23 zuständig ist.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 20
-Errichtung und Zuständigkeit externer Meldestellen der Länder
+§ 20 Errichtung und Zuständigkeit externer Meldestellen der Länder
  
 
 Jedes Land kann eine eigene externe Meldestelle einrichten für Meldungen, die die jeweilige Landesverwaltung und die jeweiligen Kommunalverwaltungen betreffen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 21
-Bundesanstalt für Finanzdienstleistungsaufsicht als externe Meldestelle
+§ 21 Bundesanstalt für Finanzdienstleistungsaufsicht als externe Meldestelle
  
 
 Die Bundesanstalt für Finanzdienstleistungsaufsicht ist zuständige externe Meldestelle für 1.
@@ -536,8 +515,7 @@ nach § 2 Absatz 1 Nummer 3 Buchstabe r bis t.
 Für die über dieses Gesetz hinausgehende nähere Ausgestaltung der Organisation und des Verfahrens der Bundesanstalt für Finanzdienstleistungsaufsicht als externe Meldestelle gilt § 4d des Finanzdienstleistungsaufsichtsgesetzes.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 22
-Bundeskartellamt als externe Meldestelle
+§ 22 Bundeskartellamt als externe Meldestelle
  
 
 (1) Das Bundeskartellamt ist zuständige externe Meldestelle für Meldungen von Informationen über Verstöße nach § 2 Absatz 1 Nummer 8 und 9. § 7 Absatz 1 Satz 3 findet mit der Maßgabe Anwendung, dass sich die hinweisgebende Person jederzeit und unabhängig vom Ausgang des Verfahrens über die interne Meldung an das Bundeskartellamt wenden kann.
@@ -545,8 +523,7 @@ Bundeskartellamt als externe Meldestelle
 (2) Die Befugnisse des Bundeskartellamts nach anderen Vorschriften bleiben unberührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 23
-Weitere externe Meldestellen
+§ 23 Weitere externe Meldestellen
  
 
 (1) Der Bund richtet eine weitere externe Meldestelle ein für externe Meldungen, die die externe Meldestelle des Bundes nach § 19 betreffen.
@@ -554,8 +531,7 @@ Weitere externe Meldestellen
 (2) Für Meldungen, die eine externe Meldestelle nach den §§ 20 bis 22 betreffen, ist weitere externe Meldestelle die externe Meldestelle des Bundes nach § 19.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 24
-Aufgaben der externen Meldestellen
+§ 24 Aufgaben der externen Meldestellen
  
 
 (1) Die externen Meldestellen errichten und betreiben Meldekanäle nach § 27, prüfen die Stichhaltigkeit einer Meldung und führen das Verfahren nach § 28.
@@ -582,8 +558,7 @@ Fußnote
 (+++ § 24: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 25
-Unabhängige Tätigkeit; Schulung
+§ 25 Unabhängige Tätigkeit; Schulung
  
 
 (1) Die externen Meldestellen arbeiten im Rahmen ihrer Aufgaben und Befugnisse fachlich unabhängig und von den internen Meldestellen getrennt. Die Aufsicht über sie erstreckt sich auf die Beachtung von Gesetz und sonstigem Recht.
@@ -595,8 +570,7 @@ Fußnote
 (+++ § 25: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 26
-Berichtspflichten der externen Meldestellen
+§ 26 Berichtspflichten der externen Meldestellen
  
 
 (1) Die externen Meldestellen berichten jährlich in zusammengefasster Form über die eingegangenen Meldungen. Der Bericht darf keine Rückschlüsse auf die beteiligten Personen oder Unternehmen zulassen. Er ist der Öffentlichkeit zugänglich zu machen.
@@ -616,8 +590,7 @@ Unterabschnitt 4
 Externe Meldungen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 27
-Meldekanäle für externe Meldestellen
+§ 27 Meldekanäle für externe Meldestellen
  
 
 (1) Für externe Meldestellen werden Meldekanäle eingerichtet, über die sich hinweisgebende Personen an die externen Meldestellen wenden können, um Informationen über Verstöße zu melden. § 16 Absatz 2 gilt entsprechend. Die externe Meldestelle sollte auch anonym eingehende Meldungen bearbeiten. Vorbehaltlich spezialgesetzlicher Regelungen besteht allerdings keine Verpflichtung, die Meldekanäle so zu gestalten, dass sie die Abgabe anonymer Meldungen ermöglichen.
@@ -631,8 +604,7 @@ Fußnote
 (+++ § 27: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 28
-Verfahren bei externen Meldungen
+§ 28 Verfahren bei externen Meldungen
  
 
 (1) Die externen Meldestellen bestätigen den Eingang einer Meldung umgehend, spätestens jedoch sieben Tage nach Eingang der Meldung. Eine Eingangsbestätigung erfolgt nicht, wenn die hinweisgebende Person darauf ausdrücklich verzichtet oder wenn hinreichender Grund zu der Annahme besteht, dass die Eingangsbestätigung den Schutz der Identität der hinweisgebenden Person beeinträchtigen würde. In für ein internes Meldeverfahren geeigneten Fällen weisen die externen Meldestellen zusammen mit der Eingangsbestätigung die hinweisgebende Person auf die Möglichkeit einer internen Meldung hin.
@@ -650,8 +622,7 @@ Fußnote
 (+++ § 28: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 29
-Folgemaßnahmen der externen Meldestellen
+§ 29 Folgemaßnahmen der externen Meldestellen
  
 
 (1) Die externen Meldestellen können nach pflichtgemäßem Ermessen Auskünfte von den betroffenen natürlichen Personen, von dem betroffenen Beschäftigungsgeber, von Dritten sowie von Behörden verlangen, soweit dies zur Überprüfung der Stichhaltigkeit der Meldung erforderlich ist. Für die Beantwortung des Auskunftsverlangens ist eine angemessene Frist zu gewähren. Für Auskunftsverlangen nach Satz 1 gelten das Zeugnisverweigerungsrecht nach den §§ 53 und 53a und das Auskunftsverweigerungsrecht nach § 55 der Strafprozessordnung entsprechend. Für die Beantwortung von Auskunftsverlangen wird auf Antrag eine Entschädigung entsprechend den Vorschriften des Justizvergütungs- und -entschädigungsgesetzes über die Entschädigung von Zeugen gewährt. § 23 Absatz 2 Satz 2 des Justizvergütungs- und -entschädigungsgesetzes gilt entsprechend.
@@ -670,8 +641,7 @@ Fußnote
 (+++ § 29: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 30
-Zusammenarbeit mit anderen öffentlichen Stellen
+§ 30 Zusammenarbeit mit anderen öffentlichen Stellen
  
 
 Die externen Meldestellen sowie die sonstigen öffentlichen Stellen, die für die Aufklärung, Verhütung und Verfolgung von Verstößen im Anwendungsbereich dieses Gesetzes zuständig sind, arbeiten zur Durchführung dieses Gesetzes zusammen und unterstützen sich gegenseitig. Spezielle gesetzliche Regelungen zur Zusammenarbeit öffentlicher Stellen bleiben hiervon unberührt.
@@ -681,8 +651,7 @@ Fußnote
 (+++ § 30: zur Anwendung vgl. § 34d Abs. 12 Satz 3 GewO +++)
 
  Nichtamtliches Inhaltsverzeichnis
-§ 31
-Abschluss des Verfahrens
+§ 31 Abschluss des Verfahrens
  
 
 (1) Hat eine externe Meldestelle die Stichhaltigkeit einer Meldung geprüft und das Verfahren nach § 28 geführt, schließt sie das Verfahren ab.
@@ -707,8 +676,7 @@ Abschnitt 3
 Offenlegung
 
  Nichtamtliches Inhaltsverzeichnis
-§ 32
-Offenlegen von Informationen
+§ 32 Offenlegen von Informationen
  
 
 (1) Personen, die Informationen über Verstöße offenlegen, fallen unter die Schutzmaßnahmen dieses Gesetzes, wenn sie 1.
@@ -731,8 +699,7 @@ Abschnitt 4
 Schutzmaßnahmen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 33
-Voraussetzungen für den Schutz hinweisgebender Personen
+§ 33 Voraussetzungen für den Schutz hinweisgebender Personen
  
 
 (1) Die §§ 35 bis 37 sind auf hinweisgebende Personen anwendbar, sofern 1.
@@ -745,8 +712,7 @@ die Informationen Verstöße betreffen, die in den Anwendungsbereich dieses Gese
 (2) Die §§ 35 bis 37 sind unter den Voraussetzungen des Absatzes 1 auch anwendbar auf Personen, die zuständigen Organen, Einrichtungen oder sonstigen Stellen der Europäischen Union in den Anwendungsbereich dieses Gesetzes fallende Verstöße gegen das Unionsrecht melden.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 34
-Weitere geschützte Personen
+§ 34 Weitere geschützte Personen
  
 
 (1) Die §§ 35 bis 37 gelten entsprechend für natürliche Personen, die die hinweisgebende Person bei einer internen oder externen Meldung oder einer Offenlegung im beruflichen Zusammenhang vertraulich unterstützen, sofern die gemeldeten oder offengelegten Informationen 1.
@@ -760,8 +726,7 @@ Dritte, die mit der hinweisgebenden Person in Verbindung stehen und in einem ber
 juristische Personen, rechtsfähige Personengesellschaften und sonstige rechtsfähige Personenvereinigungen, die mit der hinweisgebenden Person infolge einer Beteiligung rechtlich verbunden sind oder für die die hinweisgebende Person tätig ist oder mit denen sie in einem beruflichen Kontext anderweitig in Verbindung steht.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 35
-Ausschluss der Verantwortlichkeit
+§ 35 Ausschluss der Verantwortlichkeit
  
 
 (1) Eine hinweisgebende Person kann nicht für die Beschaffung von oder den Zugriff auf Informationen, die sie gemeldet oder offengelegt hat, rechtlich verantwortlich gemacht werden, sofern die Beschaffung nicht als solche oder der Zugriff nicht als solcher eine eigenständige Straftat darstellt.
@@ -769,8 +734,7 @@ Ausschluss der Verantwortlichkeit
 (2) Eine hinweisgebende Person verletzt keine Offenlegungsbeschränkungen und kann nicht für die bei einer Meldung oder Offenlegung erfolgte Weitergabe von Informationen rechtlich verantwortlich gemacht werden, sofern sie hinreichenden Grund zu der Annahme hatte, dass die Weitergabe der Informationen erforderlich war, um einen Verstoß aufzudecken.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 36
-Verbot von Repressalien; Beweislastumkehr
+§ 36 Verbot von Repressalien; Beweislastumkehr
  
 
 (1) Gegen hinweisgebende Personen gerichtete Repressalien sind verboten. Das gilt auch für die Androhung und den Versuch, Repressalien auszuüben.
@@ -778,8 +742,7 @@ Verbot von Repressalien; Beweislastumkehr
 (2) Erleidet eine hinweisgebende Person eine Benachteiligung im Zusammenhang mit ihrer beruflichen Tätigkeit und macht sie geltend, diese Benachteiligung infolge einer Meldung oder Offenlegung nach diesem Gesetz erlitten zu haben, so wird vermutet, dass diese Benachteiligung eine Repressalie für diese Meldung oder Offenlegung ist. In diesem Fall hat die Person, die die hinweisgebende Person benachteiligt hat, zu beweisen, dass die Benachteiligung auf hinreichend gerechtfertigten Gründen basierte oder dass sie nicht auf der Meldung oder Offenlegung beruhte.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 37
-Schadensersatz nach Repressalien
+§ 37 Schadensersatz nach Repressalien
  
 
 (1) Bei einem Verstoß gegen das Verbot von Repressalien ist der Verursacher verpflichtet, der hinweisgebenden Person den daraus entstehenden Schaden zu ersetzen.
@@ -787,15 +750,13 @@ Schadensersatz nach Repressalien
 (2) Ein Verstoß gegen das Verbot von Repressalien begründet keinen Anspruch auf Begründung eines Beschäftigungsverhältnisses, eines Berufsausbildungsverhältnisses oder eines anderen Vertragsverhältnisses oder auf einen beruflichen Aufstieg.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 38
-Schadensersatz nach einer Falschmeldung
+§ 38 Schadensersatz nach einer Falschmeldung
  
 
 Die hinweisgebende Person ist zum Ersatz des Schadens verpflichtet, der aus einer vorsätzlichen oder grob fahrlässigen Meldung oder Offenlegung unrichtiger Informationen entstanden ist.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 39
-Verbot abweichender Vereinbarungen
+§ 39 Verbot abweichender Vereinbarungen
  
 
 Vereinbarungen, die die nach diesem Gesetz bestehenden Rechte hinweisgebender Personen oder sonst nach diesem Gesetz geschützter Personen einschränken, sind unwirksam.
@@ -804,8 +765,7 @@ Abschnitt 5
 Sanktionen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 40
-Bußgeldvorschriften
+§ 40 Bußgeldvorschriften
  
 
 (1) Ordnungswidrig handelt, wer wissentlich entgegen § 32 Absatz 2 eine unrichtige Information offenlegt.
@@ -829,8 +789,7 @@ Abschnitt 6
 Schlussvorschriften
 
  Nichtamtliches Inhaltsverzeichnis
-§ 41
-Verordnungsermächtigung
+§ 41 Verordnungsermächtigung
  
 
 Das Bundesministerium der Justiz wird ermächtigt, durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, im Einvernehmen mit dem Bundesministerium für Wirtschaft und Klimaschutz, dem Bundesministerium der Finanzen, dem Bundesministerium des Innern und für Heimat, dem Bundesministerium für Arbeit und Soziales, dem Bundesministerium der Verteidigung, dem Bundesministerium für Gesundheit und dem Bundesministerium für Umwelt, Naturschutz, nukleare Sicherheit und Verbraucherschutz 1.
@@ -839,8 +798,7 @@ die nähere Ausgestaltung der Organisation und des Verfahrens der externen Melde
 eine weitere externe Meldestelle nach § 23 Absatz 1 zu bestimmen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 42
-Übergangsregelung
+§ 42 Übergangsregelung
  
 
 (1) Abweichend von § 12 Absatz 1 müssen private Beschäftigungsgeber mit in der Regel 50 bis 249 Beschäftigten ihre internen Meldestellen erst ab dem 17. Dezember 2023 einrichten. Satz 1 gilt nicht für die in § 12 Absatz 3 genannten Beschäftigungsgeber.
