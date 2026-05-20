@@ -22,10 +22,8 @@ export default function ImpressumPage() {
             <h2 className="text-white font-semibold text-base mb-3">Angaben gemäß § 5 DDG</h2>
             <p className="leading-7">
               Complio<br />
-              {/* TODO BEFORE LAUNCH: replace with real street + house number */}
-              Musterstraße 1<br />
-              {/* TODO BEFORE LAUNCH: replace with real postcode */}
-              64283 Darmstadt<br />
+              Mathildenstraße 39<br />
+              64285 Darmstadt<br />
               Deutschland
             </p>
           </section>

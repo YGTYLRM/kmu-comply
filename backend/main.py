@@ -180,8 +180,10 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(TimeoutMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
-# Correctly extract real client IP from X-Forwarded-For when behind a reverse proxy
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+# Extract real client IP from X-Forwarded-For when behind a reverse proxy.
+# In production, restrict to your actual proxy IPs via PROXY_TRUSTED_HOSTS env var.
+_trusted = [h.strip() for h in (settings.proxy_trusted_hosts or "*").split(",") if h.strip()]
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=_trusted if _trusted != ["*"] else "*")
 
 app.include_router(analysis_router)
 app.include_router(companies_router)

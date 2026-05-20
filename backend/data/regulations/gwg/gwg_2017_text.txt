@@ -1,4 +1,4 @@
-GwG — Geldwäschegesetz (Anti-Money Laundering Act)
+GwG — Geldwäschegesetz 2017
 Source: https://www.gesetze-im-internet.de/gwg_2017/BJNR182210017.html
 
 GwG - Gesetz �ber das Aufsp�ren von Gewinnen aus schweren Straftaten
@@ -20,7 +20,7 @@ GwG - Gesetz �ber das Aufsp�ren von Gewinnen aus schweren Straftaten
 
  
 Gesetz über das Aufspüren von Gewinnen aus schweren Straftaten  (Geldwäschegesetz - GwG)
-
+Nichtamtliches Inhaltsverzeichnis
 GwG
 
 Ausfertigungsdatum: 23.06.2017
@@ -53,7 +53,7 @@ Fußnote
  
 Das G wurde als Art. 1 des G v. 23.6.2017 I 1822 vom Bundestag mit Zustimmung des Bundesrates beschlossen. Es ist gem. Art. 24 Satz 1 dieses G am 26.6.2017 in Kraft getreten.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 Inhaltsübersicht 
  
 
@@ -262,7 +262,7 @@ Anlage 2Faktoren für ein potenziell höheres Risiko
 Abschnitt 1
 Begriffsbestimmungen, Verpflichtete und risikobasierter Ansatz
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 1 Begriffsbestimmungen
  
 
@@ -451,7 +451,7 @@ Verordnung (EU) 2023/1114 bezeichnet die Verordnung (EU) 2023/1114 des Europäis
 
 (33) Selbst gehostete Adresse im Sinne dieses Gesetzes ist eine selbst gehostete Adresse im Sinne des Artikels 3 Nummer 20 der Verordnung (EU) 2023/1113.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 2 Verpflichtete, Verordnungsermächtigung
  
 
@@ -550,7 +550,7 @@ In diesem Fall hat es die Europäische Kommission zeitnah zu unterrichten.
 
 (4) Für Behörden sowie Körperschaften und Anstalten des öffentlichen Rechts, die öffentliche Versteigerungen durchführen, gelten die in den Abschnitten 3, 5 und 6 genannten Identifizierungs- und Meldepflichten sowie die Pflicht zur Zusammenarbeit mit der Zentralstelle für Finanztransaktionsuntersuchungen entsprechend, soweit Transaktionen mit Barzahlungen über mindestens 10 000 Euro getätigt werden. Satz 1 gilt nicht, soweit im Rahmen der Zwangsvollstreckung gepfändete Gegenstände verwertet werden. Die Identifizierung des Erstehers soll bei Zuschlag erfolgen, spätestens jedoch bei Einzahlung des Bargebots. Nach Satz 1 verpflichtete Behörden sowie Körperschaften und Anstalten des öffentlichen Rechts können bei der Erfüllung ihrer Pflichten nach Satz 1 auf Dritte zurückgreifen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 3 Wirtschaftlich Berechtigter
  
 
@@ -592,7 +592,7 @@ Fußnote
 (+++ § 3 Abs 1 u. 3: Zur Anwendung vgl. § 19 Abs. 2 +++) 
 § 3 Abs. 3 Nr. 6 Buchst. b Kursivdruck: Aufgrund offensichtlicher Unrichtigkeit wurde das Wort "Begünstige" durch das Wort "Begünstigte" ersetzt
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 3a Risikobasierter Ansatz, nationale Risikoanalyse
  
 
@@ -603,7 +603,7 @@ Fußnote
 Abschnitt 2
 Risikomanagement
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 4 Risikomanagement
  
 
@@ -629,7 +629,7 @@ Transaktionen über sonstige Güter, bei welchen sie Barzahlungen über mindeste
 2.
 als Kunstvermittler und Kunstlagerhalter bei Transaktionen im Wert von mindestens 10 000 Euro.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5 Risikoanalyse
  
 
@@ -646,7 +646,7 @@ der Aufsichtsbehörde auf Verlangen die jeweils aktuelle Fassung der Risikoanaly
 
 (4) Die Aufsichtsbehörde kann einen Verpflichteten auf dessen Antrag von der Dokumentation der Risikoanalyse befreien, wenn der Verpflichtete darlegen kann, dass die in dem jeweiligen Bereich bestehenden konkreten Risiken klar erkennbar sind und sie verstanden werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 6 Interne Sicherungsmaßnahmen
  
 
@@ -699,7 +699,7 @@ Die Verpflichteten haben in ihrer Anzeige darzulegen, dass die Voraussetzungen f
 
 (9) Die Aufsichtsbehörde kann anordnen, dass auf einzelne Verpflichtete oder Gruppen von Verpflichteten wegen der Art der von diesen betriebenen Geschäfte und wegen der Größe des Geschäftsbetriebs unter Berücksichtigung der Risiken in Bezug auf Geldwäsche oder Terrorismusfinanzierung die Vorschriften der Absätze 1 bis 6 risikoangemessen anzuwenden sind.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 7 Geldwäschebeauftragter
  
 
@@ -720,7 +720,7 @@ nach risikobasierter Bewertung anderweitige Vorkehrungen getroffen werden, um Ge
 
 (7) Dem Geldwäschebeauftragten und dem Stellvertreter darf wegen der Erfüllung ihrer Aufgaben keine Benachteiligung im Beschäftigungsverhältnis entstehen. Die Kündigung des Arbeitsverhältnisses ist unzulässig, es sei denn, dass Tatsachen vorliegen, welche die verantwortliche Stelle zur Kündigung aus wichtigem Grund ohne Einhaltung einer Kündigungsfrist berechtigen. Nach der Abberufung als Geldwäschebeauftragter oder als Stellvertreter ist die Kündigung innerhalb eines Jahres nach der Beendigung der Bestellung unzulässig, es sei denn, dass die verantwortliche Stelle zur Kündigung aus wichtigem Grund ohne Einhaltung einer Kündigungsfrist berechtigt ist.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8 Aufzeichnungs- und Aufbewahrungspflicht
  
 
@@ -759,7 +759,7 @@ Fußnote
 
 (+++ § 8: Zur Anwendung vgl. § 25i Abs. 3 Satz 2 KredWG +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 9 Gruppenweite Pflichten
  
 
@@ -791,7 +791,7 @@ deren Mutterunternehmen weder nach Absatz 1 noch nach dem Recht des Staates, in 
 Abschnitt 3
 Sorgfaltspflichten in Bezug auf Kunden
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 10 Allgemeine Sorgfaltspflichten
  
 
@@ -878,7 +878,7 @@ Fußnote
 (+++ § 10 Abs. 2 Satz 4: Zur Anwendung vgl. § 15 Abs. 2 +++) 
 (+++ § 10 Abs. 9: Zur Anwendung vgl. § 14 Abs. 3 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 11 Identifizierung; Erhebung von Angaben zum Zweck der Identifizierung
  
 
@@ -920,7 +920,7 @@ die Namen der Mitglieder des Vertretungsorgans oder die Namen der gesetzlichen V
 
 (7) Verwalter von Rechtsgestaltungen im Sinne des § 3 Absatz 3 haben dem Verpflichteten ihre Verwaltereigenschaft offenzulegen und ihm unverzüglich die Angaben zu übermitteln, die nach Absatz 5 zur Identifizierung aller wirtschaftlich Berechtigten im Sinne des § 3 Absatz 3 erforderlich sind, wenn sie in dieser Position eine Geschäftsbeziehung aufnehmen oder eine Transaktion oberhalb der in § 10 Absatz 3 Nummer 2, Absatz 5, Absatz 6 oder Absatz 6a genannten Schwellenbeträge durchführen. Im Falle von Trusts und anderen Rechtsgestaltungen nach § 21 sind dem Verpflichteten die Angaben nach § 21 Absatz 1 und 2 unverzüglich zu übermitteln.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 11a Verarbeitung personenbezogener Daten durch Verpflichtete
  
 
@@ -930,7 +930,7 @@ die Namen der Mitglieder des Vertretungsorgans oder die Namen der gesetzlichen V
 
 (3) Die Absätze 1 und 2 finden entsprechende Anwendung auf Dritte im Sinne von § 17, auf die ein Verpflichteter zur Erfüllung der allgemeinen Sorgfaltspflichten nach § 10 Absatz 1 Nummer 1 bis 4 zurückgreift.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 12 Überprüfung von Angaben zum Zweck der Identifizierung, Verordnungsermächtigung
  
 
@@ -968,7 +968,7 @@ Fußnote
 
 (+++ Hinweis: Die Änderung d. Art. 6 Abs. 1 G v. 21.6.2019 I 846 durch Art. 154a Nr. 3 Buchst. a G v. 20.11.2019 I 1626 (Verschiebung d. Inkrafttretens zum 1.11.2020) ist nicht ausführbar, da Art. 5 d. G v. 21.6.2019 I 846 zum Zeitpunkt d. Inkrafttretens d. G v. 20.11.2019 I 1626 bereits mWv 1.11.2019 in Kraft getreten war +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 13 Verfahren zur Überprüfung von Angaben zum Zweck der Identifizierung, Verordnungsermächtigung
  
 
@@ -985,7 +985,7 @@ Verfahren bestimmen, die zur geldwäscherechtlichen Identifizierung nach Absatz 
 Verfahren bestimmen, deren Eignung zur geldwäscherechtlichen Überprüfung der Identität erprobt wird und bei denen zu ermitteln ist, ob sie ein Sicherheitsniveau aufweisen, das dem in Absatz 1 Nummer 1 genannten Verfahren gleichwertig ist.
 Bei Verfahren nach Nummer 3 können die Aufsichtsbehörden nach § 50 dazu ermächtigt werden, die Nutzung der Verfahren befristet, unter Vorbehalt eines Widerrufs und unter Auflagen zuzulassen. Eine Zulassung elektronischer Verfahren nach Nummer 3 erfolgt nur, wenn das Bundesamt für Sicherheit in der Informationstechnik bei einer vorherigen Überprüfung des Verfahrens das für die Erprobung notwendige Sicherheitsniveau festgestellt hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 14 Vereinfachte Sorgfaltspflichten, Verordnungsermächtigung
  
 
@@ -1008,7 +1008,7 @@ der Zahlungsdienstleister des Begünstigten in der Lage ist, anhand einer indivi
 3.
 der überwiesene Betrag höchstens 1 000 Euro beträgt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 15 Verstärkte Sorgfaltspflichten, Verordnungsermächtigung
  
 
@@ -1108,7 +1108,7 @@ Fallkonstellationen bestimmen, in denen insbesondere im Hinblick auf Staaten, Ku
 für Fallkonstellationen im Sinne des Absatzes 3 Nummer 2 bestimmte verstärkte Sorgfaltspflichten und Gegenmaßnahmen anordnen sowie für die Anordnung und Ausgestaltung verstärkter Sorgfaltspflichten durch die zuständigen Aufsichtsbehörden nach Absatz 5a Regelungen treffen.
 Das Bundesministerium der Finanzen hat bei Erlass einer Rechtsverordnung nach dieser Vorschrift einschlägige Evaluierungen, Bewertungen oder Berichte internationaler Organisationen oder von Einrichtungen für die Festlegung von Standards mit Kompetenzen im Bereich der Verhinderung von Geldwäsche und der Bekämpfung von Terrorismusfinanzierung hinsichtlich der von einzelnen Drittstaaten ausgehenden Risiken zu berücksichtigen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 15a Verstärkte Sorgfaltspflichten bei der Übertragung von Kryptowerten von einer selbst gehosteten oder an eine selbst gehostete Adresse
  
 
@@ -1123,7 +1123,7 @@ die verstärkte, kontinuierliche Überwachung dieser Transaktionen und der mit d
 4.
 andere Maßnahmen zur Minderung und Beherrschung der Risiken von Geldwäsche und von Terrorismusfinanzierung sowie des Risikos der Nichtumsetzung und Umgehung gezielter Finanzsanktionen und gezielter Finanzsanktionen im Zusammenhang mit Proliferationsfinanzierung.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 16 Besondere Vorschriften für das Glücksspiel im Internet
  
 
@@ -1157,7 +1157,7 @@ Bei der Transaktion hat der Verpflichtete den Verwendungszweck dahingehend zu sp
 
 (8) Abweichend von § 11 kann der Verpflichtete bei einem Spieler, für den er ein Spielerkonto einrichtet, eine vorläufige Identifizierung durchführen. Die vorläufige Identifizierung kann anhand einer elektronisch oder auf dem Postweg übersandten Kopie eines Dokuments nach § 12 Absatz 1 Satz 1 Nummer 1 erfolgen. Eine vollständige Identifizierung ist unverzüglich nachzuholen. Sowohl die vorläufige als auch die vollständige Identifizierung kann auch anhand der glücksspielrechtlichen Anforderungen an Identifizierung und Authentifizierung erfolgen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 16a Verbot der Barzahlung beim Erwerb von Immobilien
  
 
@@ -1178,7 +1178,7 @@ in dem Fall, in dem er nach § 43 Absatz 1 zu einer Meldung verpflichtet ist, di
 
 (5) Die Absätze 2 bis 4 gelten nicht, wenn die geschuldete Gegenleistung einen Betrag von 10 000 Euro nicht übersteigt oder soweit sie über ein Anderkonto des mit der Einreichung des Eintragungsantrags beauftragten Notars erbracht wird. Zudem gilt ein schlüssiger Nachweis im Sinne der Absätze 3 und 4 auch dann als erbracht, wenn dem Notar über einen Wert von nicht mehr als 10 000 Euro der geschuldeten Gegenleistung kein schlüssiger Nachweis nach Absatz 2 vorliegt. Absatz 4 gilt nicht, wenn es nach der Vertragsgestaltung ausgeschlossen erscheint, dass die Vereinbarung der nachträglichen Erbringung der Gegenleistung darauf beruht, dass die Gegenleistung aus einer strafbaren Handlung stammt, die eine Vortat der Geldwäsche darstellen könnte, oder dass der Erwerbsvorgang im Zusammenhang mit Terrorismusfinanzierung steht.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 17 Ausführung der Sorgfaltspflichten durch Dritte, vertragliche Auslagerung
  
 
@@ -1242,7 +1242,7 @@ die Aufsicht der Aufsichtsbehörde über den Verpflichteten.
 Abschnitt 4
 Transparenzregister
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 18 Einrichtung des Transparenzregisters und registerführende Stelle
  
 
@@ -1260,7 +1260,7 @@ Transparenzregister
 
 (6) Das Bundesministerium der Finanzen wird ermächtigt, durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, die technischen Einzelheiten zu Einrichtung und Führung des Transparenzregisters einschließlich der Speicherung historischer Datensätze sowie die Einhaltung von Löschungsfristen für die im Transparenzregister gespeicherten Daten zu regeln.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 19 Angaben zum wirtschaftlich Berechtigten
  
 
@@ -1289,7 +1289,7 @@ der Funktion des gesetzlichen Vertreters, geschäftsführenden Gesellschafters o
 bei Rechtsgestaltungen nach § 21 und rechtsfähigen Stiftungen aus einer der in § 3 Absatz 3 aufgeführten Funktionen.
 In den Fällen des Satzes 1 Nummer 1 Buchstabe c ist anzugeben, ob ermittelt wurde, dass keine natürliche Person die Voraussetzungen eines wirtschaftlich Berechtigten nach § 3 Absatz 1 oder Absatz 2 Satz 1 bis 4 erfüllt, oder ob die Ermittlung eines wirtschaftlich Berechtigten nach § 3 Absatz 1 oder Absatz 2 Satz 1 bis 4 nach Durchführung umfassender Prüfungen nicht möglich war.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 19a Angaben zu Immobilien
  
 
@@ -1312,7 +1312,7 @@ Art und Umfang der Berechtigung,
 6.
 Beginn und Ende der Berechtigung.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 19b Erfassung und Zuordnung von Immobilien
  
 
@@ -1352,7 +1352,7 @@ Die Übermittlung erfolgt auf Basis bereits verfügbarer strukturierter Daten. S
 
 (4) Abweichend von den Absätzen 1 und 2 können die Länder eine Übermittlung der Daten durch die für die Führung der Liegenschaftskataster zuständigen Behörden vorsehen. Die Grundbuchämter und die für die Führung der Liegenschaftskataster zuständigen Behörden können mit der registerführenden Stelle Vereinbarungen über das zu verwendende Datenformat treffen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 20 Transparenzpflichten im Hinblick auf bestimmte Vereinigungen
  
 
@@ -1381,7 +1381,7 @@ Der Anteilseigner hat die Mitteilung an die Vereinigung zu dokumentieren und auf
 
 (5) Die Zentralstelle für Finanztransaktionsuntersuchungen und die Aufsichtsbehörden können im Rahmen ihrer Aufgaben und Befugnisse die nach Absatz 1 aufbewahrten Angaben einsehen oder sich vorlegen lassen. Die Angaben sind ihnen unverzüglich zur Verfügung zu stellen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 20a Automatische Eintragung für Vereine
  
 
@@ -1399,7 +1399,7 @@ Eine Eintragung durch die registerführende Stelle nach Absatz 1 wird nicht vorg
 
 (4) Bei Eintragung nach Absatz 1 handelt die registerführende Stelle nach § 18 Absatz 2 im Rahmen der hoheitlichen Aufgaben des Bundes. Zu diesem Zweck ist die registerführende Stelle beim Abruf von Daten aus den Vereinsregistern von der Zahlung der Gebühren nach § 2 Absatz 1 des Justizverwaltungskostengesetzes befreit.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 21 Transparenzpflichten im Hinblick auf bestimmte Rechtsgestaltungen
  
 
@@ -1426,7 +1426,7 @@ Rechtsgestaltungen, die solchen Stiftungen in ihrer Struktur oder Funktion entsp
 
 (4) Das Bundesministerium der Finanzen wird ermächtigt, im Einvernehmen mit dem Bundesministerium der Justiz und für Verbraucherschutz durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, die Einzelheiten zu regeln, welche Trusts und trustähnlichen Rechtsgestaltungen von § 21 Absatz 1 und 2 erfasst sind und durch welche Merkmale sich diese auszeichnen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 22 Zugängliche Dokumente und Datenübermittlung an das Transparenzregister, Verordnungsermächtigung
  
 
@@ -1456,7 +1456,7 @@ Zugänglich in dem nach den besonderen registerrechtlichen Vorschriften für die
 
 (4) Das Bundesministerium der Finanzen wird ermächtigt, im Benehmen mit dem Bundesministerium der Justiz und für Verbraucherschutz durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, Registrierungsverfahren für die Mitteilungsverpflichteten nach den §§ 20 und 21 sowie technische Einzelheiten der Datenübermittlung nach Absatz 2 Satz 2 sowie nach den §§ 20 und 21 einschließlich der Vorgaben für die zu verwendenden Datenformate und Formulare sowie zur Sicherstellung von Datenschutz und Datensicherheit zu regeln.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 23 Einsichtnahme in das Transparenzregister, Verordnungsermächtigung
  
 
@@ -1514,7 +1514,7 @@ Fußnote
 
 (+++ § 23 Abs. 1 bis 3: Zur Anwendung vgl. § 26 Abs. 1 u. § 59 Abs. 3 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 23a Meldung von Unstimmigkeiten an die registerführende Stelle
  
 
@@ -1535,7 +1535,7 @@ sie die Prüfung der Unstimmigkeitsmeldung aufgrund unklarer Sachlage nicht absc
 
 (6) Nach Eingang der Unstimmigkeitsmeldung nach Absatz 1 hat die registerführende Stelle auf dem Registerauszug sichtbar zu vermerken, dass die Angaben zu den wirtschaftlich Berechtigten der Vereinigung nach § 20 oder der Rechtsgestaltung nach § 21 der Prüfung unterliegen. Der Abschluss des Verfahrens zur Prüfung der Unstimmigkeitsmeldung ist auf dem Registerauszug zu vermerken.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 23b Meldung von Unstimmigkeiten bei der Zuordnung von Immobilien
  
 
@@ -1547,7 +1547,7 @@ sie die Prüfung der Unstimmigkeitsmeldung aufgrund unklarer Sachlage nicht absc
 
 (4) Die registerführende Stelle hat die Erfassung oder Zuordnung von Immobilien zu berichtigen, wenn sie zu dem Ergebnis gelangt, dass die gemeldete Abweichung zutreffend ist.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 24 Gebühren und Auslagen, Verordnungsermächtigung
  
 
@@ -1568,7 +1568,7 @@ die Auslagenerstattung und
 5.
 das Verfahren für eine Gebührenbefreiung nach Absatz 1 Satz 2.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 25 Übertragung der Führung des Transparenzregisters, Verordnungsermächtigung
  
 
@@ -1593,7 +1593,7 @@ sie sicherstellt, dass sie die Vorschriften zum Schutz personenbezogener Daten e
 
 (7) Für den Fall, dass keine juristische Person des Privatrechts beliehen wird, oder für den Fall, dass die Beleihung beendet wird, kann das Bundesministerium der Finanzen die Führung des Transparenzregisters auf eine Bundesoberbehörde in seinem Geschäftsbereich oder im Einvernehmen mit dem zuständigen Bundesministerium auf eine Bundesoberbehörde in dessen Geschäftsbereich übertragen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 26 Europäisches System der Registervernetzung, Verordnungsermächtigung
  
 
@@ -1605,7 +1605,7 @@ sie sicherstellt, dass sie die Vorschriften zum Schutz personenbezogener Daten e
 
 (4) Das Bundesministerium der Finanzen wird im Benehmen mit dem Bundesministerium der Justiz und für Verbraucherschutz ermächtigt, durch Rechtsverordnung, die der Zustimmung des Bundesrates bedarf, die erforderlichen Bestimmungen über die Einzelheiten des elektronischen Datenverkehrs und seiner Abwicklung nach Absatz 1 einschließlich Vorgaben über Datenformate und Zahlungsmodalitäten zu treffen, soweit keine Regelungen in den von der Europäischen Kommission gemäß Artikel 24 der Richtlinie (EU) 2017/1132 und Artikel 31a der Richtlinie (EU) 2018/843 erlassenen Durchführungsrechtsakten enthalten sind.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 26a Abruf durch bestimmte Behörden
  
 
@@ -1643,7 +1643,7 @@ erlaubt. § 23 bleibt unberührt.
 Abschnitt 5
 Zentralstelle für Finanztransaktionsuntersuchungen
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 27 Zentrale Meldestelle
  
 
@@ -1651,7 +1651,7 @@ Zentralstelle für Finanztransaktionsuntersuchungen
 
 (2) Die Zentralstelle für Finanztransaktionsuntersuchungen ist organisatorisch eigenständig und arbeitet im Rahmen ihrer Aufgaben und Befugnisse fachlich unabhängig.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 28 Aufgaben, Aufsicht und Zusammenarbeit
  
 
@@ -1690,7 +1690,7 @@ die Wahrnehmung der Aufgaben, die ihr darüber hinaus nach anderen Bestimmungen 
 
 (4) Die Zentralstelle für Finanztransaktionsuntersuchungen informiert, soweit erforderlich, die für das Besteuerungsverfahren oder den Schutz der sozialen Sicherungssysteme zuständigen Behörden über Sachverhalte, die ihr bei der Wahrnehmung ihrer Aufgaben bekannt werden und die sie nicht an eine andere zuständige staatliche Stelle übermittelt hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 28a Unterrichtung des Deutschen Bundestages
  
 
@@ -1700,7 +1700,7 @@ die Wahrnehmung der Aufgaben, die ihr darüber hinaus nach anderen Bestimmungen 
 
 (3) Die Mitglieder des Gremiums sind zur Geheimhaltung aller Angelegenheiten verpflichtet, die ihnen bei ihrer Tätigkeit bekannt geworden sind. Dies gilt auch für die Vertreterinnen und Vertreter der hinzugezogenen weiteren Stellen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 29 Verarbeitung personenbezogener Daten durch die Zentralstelle für Finanztransaktionsuntersuchungen
  
 
@@ -1738,7 +1738,7 @@ Folgende Datenarten dürfen mittels einer automatisierten Anwendung zur Datenana
 
 (8) Sofern die oder der Bundesbeauftragte für den Datenschutz und die Informationsfreiheit Verstöße nach § 16 Absatz 2 des Bundesdatenschutzgesetzes beanstandet hat, kann sie oder er geeignete Maßnahmen anordnen, wenn dies zur Beseitigung eines erheblichen Verstoßes gegen datenschutzrechtliche Vorschriften erforderlich ist.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 30 Analyse von Meldungen und Informationen
  
 
@@ -1765,7 +1765,7 @@ Fußnote
 
 (+++ § 30 Abs. 2 Satz 9: Zur Geltung vgl. § 43 Abs. 5 Satz 3 u. § 46 Abs.  1 Satz 5 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 31 Auskunftsrecht gegenüber inländischen öffentlichen Stellen, Datenzugriffsrecht, Verordnungsermächtigung
  
 
@@ -1804,7 +1804,7 @@ Tatsachen zu den Pass- und Ausweisdaten nach § 3 Absatz 2 Nummer 4 des Bundesme
 Daten zum Wohnungsgeber nach § 3 Absatz 2 Nummer 10 des Bundesmeldegesetzes.
 Entsprechendes gilt, soweit konkrete Anhaltspunkte dafür bestehen, dass dies zur Erfüllung der Aufgaben nach § 28 Absatz 1 Satz 3 Nummer 2 erforderlich ist. In den Fällen des Satzes 2 sind die nach Satz 1 abgerufenen Daten unverzüglich zu löschen, wenn sich nach Abschluss der operativen Analyse ergibt, dass die Voraussetzungen für eine Übermittlung nach § 32 Absatz 2 Satz 1 nicht vorliegen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 32 Datenübermittlungsverpflichtung an inländische öffentliche Stellen
  
 
@@ -1846,7 +1846,7 @@ In den Fällen des Absatzes 3a begründet die Zentralstelle für Finanztransakti
 
 (7) Der Empfänger darf die ihm übermittelten personenbezogenen Daten nur zu dem Zweck verwenden, zu dem sie ihm übermittelt worden sind. Eine Verwendung für andere Zwecke ist zulässig, soweit die Daten auch dafür hätten übermittelt werden dürfen. Im Falle einer Übermittlung nach Absatz 3a ist eine Verwendung für andere Zwecke zulässig, soweit die Daten auch dafür hätten übermittelt werden dürfen und die Zentralstelle für Finanztransaktionsuntersuchungen dieser Verwendung zuvor zugestimmt hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 32a Datenübermittlung an Europol
  
 
@@ -1864,7 +1864,7 @@ Sie unterbleibt darüber hinaus in den in Artikel 7 Absatz 7 der Verordnung (EU)
 
 (4) Die Übermittlung ist mit der Bedingung zu verbinden, dass Europol die ihm übermittelten personenbezogenen Daten nur zu dem Zweck verwenden darf, zu dem sie ihm übermittelt worden sind. Eine Verwendung zu anderen Zwecken bedarf der Zustimmung der Zentralstelle für Finanztransaktionsuntersuchungen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 33 Datenaustausch mit Mitgliedstaaten der Europäischen Union
  
 
@@ -1888,7 +1888,7 @@ Die Gründe für die Ablehnung des Informationsersuchens legt die Zentralstelle 
 
 (6) Die Zentralstelle für Finanztransaktionsuntersuchungen benennt eine zentrale Kontaktstelle, die für die Annahme von Informationsersuchen der zentralen Meldestellen anderer Mitgliedstaaten nach dieser Vorschrift zuständig ist.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 34 Informationsersuchen im Rahmen der internationalen Zusammenarbeit
  
 
@@ -1902,7 +1902,7 @@ zu den Zwecken, zu denen um die Daten ersucht wurde, und
 zu den Bedingungen, unter denen die Daten zur Verfügung gestellt wurden.
 Sollen die übermittelten Daten nachträglich an eine andere öffentliche Stelle weitergegeben werden oder für einen Zweck genutzt werden, der über die ursprünglichen Zwecke hinausgeht, so ist vorher die Zustimmung der übermittelnden zentralen Meldestelle einzuholen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 35 Datenübermittlung im Rahmen der internationalen Zusammenarbeit
  
 
@@ -1958,13 +1958,13 @@ Fußnote
 
 (+++ § 35 Abs. 2 bis 6: Zur Anwendung vgl. § 33 Abs. 2 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 36 Automatisierter Datenabgleich im europäischen Verbund
  
 
 Die Zentralstelle für Finanztransaktionsuntersuchungen kann im Verbund mit zentralen Meldestellen anderer Mitgliedstaaten der Europäischen Union ein System zum verschlüsselten automatisierten Abgleich von dazu geeigneten Daten, die die nationalen zentralen Meldestellen im Rahmen ihrer Aufgabenerfüllung erhoben haben, einrichten und betreiben. Zweck dieses Systems ist es, Kenntnis davon zu erlangen, ob zu einer betreffenden Person bereits durch zentrale Meldestellen anderer Mitgliedstaaten der Europäischen Union eine Analyse nach § 30 durchgeführt wurde oder anderweitige Informationen zu dieser Person dort vorliegen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 37 Berichtigung, Einschränkung der Verarbeitung und Löschung personenbezogener Daten aus automatisierter Verarbeitung und bei Speicherung in automatisierten Dateien
  
 
@@ -1992,7 +1992,7 @@ Fußnote
 
 (+++ § 37 Abs. 3 Satz 2 u. 3: Zur Anwendung vgl. § 38 Abs. 4 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 38 Berichtigung, Einschränkung der Verarbeitung und Vernichtung personenbezogener Daten, die weder automatisiert verarbeitet werden noch in einer automatisierten Datei gespeichert sind
  
 
@@ -2019,7 +2019,7 @@ In diesen Fällen schränkt die Zentralstelle für Finanztransaktionsuntersuchun
 
 (6) Für den Fall, dass unrichtige, zu löschende oder in der Verarbeitung einzuschränkende personenbezogene Daten übermittelt worden sind, gilt § 37 Absatz 7 entsprechend.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 38a Protokollierung von Informationsersuchen, Statistik, Verordnungsermächtigung
  
 
@@ -2038,7 +2038,7 @@ alle Maßnahmen, die getroffen werden, um dem Ersuchen nachzukommen.
 
 (4) Die Zentralstelle für Finanztransaktionsuntersuchungen führt eine Statistik über Ersuchen um Auskunft in den Fällen des § 33 Absatz 2 Satz 3 Halbsatz 2. Sie erhebt hierfür die Zahl der Ersuchen sowie die Reaktionszeit sowie nach Möglichkeit die Kosten der Bearbeitung der Ersuchen und stellt die Daten dem Bundesministerium der Finanzen zur Verfügung. Das Bundesministerium der Finanzen wird ermächtigt, durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, das Nähere zu den zu erhebenden Daten, deren Aufbereitung, Auswertung und Bereitstellung zu regeln.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 39 Errichtungsanordnung
  
 
@@ -2067,7 +2067,7 @@ Protokollierung.
 
 (4) In angemessenen Abständen ist die Notwendigkeit der Weiterführung oder der Änderung der Errichtungsanordnung zu überprüfen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 40 Sofortmaßnahmen
  
 
@@ -2102,7 +2102,7 @@ vergleichbaren Zwecken.
 
 (6) Gegen Maßnahmen nach Absatz 1 kann der Verpflichtete oder ein anderer Beschwerter Widerspruch erheben. Der Widerspruch hat keine aufschiebende Wirkung.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 41 Rückmeldung an Verpflichtete und Behörden
  
 
@@ -2112,7 +2112,7 @@ vergleichbaren Zwecken.
 
 (3) Die Absätze 1 und 2 Satz 1 gelten auch im Falle des § 44 dieses Gesetzes und des § 31b Absatz 2 der Abgabenordnung.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 42 Benachrichtigung von inländischen öffentlichen Stellen an die Zentralstelle für Finanztransaktionsuntersuchungen
  
 
@@ -2127,7 +2127,7 @@ Fußnote
 Abschnitt 6
 Pflichten im Zusammenhang mit Meldungen von Sachverhalten
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 43 Meldepflicht von Verpflichteten, Verordnungsermächtigung
  
 
@@ -2157,7 +2157,7 @@ Fußnote
 (+++ § 43 Abs. 1: Zur Anwendung vgl. § 54 Abs. 3 VAG 2016 +++) 
 (+++ § 43 Abs. 2: Zur Anwendung vgl. § 23a Abs. 1 +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 44 Meldepflicht von Aufsichtsbehörden
  
 
@@ -2165,7 +2165,7 @@ Fußnote
 
 (2) Absatz 1 gilt entsprechend für Behörden, die für die Überwachung der Aktien-, Devisen- und Finanzderivatemärkte zuständig sind.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 45 Form der Meldung, Registrierungspflicht, Ausführung durch Dritte, Verordnungsermächtigung
  
 
@@ -2179,7 +2179,7 @@ Fußnote
 
 (5) Das Bundesministerium der Finanzen kann durch Rechtsverordnung ohne Zustimmung des Bundesrates nähere Bestimmungen über die erforderlichen Angaben und die Form der Meldung nach § 43 Absatz 1 oder § 44 erlassen. Von Absatz 1 und den Regelungen einer Rechtsverordnung nach Satz 1 kann durch Landesrecht nicht abgewichen werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 46 Durchführung von Transaktionen
  
 
@@ -2191,7 +2191,7 @@ Für die Berechnung der Frist gilt der Samstag nicht als Werktag. Die Zentralste
 
 (2) Ist ein Aufschub der Transaktion, bei der Tatsachen vorliegen, die auf einen Sachverhalt nach § 43 Absatz 1 hindeuten, nicht möglich oder könnte durch den Aufschub die Verfolgung einer mutmaßlichen strafbaren Handlung behindert werden, so darf die Transaktion durchgeführt werden. Die Meldung nach § 43 Absatz 1 ist vom Verpflichteten unverzüglich nachzuholen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 47 Verbot der Informationsweitergabe, Verordnungsermächtigung
  
 
@@ -2252,7 +2252,7 @@ Fußnote
 
 (+++ § 47 Abs. 5: Zur Anwendung vgl. § 25h Abs. 3 Satz 4 KredWG +++)
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 48 Freistellung von der Verantwortlichkeit
  
 
@@ -2263,7 +2263,7 @@ ein Beschäftigter einen Sachverhalt nach § 43 Absatz 1 seinem Vorgesetzten mel
 2.
 ein Verpflichteter oder einer seiner Beschäftigten einem Auskunftsverlangen der Zentralstelle für Finanztransaktionsuntersuchungen nach § 30 Absatz 3 Satz 1 nachkommt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 49 Informationszugang und Schutz der meldenden Beschäftigten
  
 
@@ -2288,7 +2288,7 @@ In der Auskunft macht sie personenbezogene Daten der Einzelperson, die eine Meld
 Abschnitt 7
 Aufsicht, Zusammenarbeit, Bußgeldvorschriften, Datenschutz
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 50 Zuständige Aufsichtsbehörde
  
 
@@ -2337,7 +2337,7 @@ für die Veranstalter und Vermittler von Glücksspielen nach § 2 Absatz 1 Numme
 9.
 im Übrigen die jeweils nach Bundes- oder Landesrecht zuständige Stelle.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 51 Aufsicht, Verordnungsermächtigung
  
 
@@ -2412,7 +2412,7 @@ welche Meldungen, Anzeigen, Berichte, Anträge und sonstigen Informationen mit d
 welches elektronische Kommunikationsverfahren für die jeweilige Vorlagepflicht bei der Aufsichtsbehörde nach § 50 Nummer 1 und 2, soweit die Bundesanstalt für Finanzdienstleistungsaufsicht zuständige Aufsichtsbehörde ist, zu nutzen ist und welche Bestimmungen für die Nutzung des jeweiligen elektronischen Kommunikationsverfahrens gelten, einschließlich der Verpflichtung zu einem Zugang zu einem elektronischen Kommunikationsverfahren im Sinne der §§ 4f und 4g des Finanzdienstleistungsaufsichtsgesetzes.
 Absatz 11 Satz 2 gilt entsprechend. Das Bundesministerium der Finanzen kann die Ermächtigung nach Satz 1 durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, auf die Bundesanstalt für Finanzdienstleistungsaufsicht übertragen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 51a Verarbeitung personenbezogener Daten durch Aufsichtsbehörden
  
 
@@ -2432,7 +2432,7 @@ Unter diesen Voraussetzungen ist die zuständige Aufsichtsbehörde auch von den 
 
 (4) Wird der betroffenen Person in den Fällen des Absatzes 2 Satz 1 bis 3 keine Auskunft erteilt, so ist auf ihr Verlangen je nach Zuständigkeit dem Bundesbeauftragten für den Datenschutz und die Informationsfreiheit oder der nach Landesrecht für den Datenschutz zuständigen Aufsichtsbehörde die Auskunft zu erteilen, soweit nicht im Einzelfall festgestellt wird, dass dadurch die öffentliche Sicherheit des Bundes oder eines Landes oder die Stabilität und Integrität der Finanzmärkte gefährdet würde. Die Mitteilung des Bundesbeauftragten für den Datenschutz und die Informationsfreiheit oder der nach Landesrecht für den Datenschutz zuständigen Aufsichtsbehörde an die betroffene Person über das Ergebnis der datenschutzrechtlichen Prüfung darf keine Rückschlüsse auf den Erkenntnisstand der zuständigen Aufsichtsbehörde und der Personen und Einrichtungen, derer sich die zuständige Aufsichtsbehörde bei der Durchführung ihrer Aufgaben bedient, zulassen, sofern diese nicht einer weitergehenden Auskunft zustimmt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 52 Mitwirkungspflichten; Verordnungsermächtigung
  
 
@@ -2454,7 +2454,7 @@ die für die Einhaltung der in diesem Gesetz festgelegten Anforderungen von Bede
 
 (7) Verpflichtete haben der Bundesanstalt für Finanzdienstleistungsaufsicht, soweit diese zuständige Aufsichtsbehörde im Sinne des § 50 ist, jährlich die für die Zwecke des Artikels 40 Absatz 1 Unterabsatz 2 Buchstabe a und b der Richtlinie (EU) 2024/1640 und des Artikels 12 Absatz 2 in Verbindung mit Artikel 15 der Verordnung (EU) 2024/1620 erforderlichen Informationen zu melden. Nähere Bestimmungen zu den im Einzelnen zu übermittelnden Informationen ergeben sich insbesondere aus den von der Kommission nach Artikel 40 Absatz 2 der Richtlinie (EU) 2024/1640 sowie Artikel 12 Absatz 7 und Artikel 15 Absatz 3 der Verordnung (EU) 2024/1620 zu erlassenden technischen Regulierungs- und Durchführungsstandards in der jeweils geltenden Fassung. Das Bundesministerium der Finanzen kann durch Rechtsverordnung bestimmen, dass ergänzend zu den Informationen nach den Sätzen 1 und 2 von den Verpflichteten Informationen, die für die risikobasierte Wahrnehmung der Aufsicht durch die Bundesanstalt für Finanzdienstleistungsaufsicht erforderlich sind, zu melden sind sowie Form, Umfang und Zeitpunkt der Meldung bestimmen. Das Bundesministerium der Finanzen kann die Ermächtigung nach Satz 3 durch Rechtsverordnung, die nicht der Zustimmung des Bundesrates bedarf, auf die Bundesanstalt für Finanzdienstleistungsaufsicht übertragen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 53 Hinweise auf Verstöße
  
 
@@ -2488,7 +2488,7 @@ Dem entgegenstehende Vereinbarungen sind unwirksam.
 
 (8) Soweit die Bundesanstalt für Finanzdienstleistungsaufsicht als zuständige Behörde im Sinne des § 50 für die Errichtung eines Systems im Sinne von Absatz 1 zuständig ist, richten sich die Errichtung und der Betrieb nach § 4d des Finanzdienstleistungsaufsichtsgesetzes. Die Absätze 3 bis 7 finden insoweit keine Anwendung.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 54 Verschwiegenheitspflicht
  
 
@@ -2515,7 +2515,7 @@ mit ausdrücklicher Zustimmung der zuständigen Behörden, die diese Tatsachen m
 2.
 für solche Zwecke, denen die zuständigen Behörden zugestimmt haben.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 55 Zusammenarbeit mit anderen Behörden
  
 
@@ -2552,7 +2552,7 @@ Unterschiede in der Art und Stellung der ersuchenden und der ersuchten Behörde.
 
 (8) Die zuständigen Aufsichtsbehörden gemäß § 50 Nummer 1 und 2 können mit den zuständigen Behörden von Drittstaaten, die diesen zuständigen Aufsichtsbehörden entsprechen, Kooperationsvereinbarungen zur Zusammenarbeit und zum Austausch von Tatsachen im Sinne von § 54 Absatz 1 schließen. Solche Kooperationsvereinbarungen werden auf Basis der Gegenseitigkeit und nur dann geschlossen, wenn gewährleistet ist, dass die übermittelten Tatsachen zumindest den in § 54 Absatz 1 enthaltenen Anforderungen unterliegen. Die gemäß diesen Kooperationsvereinbarungen weitergegebenen Tatsachen müssen der Erfüllung der aufsichtsrechtlichen Aufgaben dieser Behörden dienen. § 54 Absatz 4 gilt entsprechend.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 56 Bußgeldvorschriften
  
 
@@ -2793,7 +2793,7 @@ sonstige Maßnahmen aufgrund von Verstößen gegen Vorschriften dieses Gesetzes 
 3.
 diesbezügliche Rechtsmittelverfahren und deren Ergebnisse.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 57 Bekanntmachung von bestandskräftigen Maßnahmen und von unanfechtbaren Bußgeldentscheidungen
  
 
@@ -2811,11 +2811,11 @@ Anstelle einer Aufschiebung kann die Bekanntmachung auf anonymisierter Basis erf
 
 (4) Eine Bekanntmachung muss fünf Jahre auf der Internetseite der Aufsichtsbehörde veröffentlicht bleiben. Abweichend von Satz 1 sind personenbezogene Daten zu löschen, sobald die Bekanntmachung nicht mehr erforderlich ist.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 58 (weggefallen)
  
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 59 Übergangsregelung
  
 
@@ -2860,7 +2860,7 @@ in allen anderen Fällen bis spätestens zum 31. Dezember 2023.
 
 (15) Informationen können erstmalig nach § 32 Absatz 2 Satz 4 zum automatisierten Datenabruf bereitgestellt werden, sobald das Verfahren zum automatisierten Datenabruf es ermöglicht, dass die Zentralstelle für Finanztransaktionsuntersuchungen Informationen spezifisch für den Abruf durch eine oder mehrere Strafverfolgungsbehörden kennzeichnet. Ab diesem Zeitpunkt werden für die Dauer von zwei Jahren die Informationen für Strafverfolgungsbehörden, die am automatisierten Abruf nach § 32 Absatz 4 teilnehmen, anstelle einer Übermittlung nur automatisiert bereitgestellt. Nach Ablauf dieser Frist kann die Zentralstelle für Finanztransaktionsuntersuchungen gegenüber allen Strafverfolgungsbehörden von einer Übermittlung absehen, wenn eine Evaluierung des Bundesministeriums der Finanzen im Einvernehmen mit dem Bundesministerium des Innern und für Heimat und dem Bundesministerium der Justiz ergibt, dass sich eine Bereitstellung zum automatisierten Abruf anstelle der Übermittlung in der Praxis bewährt hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 Anlage 1 (zu den §§ 5, 10, 14, 15)
 Faktoren für ein potenziell geringeres Risiko
  
@@ -2898,7 +2898,7 @@ Drittstaaten, in denen Korruption und andere kriminelle Tätigkeiten laut glaubw
 d)
 Drittstaaten, deren Anforderungen an die Verhinderung, Aufdeckung und Bekämpfung von Geldwäsche und von Terrorismusfinanzierung laut glaubwürdigen Quellen (z. B. gegenseitige Evaluierungen, detaillierte Bewertungsberichte oder veröffentlichte Follow-up-Berichte) den überarbeiteten FATF (Financial Action Task Force)-Empfehlungen entsprechen und die diese Anforderungen wirksam umsetzen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 Anlage 2 (zu den §§ 5, 10, 14, 15)
 Faktoren für ein potenziell höheres Risiko
  

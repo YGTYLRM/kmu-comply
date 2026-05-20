@@ -1,4 +1,4 @@
-LkSG — Lieferkettensorgfaltspflichtengesetz (Supply Chain Due Diligence Act)
+LkSG — Lieferkettensorgfaltspflichtengesetz
 Source: https://www.gesetze-im-internet.de/lksg/BJNR295910021.html
 
 LkSG - Gesetz �ber die unternehmerischen Sorgfaltspflichten zur Vermeidung von Menschenrechtsverletzungen in Lieferketten
@@ -41,8 +41,7 @@ Abschnitt 1
 Allgemeine Bestimmungen
 
  Nichtamtliches Inhaltsverzeichnis
-§ 1
-Anwendungsbereich
+§ 1 Anwendungsbereich
  
 
 (1) Dieses Gesetz ist anzuwenden auf Unternehmen ungeachtet ihrer Rechtsform, die 1.
@@ -60,8 +59,7 @@ Ab dem 1. Januar 2024 betragen die in Satz 1 Nummer 2 und Satz 2 Nummer 2 vorges
 (3) Innerhalb von verbundenen Unternehmen (§ 15 des Aktiengesetzes) sind die im Inland beschäftigten Arbeitnehmer sämtlicher konzernangehöriger Gesellschaften bei der Berechnung der Arbeitnehmerzahl (Absatz 1 Satz 1 Nummer 2) der Obergesellschaft zu berücksichtigen; ins Ausland entsandte Arbeitnehmer sind erfasst.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 2
-Begriffsbestimmungen
+§ 2 Begriffsbestimmungen
  
 
 (1) Geschützte Rechtspositionen im Sinne dieses Gesetzes sind solche, die sich aus den in den Nummern 1 bis 11 der Anlage aufgelisteten Übereinkommen zum Schutz der Menschenrechte ergeben.
@@ -171,8 +169,7 @@ Abschnitt 2
 Sorgfaltspflichten
 
  Nichtamtliches Inhaltsverzeichnis
-§ 3
-Sorgfaltspflichten
+§ 3 Sorgfaltspflichten
  
 
 (1) Unternehmen sind dazu verpflichtet, in ihren Lieferketten die in diesem Abschnitt festgelegten menschenrechtlichen und umweltbezogenen Sorgfaltspflichten in angemessener Weise zu beachten mit dem Ziel, menschenrechtlichen oder umweltbezogenen Risiken vorzubeugen oder sie zu minimieren oder die Verletzung menschenrechtsbezogener oder umweltbezogener Pflichten zu beenden. Die Sorgfaltspflichten enthalten: 1.
@@ -206,8 +203,7 @@ nach der Art des Verursachungsbeitrages des Unternehmens zu dem menschenrechtlic
 (3) Eine Verletzung der Pflichten aus diesem Gesetz begründet keine zivilrechtliche Haftung. Eine unabhängig von diesem Gesetz begründete zivilrechtliche Haftung bleibt unberührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 4
-Risikomanagement
+§ 4 Risikomanagement
  
 
 (1) Unternehmen müssen ein angemessenes und wirksames Risikomanagement zur Einhaltung der Sorgfaltspflichten (§ 3 Absatz 1) einrichten. Das Risikomanagement ist in alle maßgebliche Geschäftsabläufe durch angemessene Maßnahmen zu verankern.
@@ -219,8 +215,7 @@ Risikomanagement
 (4) Das Unternehmen hat bei der Errichtung und Umsetzung seines Risikomanagementsystems die Interessen seiner Beschäftigten, der Beschäftigten innerhalb seiner Lieferketten und derjenigen, die in sonstiger Weise durch das wirtschaftliche Handeln des Unternehmens oder durch das wirtschaftliche Handeln eines Unternehmens in seinen Lieferketten in einer geschützten Rechtsposition unmittelbar betroffen sein können, angemessen zu berücksichtigen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 5
-Risikoanalyse
+§ 5 Risikoanalyse
  
 
 (1) Im Rahmen des Risikomanagements hat das Unternehmen eine angemessene Risikoanalyse nach den Absätzen 2 bis 4 durchzuführen, um die menschenrechtlichen und umweltbezogenen Risiken im eigenen Geschäftsbereich sowie bei seinen unmittelbaren Zulieferern zu ermitteln. In Fällen, in denen ein Unternehmen eine missbräuchliche Gestaltung der unmittelbaren Zuliefererbeziehung oder ein Umgehungsgeschäft vorgenommen hat, um die Anforderungen an die Sorgfaltspflichten in Hinblick auf den unmittelbaren Zulieferer zu umgehen, gilt ein mittelbarer Zulieferer als unmittelbarer Zulieferer.
@@ -236,8 +231,7 @@ Fußnote
 § 5 Abs. 1 Satz 1 Kursivdruck: Wegen offensichtlicher Unrichtigkeit wird das Wort "Abätzen" durch das Wort "Absätzen" ersetzt
 
  Nichtamtliches Inhaltsverzeichnis
-§ 6
-Präventionsmaßnahmen
+§ 6 Präventionsmaßnahmen
  
 
 (1) Stellt ein Unternehmen im Rahmen einer Risikoanalyse nach § 5 ein Risiko fest, hat es unverzüglich angemessene Präventionsmaßnahmen nach den Absätzen 2 bis 4 zu ergreifen.
@@ -270,8 +264,7 @@ die Vereinbarung angemessener vertraglicher Kontrollmechanismen sowie deren risi
 (5) Die Wirksamkeit der Präventionsmaßnahmen ist einmal im Jahr sowie anlassbezogen zu überprüfen, wenn das Unternehmen mit einer wesentlich veränderten oder wesentlich erweiterten Risikolage im eigenen Geschäftsbereich oder beim unmittelbaren Zulieferer rechnen muss, etwa durch die Einführung neuer Produkte, Projekte oder eines neuen Geschäftsfeldes. Erkenntnisse aus der Bearbeitung von Hinweisen nach § 8 Absatz 1 sind zu berücksichtigen. Die Maßnahmen sind bei Bedarf unverzüglich zu aktualisieren.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 7
-Abhilfemaßnahmen
+§ 7 Abhilfemaßnahmen
  
 
 (1) Stellt das Unternehmen fest, dass die Verletzung einer menschenrechtsbezogenen oder einer umweltbezogenen Pflicht in seinem eigenen Geschäftsbereich oder bei einem unmittelbaren Zulieferer bereits eingetreten ist oder unmittelbar bevorsteht, hat es unverzüglich angemessene Abhilfemaßnahmen zu ergreifen, um diese Verletzung zu verhindern, zu beenden oder das Ausmaß der Verletzung zu minimieren. § 5 Absatz 1 Satz 2 gilt entsprechend. Im eigenen Geschäftsbereich im Inland muss die Abhilfemaßnahme zu einer Beendigung der Verletzung führen. Im eigenen Geschäftsbereich im Ausland und im eigenen Geschäftsbereich gemäß § 2 Absatz 6 Satz 3 muss die Abhilfemaßnahme in der Regel zur Beendigung der Verletzung führen.
@@ -294,8 +287,7 @@ Die bloße Tatsache, dass ein Staat eines der in der Anlage zu diesem Gesetz auf
 (4) Die Wirksamkeit der Abhilfemaßnahmen ist einmal im Jahr sowie anlassbezogen zu überprüfen, wenn das Unternehmen mit einer wesentlich veränderten oder wesentlich erweiterten Risikolage im eigenen Geschäftsbereich oder beim unmittelbaren Zulieferer rechnen muss, etwa durch die Einführung neuer Produkte, Projekte oder eines neuen Geschäftsfeldes. Erkenntnisse aus der Bearbeitung von Hinweisen nach § 8 Absatz 1 sind zu berücksichtigen. Die Maßnahmen sind bei Bedarf unverzüglich zu aktualisieren.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 8
-Beschwerdeverfahren
+§ 8 Beschwerdeverfahren
  
 
 (1) Das Unternehmen hat dafür zu sorgen, dass ein angemessenes unternehmensinternes Beschwerdeverfahren nach den Absätzen 2 bis 4 eingerichtet ist. Das Beschwerdeverfahren ermöglicht Personen, auf menschenrechtliche und umweltbezogene Risiken sowie auf Verletzungen menschenrechtsbezogener oder umweltbezogener Pflichten hinzuweisen, die durch das wirtschaftliche Handeln eines Unternehmens im eigenen Geschäftsbereich oder eines unmittelbaren Zulieferers entstanden sind. Der Eingang des Hinweises ist den Hinweisgebern zu bestätigen. Die von dem Unternehmen mit der Durchführung des Verfahrens betrauten Personen haben den Sachverhalt mit den Hinweisgebern zu erörtern. Sie können ein Verfahren der einvernehmlichen Beilegung anbieten. Die Unternehmen können sich stattdessen an einem entsprechenden externen Beschwerdeverfahren beteiligen, sofern es die nachfolgenden Kriterien erfüllt.
@@ -309,8 +301,7 @@ Beschwerdeverfahren
 (5) Die Wirksamkeit des Beschwerdeverfahrens ist mindestens einmal im Jahr sowie anlassbezogen zu überprüfen, wenn das Unternehmen mit einer wesentlich veränderten oder wesentlich erweiterten Risikolage im eigenen Geschäftsbereich oder beim unmittelbaren Zulieferer rechnen muss, etwa durch die Einführung neuer Produkte, Projekte oder eines neuen Geschäftsfeldes. Die Maßnahmen sind bei Bedarf unverzüglich zu wiederholen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 9
-Mittelbare Zulieferer; Verordnungsermächtigung
+§ 9 Mittelbare Zulieferer; Verordnungsermächtigung
  
 
 (1) Das Unternehmen muss das Beschwerdeverfahren nach § 8 so einrichten, dass es Personen auch ermöglicht, auf menschenrechtliche oder umweltbezogene Risiken sowie auf Verletzungen menschenrechtsbezogener oder umweltbezogener Pflichten hinzuweisen, die durch das wirtschaftliche Handeln eines mittelbaren Zulieferers entstanden sind.
@@ -329,8 +320,7 @@ gegebenenfalls entsprechend seine Grundsatzerklärung gemäß § 6 Absatz 2 zu a
 (4) Das Bundesministerium für Arbeit und Soziales wird ermächtigt, Näheres zu den Pflichten des Absatzes 3 durch Rechtsverordnung im Einvernehmen mit dem Bundesministerium für Wirtschaft und Energie ohne Zustimmung des Bundesrates zu regeln.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 10
-Dokumentations- und Berichtspflicht
+§ 10 Dokumentations- und Berichtspflicht
  
 
 (1) Die Erfüllung der Sorgfaltspflichten nach § 3 ist unternehmensintern fortlaufend zu dokumentieren. Die Dokumentation ist ab ihrer Erstellung mindestens sieben Jahre lang aufzubewahren.
@@ -352,8 +342,7 @@ Abschnitt 3
 Zivilprozess
 
  Nichtamtliches Inhaltsverzeichnis
-§ 11
-Besondere Prozessstandschaft
+§ 11 Besondere Prozessstandschaft
  
 
 (1) Wer geltend macht, in einer überragend wichtigen geschützten Rechtsposition aus § 2 Absatz 1 verletzt zu sein, kann zur gerichtlichen Geltendmachung seiner Rechte einer inländischen Gewerkschaft oder Nichtregierungsorganisation die Ermächtigung zur Prozessführung erteilen.
@@ -367,8 +356,7 @@ Unterabschnitt 1
 Berichtsprüfung
 
  Nichtamtliches Inhaltsverzeichnis
-§ 12
-Einreichung des Berichts
+§ 12 Einreichung des Berichts
  
 
 (1) Der Bericht nach § 10 Absatz 2 Satz 1 ist in deutscher Sprache und elektronisch über einen von der zuständigen Behörde bereitgestellten Zugang einzureichen.
@@ -376,8 +364,7 @@ Einreichung des Berichts
 (2) Der Bericht ist spätestens vier Monate nach dem Schluss des Geschäftsjahres, auf das er sich bezieht, einzureichen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 13
-Behördliche Berichtsprüfung; Verordnungsermächtigung
+§ 13 Behördliche Berichtsprüfung; Verordnungsermächtigung
  
 
 (1) Die zuständige Behörde prüft, ob 1.
@@ -396,8 +383,7 @@ Unterabschnitt 2
 Risikobasierte Kontrolle
 
  Nichtamtliches Inhaltsverzeichnis
-§ 14
-Behördliches Tätigwerden; Verordnungsermächtigung
+§ 14 Behördliches Tätigwerden; Verordnungsermächtigung
  
 
 (1) Die zuständige Behörde wird tätig: 1.
@@ -415,8 +401,7 @@ dass eine in Buchstabe a genannte Verletzung unmittelbar bevorsteht.
 (2) Das Bundesministerium für Arbeit und Soziales wird ermächtigt, durch Rechtsverordnung im Einvernehmen mit dem Bundesministerium für Wirtschaft und Energie ohne Zustimmung des Bundesrates das Verfahren der risikobasierten Kontrolle nach Absatz 1 und den §§ 15 bis 17 näher zu regeln.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 15
-Anordnungen und Maßnahmen
+§ 15 Anordnungen und Maßnahmen
  
 
 Die zuständige Behörde trifft die geeigneten und erforderlichen Anordnungen und Maßnahmen, um Verstöße gegen die Pflichten nach den §§ 3 bis 10 Absatz 1 festzustellen, zu beseitigen und zu verhindern. Sie kann insbesondere 1.
@@ -427,8 +412,7 @@ dem Unternehmen aufgeben, innerhalb von drei Monaten ab Bekanntgabe der Anordnun
 dem Unternehmen konkrete Handlungen zur Erfüllung seiner Pflichten aufgeben.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 16
-Betretensrechte
+§ 16 Betretensrechte
  
 
 Soweit dies zur Wahrnehmung der Aufgaben nach § 14 erforderlich ist, sind die zuständige Behörde und ihre Beauftragten befugt, 1.
@@ -437,8 +421,7 @@ Betriebsgrundstücke, Geschäftsräume und Wirtschaftsgebäude der Unternehmen w
 bei Unternehmen während der üblichen Geschäfts- oder Betriebszeiten geschäftliche Unterlagen und Aufzeichnungen, aus denen sich ableiten lässt, ob die Sorgfaltspflichten nach den §§ 3 bis 10 Absatz 1 eingehalten wurden, einzusehen und zu prüfen.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 17
-Auskunfts- und Herausgabepflichten
+§ 17 Auskunfts- und Herausgabepflichten
  
 
 (1) Unternehmen und nach § 15 Satz 2 Nummer 1 geladene Personen sind verpflichtet, der zuständigen Behörde auf Verlangen die Auskünfte zu erteilen und die Unterlagen herauszugeben, die die Behörde zur Durchführung der ihr durch dieses Gesetz oder aufgrund dieses Gesetzes übertragenen Aufgaben benötigt. Die Verpflichtung erstreckt sich auch auf Auskünfte über verbundene Unternehmen (§ 15 des Aktiengesetzes), unmittelbare und mittelbare Zulieferer und die Herausgabe von Unterlagen dieser Unternehmen, soweit das auskunfts- oder herausgabepflichtige Unternehmen oder die auskunfts- oder herausgabepflichtige Person die Informationen zur Verfügung hat oder aufgrund bestehender vertraglicher Beziehungen zur Beschaffung der verlangten Informationen in der Lage ist.
@@ -453,8 +436,7 @@ die Namen der zur Überwachung der internen Prozesse des Unternehmens zur Erfül
 (3) Wer zur Auskunft nach Absatz 1 verpflichtet ist, kann die Auskunft auf solche Fragen verweigern, deren Beantwortung ihn selbst oder einen der in § 52 Absatz 1 der Strafprozessordnung bezeichneten Angehörigen der Gefahr strafgerichtlicher Verfolgung oder eines Verfahrens nach dem Gesetz über Ordnungswidrigkeiten aussetzen würde. Die auskunftspflichtige Person ist über ihr Recht zur Verweigerung der Auskunft zu belehren. Sonstige gesetzliche Auskunfts- oder Aussageverweigerungsrechte sowie gesetzliche Verschwiegenheitspflichten bleiben unberührt.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 18
-Duldungs- und Mitwirkungspflichten
+§ 18 Duldungs- und Mitwirkungspflichten
  
 
 Die Unternehmen haben die Maßnahmen der zuständigen Behörde und ihrer Beauftragten zu dulden und bei der Durchführung der Maßnahmen mitzuwirken. Satz 1 gilt auch für die Inhaber der Unternehmen und ihre Vertretung, bei juristischen Personen für die nach Gesetz oder Satzung zur Vertretung berufenen Personen.
@@ -463,8 +445,7 @@ Unterabschnitt 3
 Zuständige Behörde, Handreichungen, Rechenschaftsbericht
 
  Nichtamtliches Inhaltsverzeichnis
-§ 19
-Zuständige Behörde
+§ 19 Zuständige Behörde
  
 
 (1) Für die behördliche Kontrolle und Durchsetzung nach diesem Abschnitt ist das Bundesamt für Wirtschaft und Ausfuhrkontrolle zuständig. Für die Aufgaben nach diesem Gesetz obliegt die Rechts- und Fachaufsicht über das Bundesamt dem Bundesministerium für Wirtschaft und Energie. Das Bundesministerium für Wirtschaft und Energie übt die Rechts- und Fachaufsicht im Einvernehmen mit dem Bundesministerium für Arbeit und Soziales aus.
@@ -472,15 +453,13 @@ Zuständige Behörde
 (2) Bei der Wahrnehmung ihrer Aufgaben verfolgt die zuständige Behörde einen risikobasierten Ansatz.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 20
-Handreichungen
+§ 20 Handreichungen
  
 
 Die zuständige Behörde veröffentlicht branchenübergreifende oder branchenspezifische Informationen, Hilfestellungen und Empfehlungen zur Einhaltung dieses Gesetzes und stimmt sich dabei mit den fachlich betroffenen Behörden ab. Die Informationen, Hilfestellungen oder Empfehlungen bedürfen vor Veröffentlichung der Zustimmung des Auswärtigen Amtes, insofern außenpolitische Belange davon berührt sind.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 21
-Rechenschaftsbericht
+§ 21 Rechenschaftsbericht
  
 
 (1) Die nach § 19 Absatz 1 Satz 1 zuständige Behörde berichtet einmal jährlich über ihre im vorausgegangenen Kalenderjahr erfolgten Kontroll- und Durchsetzungstätigkeiten nach Abschnitt 4. Der Bericht ist erstmals für das Jahr 2022 zu erstellen und auf der Webseite der zuständigen Behörde zu veröffentlichen.
@@ -491,8 +470,7 @@ Abschnitt 5
 Öffentliche Beschaffung
 
  Nichtamtliches Inhaltsverzeichnis
-§ 22
-Ausschluss von der Vergabe öffentlicher Aufträge
+§ 22 Ausschluss von der Vergabe öffentlicher Aufträge
  
 
 (1) Von der Teilnahme an einem Verfahren über die Vergabe eines Liefer-, Bau- oder Dienstleistungsauftrags der in den §§ 99 und 100 des Gesetzes gegen Wettbewerbsbeschränkungen genannten Auftraggeber sollen Unternehmen bis zur nachgewiesenen Selbstreinigung nach § 125 des Gesetzes gegen Wettbewerbsbeschränkungen ausgeschlossen werden, die wegen eines rechtskräftig festgestellten Verstoßes nach § 24 Absatz 1 mit einer Geldbuße nach Maßgabe von Absatz 2 belegt worden sind. Der Ausschluss nach Satz 1 darf nur innerhalb eines angemessenen Zeitraums von bis zu drei Jahren erfolgen.
@@ -510,15 +488,13 @@ Abschnitt 6
 Zwangsgeld und Bußgeld
 
  Nichtamtliches Inhaltsverzeichnis
-§ 23
-Zwangsgeld
+§ 23 Zwangsgeld
  
 
 Die Höhe des Zwangsgeldes im Verwaltungszwangsverfahren der nach § 19 Absatz 1 Satz 1 zuständigen Behörde beträgt abweichend von § 11 Absatz 3 des Verwaltungsvollstreckungsgesetzes bis zu 50 000 Euro.
 
  Nichtamtliches Inhaltsverzeichnis
-§ 24
-Bußgeldvorschriften
+§ 24 Bußgeldvorschriften
  
 
 (1) Ordnungswidrig handelt, wer vorsätzlich oder fahrlässig 1.
