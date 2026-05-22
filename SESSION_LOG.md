@@ -2143,3 +2143,77 @@ Full checkout flow built end-to-end:
 - Delta shows: overall score change (+X% / -X%), count of gaps that improved, count that regressed
 - Color coded: green for improvement, red for decline, neutral for no change
 - "View previous report" link back to the old report URL
+
+---
+
+## Session 27 — 2026-05-22 — Bug fixes: auth, subscription gating, report listing, dashboard
+
+**Branch:** `feat/polish`
+**Commit:** `482a132`
+
+### Context
+
+User-reported issues: no forgot-password flow, new accounts had free access to scanning, dashboard broken, Berichte section not showing past scans.
+
+### Changes
+
+#### Forgot password + password reset flow
+- `frontend/src/app/forgot-password/page.tsx` — new page. Email form calls `supabase.auth.resetPasswordForEmail(email, { redirectTo: origin + '/reset-password' })`. Shows success confirmation.
+- `frontend/src/app/reset-password/page.tsx` — new page. Listens for Supabase `PASSWORD_RECOVERY` auth event, shows new-password + confirm fields, calls `supabase.auth.updateUser({ password })`, redirects to `/login` on success.
+- `frontend/src/app/login/page.tsx` — added "Passwort vergessen?" link inline next to the password label, linking to `/forgot-password`.
+- `frontend/src/app/register/page.tsx` — added live password requirements checklist below the password field (min 8 chars / uppercase / digit, each turns green as the user types).
+
+#### Subscription gating fix
+- `backend/routes/analysis.py` — subscription check condition changed from `stripe_enabled AND database_url` to `database_url AND (stripe_enabled OR stripe_secret_key present)`. Previously a new account could scan for free whenever `STRIPE_ENABLED` was not explicitly set to `true`, even with Stripe keys configured.
+- Frontend `analyze/page.tsx` — 402 response now shows an amber "Abonnement erforderlich" banner with a "Plan auswählen →" button linking to `/account/billing`, instead of a generic red error.
+
+#### Berichte (reports list) fix
+- `backend/services/report_store.py` — `list_recent_async` now merges DB results with disk results. Previously if a report was saved to disk but the DB write failed mid-job (DB down during analysis), the report would never appear in the list because the DB returned empty and the disk fallback was only checked on exception. Now disk reports not present in DB are appended and the merged list is returned sorted by date.
+
+#### Dashboard fix
+- `backend/routes/companies.py` — `list_companies` and `dashboard_summary` now return empty responses (instead of crashing with 500) when `DATABASE_URL` is not configured.
+- `frontend/src/app/dashboard/page.tsx` — dashboard error now shows the actual API error message instead of a generic string, making root-cause diagnosis easier.
+
+#### Print page auth fix (pre-existing uncommitted change)
+- `frontend/src/app/report/[id]/print/page.tsx` — print page fetch now attaches the Supabase session `Authorization: Bearer` header. Previously the fetch was unauthenticated and would fail with 401 for any authenticated report.
+
+#### datetime compatibility (pre-existing uncommitted change)
+- `backend/db/models.py`, `backend/dependencies.py` — reverted `datetime.now(timezone.utc)` back to `datetime.utcnow()` for Python 3.14 compatibility with SQLAlchemy column defaults.
+
+---
+
+## Session 28 — 2026-05-22 — Full German translation of screening form + functional settings page
+
+**Branch:** `feat/polish`
+**Commit:** `2f8d76e`
+
+### Context
+
+All user-facing text in the compliance screening form was still in English. The settings page existed but only showed static GDPR info and account deletion — users couldn't change their name or password.
+
+### Changes
+
+#### Full German translation — profile form (all 10 steps)
+- `bool-field.tsx` — "Yes" / "No" → "Ja" / "Nein"
+- `step1-company.tsx` — legal disclaimer, all field labels ("Company name" → "Unternehmensname", etc.), all 22 industry labels translated
+- `step2-financials.tsx` — section description, field labels and hints (CSRD/LkSG thresholds)
+- `step3-data.tsx` — DSGVO/BDSG section description, all 5 data processing questions
+- `step4-supply-energy.tsx` — section description, LkSG supply chain and EnEfG energy questions
+- `step5-governance.tsx` — section description, CSRD/NIS2/EU AI Act questions, notes textarea label and placeholder
+- `step6-documents.tsx` — upload zone text, file count text, hints table (regulation → example documents), error messages
+- `step7-privacy.tsx` — section description, all 8 DSGVO Art. 13/28/32/33 privacy questions with hints
+- `step8-security.tsx` — section description, NIS2 Art. 21 cybersecurity section header + 7 questions, EU AI Act section header + 4 questions with all hints
+- `step9-workplace.tsx` — ArbSchG, AGG, MiLoG, HinSchG, LkSG section headers + all questions with hints; dynamic conditional text for HinSchG (≥50 employees)
+- `step10-digital.tsx` — TTDSG/TDDDG, GwG, EU Data Act section headers + all questions with hints
+
+#### Translation — analyze page navigation
+- `frontend/src/app/analyze/page.tsx` — step indicator labels ("Company" → "Unternehmen", etc.), Back/Continue/Submit buttons, error messages, "Cannot reach server" message
+
+#### Translation — processing view
+- `frontend/src/app/analyze/processing/processing-view.tsx` — all 6 analysis step labels (profile_validation → "Profil wird validiert", etc.), progress label, idle/running status text, error title and messages, "Start a new screening" button
+
+#### Settings page — functional profile management
+- `frontend/src/app/account/settings/page.tsx` — rewrote from info-only to fully interactive:
+  - **Anzeigename** section: input pre-filled from `supabase.auth.getUser()` metadata, saves via `supabase.auth.updateUser({ data: { name } })`, shows green "Name gespeichert" confirmation for 3 s
+  - **Passwort ändern** section: new-password + confirm fields with client-side validation (min 8 chars, must match), saves via `supabase.auth.updateUser({ password })`, shows success confirmation, clears fields
+  - GDPR rights info, data retention overview, and account deletion section retained unchanged
