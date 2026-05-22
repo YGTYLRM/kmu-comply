@@ -12,71 +12,71 @@ export function Step10Digital({ form }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <p className="text-sm text-slate-500">
-        These questions cover cookie consent (TTDSG/TDDDG), anti-money laundering (GwG), and data access obligations (EU Data Act).
+        Diese Fragen betreffen Cookie-Einwilligung (TTDSG/TDDDG), Geldwäscheprävention (GwG) und Datenzugangspflichten (EU Data Act).
       </p>
 
       {/* TTDSG / TDDDG */}
       <div className="pt-2 pb-1">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Cookie Consent (TTDSG / TDDDG)</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Cookie-Einwilligung (TTDSG / TDDDG)</p>
       </div>
 
       <Controller control={control} name="has_website" render={({ field }) => (
         <BoolField
-          label="Does the company operate a public-facing website or app?"
-          hint="Any website accessible by users in Germany triggers TTDSG §25 obligations."
+          label="Betreibt das Unternehmen eine öffentlich zugängliche Website oder App?"
+          hint="Jede für Nutzer in Deutschland zugängliche Website löst Pflichten nach §25 TTDSG aus."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_cookie_banner" render={({ field }) => (
         <BoolField
-          label="Is a cookie consent banner implemented (opt-in before tracking)?"
-          hint="§25 TDDDG requires informed consent BEFORE setting any non-essential cookies, pixels, or fingerprinting scripts."
+          label="Ist ein Cookie-Einwilligungsbanner implementiert (Opt-in vor dem Tracking)?"
+          hint="§25 TDDDG erfordert eine informierte Einwilligung BEVOR nicht notwendige Cookies, Pixel oder Fingerprinting-Skripte gesetzt werden."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_cookie_policy" render={({ field }) => (
         <BoolField
-          label="Is there a documented cookie/tracking inventory?"
-          hint="A published list of all cookies and tracking technologies used, their purposes, and retention periods."
+          label="Gibt es ein dokumentiertes Cookie-/Tracking-Verzeichnis?"
+          hint="Eine veröffentlichte Liste aller verwendeten Cookies und Tracking-Technologien mit Zwecken und Speicherdauern."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       {/* GwG */}
       <div className="pt-4 pb-1">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Anti-Money Laundering (GwG)</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Geldwäscheprävention (GwG)</p>
       </div>
 
       <Controller control={control} name="is_aml_obligated_sector" render={({ field }) => (
         <BoolField
-          label="Is the company in an AML-obligated sector?"
-          hint="Financial services, crypto, real estate brokerage, legal/notarial services, tax advisory, or gambling — §2 GwG."
+          label="Ist das Unternehmen in einem nach GwG verpflichteten Sektor tätig?"
+          hint="Finanzdienstleistungen, Krypto, Immobilienmakler, Rechts-/Notardienstleistungen, Steuerberatung oder Glücksspiel — §2 GwG."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_aml_risk_analysis" render={({ field }) => (
         <BoolField
-          label="Has an AML risk analysis been conducted?"
-          hint="Documented risk assessment of money laundering and terrorist financing exposure — §5 GwG."
+          label="Wurde eine Risikoanalyse zur Geldwäscheprävention durchgeführt?"
+          hint="Dokumentierte Risikobewertung für Geldwäsche- und Terrorismusfinanzierungsrisiken — §5 GwG."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_aml_officer" render={({ field }) => (
         <BoolField
-          label="Is a designated AML compliance officer (Geldwäschebeauftragter) appointed?"
-          hint="Required for regulated financial institutions and larger obligated entities — §7 GwG."
+          label="Ist ein Geldwäschebeauftragter benannt?"
+          hint="Pflicht für regulierte Finanzinstitute und größere verpflichtete Unternehmen — §7 GwG."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_kyc_procedures" render={({ field }) => (
         <BoolField
-          label="Are KYC (Know Your Customer) procedures in place?"
-          hint="Customer identification and verification before establishing a business relationship — §10 GwG."
+          label="Sind KYC-Verfahren (Kundendurchleuchtung) implementiert?"
+          hint="Identifizierung und Überprüfung des Kunden vor Aufnahme einer Geschäftsbeziehung — §10 GwG."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -88,24 +88,24 @@ export function Step10Digital({ form }: Props) {
 
       <Controller control={control} name="produces_connected_products" render={({ field }) => (
         <BoolField
-          label="Does the company manufacture connected (IoT) products?"
-          hint="Smart devices, industrial sensors, wearables, connected vehicles, or any product that generates data during use."
+          label="Stellt das Unternehmen vernetzte (IoT-)Produkte her?"
+          hint="Smarte Geräte, Industriesensoren, Wearables, vernetzte Fahrzeuge oder andere Produkte, die im Betrieb Daten erzeugen."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="provides_data_processing_services" render={({ field }) => (
         <BoolField
-          label="Does the company provide cloud or data processing services?"
-          hint="Cloud hosting, SaaS platforms, edge computing, or other data processing services with switching obligations — Art. 23-25."
+          label="Bietet das Unternehmen Cloud- oder Datenverarbeitungsdienste an?"
+          hint="Cloud-Hosting, SaaS-Plattformen, Edge Computing oder andere Datenverarbeitungsdienste mit Wechselpflichten — Art. 23–25."
           value={field.value} onChange={field.onChange}
         />
       )} />
 
       <Controller control={control} name="has_data_access_mechanism" render={({ field }) => (
         <BoolField
-          label="Is there a mechanism for users to access their device-generated data?"
-          hint="Connected product users must be able to access data generated by their devices easily — Art. 4 EU Data Act."
+          label="Gibt es einen Mechanismus, über den Nutzer auf ihre geräteerzeugten Daten zugreifen können?"
+          hint="Nutzer vernetzter Produkte müssen einfach auf die von ihren Geräten erzeugten Daten zugreifen können — Art. 4 EU Data Act."
           value={field.value} onChange={field.onChange}
         />
       )} />

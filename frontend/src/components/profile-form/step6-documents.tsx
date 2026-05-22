@@ -5,12 +5,12 @@ import { Upload, X, FileText, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const HINTS = [
-  { label: "GDPR / BDSG",  examples: "Privacy policy, records of processing, DPO appointment letter" },
-  { label: "NIS2",         examples: "Information security policy, incident response plan, risk assessment" },
-  { label: "EU AI Act",    examples: "AI system documentation, impact assessment, human oversight procedures" },
-  { label: "HinSchG",      examples: "Whistleblower policy, reporting channel documentation" },
-  { label: "ArbSchG",      examples: "Workplace risk assessment (Gefährdungsbeurteilung), safety instructions" },
-  { label: "AGG / MiLoG",  examples: "Anti-discrimination policy, working time records, payroll procedures" },
+  { label: "DSGVO / BDSG",  examples: "Datenschutzerklärung, Verarbeitungsverzeichnis, DSB-Bestellungsurkunde" },
+  { label: "NIS2",          examples: "Informationssicherheitsrichtlinie, Notfallplan, Risikoanalyse" },
+  { label: "EU AI Act",     examples: "KI-Systemdokumentation, Folgeabschätzung, Aufsichtsverfahren" },
+  { label: "HinSchG",       examples: "Hinweisgeberrichtlinie, Dokumentation des Meldekanals" },
+  { label: "ArbSchG",       examples: "Gefährdungsbeurteilung, Sicherheitsunterweisungen" },
+  { label: "AGG / MiLoG",   examples: "Antidiskriminierungsrichtlinie, Arbeitszeitaufzeichnungen, Lohnabrechnung" },
 ];
 
 interface Props {
@@ -34,13 +34,13 @@ export function Step6Documents({ files, onChange }: Props) {
       if (!allowed.includes(f.type) && !f.name.endsWith(".txt") && !f.name.endsWith(".md")) {
         bad.push(f.name);
       } else if (f.size > 15 * 1024 * 1024) {
-        bad.push(`${f.name} (exceeds 15 MB)`);
+        bad.push(`${f.name} (überschreitet 15 MB)`);
       } else {
         valid.push(f);
       }
     });
 
-    if (bad.length) setError(`Skipped: ${bad.join(", ")}. Only PDF and TXT files up to 15 MB are accepted.`);
+    if (bad.length) setError(`Übersprungen: ${bad.join(", ")}. Nur PDF- und TXT-Dateien bis 15 MB werden akzeptiert.`);
     if (valid.length) onChange([...files, ...valid]);
   }, [files, onChange]);
 
@@ -54,9 +54,9 @@ export function Step6Documents({ files, onChange }: Props) {
     <div className="flex flex-col gap-6">
       <div>
         <p className="text-sm text-slate-400 leading-relaxed">
-          Upload your company documents to get evidence-backed assessments instead of questionnaire-only results. The AI will read your actual policies and cite specific clauses.
+          Laden Sie Unternehmensdokumente hoch, um beleggestützte Bewertungen statt reiner Fragebogen-Ergebnisse zu erhalten. Die KI liest Ihre tatsächlichen Richtlinien und zitiert konkrete Klauseln.
         </p>
-        <p className="text-xs text-slate-600 mt-1.5">Optional. You can skip and run the screening without documents.</p>
+        <p className="text-xs text-slate-600 mt-1.5">Optional. Sie können das Screening auch ohne Dokumente starten.</p>
       </div>
 
       {/* Drop zone */}
@@ -82,8 +82,8 @@ export function Step6Documents({ files, onChange }: Props) {
           <Upload className="h-6 w-6 text-brand-400" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-slate-300">Drop files here or click to browse</p>
-          <p className="text-xs text-slate-600 mt-1">PDF or TXT, up to 15 MB per file</p>
+          <p className="text-sm font-semibold text-slate-300">Dateien hier ablegen oder zum Durchsuchen klicken</p>
+          <p className="text-xs text-slate-600 mt-1">PDF oder TXT, max. 15 MB pro Datei</p>
         </div>
       </label>
 
@@ -97,7 +97,9 @@ export function Step6Documents({ files, onChange }: Props) {
       {/* Uploaded file list */}
       {files.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{files.length} file{files.length !== 1 ? "s" : ""} selected</p>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+            {files.length} {files.length !== 1 ? "Dateien" : "Datei"} ausgewählt
+          </p>
           {files.map((f, i) => (
             <div key={i} className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] px-4 py-2.5">
               <FileText className="h-4 w-4 text-brand-400 flex-shrink-0" />
@@ -117,7 +119,7 @@ export function Step6Documents({ files, onChange }: Props) {
 
       {/* What to upload hints */}
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">What to upload per regulation</p>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Empfohlene Dokumente je Vorschrift</p>
         <div className="grid sm:grid-cols-2 gap-y-2 gap-x-6">
           {HINTS.map(({ label, examples }) => (
             <div key={label}>
