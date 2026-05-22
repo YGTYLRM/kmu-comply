@@ -53,13 +53,22 @@ export default function PrintPage() {
   const [error,  setError]  = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${BASE}/api/report/${jobId}`)
-      .then(r => r.json())
-      .then(d => {
+    (async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+        const r = await fetch(`${BASE}/api/report/${jobId}`, { headers });
+        if (!r.ok) { setError(`HTTP ${r.status}`); return; }
+        const d = await r.json();
         setReport(d);
         setTimeout(() => window.print(), 1500);
-      })
-      .catch(e => setError(String(e)));
+      } catch (e) {
+        setError(String(e));
+      }
+    })();
   }, [jobId]);
 
   if (error) return <div style={{ padding: 40, fontFamily: "Inter, sans-serif", color: "#dc2626" }}>Error: {error}</div>;

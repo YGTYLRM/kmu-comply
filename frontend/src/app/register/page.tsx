@@ -122,6 +122,20 @@ export default function RegisterPage() {
               placeholder="Mind. 8 Zeichen"
               className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/15 transition-all"
             />
+            <ul className="mt-1 flex flex-col gap-0.5 pl-1">
+              <li className={`flex items-center gap-1.5 text-xs transition-colors ${password.length >= 8 ? "text-emerald-400" : "text-slate-600"}`}>
+                <span className={`h-1 w-1 rounded-full flex-shrink-0 ${password.length >= 8 ? "bg-emerald-400" : "bg-slate-700"}`} />
+                Mindestens 8 Zeichen
+              </li>
+              <li className={`flex items-center gap-1.5 text-xs transition-colors ${/[A-Z]/.test(password) ? "text-emerald-400" : "text-slate-600"}`}>
+                <span className={`h-1 w-1 rounded-full flex-shrink-0 ${/[A-Z]/.test(password) ? "bg-emerald-400" : "bg-slate-700"}`} />
+                Ein Großbuchstabe
+              </li>
+              <li className={`flex items-center gap-1.5 text-xs transition-colors ${/[0-9]/.test(password) ? "text-emerald-400" : "text-slate-600"}`}>
+                <span className={`h-1 w-1 rounded-full flex-shrink-0 ${/[0-9]/.test(password) ? "bg-emerald-400" : "bg-slate-700"}`} />
+                Eine Zahl
+              </li>
+            </ul>
           </div>
 
           {error && (

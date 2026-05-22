@@ -74,9 +74,14 @@ function LoginInner() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
-              <Lock className="h-3.5 w-3.5" /> Passwort
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                <Lock className="h-3.5 w-3.5" /> Passwort
+              </label>
+              <Link href="/forgot-password" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
+                Passwort vergessen?
+              </Link>
+            </div>
             <input
               type="password"
               required
