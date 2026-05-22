@@ -162,9 +162,20 @@ async def list_recent_async(limit: int = 50, user_id: str | None = None) -> list
     from config import settings
     if settings.database_url and user_id:
         try:
-            return await _list_from_db(user_id, limit)
+            db_results = await _list_from_db(user_id, limit)
         except Exception as exc:
             logger.warning("report_store: DB list failed, falling back to disk: %s", exc)
+            return _list_from_disk(limit=limit, user_id=user_id)
+        # Supplement DB results with disk reports not yet persisted (e.g. DB save failed mid-job)
+        disk_results = _list_from_disk(limit=limit, user_id=user_id)
+        if disk_results:
+            db_job_ids = {r["job_id"] for r in db_results}
+            for r in disk_results:
+                if r["job_id"] not in db_job_ids:
+                    db_results.append(r)
+            db_results.sort(key=lambda r: r.get("generated_at") or "", reverse=True)
+            db_results = db_results[:limit]
+        return db_results
     return _list_from_disk(limit=limit, user_id=user_id)
 
 

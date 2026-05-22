@@ -115,7 +115,7 @@ export default function DashboardPage() {
     ]).then(([d, s]) => {
       setCompanies(d.companies);
       setSummary(s);
-    }).catch(() => setError("Unternehmen konnten nicht geladen werden."))
+    }).catch((e) => setError(e instanceof Error ? e.message : "Unternehmen konnten nicht geladen werden."))
       .finally(() => setLoading(false));
   }, []);
 

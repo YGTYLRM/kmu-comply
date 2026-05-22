@@ -8,7 +8,7 @@ from db.database import Base
 
 
 def _now():
-    return datetime.now(timezone.utc)
+    return datetime.utcnow()
 
 
 def _uuid():

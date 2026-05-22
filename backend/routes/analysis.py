@@ -178,12 +178,12 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
         if session_owner is None or session_owner != current_user["id"]:
             raise HTTPException(status_code=403, detail="Document session not found or access denied.")
 
-    if settings.stripe_enabled and settings.database_url:
+    if settings.database_url and (settings.stripe_enabled or bool(settings.stripe_secret_key)):
         from services.stripe_service import get_active_subscription, check_company_limit
 
         sub = await get_active_subscription(current_user["id"])
         if not sub:
-            raise HTTPException(status_code=402, detail="Active subscription required.")
+            raise HTTPException(status_code=402, detail="Aktives Abonnement erforderlich. Bitte wählen Sie einen Plan unter /account/billing.")
         allowed, reason = await check_company_limit(current_user["id"])
         if not allowed:
             raise HTTPException(status_code=402, detail=reason)
@@ -212,6 +212,7 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
         status=JobStatus.PENDING,
         message="Analysis job created. Use GET /api/status/{job_id} to track progress.",
     )
+
 
 
 @router.get("/api/status/{job_id}", response_model=StatusResponse)
