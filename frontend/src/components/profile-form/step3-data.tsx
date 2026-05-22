@@ -15,15 +15,15 @@ export function Step3Data({ form }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <p className="text-sm text-slate-500">
-        Data processing determines GDPR / DSGVO and BDSG applicability.
+        Die Verarbeitung personenbezogener Daten bestimmt die Anwendbarkeit der DSGVO und des BDSG.
       </p>
       <Controller
         control={control}
         name="processes_personal_data"
         render={({ field }) => (
           <BoolField
-            label="Does the company process personal data?"
-            hint="Customer records, employee data, user accounts, etc."
+            label="Verarbeitet das Unternehmen personenbezogene Daten?"
+            hint="Kundendaten, Mitarbeiterdaten, Nutzerkonten usw."
             value={field.value}
             onChange={field.onChange}
             error={errors.processes_personal_data?.message}
@@ -37,8 +37,8 @@ export function Step3Data({ form }: Props) {
             name="processes_special_category_data"
             render={({ field }) => (
               <BoolField
-                label="Does it process special category data?"
-                hint="Health, biometric, racial/ethnic origin, religious beliefs, etc. (Art. 9 GDPR)"
+                label="Werden besondere Kategorien personenbezogener Daten verarbeitet?"
+                hint="Gesundheitsdaten, biometrische Daten, Herkunft, religiöse Überzeugungen usw. (Art. 9 DSGVO)"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -49,8 +49,8 @@ export function Step3Data({ form }: Props) {
             name="processing_is_occasional"
             render={({ field }) => (
               <BoolField
-                label="Is processing only occasional?"
-                hint="Not core business. Infrequent, limited scope."
+                label="Erfolgt die Verarbeitung nur gelegentlich?"
+                hint="Nicht Kerngeschäft. Unregelmäßig, geringer Umfang."
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -61,7 +61,7 @@ export function Step3Data({ form }: Props) {
             name="has_dpo"
             render={({ field }) => (
               <BoolField
-                label="Does the company have a Data Protection Officer?"
+                label="Hat das Unternehmen einen Datenschutzbeauftragten (DSB)?"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -72,7 +72,7 @@ export function Step3Data({ form }: Props) {
             name="has_processing_records"
             render={({ field }) => (
               <BoolField
-                label="Are Records of Processing Activities (RoPA) maintained?"
+                label="Wird ein Verzeichnis von Verarbeitungstätigkeiten (VVT) geführt?"
                 value={field.value}
                 onChange={field.onChange}
               />

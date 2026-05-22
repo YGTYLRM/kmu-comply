@@ -16,14 +16,14 @@ export function Step4SupplyEnergy({ form }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <p className="text-sm text-slate-500">
-        Supply chain reach determines LkSG applicability. Energy data feeds EnEfG checks.
+        Die internationale Lieferkette bestimmt die LkSG-Pflichten. Energiedaten werden für die EnEfG-Prüfung benötigt.
       </p>
       <Controller
         control={control}
         name="has_supply_chain_abroad"
         render={({ field }) => (
           <BoolField
-            label="Does the company have suppliers abroad?"
+            label="Hat das Unternehmen Lieferanten im Ausland?"
             value={field.value}
             onChange={field.onChange}
           />
@@ -31,18 +31,18 @@ export function Step4SupplyEnergy({ form }: Props) {
       />
       {hasSupplyChainAbroad && (
         <Input
-          label="Supply chain countries"
-          placeholder="China, India, Vietnam"
-          hint="Comma-separated list of countries"
+          label="Lieferantenländer"
+          placeholder="China, Indien, Vietnam"
+          hint="Kommagetrennte Liste der Länder"
           {...register("supply_chain_countries_raw")}
         />
       )}
       <Input
-        label="Annual energy consumption (MWh)"
+        label="Jährlicher Energieverbrauch (MWh)"
         type="number"
         min={0}
         placeholder="7500"
-        hint="Required for EnEfG. Leave blank if unknown."
+        hint="Erforderlich für EnEfG. Leer lassen, falls unbekannt."
         error={errors.annual_energy_consumption_mwh?.message}
         {...register("annual_energy_consumption_mwh")}
       />
@@ -51,7 +51,7 @@ export function Step4SupplyEnergy({ form }: Props) {
         name="has_energy_management_system"
         render={({ field }) => (
           <BoolField
-            label="Does the company have an energy management system (ISO 50001)?"
+            label="Hat das Unternehmen ein Energiemanagementsystem (ISO 50001)?"
             value={field.value}
             onChange={field.onChange}
           />
@@ -62,7 +62,7 @@ export function Step4SupplyEnergy({ form }: Props) {
         name="has_conducted_energy_audit"
         render={({ field }) => (
           <BoolField
-            label="Has an energy audit (DIN EN 16247) been conducted?"
+            label="Wurde ein Energieaudit (DIN EN 16247) durchgeführt?"
             value={field.value}
             onChange={field.onChange}
           />

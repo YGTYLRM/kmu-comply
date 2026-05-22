@@ -109,7 +109,7 @@ const schema = z.object({
 
 export type ProfileFormData = z.infer<typeof schema>;
 
-const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Policies", "Security", "Workplace", "Digital & AML", "Documents"];
+const STEP_LABELS = ["Unternehmen", "Finanzen", "Datenschutz", "Lieferkette", "Governance", "Richtlinien", "Sicherheit", "Personal", "Digital", "Dokumente"];
 
 const STEP_FIELDS: (keyof ProfileFormData)[][] = [
   ["company_name", "industry", "employee_count"],
@@ -313,7 +313,7 @@ function AnalyzeInner() {
       const msg = err instanceof Error ? err.message : "Submission failed";
       const isOffline = msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network");
       setSubmitError(isOffline
-        ? "Cannot reach the server. Make sure the backend is running and try again."
+        ? "Server nicht erreichbar. Stellen Sie sicher, dass das Backend läuft, und versuchen Sie es erneut."
         : msg
       );
     }
@@ -364,41 +364,62 @@ function AnalyzeInner() {
                   {step === 9 && <Step10Digital     form={form} />}
                   {step === 10 && <Step6Documents   files={files} onChange={setFiles} />}
 
-                  {submitError && (
-                    <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-400">{submitError}</p>
+                  {submitError && (() => {
+                    const isPaywall = submitError.toLowerCase().includes("abonnement") || submitError.toLowerCase().includes("subscription");
+                    return isPaywall ? (
+                      <div className="mt-5 rounded-xl bg-amber-500/10 border border-amber-500/25 px-4 py-4 flex flex-col gap-3">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-amber-300">Abonnement erforderlich</p>
+                            <p className="text-xs text-amber-400/70 mt-0.5">
+                              Das Compliance-Screening ist nur für aktive Abonnenten verfügbar.
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href="/account/billing"
+                          className="self-start rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-black hover:bg-amber-400 transition-colors"
+                        >
+                          Plan auswählen →
+                        </a>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setSubmitError(null)}
-                        className="self-start text-xs text-red-400/70 hover:text-red-300 underline transition-colors"
-                      >
-                        Dismiss and try again
-                      </button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-red-400">{submitError}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSubmitError(null)}
+                          className="self-start text-xs text-red-400/70 hover:text-red-300 underline transition-colors"
+                        >
+                          Schließen und erneut versuchen
+                        </button>
+                      </div>
+                    );
+                  })()}
 
                   <div className="mt-7 flex justify-between items-center pt-5 border-t border-white/[0.06]">
                     {step > 1 ? (
                       <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-                        ← Back
+                        ← Zurück
                       </Button>
                     ) : (
                       <div />
                     )}
                     {step < 10 ? (
                       <Button type="button" onClick={advance} size="md">
-                        Continue →
+                        Weiter →
                       </Button>
                     ) : (
                       <Button type="submit" size="md" disabled={form.formState.isSubmitting}>
                         {form.formState.isSubmitting
-                          ? files.length > 0 ? "Uploading docs…" : "Submitting…"
+                          ? files.length > 0 ? "Dokumente werden hochgeladen…" : "Wird gesendet…"
                           : files.length > 0
-                            ? `Run screening with ${files.length} doc${files.length !== 1 ? "s" : ""} →`
-                            : "Run screening →"}
+                            ? `Screening mit ${files.length} Dok${files.length !== 1 ? "." : "."} starten →`
+                            : "Screening starten →"}
                       </Button>
                     )}
                   </div>
