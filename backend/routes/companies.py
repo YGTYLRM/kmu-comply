@@ -18,6 +18,9 @@ async def list_reports(current_user: dict = Depends(get_current_user)):
 
 @router.get("/api/companies")
 async def list_companies(current_user: dict = Depends(get_current_user)):
+    from config import settings
+    if not settings.database_url:
+        return {"companies": []}
     from db.database import AsyncSessionLocal
     from db.models import Company, Report
     from sqlalchemy import select, func
@@ -71,6 +74,9 @@ async def list_companies(current_user: dict = Depends(get_current_user)):
 
 @router.get("/api/dashboard/summary")
 async def dashboard_summary(current_user: dict = Depends(get_current_user)):
+    from config import settings
+    if not settings.database_url:
+        return {"company_count": 0, "report_count": 0, "avg_score": None, "recent_notifications": []}
     from db.database import AsyncSessionLocal
     from db.models import Company, Report, Notification
     from sqlalchemy import select, func

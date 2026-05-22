@@ -27,7 +27,7 @@ async def check_rate_limit(user_id: str) -> None:
         from db.models import RateLimitEvent
         from sqlalchemy import select, func, delete
 
-        now_dt = datetime.now(timezone.utc)
+        now_dt = datetime.utcnow()
         window_start = now_dt - timedelta(seconds=ANALYZE_WINDOW)
         async with AsyncSessionLocal() as db:
             count = (await db.execute(
@@ -106,7 +106,7 @@ async def check_endpoint_rate_limit(user_id: str, endpoint: str, limit: int, win
         from db.models import RateLimitEvent
         from sqlalchemy import select, func
 
-        now_dt = datetime.now(timezone.utc)
+        now_dt = datetime.utcnow()
         window_start = now_dt - timedelta(seconds=window)
         async with AsyncSessionLocal() as db:
             count = (await db.execute(
