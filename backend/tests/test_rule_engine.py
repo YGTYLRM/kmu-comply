@@ -21,8 +21,8 @@ _BACKEND_ROOT = Path(__file__).parent.parent
 if str(_BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(_BACKEND_ROOT))
 
-from agent.rule_engine import RuleEngine, RULE_ENGINE_VERSION
-from models.company_profile import CompanyProfile
+from agent.rule_engine import RuleEngine, RULE_ENGINE_VERSION  # noqa: E402
+from models.company_profile import CompanyProfile  # noqa: E402
 
 _PROFILES_FILE = Path(__file__).parent / "golden_profiles" / "profiles.json"
 

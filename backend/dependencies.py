@@ -4,7 +4,7 @@ Shared FastAPI dependencies and request-guard helpers.
 import logging
 import secrets
 from collections import defaultdict
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from time import time
 
 from fastapi import HTTPException, Header

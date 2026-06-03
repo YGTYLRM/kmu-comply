@@ -32,7 +32,7 @@ HEADERS = {
 
 def main() -> None:
     FONTS_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Fetching font CSS from Google Fonts...")
+    print("Fetching font CSS from Google Fonts...")
 
     css_resp = httpx.get(GOOGLE_FONTS_URL, headers=HEADERS, follow_redirects=True, timeout=30)
     css_resp.raise_for_status()
