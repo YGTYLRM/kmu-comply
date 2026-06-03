@@ -20,7 +20,7 @@ _pw = None
 _browser = None
 _browser_lock = threading.Lock()
 
-from config import settings as _settings
+from config import settings as _settings  # noqa: E402
 _pdf_semaphore = threading.Semaphore(getattr(_settings, "pdf_concurrency", 3))
 
 

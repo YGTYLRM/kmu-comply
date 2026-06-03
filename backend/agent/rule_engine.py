@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 from models.company_profile import CompanyProfile
 
@@ -95,8 +94,6 @@ class RuleEngine:
     def check_gdpr_dsgvo(self, profile: CompanyProfile) -> ApplicabilityResult:
         reg = "gdpr_dsgvo"
         required = ["processes_personal_data"]
-        # Secondary fields that improve precision
-        secondary = ["has_website", "has_employees"]
         missing = _missing(profile, required)
 
         # Applies if processes personal data OR has website OR has employees
@@ -158,7 +155,6 @@ class RuleEngine:
     def check_nis2(self, profile: CompanyProfile) -> ApplicabilityResult:
         reg = "nis2"
         required = ["employee_count", "is_critical_infrastructure_sector"]
-        optional_size = ["annual_revenue_eur"]
         missing = _missing(profile, required)
 
         in_scope_sector = (
@@ -273,7 +269,6 @@ class RuleEngine:
     def check_enefg(self, profile: CompanyProfile) -> ApplicabilityResult:
         reg = "enefg"
         required = ["employee_count"]
-        optional = ["annual_energy_consumption_mwh", "annual_revenue_eur", "balance_sheet_total_eur"]
         missing = _missing(profile, required)
 
         energy_mwh = profile.annual_energy_consumption_mwh or 0
@@ -322,7 +317,6 @@ class RuleEngine:
     def check_csrd(self, profile: CompanyProfile) -> ApplicabilityResult:
         reg = "csrd"
         required = ["employee_count"]
-        optional = ["annual_revenue_eur", "balance_sheet_total_eur"]
         missing = _missing(profile, required)
 
         criteria_met = 0

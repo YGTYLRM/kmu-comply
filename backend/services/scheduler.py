@@ -387,7 +387,7 @@ async def document_ageing_check() -> None:
         from sqlalchemy import select
         from datetime import datetime, timezone, timedelta
         import chromadb
-        from rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS, OFFICIAL_URLS
+        from rag.ingest import CHROMA_DIR, REGULATION_COLLECTIONS
 
         # Build current KB ingest dates from ChromaDB metadata
         kb_dates: dict[str, datetime] = {}
@@ -479,7 +479,7 @@ async def _queue_document_ageing_notification(
     user_email: str,
     company_name: str,
     stale_regulations: list[str],
-    report_date: "datetime",
+    report_date: str,
 ) -> None:
     """Create and send a document-ageing notification."""
     try:

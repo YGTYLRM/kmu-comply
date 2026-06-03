@@ -10,7 +10,6 @@ Usage:
 Requires DATABASE_URL in backend/.env or environment.
 """
 import sys
-import os
 import argparse
 from pathlib import Path
 
@@ -64,7 +63,7 @@ def apply_rls(dry_run: bool = False) -> None:
         sys.exit(1)
 
     db_url = get_connection_string()
-    print(f"Connecting to database...")
+    print("Connecting to database...")
     conn = psycopg2.connect(db_url)
     conn.autocommit = True
     cur = conn.cursor()

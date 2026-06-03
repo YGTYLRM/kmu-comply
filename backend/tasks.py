@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from celery_app import celery_app
-from models.enums import AnalysisStep, JobStatus
+from models.enums import AnalysisStep
 
 logger = logging.getLogger(__name__)
 

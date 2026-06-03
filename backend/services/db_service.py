@@ -167,9 +167,9 @@ async def _notify_threshold_changes(
 
     title = f"Regulatory profile change detected for {new_profile.company_name}"
     message = (
-        f"Your company profile update crossed one or more regulation thresholds. "
+        "Your company profile update crossed one or more regulation thresholds. "
         + " | ".join(parts)
-        + f". Run a new compliance analysis to get an updated assessment."
+        + ". Run a new compliance analysis to get an updated assessment."
     )
     logger.info(
         "db_service: threshold change for user %s — %s",
