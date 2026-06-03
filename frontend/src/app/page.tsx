@@ -128,7 +128,7 @@ const PLANS = [
 const FAQS = [
   {
     q: "Was ist ein Compliance-Screening und was ist es nicht?",
-    a: "Ein Screening zeigt Ihnen, wo Ihr Unternehmen wahrscheinlich Lücken hat. Es basiert auf Ihren Angaben, zitiert konkrete Gesetzesartikel und priorisiert Handlungsbedarf. Die im Bericht genannten gesetzlichen Fristen sind Orientierungswerte — keine rechtsverbindliche Auskunft für Ihre konkrete Situation. Es ist kein Rechtsgutachten, kein zertifiziertes Audit und ersetzt nicht den Rechtsanwalt. Es ist der Schritt davor.",
+    a: "Ein Screening zeigt Ihnen, wo Ihr Unternehmen wahrscheinlich Lücken hat. Es basiert auf Ihren Angaben, zitiert konkrete Gesetzesartikel und priorisiert Handlungsbedarf. Die im Bericht genannten gesetzlichen Fristen sind Orientierungswerte, keine rechtsverbindliche Auskunft für Ihre konkrete Situation. Es ist kein Rechtsgutachten, kein zertifiziertes Audit und ersetzt nicht den Rechtsanwalt. Es ist der Schritt davor.",
   },
   {
     q: "Welche Gesetze prüft Complio?",
@@ -392,10 +392,6 @@ export default function HomePage() {
                     {t}
                   </span>
                 ))}
-                <a href="#pricing" className="flex items-center gap-1.5 hover:text-slate-400 transition-colors">
-                  <ArrowRight className="h-3.5 w-3.5 flex-shrink-0" />
-                  Preise ansehen
-                </a>
               </div>
             </motion.div>
 
@@ -493,23 +489,29 @@ export default function HomePage() {
 
       {/* ── How it works ──────────────────────────────────────── */}
       <section id="how-it-works" className="border-t border-white/[0.05] bg-dark-900/40 py-16 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-10 sm:mb-14 text-center">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">So funktioniert es</p>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Vom Profil zum Bericht in fünf Schritten</h2>
           </motion.div>
 
-          <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="grid grid-cols-1 sm:grid-cols-5 gap-8 sm:gap-0">
+          <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} className="space-y-px">
             {STEPS.map(({ n, title, desc }, i) => (
-              <motion.div key={n} variants={fadeUp} className="relative flex flex-col gap-3 sm:px-4 pb-2">
-                {i < STEPS.length - 1 && (
-                  <div className="hidden sm:block absolute top-5 left-[calc(50%+28px)] right-0 h-px bg-gradient-to-r from-brand-500/35 to-transparent" />
-                )}
-                <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-brand-500/35 bg-brand-500/10 text-xs font-black text-brand-400 shadow-glow-blue-sm">
-                  {n}
+              <motion.div
+                key={n}
+                variants={fadeUp}
+                className={`flex items-start gap-5 border border-white/[0.06] px-6 py-5 hover:bg-white/[0.02] transition-colors ${
+                  i === 0 ? "rounded-t-2xl" : ""
+                } ${i === STEPS.length - 1 ? "rounded-b-2xl" : ""}`}
+                style={{ background: "rgba(6,14,48,0.60)" }}
+              >
+                <div className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500/10 border border-brand-500/20">
+                  <span className="text-xs font-black text-brand-400 tabular-nums">{n}</span>
                 </div>
-                <p className="text-sm font-bold text-white leading-snug">{title}</p>
-                <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <p className="text-sm font-bold text-white mb-1 leading-snug">{title}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -794,7 +796,7 @@ export default function HomePage() {
               <Link href="/datenschutz" className="hover:text-slate-400 transition-colors">Datenschutz</Link>
               <Link href="/agb"       className="hover:text-slate-400 transition-colors">AGB</Link>
             </div>
-            <p className="text-xs text-slate-600">Vorläufige Einschätzung — keine Rechtsberatung</p>
+            <p className="text-xs text-slate-600">Vorläufige Einschätzung, keine Rechtsberatung</p>
           </div>
         </div>
       </footer>

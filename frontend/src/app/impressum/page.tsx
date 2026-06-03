@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Impressum — Complio",
+  title: "Impressum | Complio",
 };
 
 export default function ImpressumPage() {
@@ -12,12 +12,6 @@ export default function ImpressumPage() {
 
         <div className="space-y-8 text-sm text-slate-400 leading-relaxed">
 
-          {/*
-            BEFORE LAUNCH — § 5 DDG requires a COMPLETE postal address (street + postcode).
-            Replace the placeholder lines below with the real address before going live.
-            Using a virtual office (e.g. Regus, Spaces, Davinci) is legally acceptable.
-            Operating without a complete address exposes the site to Abmahnung under UWG.
-          */}
           <section>
             <h2 className="text-white font-semibold text-base mb-3">Angaben gemäß § 5 DDG</h2>
             <p className="leading-7">
@@ -39,52 +33,53 @@ export default function ImpressumPage() {
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">Umsatzsteuer-Identifikationsnummer</h2>
+            <h2 className="text-white font-semibold text-base mb-3">Umsatzsteuerliche Registrierung</h2>
             <p>
-              {/*
-                TODO BEFORE LAUNCH: Add your USt-IdNr. (§ 27a UStG) once you have one.
-                If not yet VAT-registered, replace this section with:
-                "Umsatzsteuerliche Registrierung folgt nach Aufnahme der gewerblichen Tätigkeit."
-              */}
-              Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: DE[XXXXXXXXX]
+              Umsatzsteuerliche Registrierung erfolgt nach Aufnahme der gewerblichen Tätigkeit
+              gemäß § 27a UStG.
             </p>
           </section>
 
           <section>
             <h2 className="text-white font-semibold text-base mb-3">Inhaltlich verantwortlich</h2>
             <p>
-              {/* TODO BEFORE LAUNCH: Replace with the full name of the natural person responsible for content */}
-              [Vollständiger Name], Darmstadt
+              Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:<br />
+              Gründer und Betreiber von Complio, Mathildenstraße 39, 64285 Darmstadt.
             </p>
           </section>
 
           <section>
             <h2 className="text-white font-semibold text-base mb-3">Haftung für Inhalte</h2>
             <p>
-              Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den
-              allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht
-              verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen
-              zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+              Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten
+              nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als
+              Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
+              Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige
+              Tätigkeit hinweisen.
             </p>
             <p className="mt-3">
-              Die über Complio erstellten Compliance-Berichte sind automatisierte Ersteinschätzungen auf Basis
-              der eingegebenen Unternehmensdaten. Sie stellen keine Rechtsberatung im Sinne des
-              Rechtsdienstleistungsgesetzes (RDG) dar und ersetzen nicht die Beratung durch einen zugelassenen
-              Rechtsanwalt.
+              Die über Complio erstellten Compliance-Berichte sind automatisierte Ersteinschätzungen
+              auf Basis der eingegebenen Unternehmensdaten. Sie stellen keine Rechtsberatung im Sinne
+              des Rechtsdienstleistungsgesetzes (RDG) dar und ersetzen nicht die Beratung durch einen
+              zugelassenen Rechtsanwalt oder Steuerberater.
             </p>
           </section>
 
           <section>
             <h2 className="text-white font-semibold text-base mb-3">Haftung für Links</h2>
             <p>
-              Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss
-              haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte
-              der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+              Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen
+              Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr
+              übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
+              oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt
+              der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum
+              Zeitpunkt der Verlinkung nicht erkennbar. Bei Bekanntwerden von Rechtsverletzungen
+              werden wir derartige Links umgehend entfernen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-white font-semibold text-base mb-3">Streitbeilegung</h2>
+            <h2 className="text-white font-semibold text-base mb-3">Online-Streitbeilegung</h2>
             <p>
               Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
               <a
@@ -95,9 +90,11 @@ export default function ImpressumPage() {
               >
                 https://ec.europa.eu/consumers/odr/
               </a>
-              . Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
-              Verbraucherschlichtungsstelle teilzunehmen. Complio richtet sich ausschließlich an Unternehmer
-              im Sinne des § 14 BGB.
+            </p>
+            <p className="mt-3">
+              Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
+              Verbraucherschlichtungsstelle teilzunehmen. Complio richtet sich ausschließlich an
+              Unternehmer im Sinne des § 14 BGB.
             </p>
           </section>
 
