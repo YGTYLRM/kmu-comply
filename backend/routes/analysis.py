@@ -178,7 +178,7 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
         if session_owner is None or session_owner != current_user["id"]:
             raise HTTPException(status_code=403, detail="Document session not found or access denied.")
 
-    if settings.database_url and (settings.stripe_enabled or bool(settings.stripe_secret_key)):
+    if settings.database_url:
         from services.stripe_service import get_active_subscription, check_company_limit
 
         sub = await get_active_subscription(current_user["id"])
