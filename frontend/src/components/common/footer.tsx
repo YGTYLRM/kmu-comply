@@ -17,7 +17,7 @@ export function Footer() {
             <Link href="/contact" className="hover:text-slate-400 transition-colors">Kontakt</Link>
           </nav>
           <p className="text-xs text-slate-700">
-            Vorläufige Einschätzung — keine Rechtsberatung
+            Vorläufige Einschätzung, keine Rechtsberatung
           </p>
         </div>
       </div>

@@ -732,7 +732,7 @@ export default function PrintPage() {
               <div key={reg}>
                 <div className="reg-heading">
                   {REGULATION_LABEL[reg] ?? reg}
-                  <span className="reg-desc">{REG_DESC[reg] ? ` — ${REG_DESC[reg]}` : ""}</span>
+                  <span className="reg-desc">{REG_DESC[reg] ? ` · ${REG_DESC[reg]}` : ""}</span>
                   <span style={{ float: "right", fontSize: "7.5pt", fontWeight: 400, color: "#64748b" }}>
                     {ok > 0 && <span style={{ color: "#059669" }}>{ok} compliant &nbsp;</span>}
                     {pc > 0 && <span style={{ color: "#b45309" }}>{pc} partial &nbsp;</span>}

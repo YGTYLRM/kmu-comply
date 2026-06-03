@@ -23,7 +23,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_website" render={({ field }) => (
         <BoolField
           label="Betreibt das Unternehmen eine öffentlich zugängliche Website oder App?"
-          hint="Jede für Nutzer in Deutschland zugängliche Website löst Pflichten nach §25 TTDSG aus."
+          hint="Jede für Nutzer in Deutschland zugängliche Website löst Pflichten nach § 25 TTDSG aus."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -31,7 +31,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_cookie_banner" render={({ field }) => (
         <BoolField
           label="Ist ein Cookie-Einwilligungsbanner implementiert (Opt-in vor dem Tracking)?"
-          hint="§25 TDDDG erfordert eine informierte Einwilligung BEVOR nicht notwendige Cookies, Pixel oder Fingerprinting-Skripte gesetzt werden."
+          hint="§ 25 TDDDG erfordert eine informierte Einwilligung BEVOR nicht notwendige Cookies, Pixel oder Fingerprinting-Skripte gesetzt werden."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -52,7 +52,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="is_aml_obligated_sector" render={({ field }) => (
         <BoolField
           label="Ist das Unternehmen in einem nach GwG verpflichteten Sektor tätig?"
-          hint="Finanzdienstleistungen, Krypto, Immobilienmakler, Rechts-/Notardienstleistungen, Steuerberatung oder Glücksspiel — §2 GwG."
+          hint="Finanzdienstleistungen, Krypto, Immobilienmakler, Rechts-/Notardienstleistungen, Steuerberatung oder Glücksspiel (§ 2 GwG)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -60,7 +60,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_aml_risk_analysis" render={({ field }) => (
         <BoolField
           label="Wurde eine Risikoanalyse zur Geldwäscheprävention durchgeführt?"
-          hint="Dokumentierte Risikobewertung für Geldwäsche- und Terrorismusfinanzierungsrisiken — §5 GwG."
+          hint="Dokumentierte Risikobewertung für Geldwäsche- und Terrorismusfinanzierungsrisiken (§ 5 GwG)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -68,7 +68,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_aml_officer" render={({ field }) => (
         <BoolField
           label="Ist ein Geldwäschebeauftragter benannt?"
-          hint="Pflicht für regulierte Finanzinstitute und größere verpflichtete Unternehmen — §7 GwG."
+          hint="Pflicht für regulierte Finanzinstitute und größere verpflichtete Unternehmen (§ 7 GwG)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -76,7 +76,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_kyc_procedures" render={({ field }) => (
         <BoolField
           label="Sind KYC-Verfahren (Kundendurchleuchtung) implementiert?"
-          hint="Identifizierung und Überprüfung des Kunden vor Aufnahme einer Geschäftsbeziehung — §10 GwG."
+          hint="Identifizierung und Überprüfung des Kunden vor Aufnahme einer Geschäftsbeziehung (§ 10 GwG)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -97,7 +97,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="provides_data_processing_services" render={({ field }) => (
         <BoolField
           label="Bietet das Unternehmen Cloud- oder Datenverarbeitungsdienste an?"
-          hint="Cloud-Hosting, SaaS-Plattformen, Edge Computing oder andere Datenverarbeitungsdienste mit Wechselpflichten — Art. 23–25."
+          hint="Cloud-Hosting, SaaS-Plattformen, Edge Computing oder andere Datenverarbeitungsdienste mit Wechselpflichten (Art. 23–25 EU Data Act)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -105,7 +105,7 @@ export function Step10Digital({ form }: Props) {
       <Controller control={control} name="has_data_access_mechanism" render={({ field }) => (
         <BoolField
           label="Gibt es einen Mechanismus, über den Nutzer auf ihre geräteerzeugten Daten zugreifen können?"
-          hint="Nutzer vernetzter Produkte müssen einfach auf die von ihren Geräten erzeugten Daten zugreifen können — Art. 4 EU Data Act."
+          hint="Nutzer vernetzter Produkte müssen einfach auf die von ihren Geräten erzeugten Daten zugreifen können (Art. 4 EU Data Act)."
           value={field.value} onChange={field.onChange}
         />
       )} />

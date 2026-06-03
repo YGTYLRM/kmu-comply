@@ -39,7 +39,7 @@ export function Step1Company({ form }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.05] px-4 py-3">
-        <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Vorläufiges Screening — keine Rechtsberatung</p>
+        <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Vorläufiges Screening, keine Rechtsberatung</p>
         <p className="text-xs text-slate-500 leading-relaxed">
           Dieses Tool liefert ausschließlich eine automatisierte Ersteinschätzung. Die Ergebnisse stellen keine Rechtsberatung dar und sollten vor Maßnahmen durch einen qualifizierten Rechtsanwalt geprüft werden.
         </p>

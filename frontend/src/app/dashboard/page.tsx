@@ -39,7 +39,7 @@ function OnboardingEmpty() {
       icon: <ShieldCheck className="h-5 w-5 text-brand-400" />,
       number: "02",
       title: "Compliance-Bericht erhalten",
-      desc: "Complio prüft 14 Gesetze automatisch — DSGVO, NIS2, EU AI Act, GwG, TTDSG und mehr. Sie erhalten einen bewerteten Bericht mit priorisiertem Maßnahmenplan.",
+      desc: "Complio prüft 14 Gesetze automatisch: DSGVO, NIS2, EU AI Act, GwG, TTDSG und mehr. Sie erhalten einen bewerteten Bericht mit priorisiertem Maßnahmenplan.",
     },
     {
       icon: <Bell className="h-5 w-5 text-brand-400" />,
