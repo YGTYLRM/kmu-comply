@@ -18,7 +18,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_privacy_policy" render={({ field }) => (
         <BoolField
           label="Hat das Unternehmen eine veröffentlichte Datenschutzerklärung?"
-          hint="Datenschutzerklärung für betroffene Personen zugänglich — erforderlich nach Art. 13/14 DSGVO."
+          hint="Datenschutzerklärung für betroffene Personen zugänglich, erforderlich nach Art. 13/14 DSGVO."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -26,7 +26,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_processor_agreements" render={({ field }) => (
         <BoolField
           label="Bestehen Auftragsverarbeitungsverträge (AVV) mit allen Dienstleistern?"
-          hint="AVV erforderlich mit jedem Dritten, der personenbezogene Daten in Ihrem Auftrag verarbeitet — Art. 28 DSGVO."
+          hint="AVV erforderlich mit jedem Dritten, der personenbezogene Daten in Ihrem Auftrag verarbeitet (Art. 28 DSGVO)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -34,7 +34,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_data_breach_procedure" render={({ field }) => (
         <BoolField
           label="Gibt es ein dokumentiertes Verfahren zur Reaktion auf Datenpannen?"
-          hint="Muss Erkennung, interne Eskalation und Meldung an die Aufsichtsbehörde innerhalb von 72 Stunden umfassen — Art. 33 DSGVO."
+          hint="Muss Erkennung, interne Eskalation und Meldung an die Aufsichtsbehörde innerhalb von 72 Stunden umfassen (Art. 33 DSGVO)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -42,7 +42,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_tom_documentation" render={({ field }) => (
         <BoolField
           label="Sind technische und organisatorische Maßnahmen (TOMs) dokumentiert?"
-          hint="Schriftliche Aufzeichnung der Schutzmaßnahmen für personenbezogene Daten — Art. 32 DSGVO."
+          hint="Schriftliche Aufzeichnung der Schutzmaßnahmen für personenbezogene Daten (Art. 32 DSGVO)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -50,7 +50,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_data_retention_policy" render={({ field }) => (
         <BoolField
           label="Gibt es eine dokumentierte Richtlinie zur Datenspeicherung und -löschung?"
-          hint="Personenbezogene Daten dürfen nicht länger als nötig gespeichert werden — Grundsatz der Speicherbegrenzung Art. 5(1)(e) DSGVO."
+          hint="Personenbezogene Daten dürfen nicht länger als nötig gespeichert werden; Grundsatz der Speicherbegrenzung Art. 5(1)(e) DSGVO."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -58,7 +58,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_data_protection_training" render={({ field }) => (
         <BoolField
           label="Erhalten Mitarbeiter, die personenbezogene Daten verarbeiten, regelmäßige Datenschutzschulungen?"
-          hint="Mitarbeiter unter der Verantwortung des Verantwortlichen müssen geschult werden — Art. 29 und Art. 32(4) DSGVO."
+          hint="Mitarbeiter unter der Verantwortung des Verantwortlichen müssen geschult werden (Art. 29 und Art. 32(4) DSGVO)."
           value={field.value} onChange={field.onChange}
         />
       )} />
@@ -74,7 +74,7 @@ export function Step7Privacy({ form }: Props) {
       <Controller control={control} name="has_consent_management" render={({ field }) => (
         <BoolField
           label="Wird die Einwilligung dort, wo erforderlich, ordnungsgemäß eingeholt und dokumentiert?"
-          hint="Gilt für Cookies, Marketing-E-Mails und nicht zwingend erforderliche Datenverarbeitungen — Art. 6/7 DSGVO."
+          hint="Gilt für Cookies, Marketing-E-Mails und nicht zwingend erforderliche Datenverarbeitungen (Art. 6/7 DSGVO)."
           value={field.value} onChange={field.onChange}
         />
       )} />

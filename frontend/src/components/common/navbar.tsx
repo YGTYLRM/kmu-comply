@@ -99,9 +99,11 @@ export function Navbar() {
               <Link href="/contact" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
                 Kontakt
               </Link>
-              <Link href="/reports" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
-                Berichte
-              </Link>
+              {userEmail && (
+                <Link href="/reports" className="rounded-lg px-3.5 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.07] transition-colors">
+                  Berichte
+                </Link>
+              )}
             </nav>
 
             <div className="flex-1" />
@@ -171,39 +173,45 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Mobile dropdown — inside the pill */}
+          {/* Mobile dropdown */}
           {mobileOpen && (
             <div className="md:hidden border-t border-white/[0.08] px-4 pb-4 pt-2">
               <nav className="flex flex-col gap-1">
                 <a href="/#how-it-works" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                  How it works
+                  So funktioniert es
                 </a>
                 <a href="/#features" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                  Features
+                  Funktionen
                 </a>
                 <a href="/#pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                  Pricing
+                  Preise
                 </a>
                 <Link href="/contact" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                  Contact
+                  Kontakt
                 </Link>
-                <Link href="/reports" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                  Reports
-                </Link>
-                {userEmail ? (
-                  <button
-                    onClick={() => { setMobileOpen(false); handleLogout(); }}
-                    className="mt-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 font-semibold text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <LogOut className="h-4 w-4" /> Abmelden
-                  </button>
-                ) : (
+                {userEmail && (
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                      Dashboard
+                    </Link>
+                    <Link href="/reports" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                      Berichte
+                    </Link>
+                    <button
+                      onClick={() => { setMobileOpen(false); handleLogout(); }}
+                      className="mt-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 font-semibold text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <LogOut className="h-4 w-4" /> Abmelden
+                    </button>
+                  </>
+                )}
+                {!userEmail && (
                   <>
                     <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-lg px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
-                      Sign in
+                      Anmelden
                     </Link>
                     <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-600 px-4 py-3 text-sm text-white font-semibold text-center hover:bg-brand-500 transition-colors">
-                      Request a Demo
+                      Demo anfordern
                     </Link>
                   </>
                 )}

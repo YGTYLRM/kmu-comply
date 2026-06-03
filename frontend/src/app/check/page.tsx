@@ -1,9 +1,8 @@
 "use client";
 
-import type { Metadata } from "next";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, XCircle, AlertCircle, ChevronDown } from "lucide-react";
+import { ArrowRight, CheckCircle2, XCircle, AlertCircle, ChevronDown, RotateCcw } from "lucide-react";
 
 const INDUSTRIES = [
   { value: "it_software",   label: "IT und Software" },
@@ -33,18 +32,55 @@ interface CheckResult {
   disclaimer: string;
 }
 
+function getGermanReason(reg: ApplicabilityResult, employees: number): string {
+  switch (reg.regulation) {
+    case "gdpr_dsgvo":
+      return "Ihr Unternehmen verarbeitet personenbezogene Daten. Die DSGVO gilt für jedes Unternehmen, das Daten von EU-Bürgern verarbeitet, unabhängig von der Größe (Art. 2 DSGVO).";
+    case "bdsg":
+      return `BDSG gilt ergänzend zur DSGVO für alle deutschen Unternehmen, die personenbezogene Daten verarbeiten (§ 1 BDSG).${employees >= 20 ? " Ab 20 Mitarbeitern ist in der Regel ein Datenschutzbeauftragter zu benennen (§ 38 BDSG)." : ""}`;
+    case "lksg":
+      return `Mit ${employees.toLocaleString("de-DE")} Beschäftigten wird der Schwellenwert von 1.000 Mitarbeitern überschritten. Das Lieferkettensorgfaltspflichtengesetz gilt seit dem 1. Januar 2024 für Unternehmen dieser Größe (§ 1 LkSG).`;
+    case "enefg":
+      return "Ihr Unternehmen überschreitet die Nicht-KMU-Schwellenwerte (mind. 250 Mitarbeiter, über 50 Mio. EUR Umsatz oder über 43 Mio. EUR Bilanzsumme). Das Energieeffizienzgesetz (EnEfG) und das EDL-G sind anwendbar.";
+    case "csrd":
+      return "Ihr Unternehmen erfüllt mindestens zwei der drei CSRD-Größenkriterien. Eine verpflichtende Nachhaltigkeitsberichterstattung nach EU-Richtlinie 2022/2464 gilt für Ihr Unternehmen.";
+    case "nis2":
+      return "Ihr Unternehmen ist in einem kritischen oder wichtigen Sektor tätig und überschreitet den Schwellenwert für mittlere Unternehmen. Die NIS2-Richtlinie ist in Deutschland über das BSIG umgesetzt.";
+    case "eu_ai_act":
+      return "Ihr Unternehmen entwickelt oder setzt KI-Systeme ein. Der EU AI Act ist anwendbar (Art. 2). Das Verbot bestimmter KI-Praktiken gilt seit Februar 2025, GPAI-Regeln seit August 2025.";
+    case "hinschg":
+      return `Mit ${employees.toLocaleString("de-DE")} Beschäftigten wird der Schwellenwert von 50 Mitarbeitern überschritten. Ein interner Hinweisgeberkanal ist nach dem Hinweisgeberschutzgesetz verpflichtend (§ 12 HinSchG).`;
+    case "workplace_law":
+      return "Das ArbSchG gilt für alle Arbeitgeber in Deutschland, unabhängig von der Betriebsgröße. Gefährdungsbeurteilung (§ 5), Dokumentation (§ 6) und regelmäßige Mitarbeiterunterweisung (§ 12) sind gesetzlich vorgeschrieben.";
+    case "agg":
+      return "Das Allgemeine Gleichbehandlungsgesetz gilt für alle Arbeitgeber. Aktive Präventionsmaßnahmen gegen Diskriminierung und ein internes Beschwerdeverfahren für Mitarbeiter sind verpflichtend (§§ 12, 13 AGG).";
+    case "milog":
+      return `Das MiLoG gilt für alle Arbeitgeber in Deutschland. Seit dem 1. Januar 2026 beträgt der gesetzliche Mindestlohn 13,90 EUR pro Stunde (§ 1 MiLoG). Arbeitszeitnachweise sind für Geringverdienende verpflichtend (§ 17 MiLoG).`;
+    case "ttdsg":
+      return "Ihr Unternehmen betreibt eine Website und verarbeitet Nutzerdaten. Das TTDSG gilt (§ 25 TDDDG): Vor dem Setzen nicht notwendiger Cookies, Tracking-Skripte oder Analysewerkzeuge ist eine ausdrückliche Einwilligung erforderlich.";
+    case "gwg":
+      return "Ihr Unternehmen ist in einem nach dem Geldwäschegesetz verpflichteten Sektor tätig (§ 2 GwG). Risikoanalyse, Kundensorgfaltspflichten (KYC), Verdachtsmeldungen an die FIU und interne Sicherungsmaßnahmen sind verpflichtend.";
+    case "eu_data_act":
+      return "Ihr Unternehmen stellt vernetzte Produkte oder Datenverarbeitungsdienste bereit. Der EU Data Act ist anwendbar (Verordnung (EU) 2023/2854, gültig seit September 2025). Nutzerdatenzugang und Anbieterwechselpflichten gelten.";
+    default:
+      return reg.reason;
+  }
+}
+
+const defaultForm = {
+  employee_count: "",
+  industry: "it_software",
+  annual_revenue_eur: "",
+  processes_personal_data: true,
+  has_website: true,
+  has_supply_chain_abroad: false,
+  is_aml_obligated_sector: false,
+  uses_ai_systems: false,
+  is_critical_infrastructure_sector: false,
+};
+
 export default function QuickCheckPage() {
-  const [form, setForm] = useState({
-    employee_count: "",
-    industry: "it_software",
-    annual_revenue_eur: "",
-    processes_personal_data: true,
-    has_website: true,
-    has_supply_chain_abroad: false,
-    is_aml_obligated_sector: false,
-    uses_ai_systems: false,
-    is_critical_infrastructure_sector: false,
-  });
+  const [form, setForm] = useState(defaultForm);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +134,7 @@ export default function QuickCheckPage() {
 
   const inputCls = "w-full rounded-xl border border-white/[0.09] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500/60 focus:bg-white/[0.06] transition-colors";
   const labelCls = "block text-xs font-semibold text-slate-400 mb-2";
+  const employees = parseInt(form.employee_count) || 1;
 
   return (
     <main className="min-h-screen pt-28 pb-20 bg-dark-950">
@@ -111,96 +148,98 @@ export default function QuickCheckPage() {
             Welche Gesetze gelten für Ihr Unternehmen?
           </h1>
           <p className="text-slate-400 leading-relaxed">
-            Geben Sie einige Eckdaten ein. Die Vorprüfung läuft sofort und kostenlos — ohne Registrierung.
+            Geben Sie einige Eckdaten ein. Die Vorprüfung läuft sofort und kostenlos, ohne Registrierung.
             Das Ergebnis zeigt, welche der 14 Vorschriften auf Basis der Schwellenwerte anwendbar sind.
             Für die vollständige Lückenanalyse ist ein bezahltes Screening erforderlich.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border border-white/[0.07] p-6 sm:p-8 space-y-6 mb-8"
-          style={{ background: "rgba(6,14,48,0.70)" }}
-        >
-          <div className="grid sm:grid-cols-2 gap-5">
-            <div>
-              <label className={labelCls}>Mitarbeiterzahl *</label>
-              <input
-                type="number"
-                min="1"
-                max="1000000"
-                required
-                placeholder="z. B. 85"
-                value={form.employee_count}
-                onChange={(e) => setForm({ ...form, employee_count: e.target.value })}
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className={labelCls}>Branche *</label>
-              <div className="relative">
-                <select
+        {!result && (
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl border border-white/[0.07] p-6 sm:p-8 space-y-6 mb-8"
+            style={{ background: "rgba(6,14,48,0.70)" }}
+          >
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className={labelCls}>Mitarbeiterzahl *</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000000"
                   required
-                  value={form.industry}
-                  onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                  className={`${inputCls} appearance-none pr-10`}
-                >
-                  {INDUSTRIES.map((i) => (
-                    <option key={i.value} value={i.value} style={{ background: "#060e30" }}>
-                      {i.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                  placeholder="z. B. 85"
+                  value={form.employee_count}
+                  onChange={(e) => setForm({ ...form, employee_count: e.target.value })}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Branche *</label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.industry}
+                    onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                    className={`${inputCls} appearance-none pr-10`}
+                  >
+                    {INDUSTRIES.map((i) => (
+                      <option key={i.value} value={i.value} style={{ background: "#060e30" }}>
+                        {i.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div>
-            <label className={labelCls}>Jahresumsatz (EUR, optional)</label>
-            <input
-              type="text"
-              placeholder="z. B. 12000000 für 12 Mio. EUR"
-              value={form.annual_revenue_eur}
-              onChange={(e) => setForm({ ...form, annual_revenue_eur: e.target.value })}
-              className={inputCls}
-            />
-            <p className="mt-1.5 text-xs text-slate-600">Relevant für CSRD und EnEfG — Schwellenwertprüfung.</p>
-          </div>
+            <div>
+              <label className={labelCls}>Jahresumsatz (EUR, optional)</label>
+              <input
+                type="text"
+                placeholder="z. B. 12000000 für 12 Mio. EUR"
+                value={form.annual_revenue_eur}
+                onChange={(e) => setForm({ ...form, annual_revenue_eur: e.target.value })}
+                className={inputCls}
+              />
+              <p className="mt-1.5 text-xs text-slate-600">Relevant für CSRD und EnEfG: Schwellenwertprüfung.</p>
+            </div>
 
-          <div className="space-y-3.5 pt-1">
-            <p className={labelCls}>Weitere Eigenschaften</p>
-            {[
-              { key: "processes_personal_data",           label: "Das Unternehmen verarbeitet personenbezogene Daten (Kunden, Mitarbeiter, etc.)" },
-              { key: "has_website",                       label: "Das Unternehmen betreibt eine öffentliche Website oder App" },
-              { key: "has_supply_chain_abroad",           label: "Das Unternehmen hat Lieferanten oder Hersteller im Ausland" },
-              { key: "uses_ai_systems",                   label: "Das Unternehmen entwickelt oder setzt KI-Systeme ein" },
-              { key: "is_critical_infrastructure_sector", label: "Das Unternehmen ist in einem kritischen Sektor tätig (Energie, Verkehr, Gesundheit, Bankwesen, digitale Infrastruktur)" },
-              { key: "is_aml_obligated_sector",           label: "Das Unternehmen ist im Finanz-, Immobilien-, Glücksspiel- oder Kryptobereich tätig (GwG §2)" },
-            ].map(({ key, label }) => (
-              <label key={key} className="flex items-start gap-3 cursor-pointer group">
-                <div className="mt-0.5 flex-shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={form[key as keyof typeof form] as boolean}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
-                    className="h-4 w-4 rounded border-white/20 bg-white/5 text-brand-500 focus:ring-brand-500/30"
-                  />
-                </div>
-                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">{label}</span>
-              </label>
-            ))}
-          </div>
+            <div className="space-y-3.5 pt-1">
+              <p className={labelCls}>Weitere Eigenschaften</p>
+              {[
+                { key: "processes_personal_data",           label: "Das Unternehmen verarbeitet personenbezogene Daten (Kunden, Mitarbeiter, etc.)" },
+                { key: "has_website",                       label: "Das Unternehmen betreibt eine öffentliche Website oder App" },
+                { key: "has_supply_chain_abroad",           label: "Das Unternehmen hat Lieferanten oder Hersteller im Ausland" },
+                { key: "uses_ai_systems",                   label: "Das Unternehmen entwickelt oder setzt KI-Systeme ein" },
+                { key: "is_critical_infrastructure_sector", label: "Das Unternehmen ist in einem kritischen Sektor tätig (Energie, Verkehr, Gesundheit, Bankwesen, digitale Infrastruktur)" },
+                { key: "is_aml_obligated_sector",           label: "Das Unternehmen ist im Finanz-, Immobilien-, Glücksspiel- oder Kryptobereich tätig (GwG § 2)" },
+              ].map(({ key, label }) => (
+                <label key={key} className="flex items-start gap-3 cursor-pointer group">
+                  <div className="mt-0.5 flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={form[key as keyof typeof form] as boolean}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
+                      className="h-4 w-4 rounded border-white/20 bg-white/5 text-brand-500 focus:ring-brand-500/30"
+                    />
+                  </div>
+                  <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">{label}</span>
+                </label>
+              ))}
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading || !form.employee_count}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Wird geprüft…" : "Vorprüfung starten"}
-            {!loading && <ArrowRight className="h-4 w-4" />}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading || !form.employee_count}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Wird geprüft…" : "Vorprüfung starten"}
+              {!loading && <ArrowRight className="h-4 w-4" />}
+            </button>
+          </form>
+        )}
 
         {error && (
           <div className="rounded-xl border border-red-500/20 bg-red-500/8 px-5 py-4 text-sm text-red-300 mb-8">
@@ -233,7 +272,7 @@ export default function QuickCheckPage() {
                         <CheckCircle2 className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-bold text-white mb-1">{reg.name}</p>
-                          <p className="text-xs text-slate-500 leading-relaxed">{reg.reason}</p>
+                          <p className="text-xs text-slate-500 leading-relaxed">{getGermanReason(reg, employees)}</p>
                         </div>
                       </div>
                     </div>
@@ -267,7 +306,7 @@ export default function QuickCheckPage() {
             <div className="rounded-xl border border-amber-500/15 bg-amber-500/6 px-5 py-4 flex gap-3">
               <AlertCircle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
               <p className="text-xs text-slate-400 leading-relaxed">
-                Diese Vorprüfung zeigt nur, ob die Schwellenwerte erreicht werden — nicht, wo konkret Lücken bestehen.
+                Diese Vorprüfung zeigt nur, ob die Schwellenwerte erreicht werden, nicht wo konkret Lücken bestehen.
                 Für die vollständige Lückenanalyse mit Artikelzitaten, Bewertung und Maßnahmenplan ist das bezahlte Screening erforderlich.
               </p>
             </div>
@@ -280,12 +319,13 @@ export default function QuickCheckPage() {
                 Vollständiges Screening starten
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/#pricing"
+              <button
+                onClick={() => { setResult(null); setForm(defaultForm); }}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors"
               >
-                Preise ansehen
-              </Link>
+                <RotateCcw className="h-4 w-4" />
+                Neue Prüfung starten
+              </button>
             </div>
           </div>
         )}

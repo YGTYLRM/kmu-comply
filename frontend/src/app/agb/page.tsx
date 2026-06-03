@@ -22,7 +22,7 @@ export default function AGBPage() {
               unter complio.de sowie aller zugehörigen Dienste.
             </p>
             <p className="mt-3">
-              Complio richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB — juristische
+              Complio richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB: juristische
               Personen des öffentlichen oder privaten Rechts sowie natürliche Personen, die in Ausübung
               ihrer gewerblichen oder selbstständigen beruflichen Tätigkeit handeln. Die Nutzung durch
               Verbraucher im Sinne des § 13 BGB ist ausgeschlossen.

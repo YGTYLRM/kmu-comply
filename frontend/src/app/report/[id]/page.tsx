@@ -186,7 +186,7 @@ export default function ReportPage() {
                 <ShieldAlert className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-bold text-amber-300 mb-1">
-                    Unvollständiger Bericht — {report.requires_manual_review.length} Schritt{report.requires_manual_review.length !== 1 ? "e" : ""} erfordern manuelle Prüfung
+                    Unvollständiger Bericht: {report.requires_manual_review.length} Schritt{report.requires_manual_review.length !== 1 ? "e" : ""} erfordern manuelle Prüfung
                   </p>
                   <p className="text-xs text-slate-400 leading-relaxed mb-2">
                     Die folgenden Analyseschritte sind fehlgeschlagen und die Ergebnisse können unvollständig sein.
@@ -220,7 +220,7 @@ export default function ReportPage() {
                   </button>
                 </div>
                 <p className="text-sm text-slate-400 leading-relaxed mb-4">
-                  Dieser Bericht ist unvollständig — {report.requires_manual_review?.length} Analyseschritt{(report.requires_manual_review?.length ?? 0) !== 1 ? "e" : ""} fehlgeschlagen.
+                  Dieser Bericht ist unvollständig: {report.requires_manual_review?.length} Analyseschritt{(report.requires_manual_review?.length ?? 0) !== 1 ? "e" : ""} fehlgeschlagen.
                   Der Export eines unvollständigen Berichts kann irreführend sein und sollte nicht an Prüfer oder Rechtsberater weitergegeben werden.
                 </p>
                 <p className="text-xs text-slate-500 mb-5">
@@ -295,7 +295,7 @@ export default function ReportPage() {
 
           {/* Legal disclaimer */}
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-5 py-4">
-            <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Preliminary screening only — not legal advice</p>
+            <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Vorläufiges Screening, keine Rechtsberatung</p>
             <p className="text-xs text-slate-500 leading-relaxed">{report.disclaimer}</p>
           </div>
         </motion.div>
@@ -324,7 +324,7 @@ function KnowledgeBaseVersions({ versions }: { versions: Record<string, { fetche
         <div className="flex items-center gap-2.5">
           <Database className="h-3.5 w-3.5 text-slate-500" />
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Rechtsquellen-Versionen</span>
-          <span className="text-xs text-slate-600">— welche Gesetzesversion für diesen Bericht verwendet wurde</span>
+          <span className="text-xs text-slate-600">welche Gesetzesversion für diesen Bericht verwendet wurde</span>
         </div>
         <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
@@ -379,7 +379,7 @@ function SourceCoverage({ coverage }: { coverage: Record<string, { law_chunks: n
         <div className="flex items-center gap-2.5">
           <BookOpen className="h-3.5 w-3.5 text-slate-500" />
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Quellenabdeckung</span>
-          <span className="text-xs text-slate-600">— wie viele Gesetzestexte pro Regelwerk ausgewertet wurden</span>
+          <span className="text-xs text-slate-600">wie viele Gesetzestexte pro Regelwerk ausgewertet wurden</span>
         </div>
         <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
