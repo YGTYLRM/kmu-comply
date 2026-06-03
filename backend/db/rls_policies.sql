@@ -24,6 +24,9 @@ ALTER TABLE public.rate_limit_events    ENABLE ROW LEVEL SECURITY;
 -- Admin-only table — no user access
 ALTER TABLE public.pending_regulation_updates ENABLE ROW LEVEL SECURITY;
 
+-- Alembic migration tracking — internal only, no client access
+ALTER TABLE public.alembic_version           ENABLE ROW LEVEL SECURITY;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- profiles — users can read and update only their own row
 -- ─────────────────────────────────────────────────────────────────────────────
