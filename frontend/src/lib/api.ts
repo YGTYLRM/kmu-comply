@@ -6,7 +6,9 @@ import type {
 } from "./types";
 export type { CompanyProfile };
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Use relative URLs so requests go through the Next.js proxy rewrite (/api/* → backend).
+// This avoids CORS entirely — the browser sees same-origin requests.
+const BASE = "";
 
 async function getAuthHeader(): Promise<Record<string, string>> {
   if (typeof window === "undefined") return {};
@@ -139,6 +141,9 @@ export const api = {
     request<{ updates: AdminRegulationUpdate[] }>("/api/admin/regulation-updates", {
       headers: { "X-Admin-Key": adminKey } as Record<string, string>,
     }),
+
+  getBilling: () =>
+    request<{ subscription: BillingSubscription | null; stripe_enabled: boolean }>("/api/billing"),
 };
 
 export interface CompanySummary {
@@ -217,4 +222,13 @@ export interface AdminRegulationUpdate {
   new_hash: string;
   previous_hash: string | null;
   reviewed_at: string | null;
+}
+
+export interface BillingSubscription {
+  plan: string;
+  status: string;
+  current_period_end: string | null;
+  stripe_subscription_id: string | null;
+  company_limit: number;
+  reassessment_days: number;
 }

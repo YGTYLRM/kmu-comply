@@ -10,9 +10,9 @@ import { Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
 function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next") ?? "/analyze";
+  const rawNext = searchParams.get("next") ?? "/dashboard";
   // Only allow relative paths to prevent open redirect attacks
-  const next = rawNext.startsWith("/") ? rawNext : "/analyze";
+  const next = rawNext.startsWith("/") ? rawNext : "/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

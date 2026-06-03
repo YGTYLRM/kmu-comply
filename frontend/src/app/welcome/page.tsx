@@ -132,14 +132,14 @@ export default function WelcomePage() {
           className="text-center"
         >
           <Link
-            href="/analyze"
+            href="/account/billing"
             className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-4 text-sm font-bold text-white hover:bg-brand-500 transition-all shadow-glow-blue-sm hover:shadow-glow-blue"
           >
-            Erstes Screening starten
+            Plan auswählen & starten
             <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="mt-3 text-xs text-slate-600">
-            Dauert ca. 2 Minuten · Bericht sofort verfügbar
+            Plan auswählen · Screening sofort verfügbar
           </p>
           <p className="mt-4 text-xs text-slate-700">
             <Link href="/dashboard" className="hover:text-slate-500 transition-colors underline underline-offset-2">
