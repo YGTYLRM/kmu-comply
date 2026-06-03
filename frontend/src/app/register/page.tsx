@@ -43,11 +43,11 @@ export default function RegisterPage() {
 
     // If email confirmation is disabled, session is available immediately
     if (data.session) {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/auth/sync-profile`, {
+      await fetch(`/api/auth/sync-profile`, {
         method: "POST",
         headers: { Authorization: `Bearer ${data.session.access_token}` },
       }).catch(() => {});
-      router.push("/welcome");
+      router.push("/");
       router.refresh();
     } else {
       setDone(true);

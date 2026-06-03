@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import { CreditCard, CheckCircle2, AlertTriangle, Loader2, ExternalLink, ArrowLeft } from "lucide-react";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE = "";
 
 const PLAN_LABELS: Record<string, { name: string; price: string; features: string[] }> = {
   starter: {

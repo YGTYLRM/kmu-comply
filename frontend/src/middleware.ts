@@ -4,6 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 const PROTECTED = ["/analyze", "/reports", "/report", "/dashboard"];
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/_next/") || pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -36,7 +41,7 @@ export async function middleware(request: NextRequest) {
   // Redirect logged-in users away from auth pages
   if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/analyze";
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 

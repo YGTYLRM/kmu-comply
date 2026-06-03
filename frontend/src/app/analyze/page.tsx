@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, ShieldCheck, FileText, Bell } from "lucide-react";
 import { StepIndicator } from "@/components/profile-form/step-indicator";
 import { Step1Company } from "@/components/profile-form/step1-company";
 import { Step2Financials } from "@/components/profile-form/step2-financials";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import type { CompanyProfile } from "@/lib/types";
+import { Lock } from "lucide-react";
 
 const optNum = (label: string) =>
   z.preprocess(
@@ -205,6 +206,9 @@ function AnalyzeInner() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [prefilling, setPrefilling]   = useState(!!fromJobId);
 
+  const [billingLoading, setBillingLoading] = useState(true);
+  const [paywalled, setPaywalled] = useState(false);
+
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -214,6 +218,15 @@ function AnalyzeInner() {
       processes_personal_data: undefined,
     },
   });
+
+  useEffect(() => {
+    api.getBilling()
+      .then(({ subscription, stripe_enabled }) => {
+        if (stripe_enabled && !subscription) setPaywalled(true);
+      })
+      .catch(() => { /* fail open — backend enforces */ })
+      .finally(() => setBillingLoading(false));
+  }, []);
 
   useEffect(() => {
     if (!fromJobId) return;
@@ -318,6 +331,68 @@ function AnalyzeInner() {
       );
     }
   });
+
+  if (billingLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-dark-950">
+        <div className="text-slate-500 text-sm">Wird geladen…</div>
+      </div>
+    );
+  }
+
+  if (paywalled) {
+    return (
+      <div className="min-h-screen bg-dark-950 pt-24 pb-16">
+        <div className="mx-auto max-w-lg px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center text-center gap-6 pt-12"
+          >
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/20">
+              <ShieldCheck className="h-8 w-8 text-brand-400" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl font-black text-white tracking-tight">
+                Ihr Screening wartet
+              </h1>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Wählen Sie einen Plan und starten Sie in weniger als 5 Minuten Ihr erstes Compliance-Screening.
+              </p>
+            </div>
+
+            <div className="w-full rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5 text-left flex flex-col gap-3">
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Was Sie erhalten</p>
+              {[
+                { icon: <FileText className="h-4 w-4 text-emerald-400" />, text: "14 Gesetze automatisch geprüft: DSGVO, NIS2, EU AI Act und mehr" },
+                { icon: <ShieldCheck className="h-4 w-4 text-emerald-400" />, text: "Vollständige Lückenanalyse mit priorisiertem Maßnahmenplan" },
+                { icon: <Bell className="h-4 w-4 text-emerald-400" />, text: "Automatische Benachrichtigung bei relevanten Gesetzesänderungen" },
+                { icon: <CheckCircle2 className="h-4 w-4 text-emerald-400" />, text: "PDF-Bericht zum Teilen mit Beratern oder der Geschäftsführung" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
+                  <p className="text-sm text-slate-300">{item.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="/account/billing"
+              className="w-full rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-brand-500 transition-all shadow-glow-blue-sm hover:shadow-glow-blue text-center"
+            >
+              Plan auswählen & Screening starten →
+            </a>
+
+            <a href="/dashboard" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              Zurück zum Dashboard
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-dark-950 pt-24">

@@ -215,8 +215,6 @@ async def check_feature_access(user_id: str, feature: str) -> tuple[bool, str]:
     Features: 'templates', 'document_upload', 'expert_review'
     Returns (allowed, reason_if_denied).
     """
-    if not settings.stripe_enabled:
-        return True, ""
     sub = await get_active_subscription(user_id)
     if not sub:
         return False, "Active subscription required."
@@ -238,8 +236,6 @@ async def check_feature_access(user_id: str, feature: str) -> tuple[bool, str]:
 
 
 async def check_company_limit(user_id: str) -> tuple[bool, str]:
-    if not settings.stripe_enabled:
-        return True, ""
     sub = await get_active_subscription(user_id)
     if not sub:
         return False, "Active subscription required."
