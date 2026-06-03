@@ -97,7 +97,7 @@ def fetch_eurlex(celex: str, dest_dir: Path, filename: str, label: str, lang: st
         return False
 
     if "JavaScript" in raw[:500] and "robot" in raw[:500].lower():
-        print(f"  WARNING: Got CAPTCHA/JS challenge page — cannot auto-fetch")
+        print("  WARNING: Got CAPTCHA/JS challenge page — cannot auto-fetch")
         return False
 
     text = strip_html(raw)

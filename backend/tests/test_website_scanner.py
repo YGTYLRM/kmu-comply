@@ -4,13 +4,10 @@ Unit tests for the website scanner service.
 These tests do NOT make real network requests — they test the helper functions
 and the result-building logic with mocked data.
 """
-import pytest
 
 from services.website_scanner import (
     _build_result,
     _is_tracker,
-    _TRACKER_DOMAINS,
-    WebScanResult,
 )
 from routes.scanning import _build_findings
 
