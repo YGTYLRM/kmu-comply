@@ -102,6 +102,41 @@ async def dashboard_summary(current_user: dict = Depends(get_current_user)):
 
     avg_score = float(report_stats[1]) if report_stats[1] is not None else None
 
+    # Collect top CRITICAL/HIGH action items from latest report per company
+    top_actions: list[dict] = []
+    if settings.database_url:
+        from sqlalchemy import select as sa_select
+        from db.models import Company as CompanyModel, Report as ReportModel
+        async with AsyncSessionLocal() as db2:
+            latest_subq = (
+                sa_select(ReportModel.company_id, func.max(ReportModel.created_at).label("latest"))
+                .join(CompanyModel, CompanyModel.id == ReportModel.company_id)
+                .where(CompanyModel.user_id == user_id)
+                .group_by(ReportModel.company_id)
+                .subquery()
+            )
+            latest_reports = (await db2.execute(
+                sa_select(ReportModel)
+                .join(latest_subq, (ReportModel.company_id == latest_subq.c.company_id) &
+                      (ReportModel.created_at == latest_subq.c.latest))
+                .limit(10)
+            )).scalars().all()
+        for rep in latest_reports:
+            if not rep.raw_json:
+                continue
+            action_plan = rep.raw_json.get("action_plan") or []
+            for item in action_plan:
+                if item.get("priority") in ("CRITICAL", "HIGH"):
+                    top_actions.append({
+                        "job_id": rep.job_id,
+                        "priority": item.get("priority"),
+                        "action": item.get("action", "")[:120],
+                        "regulation": item.get("regulation"),
+                        "deadline": item.get("deadline"),
+                    })
+    top_actions.sort(key=lambda x: 0 if x["priority"] == "CRITICAL" else 1)
+    top_actions = top_actions[:5]
+
     return {
         "company_count": company_count,
         "report_count": report_stats[0],
@@ -117,6 +152,7 @@ async def dashboard_summary(current_user: dict = Depends(get_current_user)):
             }
             for n in notifications
         ],
+        "top_actions": top_actions,
     }
 
 

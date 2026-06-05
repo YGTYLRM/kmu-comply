@@ -77,6 +77,8 @@ const defaultForm = {
   is_aml_obligated_sector: false,
   uses_ai_systems: false,
   is_critical_infrastructure_sector: false,
+  produces_connected_products: false,
+  provides_data_processing_services: false,
 };
 
 export default function QuickCheckPage() {
@@ -102,6 +104,8 @@ export default function QuickCheckPage() {
         is_aml_obligated_sector: form.is_aml_obligated_sector,
         uses_ai_systems: form.uses_ai_systems,
         is_critical_infrastructure_sector: form.is_critical_infrastructure_sector,
+        produces_connected_products: form.produces_connected_products,
+        provides_data_processing_services: form.provides_data_processing_services,
       };
       if (form.annual_revenue_eur) {
         payload.annual_revenue_eur = parseFloat(form.annual_revenue_eur.replace(/[^0-9.]/g, ""));
@@ -213,8 +217,10 @@ export default function QuickCheckPage() {
                 { key: "has_website",                       label: "Das Unternehmen betreibt eine öffentliche Website oder App" },
                 { key: "has_supply_chain_abroad",           label: "Das Unternehmen hat Lieferanten oder Hersteller im Ausland" },
                 { key: "uses_ai_systems",                   label: "Das Unternehmen entwickelt oder setzt KI-Systeme ein" },
-                { key: "is_critical_infrastructure_sector", label: "Das Unternehmen ist in einem kritischen Sektor tätig (Energie, Verkehr, Gesundheit, Bankwesen, digitale Infrastruktur)" },
-                { key: "is_aml_obligated_sector",           label: "Das Unternehmen ist im Finanz-, Immobilien-, Glücksspiel- oder Kryptobereich tätig (GwG § 2)" },
+                { key: "is_critical_infrastructure_sector",  label: "Das Unternehmen ist in einem kritischen Sektor tätig (Energie, Verkehr, Gesundheit, Bankwesen, digitale Infrastruktur)" },
+                { key: "is_aml_obligated_sector",            label: "Das Unternehmen ist im Finanz-, Immobilien-, Glücksspiel- oder Kryptobereich tätig (GwG § 2)" },
+                { key: "produces_connected_products",        label: "Das Unternehmen stellt vernetzte Produkte her oder vertreibt sie (IoT, Smart Devices) — EU Data Act" },
+                { key: "provides_data_processing_services",  label: "Das Unternehmen bietet Cloud- oder Datenverarbeitungsdienste an (Hosting, SaaS, IaaS) — EU Data Act" },
               ].map(({ key, label }) => (
                 <label key={key} className="flex items-start gap-3 cursor-pointer group">
                   <div className="mt-0.5 flex-shrink-0">

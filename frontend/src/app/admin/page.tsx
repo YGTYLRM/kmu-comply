@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { api, type AdminExpertReview, type AdminRegulationUpdate } from "@/lib/api";
-import { ShieldCheck, RefreshCw, Loader2, AlertCircle, CheckCircle2, Clock, Eye } from "lucide-react";
+import { ShieldCheck, RefreshCw, Loader2, AlertCircle, CheckCircle2, Clock, Eye, UserPlus, X } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -21,6 +21,8 @@ export default function AdminPage() {
   const [regUpdates, setRegUpdates] = useState<AdminRegulationUpdate[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assigningId, setAssigningId] = useState<string | null>(null);
+  const [assignInput, setAssignInput] = useState("");
 
   const authenticate = () => {
     localStorage.setItem("admin_key", keyInput);
@@ -58,6 +60,20 @@ export default function AdminPage() {
       setExpertReviews(prev =>
         prev?.map(r => r.id === id ? { ...r, status, reviewed_at: new Date().toISOString() } : r) ?? null
       );
+    } catch (e) {
+      alert((e as Error).message);
+    }
+  };
+
+  const confirmAssign = async (id: string) => {
+    if (!adminKey || !assignInput.trim()) return;
+    try {
+      await api.adminAssignExpertReview(adminKey, id, assignInput.trim());
+      setExpertReviews(prev =>
+        prev?.map(r => r.id === id ? { ...r, assigned_to: assignInput.trim(), status: r.status === "pending" ? "in_review" : r.status } : r) ?? null
+      );
+      setAssigningId(null);
+      setAssignInput("");
     } catch (e) {
       alert((e as Error).message);
     }
@@ -180,6 +196,35 @@ export default function AdminPage() {
                   </div>
                 )}
 
+                {/* Assigned reviewer badge */}
+                {r.assigned_to && (
+                  <p className="text-xs text-slate-500 mb-3">
+                    Zugewiesen an: <span className="text-slate-300 font-medium">{r.assigned_to}</span>
+                  </p>
+                )}
+
+                {/* Inline assignment form */}
+                {assigningId === r.id && (
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={assignInput}
+                      onChange={e => setAssignInput(e.target.value)}
+                      placeholder="E-Mail oder Name des Prüfers"
+                      onKeyDown={e => e.key === "Enter" && confirmAssign(r.id)}
+                      className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white placeholder-slate-600 outline-none focus:border-brand-500/50"
+                    />
+                    <button
+                      onClick={() => confirmAssign(r.id)}
+                      className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs text-white hover:bg-brand-500 transition-colors"
+                    >Zuweisen</button>
+                    <button
+                      onClick={() => { setAssigningId(null); setAssignInput(""); }}
+                      className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+                    ><X className="h-3 w-3" /></button>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 flex-wrap">
                   <a
                     href={`/report/${r.job_id}`}
@@ -189,6 +234,14 @@ export default function AdminPage() {
                   >
                     <Eye className="h-3 w-3" /> Bericht ansehen
                   </a>
+                  {r.status !== "completed" && (
+                    <button
+                      onClick={() => { setAssigningId(r.id); setAssignInput(r.assigned_to ?? ""); }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-brand-500/20 bg-brand-500/10 px-3 py-1.5 text-xs text-brand-400 hover:bg-brand-500/20 transition-colors"
+                    >
+                      <UserPlus className="h-3 w-3" /> {r.assigned_to ? "Neu zuweisen" : "Zuweisen"}
+                    </button>
+                  )}
                   {r.status === "pending" && (
                     <button
                       onClick={() => updateStatus(r.id, "in_review")}
