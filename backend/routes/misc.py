@@ -31,7 +31,7 @@ _KB_EXPECTED_MIN_CHUNKS: dict[str, int] = {
     "lksg":             15,
     "enefg":            10,
     "csrd":             80,
-    "compliance_guides": 500,
+    "compliance_guides": 460,
     "nis2":             40,
     "eu_ai_act":        70,
     "hinschg":          30,
@@ -155,6 +155,8 @@ async def quick_check(request: Request):
         has_supply_chain_abroad=bool(body.get("has_supply_chain_abroad", False)),
         supply_chain_countries=body.get("supply_chain_countries") or [],
         is_critical_infrastructure_sector=bool(body.get("is_critical_infrastructure_sector", False)),
+        produces_connected_products=bool(body.get("produces_connected_products", False)),
+        provides_data_processing_services=bool(body.get("provides_data_processing_services", False)),
     )
 
     contact_calls[ip].append(now)

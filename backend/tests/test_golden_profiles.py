@@ -320,8 +320,8 @@ async def test_e2e_fully_compliant_profile():
 
     enriched = await enrich_profile(profile)
     applicability = determine_applicability(enriched)
-    chunks = retrieve_regulatory_context(enriched, applicability)
-    gaps = await run_gap_analysis(enriched, chunks, [])
+    chunks, empty_regs, _ = retrieve_regulatory_context(enriched, applicability)
+    gaps = await run_gap_analysis(enriched, chunks, empty_regs)
 
     non_compliant = [
         g for g in gaps if g.status == ComplianceStatus.NON_COMPLIANT
@@ -360,8 +360,8 @@ async def test_e2e_bare_minimum_profile():
 
     enriched = await enrich_profile(profile)
     applicability = determine_applicability(enriched)
-    chunks = retrieve_regulatory_context(enriched, applicability)
-    gaps = await run_gap_analysis(enriched, chunks, [])
+    chunks, empty_regs, _ = retrieve_regulatory_context(enriched, applicability)
+    gaps = await run_gap_analysis(enriched, chunks, empty_regs)
 
     compliant_gaps = [
         g for g in gaps if g.status == ComplianceStatus.COMPLIANT
