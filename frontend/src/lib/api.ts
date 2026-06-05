@@ -137,6 +137,16 @@ export const api = {
       }
     ),
 
+  adminAssignExpertReview: (adminKey: string, reviewId: string, assignedTo: string, notes?: string) =>
+    request<{ ok: boolean; id: string; assigned_to: string }>(
+      `/api/admin/expert-reviews/${reviewId}/assign`,
+      {
+        method: "PATCH",
+        headers: { "X-Admin-Key": adminKey } as Record<string, string>,
+        body: JSON.stringify({ assigned_to: assignedTo, reviewer_notes: notes }),
+      }
+    ),
+
   adminListRegulationUpdates: (adminKey: string) =>
     request<{ updates: AdminRegulationUpdate[] }>("/api/admin/regulation-updates", {
       headers: { "X-Admin-Key": adminKey } as Record<string, string>,
@@ -192,11 +202,20 @@ export interface ReportSummary {
   applicable_regulation_count: number;
 }
 
+export interface TopAction {
+  job_id: string;
+  priority: "CRITICAL" | "HIGH";
+  action: string;
+  regulation: string | null;
+  deadline: string | null;
+}
+
 export interface DashboardSummary {
   company_count: number;
   report_count: number;
   avg_score: number | null;
   recent_notifications: NotificationItem[];
+  top_actions?: TopAction[];
 }
 
 export interface AdminExpertReview {
@@ -208,6 +227,8 @@ export interface AdminExpertReview {
   focus_items: { regulation: string; article_number: string }[] | null;
   message: string | null;
   status: string;
+  assigned_to: string | null;
+  reviewer_notes: string | null;
   created_at: string | null;
   reviewed_at: string | null;
 }

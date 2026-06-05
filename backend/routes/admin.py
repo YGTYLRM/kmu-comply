@@ -100,6 +100,11 @@ class UpdateExpertReviewBody(BaseModel):
     notes: Optional[str] = None
 
 
+class AssignExpertReviewBody(BaseModel):
+    assigned_to: str  # email or name of the reviewer
+    reviewer_notes: Optional[str] = None
+
+
 @router.get("/expert-reviews")
 async def list_expert_reviews_admin(status: Optional[str] = None):
     from db.database import AsyncSessionLocal
@@ -122,6 +127,8 @@ async def list_expert_reviews_admin(status: Optional[str] = None):
             "focus_items": r.focus_items,
             "message": r.message,
             "status": r.status,
+            "assigned_to": r.assigned_to,
+            "reviewer_notes": r.reviewer_notes,
             "created_at": r.created_at.isoformat() if r.created_at else None,
             "reviewed_at": r.reviewed_at.isoformat() if r.reviewed_at else None,
         }
@@ -149,3 +156,25 @@ async def update_expert_review_status(review_id: str, body: UpdateExpertReviewBo
         await db.commit()
 
     return {"ok": True, "id": review_id, "status": body.status}
+
+
+@router.patch("/expert-reviews/{review_id}/assign")
+async def assign_expert_review(review_id: str, body: AssignExpertReviewBody):
+    from db.database import AsyncSessionLocal
+    from db.models import ExpertReviewRequest
+    from sqlalchemy import select
+
+    async with AsyncSessionLocal() as db:
+        row = (await db.execute(
+            select(ExpertReviewRequest).where(ExpertReviewRequest.id == review_id)
+        )).scalar_one_or_none()
+        if not row:
+            raise HTTPException(status_code=404, detail="Expert review request not found.")
+        row.assigned_to = body.assigned_to
+        if body.reviewer_notes:
+            row.reviewer_notes = body.reviewer_notes
+        if row.status == "pending":
+            row.status = "in_review"
+        await db.commit()
+
+    return {"ok": True, "id": review_id, "assigned_to": body.assigned_to}

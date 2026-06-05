@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { api, type CompanySummary, type DashboardSummary } from "@/lib/api";
-import { Building2, ChevronRight, Plus, Clock, BarChart3, AlertCircle, Loader2, FileText, ShieldCheck, Bell } from "lucide-react";
+import { api, type CompanySummary, type DashboardSummary, type TopAction } from "@/lib/api";
+import { Building2, ChevronRight, Plus, Clock, BarChart3, AlertCircle, Loader2, FileText, ShieldCheck, Bell, Zap } from "lucide-react";
 
 function ScoreRing({ score }: { score: number | null }) {
   if (score === null) return (
@@ -89,7 +89,7 @@ function OnboardingEmpty() {
           <Plus className="h-4 w-4" /> Erstes Screening starten
         </Link>
         <p className="mt-3 text-xs text-slate-600">
-          Kostenlos starten · Keine Kreditkarte für den Test · Bericht in ca. 2 Minuten
+          Kostenlos starten · Keine Kreditkarte für den Test · Bericht in ca. 5–10 Min.
         </p>
       </div>
     </motion.div>
@@ -100,6 +100,58 @@ function triggerLabel(triggered_by: string) {
   if (triggered_by === "reg_change") return "Gesetzesänderung";
   if (triggered_by === "scheduled")  return "Monatliche Prüfung";
   return "Manuell";
+}
+
+const REG_DISPLAY: Record<string, string> = {
+  gdpr_dsgvo: "DSGVO", bdsg: "BDSG", nis2: "NIS2", eu_ai_act: "EU AI Act",
+  hinschg: "HinSchG", workplace_law: "ArbSchG", agg: "AGG",
+  milog: "MiLoG", lksg: "LkSG", enefg: "EnEfG", csrd: "CSRD",
+  ttdsg: "TTDSG", gwg: "GwG", eu_data_act: "EU Data Act",
+};
+
+function TopActionsWidget({ actions }: { actions: TopAction[] }) {
+  if (actions.length === 0) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 }}
+      className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03] overflow-hidden"
+    >
+      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-white/[0.05]">
+        <Zap className="h-3.5 w-3.5 text-red-400" />
+        <span className="text-xs font-semibold uppercase tracking-widest text-red-400">Dringende Maßnahmen</span>
+        <span className="ml-auto text-xs text-slate-600">{actions.length} offen</span>
+      </div>
+      <div className="divide-y divide-white/[0.04]">
+        {actions.map((a, i) => (
+          <Link
+            key={i}
+            href={`/report/${a.job_id}`}
+            className="flex items-start gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors group"
+          >
+            <span className={`mt-0.5 flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded ${
+              a.priority === "CRITICAL"
+                ? "bg-red-500/15 text-red-400"
+                : "bg-amber-500/15 text-amber-400"
+            }`}>{a.priority === "CRITICAL" ? "KRITISCH" : "HOCH"}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-slate-300 leading-relaxed line-clamp-2 group-hover:text-white transition-colors">{a.action}</p>
+              <div className="flex items-center gap-2 mt-1">
+                {a.regulation && (
+                  <span className="text-[10px] text-slate-600">{REG_DISPLAY[a.regulation] ?? a.regulation}</span>
+                )}
+                {a.deadline && (
+                  <span className="text-[10px] text-slate-600">· Frist: {a.deadline}</span>
+                )}
+              </div>
+            </div>
+            <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-slate-400 flex-shrink-0 mt-0.5 transition-colors" />
+          </Link>
+        ))}
+      </div>
+    </motion.div>
+  );
 }
 
 export default function DashboardPage() {
@@ -211,6 +263,11 @@ export default function DashboardPage() {
           <OnboardingEmpty />
         )}
 
+        {/* Top actions widget */}
+        {!loading && summary && summary.top_actions && summary.top_actions.length > 0 && (
+          <TopActionsWidget actions={summary.top_actions} />
+        )}
+
         {/* Company grid */}
         {!loading && companies.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -250,7 +307,7 @@ export default function DashboardPage() {
                         : "Noch nicht geprüft"}
                     </span>
                     <span className="flex items-center gap-0.5 text-brand-500 group-hover:text-brand-400">
-                      {c.report_count} report{c.report_count !== 1 ? "s" : ""}
+                      {c.report_count} Bericht{c.report_count !== 1 ? "e" : ""}
                       <ChevronRight className="h-3 w-3" />
                     </span>
                   </div>

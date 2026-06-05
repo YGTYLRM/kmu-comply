@@ -206,6 +206,8 @@ class ExpertReviewRequest(Base):
     focus_items: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|in_review|completed
+    assigned_to: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    reviewer_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
