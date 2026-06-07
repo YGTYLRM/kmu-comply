@@ -384,7 +384,7 @@ async def _executive_summary(
         try:
             resp = await _async_llm_client().messages.create(
                 model=settings.llm_model,
-                max_tokens=512,
+                max_tokens=1024,
                 temperature=0,
                 system=SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
