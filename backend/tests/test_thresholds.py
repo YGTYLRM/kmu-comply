@@ -164,7 +164,7 @@ class TestLkSG:
             processes_personal_data=False,
         )
         result = check_lksg(profile)
-        assert "§1(1)" in result.reason
+        assert "§1 Abs. 1 LkSG" in result.reason
         assert "LkSG" in result.reason
 
 

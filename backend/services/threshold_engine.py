@@ -156,7 +156,7 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
             applies=False,
             dpo_required=False,
             processing_records_required=False,
-            reason="Company does not process personal data — GDPR does not apply.",
+            reason="Unternehmen verarbeitet keine personenbezogenen Daten: DSGVO ist nicht anwendbar.",
             dpo_reason="N/A",
             records_reason="N/A",
         )
@@ -175,17 +175,20 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
         and profile.industry in _MANUAL_HEAVY_INDUSTRIES
     )
     dpo_reason = (
-        f"DPO likely required: {profile.employee_count} employees regularly processing "
-        f"personal data automatically (BDSG §38(1) — ≥20 persons constantly in automated "
-        f"processing). Note: exact applicability depends on how many staff are constantly "
-        f"engaged in automated processing, not just total headcount."
-        + (" ⚠ BORDERLINE: in manual-processing-heavy industries, fewer than 20 staff "
-           "may actually be constantly engaged in automated processing — verify with counsel."
+        f"Datenschutzbeauftragter voraussichtlich erforderlich: {profile.employee_count} "
+        f"Mitarbeitende verarbeiten regelmäßig automatisiert personenbezogene Daten (§38 Abs. 1 "
+        f"BDSG - ab 20 Personen ständig mit automatisierter Verarbeitung beschäftigt). Hinweis: "
+        f"Die genaue Anwendbarkeit hängt davon ab, wie viele Mitarbeitende ständig mit "
+        f"automatisierter Verarbeitung befasst sind, nicht nur von der Gesamtmitarbeiterzahl."
+        + (" ⚠ GRENZFALL: In Branchen mit überwiegend manueller Verarbeitung sind unter "
+           "Umständen weniger als 20 Mitarbeitende tatsächlich ständig mit automatisierter "
+           "Verarbeitung befasst - bitte rechtlich prüfen lassen."
            if dpo_borderline else "")
         if dpo_required
         else (
-            f"DPO not required: {profile.employee_count} employees < 20 threshold or "
-            f"processing is occasional (BDSG §38(1))."
+            f"Datenschutzbeauftragter nicht erforderlich: {profile.employee_count} Mitarbeitende "
+            f"liegen unter dem Schwellenwert von 20 oder die Verarbeitung erfolgt nur "
+            f"gelegentlich (§38 Abs. 1 BDSG)."
         )
     )
 
@@ -196,23 +199,23 @@ def check_gdpr(profile: CompanyProfile) -> GDPRResult:
     )
     records_parts = []
     if profile.employee_count >= 250:
-        records_parts.append(f"employee count {profile.employee_count} >= 250 (Art. 30(5) GDPR)")
+        records_parts.append(f"Mitarbeiterzahl {profile.employee_count} >= 250 (Art. 30 Abs. 5 DSGVO)")
     if not profile.processing_is_occasional:
-        records_parts.append("processing is not occasional (Art. 30(5) GDPR)")
+        records_parts.append("Verarbeitung erfolgt nicht nur gelegentlich (Art. 30 Abs. 5 DSGVO)")
     if profile.processes_special_category_data:
-        records_parts.append("processes special category data (Art. 30(5) GDPR)")
+        records_parts.append("verarbeitet besondere Kategorien personenbezogener Daten (Art. 30 Abs. 5 DSGVO)")
 
     records_reason = (
-        "Processing records required: " + "; ".join(records_parts) + "."
+        "Verarbeitungsverzeichnis erforderlich: " + "; ".join(records_parts) + "."
         if records_required
-        else "Processing records not strictly required (Art. 30(5) GDPR exemption for SMEs with <250 employees and occasional processing)."
+        else "Verarbeitungsverzeichnis nicht zwingend erforderlich (Ausnahme nach Art. 30 Abs. 5 DSGVO für KMU mit weniger als 250 Mitarbeitenden und nur gelegentlicher Verarbeitung)."
     )
 
     return GDPRResult(
         applies=True,
         dpo_required=dpo_required,
         processing_records_required=records_required,
-        reason="Company processes personal data — GDPR applies (Art. 2 GDPR).",
+        reason="Unternehmen verarbeitet personenbezogene Daten: DSGVO ist anwendbar (Art. 2 DSGVO).",
         dpo_reason=dpo_reason,
         records_reason=records_reason,
     )
@@ -259,22 +262,24 @@ def check_lksg(profile: CompanyProfile) -> LkSGResult:
 
     if directly_applies:
         reason = (
-            f"LkSG applies directly: {profile.employee_count} employees >= 1,000 threshold "
-            f"(§1(1) LkSG, effective 1 Jan 2024). Due diligence obligations cover own business "
-            f"area and supply chain. Policy statement (§6), risk analysis (§5), and complaints "
-            f"mechanism (§8) are mandatory."
+            f"LkSG ist direkt anwendbar: {profile.employee_count} Mitarbeitende erreichen den "
+            f"Schwellenwert von 1.000 (§1 Abs. 1 LkSG, gültig seit 1. Januar 2024). Die "
+            f"Sorgfaltspflichten umfassen den eigenen Geschäftsbereich sowie die Lieferkette. "
+            f"Grundsatzerklärung (§6), Risikoanalyse (§5) und Beschwerdeverfahren (§8) sind "
+            f"verpflichtend."
         )
     else:
         indirect_note = (
-            " Note: if your company supplies to LkSG-obligated customers (>=1,000 employees), "
-            "you may receive supplier due diligence questionnaires and contractual obligations "
-            "even without direct LkSG applicability."
+            " Hinweis: Beliefert Ihr Unternehmen LkSG-verpflichtete Kunden (>= 1.000 "
+            "Mitarbeitende), können Sie auch ohne direkte LkSG-Anwendbarkeit "
+            "Sorgfaltspflichten-Fragebögen und vertragliche Verpflichtungen von diesen Kunden "
+            "erhalten."
             if profile.has_supply_chain_abroad or profile.employee_count >= 500
             else ""
         )
         reason = (
-            f"LkSG does not apply directly: {profile.employee_count} employees < 1,000 threshold "
-            f"(§1(1) LkSG).{indirect_note}"
+            f"LkSG ist nicht direkt anwendbar: {profile.employee_count} Mitarbeitende liegen "
+            f"unter dem Schwellenwert von 1.000 (§1 Abs. 1 LkSG).{indirect_note}"
         )
 
     return LkSGResult(applies=directly_applies, reason=reason)
@@ -339,21 +344,21 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
     if not applies:
         unmet = []
         if not exceeds_employees:
-            unmet.append(f"{profile.employee_count} employees < 250")
+            unmet.append(f"{profile.employee_count} Mitarbeitende < 250")
         if not exceeds_revenue:
             unmet.append(
-                "revenue not provided" if profile.annual_revenue_eur is None
-                else f"revenue {profile.annual_revenue_eur:,.0f} EUR ≤ 50M"
+                "Umsatz nicht angegeben" if profile.annual_revenue_eur is None
+                else f"Umsatz {profile.annual_revenue_eur:,.0f} EUR <= 50 Mio."
             )
         if not exceeds_balance:
             unmet.append(
-                "balance sheet not provided" if profile.balance_sheet_total_eur is None
-                else f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR ≤ 43M"
+                "Bilanzsumme nicht angegeben" if profile.balance_sheet_total_eur is None
+                else f"Bilanzsumme {profile.balance_sheet_total_eur:,.0f} EUR <= 43 Mio."
             )
         energy_note = (
-            "annual energy consumption not provided — provide it to check EnEfG §8(1)"
+            "jährlicher Energieverbrauch nicht angegeben - bitte angeben, um §8 Abs. 1 EnEfG zu prüfen"
             if energy_mwh == 0
-            else f"energy consumption {energy_gwh:.1f} GWh ≤ 7.5 GWh threshold"
+            else f"Energieverbrauch {energy_gwh:.1f} GWh <= Schwellenwert von 7,5 GWh"
         )
         return EnEfGResult(
             applies=False,
@@ -361,8 +366,8 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
             energy_management_required=False,
             waste_heat_reporting_required=False,
             reason=(
-                f"EnEfG / EDL-G do not apply — qualifies as EU SME ({'; '.join(unmet)}) "
-                f"and {energy_note} (EnEfG §8(1))."
+                f"EnEfG / EDL-G sind nicht anwendbar - das Unternehmen gilt als EU-KMU "
+                f"({'; '.join(unmet)}) und {energy_note} (§8 Abs. 1 EnEfG)."
             ),
         )
 
@@ -371,28 +376,28 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
 
     if is_non_sme:
         if exceeds_employees:
-            criteria.append(f"{profile.employee_count} employees ≥ 250")
+            criteria.append(f"{profile.employee_count} Mitarbeitende >= 250")
         if exceeds_revenue:
-            criteria.append(f"revenue {profile.annual_revenue_eur:,.0f} EUR > 50M")
+            criteria.append(f"Umsatz {profile.annual_revenue_eur:,.0f} EUR > 50 Mio.")
         if exceeds_balance:
-            criteria.append(f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR > 43M")
-        obligations.append(f"non-SME ({'; '.join(criteria)}) → EDL-G §8 energy audit every 4 years")
+            criteria.append(f"Bilanzsumme {profile.balance_sheet_total_eur:,.0f} EUR > 43 Mio.")
+        obligations.append(f"kein KMU ({'; '.join(criteria)}) - Energieaudit alle 4 Jahre verpflichtend (§8 EDL-G)")
 
     if energy_mwh == 0:
         obligations.append(
-            "annual energy consumption not provided — cannot confirm EnEfG §8(1) status; "
-            "provide 3-year average consumption in GWh"
+            "jährlicher Energieverbrauch nicht angegeben - Status nach §8 Abs. 1 EnEfG kann "
+            "nicht bestätigt werden; bitte 3-Jahres-Durchschnittsverbrauch in GWh angeben"
         )
     elif enms_required:
         obligations.append(
-            f"energy consumption {energy_gwh:.1f} GWh > 7.5 GWh (3-year average) → "
-            f"certified energy management system (ISO 50001 or EMAS) mandatory (EnEfG §8(1)); "
-            f"energy-saving implementation plans required (EnEfG §9)"
+            f"Energieverbrauch {energy_gwh:.1f} GWh > 7,5 GWh (3-Jahres-Durchschnitt) - "
+            f"zertifiziertes Energie- oder Umweltmanagementsystem (ISO 50001 oder EMAS) "
+            f"verpflichtend (§8 Abs. 1 EnEfG); Energieeinsparungs-Umsetzungspläne erforderlich (§9 EnEfG)"
         )
 
     reason = (
-        f"EnEfG / EDL-G apply. Obligations: {'; '.join(obligations)}. "
-        f"Waste heat assessment required if technically usable waste heat ≥ 200 kW (EnEfG §16)."
+        f"EnEfG / EDL-G sind anwendbar. Pflichten: {'; '.join(obligations)}. "
+        f"Bei technisch nutzbarer Abwärme ab 200 kW ist eine Abwärme-Bewertung erforderlich (§16 EnEfG)."
     )
 
     return EnEfGResult(
@@ -437,13 +442,13 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
 
     if profile.employee_count > 250:
         criteria_met += 1
-        met_list.append(f"employees {profile.employee_count} > 250")
+        met_list.append(f"Mitarbeitende {profile.employee_count} > 250")
     if profile.annual_revenue_eur is not None and profile.annual_revenue_eur > 50_000_000:
         criteria_met += 1
-        met_list.append(f"revenue {profile.annual_revenue_eur:,.0f} EUR > 50M")
+        met_list.append(f"Umsatz {profile.annual_revenue_eur:,.0f} EUR > 50 Mio.")
     if profile.balance_sheet_total_eur is not None and profile.balance_sheet_total_eur > 25_000_000:
         criteria_met += 1
-        met_list.append(f"balance sheet {profile.balance_sheet_total_eur:,.0f} EUR > 25M")
+        met_list.append(f"Bilanzsumme {profile.balance_sheet_total_eur:,.0f} EUR > 25 Mio.")
 
     is_large = criteria_met >= 2
     applies  = is_large or profile.is_listed_company
@@ -460,16 +465,18 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
         wave, first_fy = None, None
         unmet_count = 3 - criteria_met
         reason = (
-            f"CSRD does not apply: only {criteria_met}/3 size criteria met"
+            f"CSRD ist nicht anwendbar: nur {criteria_met}/3 Größenkriterien erfüllt"
             + (f" ({'; '.join(met_list)})" if met_list else "")
-            + f" — 2/3 required. {unmet_count} criteria not met "
-            + "(EU Directive 2022/2464, Art. 5)."
+            + f" - 2 von 3 erforderlich. {unmet_count} Kriterien nicht erfüllt "
+            + "(EU-Richtlinie 2022/2464, Art. 5)."
         )
     elif is_pie_above_500:
         wave, first_fy = 1, 2024
         reason = (
-            "CSRD applies as Wave 1 (PIE with >500 employees): first reporting FY 2024 "
-            "(report published 2025). Not postponed by Directive (EU) 2025/794."
+            "CSRD ist anwendbar als Welle 1 (kapitalmarktorientiertes Unternehmen von "
+            "öffentlichem Interesse mit > 500 Mitarbeitenden): erste Berichtspflicht für das "
+            "Geschäftsjahr 2024 (Bericht veröffentlicht 2025). Nicht verschoben durch "
+            "Richtlinie (EU) 2025/794."
         )
     elif is_large:
         wave, first_fy = 2, 2027
@@ -482,25 +489,28 @@ def check_csrd(profile: CompanyProfile) -> CSRDResult:
             or profile.annual_revenue_eur <= 450_000_000
         )
         _omnibus_note = (
-            " ⚠ OMNIBUS CAVEAT: The EU Omnibus package (Council agreement Feb 2026) proposes "
-            "narrowing CSRD scope to >1,000 employees AND >€450M net turnover. Formal EU adoption "
-            "and German transposition are pending as of May 2026. This company meets the original "
-            "2/3 criteria but does NOT meet the proposed Omnibus thresholds — it may fall outside "
-            "CSRD scope once adopted. Verify current status with legal counsel before starting "
-            "any CSRD reporting programme."
+            " ⚠ OMNIBUS-VORBEHALT: Das EU-Omnibus-Paket (Ratseinigung Februar 2026) sieht vor, "
+            "den CSRD-Anwendungsbereich auf Unternehmen mit > 1.000 Mitarbeitenden UND > 450 "
+            "Mio. EUR Nettoumsatz einzugrenzen. Die formelle Verabschiedung auf EU-Ebene und die "
+            "Umsetzung in deutsches Recht stehen mit Stand Mai 2026 noch aus. Dieses Unternehmen "
+            "erfüllt die ursprünglichen 2-von-3-Kriterien, jedoch NICHT die vorgeschlagenen "
+            "Omnibus-Schwellenwerte - es könnte nach Inkrafttreten aus dem CSRD-Anwendungsbereich "
+            "herausfallen. Bitte den aktuellen Stand vor Beginn eines CSRD-Berichtsprogramms "
+            "rechtlich prüfen lassen."
             if _below_omnibus else ""
         )
         reason = (
-            f"CSRD applies as Wave 2: {criteria_met}/3 size criteria met ({'; '.join(met_list)}) "
-            f"(EU Directive 2022/2464, Art. 5). First reporting year: FY 2027 (report 2028) "
-            f"per Directive (EU) 2025/794 stop-the-clock.{_omnibus_note}"
+            f"CSRD ist anwendbar als Welle 2: {criteria_met}/3 Größenkriterien erfüllt "
+            f"({'; '.join(met_list)}) (EU-Richtlinie 2022/2464, Art. 5). Erstes Berichtsjahr: "
+            f"Geschäftsjahr 2027 (Bericht 2028) gemäß Stop-the-Clock-Richtlinie (EU) "
+            f"2025/794.{_omnibus_note}"
         )
     else:
         wave, first_fy = 3, 2028
         reason = (
-            "CSRD applies as Wave 3 (listed SME on EU-regulated market). "
-            "First reporting year postponed to FY 2028 (report 2029) "
-            "under Directive (EU) 2025/794."
+            "CSRD ist anwendbar als Welle 3 (börsennotiertes KMU an einem EU-regulierten Markt). "
+            "Das erste Berichtsjahr wurde auf das Geschäftsjahr 2028 (Bericht 2029) gemäß "
+            "Richtlinie (EU) 2025/794 verschoben."
         )
 
     return CSRDResult(applies=applies, criteria_met=criteria_met, wave=wave, first_reporting_fy=first_fy, reason=reason)
@@ -531,9 +541,9 @@ def check_bdsg(profile: CompanyProfile) -> BDSGResult:
             applies=False,
             dpo_required=False,
             reason=(
-                "BDSG does not apply: company is not in Germany."
+                "BDSG ist nicht anwendbar: Unternehmen hat seinen Sitz nicht in Deutschland."
                 if profile.country != "DE"
-                else "BDSG does not apply: company does not process personal data."
+                else "BDSG ist nicht anwendbar: Unternehmen verarbeitet keine personenbezogenen Daten."
             ),
         )
 
@@ -542,11 +552,14 @@ def check_bdsg(profile: CompanyProfile) -> BDSGResult:
         applies=True,
         dpo_required=dpo_required,
         reason=(
-            "BDSG applies: German company processing personal data (BDSG §1). "
+            "BDSG ist anwendbar: deutsches Unternehmen verarbeitet personenbezogene Daten "
+            "(§1 BDSG). "
             + (
-                f"DPO required: {profile.employee_count} employees >= 20 threshold (BDSG §38(1))."
+                f"Datenschutzbeauftragter erforderlich: {profile.employee_count} Mitarbeitende "
+                f"erreichen den Schwellenwert von 20 (§38 Abs. 1 BDSG)."
                 if dpo_required
-                else f"DPO not required: {profile.employee_count} employees < 20 or processing is occasional (BDSG §38(1))."
+                else f"Datenschutzbeauftragter nicht erforderlich: {profile.employee_count} "
+                     f"Mitarbeitende < 20 oder die Verarbeitung erfolgt nur gelegentlich (§38 Abs. 1 BDSG)."
             )
         ),
     )
@@ -631,11 +644,12 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
         return NIS2Result(
             applies=False, particularly_important=False, important=False,
             reason=(
-                f"NIS2 sector classification cannot be determined for industry '{profile.industry}'. "
-                f"NIS2 / BSIG applies to 18 specific sector categories (Annex I and II). "
-                f"Consult BSI sector guidance to confirm whether your company falls under "
-                f"§28(6) or §28(7) BSIG. Set 'is_critical_infrastructure_sector=true' if "
-                f"your company has been designated as a KRITIS operator."
+                f"Die NIS2-Sektoreinordnung kann für die Branche '{profile.industry}' nicht "
+                f"eindeutig bestimmt werden. NIS2 / BSIG erfasst 18 spezifische Sektorkategorien "
+                f"(Anlage 1 und 2). Bitte anhand der BSI-Sektorleitfäden prüfen, ob Ihr "
+                f"Unternehmen unter §28 Abs. 6 oder Abs. 7 BSIG fällt. Markieren Sie Ihr "
+                f"Unternehmen im Profil als KRITIS-Betreiber, falls eine entsprechende "
+                f"Einstufung vorliegt."
             ),
         )
 
@@ -643,8 +657,9 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
         return NIS2Result(
             applies=False, particularly_important=False, important=False,
             reason=(
-                f"NIS2 does not apply: industry '{profile.industry}' is not in a critical "
-                f"or important sector under NIS2 Annex I or II / BSIG, and no KRITIS designation set."
+                f"NIS2 ist nicht anwendbar: Die Branche '{profile.industry}' zählt nicht zu "
+                f"den kritischen oder wichtigen Sektoren nach NIS2 Anlage 1 oder 2 / BSIG, und "
+                f"es liegt keine KRITIS-Einstufung vor."
             ),
         )
 
@@ -666,41 +681,44 @@ def check_nis2(profile: CompanyProfile) -> NIS2Result:
 
     if is_particularly_important:
         kritis_note = (
-            " Company is a designated KRITIS operator — besonders wichtige Einrichtung "
-            "regardless of size thresholds."
+            " Das Unternehmen ist als KRITIS-Betreiber eingestuft - unabhängig von "
+            "Größenschwellen eine besonders wichtige Einrichtung."
             if profile.is_critical_infrastructure_sector and not is_large
             else ""
         )
         revenue_caveat = (
-            " Note: revenue alone may not be sufficient for all sectors — "
-            "some require balance sheet confirmation (sector-dependent per BSIG)."
+            " Hinweis: Der Umsatz allein ist nicht für alle Sektoren ausschlaggebend - je "
+            "nach Sektor ist nach BSIG zusätzlich die Bilanzsumme zu prüfen."
             if profile.annual_revenue_eur is not None and not (profile.employee_count >= 250)
             else ""
         )
         return NIS2Result(
             applies=True, particularly_important=True, important=False,
             reason=(
-                f"NIS2 (BSIG) applies as besonders wichtige Einrichtung: "
-                f"{profile.employee_count} employees in critical/important sector.{kritis_note} "
-                f"Full BSIG obligations apply (§28(6) BSIG / Art. 3(1) NIS2).{revenue_caveat}"
+                f"NIS2 (BSIG) ist anwendbar als besonders wichtige Einrichtung: "
+                f"{profile.employee_count} Mitarbeitende in einem kritischen/wichtigen "
+                f"Sektor.{kritis_note} Es gelten die vollen BSIG-Pflichten (§28 Abs. 6 BSIG / "
+                f"Art. 3 Abs. 1 NIS2).{revenue_caveat}"
             ),
         )
     if is_important_entity:
-        annex = "Annex I" if in_annex_i else "Annex II"
+        annex = "Anlage 1" if in_annex_i else "Anlage 2"
         return NIS2Result(
             applies=True, particularly_important=False, important=True,
             reason=(
-                f"NIS2 (BSIG) applies as wichtige Einrichtung: "
-                f"{profile.employee_count} employees in {annex} sector '{profile.industry}'. "
-                f"Security and incident reporting obligations apply (§28(7) BSIG / Art. 3(2) NIS2)."
+                f"NIS2 (BSIG) ist anwendbar als wichtige Einrichtung: "
+                f"{profile.employee_count} Mitarbeitende im Sektor '{profile.industry}' "
+                f"({annex}). Es gelten Sicherheits- und Meldepflichten (§28 Abs. 7 BSIG / "
+                f"Art. 3 Abs. 2 NIS2)."
             ),
         )
 
     return NIS2Result(
         applies=False, particularly_important=False, important=False,
         reason=(
-            "NIS2 does not apply: below size thresholds (< 50 employees, < 10M revenue) "
-            "for the identified sector (NIS2 Art. 2(2)). Small enterprises generally exempt."
+            "NIS2 ist nicht anwendbar: Das Unternehmen liegt unter den Größenschwellen "
+            "(< 50 Mitarbeitende, < 10 Mio. EUR Umsatz) für den identifizierten Sektor "
+            "(Art. 2 Abs. 2 NIS2). Kleinstunternehmen sind in der Regel ausgenommen."
         ),
     )
 
@@ -761,51 +779,55 @@ def check_ai_act(profile: CompanyProfile) -> AIActResult:
             applies=False,
             high_risk_obligations_active=high_risk_obligations_active,
             gpai_rules_active=gpai_rules_active,
-            reason="EU AI Act does not apply: company does not develop or deploy AI systems.",
+            reason="Der EU AI Act ist nicht anwendbar: Das Unternehmen entwickelt oder nutzt keine KI-Systeme.",
         )
 
     is_high_risk = profile.ai_systems_are_high_risk
 
     if is_high_risk:
         risk_note = (
-            "AI systems are classified as high-risk (Annex III): full provider/deployer "
-            "obligations apply including risk management (Art. 9), technical documentation "
-            "(Art. 11), human oversight (Art. 14), and quality management system (Art. 17). "
-            "Fundamental rights impact assessment required for deployers in public/HR contexts (Art. 26(9))."
+            "Die KI-Systeme sind als Hochrisiko-Systeme eingestuft (Anhang III): Es gelten die "
+            "vollständigen Anbieter-/Betreiberpflichten, u. a. Risikomanagement (Art. 9), "
+            "technische Dokumentation (Art. 11), menschliche Aufsicht (Art. 14) und "
+            "Qualitätsmanagementsystem (Art. 17). Für Betreiber im öffentlichen Bereich oder "
+            "im HR-Kontext ist eine Grundrechte-Folgenabschätzung erforderlich (Art. 26 Abs. 9)."
         )
     elif is_high_risk is False:
         risk_note = (
-            "AI systems are not classified as high-risk: transparency obligations apply "
-            "where AI interacts with people (Art. 50). Verify classification against "
-            "Annex III — employment decisions, creditworthiness, and safety components "
-            "are always high-risk regardless of perceived impact."
+            "Die KI-Systeme sind nicht als Hochrisiko-Systeme eingestuft: Es gelten "
+            "Transparenzpflichten, sofern die KI mit Menschen interagiert (Art. 50). Bitte die "
+            "Einstufung anhand von Anhang III prüfen - Personalentscheidungen, "
+            "Kreditwürdigkeitsprüfungen und sicherheitsrelevante Komponenten gelten unabhängig "
+            "von der wahrgenommenen Auswirkung stets als Hochrisiko."
         )
     else:
         risk_note = (
-            "High-risk classification not confirmed. Verify against Annex III EU AI Act: "
-            "AI used in employment/HR decisions, creditworthiness, education, law enforcement, "
-            "or safety-critical systems is high-risk regardless of company size. "
-            "Transparency obligations (Art. 50) apply in all cases where AI interacts with people."
+            "Die Hochrisiko-Einstufung ist nicht bestätigt. Bitte anhand von Anhang III des EU "
+            "AI Act prüfen: KI in Personal-/HR-Entscheidungen, Kreditwürdigkeitsprüfungen, "
+            "Bildung, Strafverfolgung oder sicherheitskritischen Systemen gilt unabhängig von "
+            "der Unternehmensgröße als Hochrisiko. Transparenzpflichten (Art. 50) gelten in "
+            "allen Fällen, in denen KI mit Menschen interagiert."
         )
 
-    active_now = ["Art. 5 prohibited AI practices (since 2 Feb 2025)"]
+    active_now = ["verbotene KI-Praktiken nach Art. 5 (seit 2. Februar 2025)"]
     if gpai_rules_active:
-        active_now.append("GPAI rules Arts. 51-56 (since 2 Aug 2025)")
+        active_now.append("GPAI-Regeln Art. 51-56 (seit 2. August 2025)")
 
     coming = []
     if not gpai_rules_active:
-        coming.append("GPAI rules Arts. 51-56 (2 Aug 2025)")
+        coming.append("GPAI-Regeln Art. 51-56 (2. August 2025)")
     if not high_risk_obligations_active:
         coming.append(
-            "high-risk Annex I + III system obligations Arts. 9-17 — current law: 2 Aug 2026; "
-            "NOTE: Digital Omnibus proposal (pending formal adoption) may delay Annex III to 2 Dec 2027. "
-            "Treat as uncertain until published in the EU Official Journal."
+            "Pflichten für Hochrisiko-Systeme nach Anhang I und III, Art. 9-17 - aktuell "
+            "geltendes Recht: 2. August 2026; HINWEIS: Der Digital-Omnibus-Vorschlag (noch "
+            "nicht formell verabschiedet) könnte Anhang III auf den 2. Dezember 2027 "
+            "verschieben. Bis zur Veröffentlichung im EU-Amtsblatt als unsicher zu betrachten."
         )
-    coming.append("high-risk legacy Annex III obligations for systems already on market before Aug 2026 (2 Aug 2027)")
+    coming.append("Pflichten für bereits vor August 2026 in Verkehr gebrachte Hochrisiko-Bestandssysteme nach Anhang III (2. August 2027)")
 
     timeline = (
-        f"Active now: {'; '.join(active_now)}. "
-        f"Coming: {'; '.join(coming)}."
+        f"Aktuell in Kraft: {'; '.join(active_now)}. "
+        f"Demnächst: {'; '.join(coming)}."
     )
 
     return AIActResult(
@@ -813,8 +835,8 @@ def check_ai_act(profile: CompanyProfile) -> AIActResult:
         high_risk_obligations_active=high_risk_obligations_active,
         gpai_rules_active=gpai_rules_active,
         reason=(
-            f"EU AI Act applies: company develops or deploys AI systems (Art. 2). "
-            f"{risk_note} {timeline}"
+            f"Der EU AI Act ist anwendbar: Das Unternehmen entwickelt oder nutzt KI-Systeme "
+            f"(Art. 2). {risk_note} {timeline}"
         ),
     )
 
@@ -837,11 +859,13 @@ def check_hinschg(profile: CompanyProfile) -> HinSchGResult:
     """
     applies = profile.employee_count >= 50
     reason = (
-        f"HinSchG applies: {profile.employee_count} employees >= 50 — "
-        f"internal whistleblower reporting channel mandatory (§12(2) HinSchG). "
-        f"Deadline: December 2023 (50-249 employees) or July 2023 (250+ employees)."
+        f"Das HinSchG ist anwendbar: {profile.employee_count} Mitarbeitende erreichen den "
+        f"Schwellenwert von 50 - eine interne Meldestelle ist verpflichtend einzurichten "
+        f"(§12 Abs. 2 HinSchG). Frist: Dezember 2023 (50-249 Mitarbeitende) bzw. Juli 2023 "
+        f"(ab 250 Mitarbeitenden)."
         if applies
-        else f"HinSchG does not apply: {profile.employee_count} employees < 50 threshold (§12(2) HinSchG)."
+        else f"Das HinSchG ist nicht anwendbar: {profile.employee_count} Mitarbeitende liegen "
+             f"unter dem Schwellenwert von 50 (§12 Abs. 2 HinSchG)."
     )
     return HinSchGResult(applies=applies, reason=reason)
 
@@ -868,12 +892,12 @@ def check_arbschg(profile: CompanyProfile) -> ArbSchGResult:
     """
     applies = profile.employee_count >= 1
     reason = (
-        f"ArbSchG applies to all employers: {profile.employee_count} employees "
-        f"(ArbSchG §1(2) — 'gilt für alle Arbeitgeber in Deutschland, unabhängig "
-        f"von der Anzahl der Beschäftigten'). "
-        f"Risk assessment (§5), documentation (§6), and employee instruction (§12) are mandatory."
+        f"Das ArbSchG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeitende "
+        f"(§1 Abs. 2 ArbSchG - 'gilt für alle Arbeitgeber in Deutschland, unabhängig "
+        f"von der Anzahl der Beschäftigten'). Gefährdungsbeurteilung (§5), deren "
+        f"Dokumentation (§6) und Unterweisung der Beschäftigten (§12) sind verpflichtend."
         if applies
-        else "ArbSchG does not apply: no employees reported."
+        else "Das ArbSchG ist nicht anwendbar: Es wurden keine Mitarbeitenden angegeben."
     )
     return ArbSchGResult(applies=applies, reason=reason)
 
@@ -902,12 +926,12 @@ def check_agg(profile: CompanyProfile) -> AGGResult:
     """
     applies = profile.employee_count >= 1
     reason = (
-        f"AGG applies to all employers: {profile.employee_count} employees. "
-        f"Employer must take active measures against discrimination on grounds of race, gender, "
-        f"religion, disability, age, and sexual identity (§12 AGG). "
-        f"Complaints procedure required (§13 AGG)."
+        f"Das AGG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeitende. Der "
+        f"Arbeitgeber muss aktive Maßnahmen gegen Diskriminierung aufgrund von Rasse, "
+        f"Geschlecht, Religion, Behinderung, Alter und sexueller Identität ergreifen "
+        f"(§12 AGG). Ein Beschwerdeverfahren ist einzurichten (§13 AGG)."
         if applies
-        else "AGG does not apply: no employees reported."
+        else "Das AGG ist nicht anwendbar: Es wurden keine Mitarbeitenden angegeben."
     )
     return AGGResult(applies=applies, reason=reason)
 
@@ -940,11 +964,13 @@ def check_milog(profile: CompanyProfile) -> MiLoGResult:
     """
     applies = profile.employee_count >= 1
     reason = (
-        f"MiLoG applies to all employers: {profile.employee_count} employees. "
-        f"Current statutory minimum wage is EUR 13.90/hour (§1 MiLoG, effective 1 January 2026; rises to EUR 14.60/hour from 1 January 2027). "
-        f"Working time records required for employees earning < EUR 2,000/month (§17 MiLoG)."
+        f"Das MiLoG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeitende. Der "
+        f"gesetzliche Mindestlohn beträgt derzeit 13,90 EUR/Stunde (§1 MiLoG, gültig ab "
+        f"1. Januar 2026; steigt ab 1. Januar 2027 auf 14,60 EUR/Stunde). Für Mitarbeitende "
+        f"mit einem Verdienst unter 2.000 EUR/Monat ist eine Arbeitszeiterfassung "
+        f"erforderlich (§17 MiLoG)."
         if applies
-        else "MiLoG does not apply: no employees reported."
+        else "Das MiLoG ist nicht anwendbar: Es wurden keine Mitarbeitenden angegeben."
     )
     return MiLoGResult(applies=applies, reason=reason)
 
@@ -967,19 +993,20 @@ def check_ttdsg(profile: CompanyProfile) -> TTDSGResult:
     applies = profile.has_website and profile.processes_personal_data
     if not applies:
         if not profile.has_website:
-            reason = "TTDSG does not apply: company has no public-facing website or app."
+            reason = "Das TTDSG ist nicht anwendbar: Das Unternehmen betreibt keine öffentlich zugängliche Website oder App."
         else:
-            reason = "TTDSG does not apply: company does not process personal data online."
+            reason = "Das TTDSG ist nicht anwendbar: Das Unternehmen verarbeitet online keine personenbezogenen Daten."
         return TTDSGResult(applies=False, reason=reason)
 
     return TTDSGResult(
         applies=True,
         reason=(
-            "TTDSG (§25 TDDDG) applies: company operates a website or app and processes "
-            "personal data of users in Germany. Prior informed consent is required before "
-            "setting any non-essential cookies, tracking pixels, analytics scripts, or "
-            "fingerprinting technologies on users' devices. No size threshold applies — "
-            "all website operators are bound regardless of company size."
+            "Das TTDSG (§25 TDDDG) ist anwendbar: Das Unternehmen betreibt eine Website oder "
+            "App und verarbeitet personenbezogene Daten von Nutzern in Deutschland. Vor dem "
+            "Setzen nicht-essenzieller Cookies, Tracking-Pixel, Analyse-Skripte oder "
+            "Fingerprinting-Technologien auf Endgeräten der Nutzer ist eine vorherige "
+            "informierte Einwilligung erforderlich. Es gilt kein Größenschwellenwert - alle "
+            "Website-Betreiber sind unabhängig von der Unternehmensgröße gebunden."
         ),
     )
 
@@ -1038,26 +1065,29 @@ def check_gwg(profile: CompanyProfile) -> GwGResult:
         return GwGResult(
             applies=False,
             reason=(
-                f"GwG does not apply: industry '{profile.industry}' is not in an AML-obligated "
-                f"sector under §2 GwG. If the company provides financial services, crypto, "
-                f"real estate brokerage, legal/notarial services, or gambling operations, "
-                f"set is_aml_obligated_sector=true to trigger a GwG assessment."
+                f"Das GwG ist nicht anwendbar: Die Branche '{profile.industry}' zählt nicht zu "
+                f"den geldwäscherechtlich verpflichteten Sektoren nach §2 GwG. Bietet das "
+                f"Unternehmen Finanzdienstleistungen, Krypto-Dienstleistungen, "
+                f"Immobilienmaklertätigkeiten, Rechts-/Notardienstleistungen oder Glücksspiel "
+                f"an, markieren Sie es im Profil als geldwäscherechtlich verpflichteten "
+                f"Sektor, um eine GwG-Prüfung auszulösen."
             ),
         )
 
     trigger = (
-        f"industry '{profile.industry}' is a GwG-obligated sector (§2 GwG)"
+        f"die Branche '{profile.industry}' zählt zu den GwG-verpflichteten Sektoren (§2 GwG)"
         if in_obligated_industry
-        else "company self-declared as AML-obligated sector (is_aml_obligated_sector=true)"
+        else "das Unternehmen wurde im Profil als geldwäscherechtlich verpflichteter Sektor angegeben"
     )
     return GwGResult(
         applies=True,
         reason=(
-            f"GwG applies: {trigger}. Obligated entities must implement: risk analysis (§5 GwG), "
-            f"internal AML safeguards (§6 GwG), customer due diligence / KYC procedures (§10 GwG), "
-            f"beneficial owner identification (§11 GwG), transaction monitoring, and suspicious "
-            f"transaction reporting to the FIU (§43 GwG). An AML compliance officer "
-            f"(Geldwäschebeauftragter) is mandatory for regulated financial institutions (§7 GwG)."
+            f"Das GwG ist anwendbar: {trigger}. Verpflichtete müssen umsetzen: Risikoanalyse "
+            f"(§5 GwG), interne Sicherungsmaßnahmen (§6 GwG), Kundensorgfaltspflichten / "
+            f"KYC-Verfahren (§10 GwG), Identifizierung wirtschaftlich Berechtigter (§11 GwG), "
+            f"Transaktionsüberwachung sowie Verdachtsmeldungen an die Zentralstelle für "
+            f"Finanztransaktionsuntersuchungen (§43 GwG). Für regulierte Finanzinstitute ist "
+            f"ein Geldwäschebeauftragter verpflichtend zu bestellen (§7 GwG)."
         ),
     )
 
@@ -1095,30 +1125,32 @@ def check_eu_data_act(profile: CompanyProfile) -> EUDataActResult:
         return EUDataActResult(
             applies=False,
             reason=(
-                "EU Data Act does not apply: company does not manufacture connected (IoT) "
-                "products and does not provide cloud or data processing services. "
-                "If either applies, set produces_connected_products=true or "
-                "provides_data_processing_services=true."
+                "Der EU Data Act ist nicht anwendbar: Das Unternehmen stellt keine vernetzten "
+                "(IoT-)Produkte her und bietet keine Cloud- oder Datenverarbeitungsdienste an. "
+                "Sollte eines davon zutreffen, geben Sie dies bitte im Unternehmensprofil an, "
+                "um eine Prüfung nach dem EU Data Act auszulösen."
             ),
         )
 
     obligations = []
     if profile.produces_connected_products:
         obligations.append(
-            "connected product manufacturer: design-for-access obligation (Art. 3), "
-            "user data access on request (Art. 4), third-party sharing on user instruction (Art. 5)"
+            "Hersteller vernetzter Produkte: Pflicht zur datenzugangsfreundlichen Gestaltung "
+            "(Art. 3), Datenzugriff der Nutzer auf Anfrage (Art. 4), Weitergabe an Dritte auf "
+            "Anweisung der Nutzer (Art. 5)"
         )
     if profile.provides_data_processing_services:
         obligations.append(
-            "data processing service provider: cloud switching obligations (Art. 23-25), "
-            "30-day maximum switching period, elimination of switching barriers by Sept 2027"
+            "Anbieter von Datenverarbeitungsdiensten: Pflichten zum Anbieterwechsel "
+            "(Art. 23-25), maximale Wechselfrist von 30 Werktagen, Abschaffung von "
+            "Wechselhindernissen bis September 2027"
         )
 
     return EUDataActResult(
         applies=True,
         reason=(
-            f"EU Data Act (Regulation (EU) 2023/2854) applies — applicable since 12 September 2025. "
-            f"Obligations: {'; '.join(obligations)}."
+            f"Der EU Data Act (Verordnung (EU) 2023/2854) ist anwendbar - gültig seit "
+            f"12. September 2025. Pflichten: {'; '.join(obligations)}."
         ),
     )
 
@@ -1152,87 +1184,87 @@ def determine_applicable_regulations(
             regulation=Regulation.GDPR,
             applies=gdpr.applies,
             reason=gdpr.reason,
-            key_threshold="Processes personal data (Art. 2 GDPR)",
+            key_threshold="Verarbeitet personenbezogene Daten (Art. 2 DSGVO)",
         ),
         RegulationApplicability(
             regulation=Regulation.LKSG,
             applies=lksg.applies,
             reason=lksg.reason,
-            key_threshold=">= 1,000 employees (§1(1) LkSG)",
+            key_threshold=">= 1.000 Mitarbeitende (§1 Abs. 1 LkSG)",
         ),
         RegulationApplicability(
             regulation=Regulation.ENEFG,
             applies=enefg.applies,
             reason=enefg.reason,
-            key_threshold="EnEfG §8 / EDL-G §8: non-SME (>=250 employees OR >50M revenue OR >43M balance sheet)",
+            key_threshold="§8 EnEfG / §8 EDL-G: kein KMU (>=250 Mitarbeitende ODER >50 Mio. EUR Umsatz ODER >43 Mio. EUR Bilanzsumme)",
         ),
         RegulationApplicability(
             regulation=Regulation.CSRD,
             applies=csrd.applies,
             reason=csrd.reason,
             key_threshold=(
-                "2 of 3: >250 employees, >50M revenue, >25M balance sheet"
-                + (f" — Wave {csrd.wave}, first FY {csrd.first_reporting_fy}" if csrd.wave else "")
+                "2 von 3: >250 Mitarbeitende, >50 Mio. EUR Umsatz, >25 Mio. EUR Bilanzsumme"
+                + (f" - Welle {csrd.wave}, erstes Geschäftsjahr {csrd.first_reporting_fy}" if csrd.wave else "")
             ),
         ),
         RegulationApplicability(
             regulation=Regulation.BDSG,
             applies=bdsg.applies,
             reason=bdsg.reason,
-            key_threshold="German company processing personal data (BDSG §1)",
+            key_threshold="Deutsches Unternehmen verarbeitet personenbezogene Daten (§1 BDSG)",
         ),
         RegulationApplicability(
             regulation=Regulation.NIS2,
             applies=nis2.applies,
             reason=nis2.reason,
-            key_threshold=">=50 employees in critical/important sector (Art. 3 NIS2)",
+            key_threshold=">=50 Mitarbeitende in kritischem/wichtigem Sektor (Art. 3 NIS2)",
         ),
         RegulationApplicability(
             regulation=Regulation.AI_ACT,
             applies=ai_act.applies,
             reason=ai_act.reason,
-            key_threshold="Develops or deploys AI systems (Art. 2 EU AI Act)",
+            key_threshold="Entwickelt oder nutzt KI-Systeme (Art. 2 EU AI Act)",
         ),
         RegulationApplicability(
             regulation=Regulation.HINSCHG,
             applies=hinschg.applies,
             reason=hinschg.reason,
-            key_threshold=">=50 employees (§12(2) HinSchG)",
+            key_threshold=">=50 Mitarbeitende (§12 Abs. 2 HinSchG)",
         ),
         RegulationApplicability(
             regulation=Regulation.ARBSCHG,
             applies=arbschg.applies,
             reason=arbschg.reason,
-            key_threshold="All employers (§3 ArbSchG)",
+            key_threshold="Alle Arbeitgeber (§3 ArbSchG)",
         ),
         RegulationApplicability(
             regulation=Regulation.AGG,
             applies=agg.applies,
             reason=agg.reason,
-            key_threshold="All employers (§6(2) AGG)",
+            key_threshold="Alle Arbeitgeber (§6 Abs. 2 AGG)",
         ),
         RegulationApplicability(
             regulation=Regulation.MILOG,
             applies=milog.applies,
             reason=milog.reason,
-            key_threshold="All employers, EUR 13.90/hour minimum (§1 MiLoG, effective Jan 2026)",
+            key_threshold="Alle Arbeitgeber, Mindestlohn 13,90 EUR/Stunde (§1 MiLoG, gültig ab Januar 2026)",
         ),
         RegulationApplicability(
             regulation=Regulation.TTDSG,
             applies=ttdsg.applies,
             reason=ttdsg.reason,
-            key_threshold="Website/app operator processing personal data of users in Germany (§25 TTDSG)",
+            key_threshold="Website-/App-Betreiber verarbeitet personenbezogene Daten von Nutzern in Deutschland (§25 TTDSG)",
         ),
         RegulationApplicability(
             regulation=Regulation.GWG,
             applies=gwg.applies,
             reason=gwg.reason,
-            key_threshold="AML-obligated sector under §2 GwG (finance, crypto, real estate, legal, gambling)",
+            key_threshold="Geldwäscherechtlich verpflichteter Sektor nach §2 GwG (Finanzen, Krypto, Immobilien, Recht, Glücksspiel)",
         ),
         RegulationApplicability(
             regulation=Regulation.EU_DATA_ACT,
             applies=eu_data_act.applies,
             reason=eu_data_act.reason,
-            key_threshold="Connected product manufacturer or data processing service provider (Art. 2 EU Data Act)",
+            key_threshold="Hersteller vernetzter Produkte oder Anbieter von Datenverarbeitungsdiensten (Art. 2 EU Data Act)",
         ),
     ]
