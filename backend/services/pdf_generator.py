@@ -198,9 +198,16 @@ def _clean_warning(w: str) -> tuple[str, str]:
     # Remove internal field-name references (snake_case like has_cookie_banner, transfers_data_outside_eea)
     w = re.sub(r"'[a-z][a-z0-9]*(?:_[a-z0-9]+)+(?::\s*[^\s']+)?'", "", w)  # 'field_name' or 'field_name: value'
     w = re.sub(r"\b[a-z][a-z0-9]*(?:_[a-z0-9]+){2,}\b", "", w)              # bare snake_case
-    # Clean up orphaned connectors left after removal (e.g. "und  sind", "' und '")
+    # Clean up orphaned connectors/commas left after removal (e.g. "und  sind", "' und '", ", sind")
     w = re.sub(r"'\s*'", "", w)
-    w = re.sub(r"\b(und|oder|sowie)\s+(und|oder|sowie|sind|ist|fehlt|nicht)\b", r"\2", w)
+    w = re.sub(r"\s*,\s*(?=(?:und|oder|sowie|sind|ist|fehlt|nicht)\b)", " ", w)
+    w = re.sub(r",\s*,", ",", w)
+    # Loop to collapse chains of 2+ connectors (single-pass re.sub only merges adjacent pairs,
+    # leaving e.g. "und oder sowie sind" -> "oder sind" with one orphan behind)
+    prev = None
+    while prev != w:
+        prev = w
+        w = re.sub(r"\b(und|oder|sowie)\s+(und|oder|sowie|sind|ist|fehlt|nicht)\b", r"\2", w)
     w = re.sub(r"\s*(und|oder)\s*$", "", w)
     w = re.sub(r"  +", " ", w).strip(" -:'\"")
     return cat, w
@@ -233,7 +240,7 @@ def _body_close() -> str:
 
 def _sec_title(num: str, title: str) -> str:
     return (
-        f'<div style="margin-bottom:5mm;">'
+        f'<div style="margin-bottom:4mm;">'
         f'<div style="{FONT}font-size:6pt;font-weight:700;letter-spacing:2.5pt;'
         f'text-transform:uppercase;color:{BLUE};margin-bottom:2mm;">{_esc(num)}</div>'
         f'<div style="{FONT}font-size:18pt;font-weight:800;color:{NAVY};'
@@ -246,7 +253,7 @@ def _sec_title(num: str, title: str) -> str:
 def _sec_sub(text: str) -> str:
     return (
         f'<p style="{FONT}font-size:9pt;color:{MUTED};line-height:1.65;'
-        f'margin-bottom:6mm;max-width:170mm;">{_esc(text)}</p>'
+        f'margin-bottom:4mm;max-width:170mm;">{_esc(text)}</p>'
     )
 
 
@@ -351,10 +358,10 @@ def _cover(report: ComplianceReport, logo: str) -> str:
             f'border:1pt solid rgba(251,146,60,0.28);border-radius:5pt;">'
             f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;'
             f'letter-spacing:1pt;color:#fb923c;margin-bottom:1.5mm;">'
-            f'Niedrige Datenvollstandigkeit - {report.profile_completeness["score_percent"]:.0f}%</div>'
+            f'Niedrige Datenvollständigkeit - {report.profile_completeness["score_percent"]:.0f}%</div>'
             f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.55;">'
-            f'{report.profile_completeness["unanswered_count"]} compliance-relevante Felder nicht ausgefullt. '
-            f'Einige Befunde konnen auf Annahmen basieren. Profil vervollstandigen und erneut ausfuhren.'
+            f'{report.profile_completeness["unanswered_count"]} compliance-relevante Felder nicht ausgefüllt. '
+            f'Einige Befunde können auf Annahmen basieren. Profil vervollständigen und erneut ausführen.'
             f'</div></div>'
             if low_completeness else ""
         )
@@ -363,10 +370,10 @@ def _cover(report: ComplianceReport, logo: str) -> str:
         f'background:rgba(245,158,11,0.06);border:1pt solid rgba(245,158,11,0.22);border-radius:5pt;">'
         f'<div style="{FONT}font-size:6pt;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:1pt;color:#f59e0b;margin-bottom:1.5mm;">'
-        f'Vorlaufiges Screening - Keine Rechtsberatung</div>'
+        f'Vorläufiges Screening - Keine Rechtsberatung</div>'
         f'<div style="{FONT}font-size:6.5pt;color:#94a3b8;line-height:1.55;">'
         f'Dieser Bericht ist ein vorläufiges KI-gestütztes Compliance-Screening. '
-        f'Er stellt keine Rechtsberatung dar und ersetzt keine qualifizierte rechtliche Prufung.'
+        f'Er stellt keine Rechtsberatung dar und ersetzt keine qualifizierte rechtliche Prüfung.'
         f'</div></div>'
 
         f'</div></div>'
@@ -428,14 +435,14 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
             badge_text = "Nein"
         rows += (
             f'<tr style="background:{bg};">'
-            f'<td style="{FONT}padding:6pt 9pt;font-weight:600;font-size:8.5pt;'
+            f'<td style="{FONT}padding:5pt 9pt;font-weight:600;font-size:8.5pt;'
             f'width:24%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;color:{NAVY};">'
             f'{_esc(_reg_label(r.regulation.value))}</td>'
-            f'<td style="padding:6pt 9pt;text-align:center;width:13%;border-bottom:1pt solid #f1f5f9;">'
+            f'<td style="padding:5pt 9pt;text-align:center;width:13%;border-bottom:1pt solid #f1f5f9;">'
             f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;'
             f'padding:2pt 10pt;border-radius:20pt;white-space:nowrap;{badge}">{badge_text}</span></td>'
-            f'<td style="{FONT}padding:6pt 9pt;font-size:8.5pt;color:#334155;'
-            f'line-height:1.55;width:63%;border-bottom:1pt solid #f1f5f9;">'
+            f'<td style="{FONT}padding:5pt 9pt;font-size:8.5pt;color:#334155;'
+            f'line-height:1.45;width:63%;border-bottom:1pt solid #f1f5f9;">'
             f'{_esc(_clean(r.reason))}</td>'
             f'</tr>'
         )
@@ -855,12 +862,12 @@ def _kb_versions_table(report: ComplianceReport) -> str:
 def _closing(report: ComplianceReport, logo: str) -> str:
     steps = [
         ("01", "Beginnen Sie mit Maßnahmen der Priorität <b>Kritisch</b> und <b>Hoch</b>. "
-               "Das sind Ihre aktuellen rechtlichen Risiken mit dem grossten Handlungsbedarf."),
-        ("02", "Weisen Sie jeder Massnahme eine verantwortliche Person und eine konkrete Frist zu. "
+               "Das sind Ihre aktuellen rechtlichen Risiken mit dem größten Handlungsbedarf."),
+        ("02", "Weisen Sie jeder Maßnahme eine verantwortliche Person und eine konkrete Frist zu. "
                "Ohne klare Verantwortlichkeit werden Maßnahmen nicht umgesetzt."),
-        ("03", "Dokumentieren Sie alles schriftlich. Behoerden werden bei einer Prufung Nachweise verlangen - "
-               "Protokolle, Richtlinien, Schulungsnachweise und Vertrage."),
-        ("04", "Fuhren Sie das Screening nach der Umsetzung erneut durch. "
+        ("03", "Dokumentieren Sie alles schriftlich. Behörden werden bei einer Prüfung Nachweise verlangen - "
+               "Protokolle, Richtlinien, Schulungsnachweise und Verträge."),
+        ("04", "Führen Sie das Screening nach der Umsetzung erneut durch. "
                "Ihr Compliance-Score wird sich verbessern und Sie sehen, was noch fehlt."),
         ("05", "Bei Unsicherheiten konsultieren Sie vor Entscheidungen einen zugelassenen deutschen Rechtsanwalt - "
                "insbesondere bei DSGVO, NIS2, LkSG und CSRD."),
@@ -911,10 +918,10 @@ def _closing(report: ComplianceReport, logo: str) -> str:
 
     return (
         f'<div style="page-break-before:always;">'
-        f'{_section_header(report.company_name, "Nachste Schritte - Abschnitt 06")}'
+        f'{_section_header(report.company_name, "Nächste Schritte - Abschnitt 06")}'
         f'{_body_open()}'
-        f'{_sec_title("Abschnitt 06", "Nachste Schritte")}'
-        f'{_sec_sub("Sie kennen jetzt Ihren Compliance-Stand. Das sind die empfohlenen nachsten Schritte.")}'
+        f'{_sec_title("Abschnitt 06", "Nächste Schritte")}'
+        f'{_sec_sub("Sie kennen jetzt Ihren Compliance-Stand. Das sind die empfohlenen nächsten Schritte.")}'
         f'<div style="margin-top:2mm;">{items}</div>'
         f'{input_block}'
         f'{_kb_versions_table(report)}'
