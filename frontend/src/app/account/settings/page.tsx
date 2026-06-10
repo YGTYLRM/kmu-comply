@@ -45,6 +45,7 @@ export default function AccountSettingsPage() {
   const router = useRouter();
 
   // Profile state
+  const [email, setEmail]             = useState("");
   const [currentName, setCurrentName] = useState("");
   const [name, setName]               = useState("");
   const [nameLoading, setNameLoading] = useState(false);
@@ -66,7 +67,8 @@ export default function AccountSettingsPage() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      const n = user?.user_metadata?.name ?? user?.email ?? "";
+      setEmail(user?.email ?? "");
+      const n = user?.user_metadata?.name ?? "";
       setCurrentName(n);
       setName(n);
     });
@@ -146,8 +148,19 @@ export default function AccountSettingsPage() {
 
         {/* Name */}
         <Section>
-          <SectionHeader icon={<User className="h-4 w-4 text-brand-400" />} title="Anzeigename" sub="Wird in Berichten verwendet" />
+          <SectionHeader icon={<User className="h-4 w-4 text-brand-400" />} title="Profil" sub="Ihre Kontodaten" />
+          <div className="flex flex-col gap-1.5 mb-4">
+            <label className="text-xs text-slate-500">E-Mail-Adresse</label>
+            <input
+              type="email"
+              value={email}
+              readOnly
+              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-sm text-slate-400 outline-none cursor-default select-all"
+            />
+            <p className="text-xs text-slate-600">Ihre Anmelde-E-Mail-Adresse kann nicht geändert werden.</p>
+          </div>
           <form onSubmit={handleSaveName} className="flex flex-col gap-3">
+            <label className="text-xs text-slate-500 -mb-1">Anzeigename</label>
             <input
               type="text"
               value={name}

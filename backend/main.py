@@ -106,23 +106,15 @@ async def _document_purge_loop():
 async def lifespan(app: FastAPI):
     _check_production_config()
     _cleanup_orphaned_chroma_collections()
-    if settings.database_url:
-        from db.database import init_db
-        await init_db()
-    from services.pdf_generator import init_browser, close_browser
     from services.document_store import document_store
     document_store.recover_sessions()
-    loop = asyncio.get_running_loop()
-    await loop.run_in_executor(None, init_browser)
-    # Pre-load the cross-encoder reranker so the first user request isn't slow
-    from rag.retrieval import _cross_encoder
-    await loop.run_in_executor(None, _cross_encoder)
     await job_manager.start()
     purge_task = asyncio.create_task(_document_purge_loop())
     yield
     purge_task.cancel()
     await job_manager.stop()
-    await loop.run_in_executor(None, close_browser)
+    from services.pdf_generator import close_browser
+    close_browser()
 
 
 app = FastAPI(
