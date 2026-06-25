@@ -11,108 +11,27 @@ from models.compliance_report import ComplianceReport
 logger = logging.getLogger(__name__)
 
 
-async def upsert_company(user_id: str, profile: CompanyProfile) -> str:
+async def upsert_company(user_id: str, profile: CompanyProfile, db=None) -> str:
     """
     Create or update a Company record for this user.
     Matches on (user_id, company_name) — re-analyses of the same company
     update the existing record rather than creating a duplicate.
     Returns the company_id.
+
+    If `db` is passed in, it's used as-is and NOT committed here — the caller
+    owns the transaction (used by create_company_with_limit_check to make the
+    company-limit check and this upsert atomic).
     """
     from db.database import AsyncSessionLocal
-    from db.models import Company, Profile
-    from sqlalchemy import select
+
+    if db is not None:
+        company_id, _old_profile_raw = await _upsert_company_in_session(db, user_id, profile)
+        return company_id
 
     async with AsyncSessionLocal() as db:
-        # Ensure profile row exists
-        result = await db.execute(select(Profile).where(Profile.id == user_id))
-        if not result.scalar_one_or_none():
-            profile_row = Profile(id=user_id)
-            db.add(profile_row)
-            await db.flush()
-
-        # Find existing company for this user with the same name
-        result = await db.execute(
-            select(Company).where(
-                Company.user_id == user_id,
-                Company.name == profile.company_name,
-            )
-        )
-        company = result.scalar_one_or_none()
-
-        data = profile.model_dump()
-        fields = {
-            "name": data["company_name"],
-            "industry": data.get("industry"),
-            "country": data.get("country", "DE"),
-            "employee_count": data.get("employee_count"),
-            "annual_revenue_eur": data.get("annual_revenue_eur"),
-            "balance_sheet_total_eur": data.get("balance_sheet_total_eur"),
-            "processes_personal_data": data.get("processes_personal_data", False),
-            "processes_special_category_data": data.get("processes_special_category_data", False),
-            "processing_is_occasional": data.get("processing_is_occasional", False),
-            "has_dpo": data.get("has_dpo", False),
-            "has_processing_records": data.get("has_processing_records", False),
-            "has_supply_chain_abroad": data.get("has_supply_chain_abroad", False),
-            "supply_chain_countries": data.get("supply_chain_countries"),
-            "annual_energy_consumption_mwh": data.get("annual_energy_consumption_mwh"),
-            "has_energy_management_system": data.get("has_energy_management_system", False),
-            "has_conducted_energy_audit": data.get("has_conducted_energy_audit", False),
-            "is_listed_company": data.get("is_listed_company", False),
-            "has_sustainability_report": data.get("has_sustainability_report", False),
-            "is_critical_infrastructure_sector": data.get("is_critical_infrastructure_sector", False),
-            "uses_ai_systems": data.get("uses_ai_systems", False),
-            "has_privacy_policy": data.get("has_privacy_policy"),
-            "has_processor_agreements": data.get("has_processor_agreements"),
-            "has_data_breach_procedure": data.get("has_data_breach_procedure"),
-            "has_tom_documentation": data.get("has_tom_documentation"),
-            "has_data_retention_policy": data.get("has_data_retention_policy"),
-            "has_data_protection_training": data.get("has_data_protection_training"),
-            "transfers_data_outside_eea": data.get("transfers_data_outside_eea"),
-            "has_consent_management": data.get("has_consent_management"),
-            "has_information_security_policy": data.get("has_information_security_policy"),
-            "has_incident_response_plan": data.get("has_incident_response_plan"),
-            "has_business_continuity_plan": data.get("has_business_continuity_plan"),
-            "has_vulnerability_management": data.get("has_vulnerability_management"),
-            "has_mfa_implemented": data.get("has_mfa_implemented"),
-            "has_supply_chain_security_assessment": data.get("has_supply_chain_security_assessment"),
-            "has_security_awareness_training": data.get("has_security_awareness_training"),
-            "ai_systems_are_high_risk": data.get("ai_systems_are_high_risk"),
-            "has_ai_risk_assessment": data.get("has_ai_risk_assessment"),
-            "has_ai_usage_documentation": data.get("has_ai_usage_documentation"),
-            "has_human_oversight_procedure": data.get("has_human_oversight_procedure"),
-            "has_gefaehrdungsbeurteilung": data.get("has_gefaehrdungsbeurteilung"),
-            "has_gefaehrdungsbeurteilung_documented": data.get("has_gefaehrdungsbeurteilung_documented"),
-            "has_first_aid_measures": data.get("has_first_aid_measures"),
-            "has_employee_safety_training": data.get("has_employee_safety_training"),
-            "has_anti_discrimination_policy": data.get("has_anti_discrimination_policy"),
-            "has_agc_complaints_procedure": data.get("has_agc_complaints_procedure"),
-            "has_working_time_records": data.get("has_working_time_records"),
-            "uses_subcontractors": data.get("uses_subcontractors"),
-            "has_whistleblower_channel": data.get("has_whistleblower_channel"),
-            "has_whistleblower_policy": data.get("has_whistleblower_policy"),
-            "has_lksg_policy_statement": data.get("has_lksg_policy_statement"),
-            "has_supplier_code_of_conduct": data.get("has_supplier_code_of_conduct"),
-            "has_supplier_risk_assessment": data.get("has_supplier_risk_assessment"),
-            "has_lksg_complaints_procedure": data.get("has_lksg_complaints_procedure"),
-            "existing_compliance_notes": data.get("existing_compliance_notes"),
-            "profile_raw": data,   # full profile snapshot for re-assessment and template generation
-            "updated_at": datetime.now(timezone.utc),
-        }
-
-        old_profile_raw = company.profile_raw if company else None
-
-        if company:
-            for k, v in fields.items():
-                setattr(company, k, v)
-        else:
-            company = Company(user_id=user_id, **fields)
-            db.add(company)
-
+        company_id, old_profile_raw = await _upsert_company_in_session(db, user_id, profile)
         await db.commit()
-        await db.refresh(company)
-        company_id = company.id
 
-    # Threshold change detection — compare old vs new applicability (outside DB session)
     if old_profile_raw:
         try:
             await _notify_threshold_changes(user_id, company_id, old_profile_raw, profile)
@@ -120,6 +39,155 @@ async def upsert_company(user_id: str, profile: CompanyProfile) -> str:
             logger.warning("db_service: threshold change detection failed: %s", exc)
 
     return company_id
+
+
+async def create_company_with_limit_check(user_id: str, profile: CompanyProfile, limit: int) -> tuple[str | None, str | None]:
+    """
+    Atomically checks the user's company-count limit and upserts the company
+    in one transaction, serialized per-user via a Postgres advisory lock.
+
+    Closes a TOCTOU race: previously the limit check (SELECT count) and the
+    insert happened in separate transactions, so two concurrent requests could
+    both pass the check before either committed, exceeding the plan's limit.
+
+    Updates to an existing company (same user_id + company_name) never count
+    against the limit — only check the count when this would be a new row.
+
+    Returns (company_id, None) on success, or (None, error_message) if the
+    limit would be exceeded.
+    """
+    from db.database import AsyncSessionLocal
+    from db.models import Company
+    from sqlalchemy import select, func, text
+
+    async with AsyncSessionLocal() as db:
+        # Transaction-scoped advisory lock keyed per-user — serializes concurrent
+        # company-creation requests from the same user without blocking other users.
+        await db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": f"company_limit:{user_id}"})
+
+        existing = (await db.execute(
+            select(Company).where(Company.user_id == user_id, Company.name == profile.company_name)
+        )).scalar_one_or_none()
+
+        if existing is None:
+            count = (await db.execute(
+                select(func.count()).where(Company.user_id == user_id)
+            )).scalar_one() or 0
+            if count >= limit:
+                return None, (
+                    f"Your plan allows {limit} company profile{'s' if limit != 1 else ''}. "
+                    f"Upgrade to add more."
+                )
+
+        company_id, old_profile_raw = await _upsert_company_in_session(db, user_id, profile)
+        await db.commit()
+
+    if old_profile_raw:
+        try:
+            await _notify_threshold_changes(user_id, company_id, old_profile_raw, profile)
+        except Exception as exc:
+            logger.warning("db_service: threshold change detection failed: %s", exc)
+
+    return company_id, None
+
+
+async def _upsert_company_in_session(db, user_id: str, profile: CompanyProfile) -> tuple[str, dict | None]:
+    """
+    Does the insert/update + flush/refresh, but does NOT commit — the caller
+    (upsert_company or create_company_with_limit_check) owns the transaction.
+    Returns (company_id, old_profile_raw) — old_profile_raw is None for new companies.
+    """
+    from db.models import Company, Profile
+    from sqlalchemy import select
+
+    # Ensure profile row exists
+    result = await db.execute(select(Profile).where(Profile.id == user_id))
+    if not result.scalar_one_or_none():
+        profile_row = Profile(id=user_id)
+        db.add(profile_row)
+        await db.flush()
+
+    # Find existing company for this user with the same name
+    result = await db.execute(
+        select(Company).where(
+            Company.user_id == user_id,
+            Company.name == profile.company_name,
+        )
+    )
+    company = result.scalar_one_or_none()
+
+    data = profile.model_dump()
+    fields = {
+        "name": data["company_name"],
+        "industry": data.get("industry"),
+        "country": data.get("country", "DE"),
+        "employee_count": data.get("employee_count"),
+        "annual_revenue_eur": data.get("annual_revenue_eur"),
+        "balance_sheet_total_eur": data.get("balance_sheet_total_eur"),
+        "processes_personal_data": data.get("processes_personal_data", False),
+        "processes_special_category_data": data.get("processes_special_category_data", False),
+        "processing_is_occasional": data.get("processing_is_occasional", False),
+        "has_dpo": data.get("has_dpo", False),
+        "has_processing_records": data.get("has_processing_records", False),
+        "has_supply_chain_abroad": data.get("has_supply_chain_abroad", False),
+        "supply_chain_countries": data.get("supply_chain_countries"),
+        "annual_energy_consumption_mwh": data.get("annual_energy_consumption_mwh"),
+        "has_energy_management_system": data.get("has_energy_management_system", False),
+        "has_conducted_energy_audit": data.get("has_conducted_energy_audit", False),
+        "is_listed_company": data.get("is_listed_company", False),
+        "has_sustainability_report": data.get("has_sustainability_report", False),
+        "is_critical_infrastructure_sector": data.get("is_critical_infrastructure_sector", False),
+        "uses_ai_systems": data.get("uses_ai_systems", False),
+        "has_privacy_policy": data.get("has_privacy_policy"),
+        "has_processor_agreements": data.get("has_processor_agreements"),
+        "has_data_breach_procedure": data.get("has_data_breach_procedure"),
+        "has_tom_documentation": data.get("has_tom_documentation"),
+        "has_data_retention_policy": data.get("has_data_retention_policy"),
+        "has_data_protection_training": data.get("has_data_protection_training"),
+        "transfers_data_outside_eea": data.get("transfers_data_outside_eea"),
+        "has_consent_management": data.get("has_consent_management"),
+        "has_information_security_policy": data.get("has_information_security_policy"),
+        "has_incident_response_plan": data.get("has_incident_response_plan"),
+        "has_business_continuity_plan": data.get("has_business_continuity_plan"),
+        "has_vulnerability_management": data.get("has_vulnerability_management"),
+        "has_mfa_implemented": data.get("has_mfa_implemented"),
+        "has_supply_chain_security_assessment": data.get("has_supply_chain_security_assessment"),
+        "has_security_awareness_training": data.get("has_security_awareness_training"),
+        "ai_systems_are_high_risk": data.get("ai_systems_are_high_risk"),
+        "has_ai_risk_assessment": data.get("has_ai_risk_assessment"),
+        "has_ai_usage_documentation": data.get("has_ai_usage_documentation"),
+        "has_human_oversight_procedure": data.get("has_human_oversight_procedure"),
+        "has_gefaehrdungsbeurteilung": data.get("has_gefaehrdungsbeurteilung"),
+        "has_gefaehrdungsbeurteilung_documented": data.get("has_gefaehrdungsbeurteilung_documented"),
+        "has_first_aid_measures": data.get("has_first_aid_measures"),
+        "has_employee_safety_training": data.get("has_employee_safety_training"),
+        "has_anti_discrimination_policy": data.get("has_anti_discrimination_policy"),
+        "has_agc_complaints_procedure": data.get("has_agc_complaints_procedure"),
+        "has_working_time_records": data.get("has_working_time_records"),
+        "uses_subcontractors": data.get("uses_subcontractors"),
+        "has_whistleblower_channel": data.get("has_whistleblower_channel"),
+        "has_whistleblower_policy": data.get("has_whistleblower_policy"),
+        "has_lksg_policy_statement": data.get("has_lksg_policy_statement"),
+        "has_supplier_code_of_conduct": data.get("has_supplier_code_of_conduct"),
+        "has_supplier_risk_assessment": data.get("has_supplier_risk_assessment"),
+        "has_lksg_complaints_procedure": data.get("has_lksg_complaints_procedure"),
+        "existing_compliance_notes": data.get("existing_compliance_notes"),
+        "profile_raw": data,   # full profile snapshot for re-assessment and template generation
+        "updated_at": datetime.now(timezone.utc),
+    }
+
+    old_profile_raw = company.profile_raw if company else None
+
+    if company:
+        for k, v in fields.items():
+            setattr(company, k, v)
+    else:
+        company = Company(user_id=user_id, **fields)
+        db.add(company)
+
+    await db.flush()
+    await db.refresh(company)
+    return company.id, old_profile_raw
 
 
 async def _notify_threshold_changes(
