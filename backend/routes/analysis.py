@@ -64,6 +64,12 @@ async def upload_documents(
     files: list[UploadFile] = File(...),
     current_user: dict = Depends(get_current_user),
 ):
+    if settings.database_url:
+        from services.stripe_service import check_feature_access
+        allowed, reason = await check_feature_access(current_user["id"], "document_upload")
+        if not allowed:
+            raise HTTPException(status_code=402, detail=reason)
+
     from services.document_store import document_store
     from services.injection_guard import classify_document_for_injection
 
@@ -95,7 +101,9 @@ async def upload_documents(
                     errors.append(f"'{filename}' was rejected: {reason}")
                     continue
             except Exception as guard_exc:
-                logger.warning("injection guard error for '%s': %s — accepting file", filename, guard_exc)
+                logger.warning("injection guard error for '%s': %s — rejecting file (fail closed)", filename, guard_exc)
+                errors.append(f"'{filename}' could not be scanned and was rejected.")
+                continue
 
             name = document_store.save_file(session_id, filename, content)
             saved.append(name)
@@ -178,23 +186,27 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
         if session_owner is None or session_owner != current_user["id"]:
             raise HTTPException(status_code=403, detail="Document session not found or access denied.")
 
+    company_id: Optional[str] = None
     if settings.database_url:
-        from services.stripe_service import get_active_subscription, check_company_limit
+        from services.stripe_service import get_active_subscription
+        from services.db_service import create_company_with_limit_check
 
         sub = await get_active_subscription(current_user["id"])
         if not sub:
             raise HTTPException(status_code=402, detail="Aktives Abonnement erforderlich. Bitte wählen Sie einen Plan unter /account/billing.")
-        allowed, reason = await check_company_limit(current_user["id"])
-        if not allowed:
-            raise HTTPException(status_code=402, detail=reason)
 
-    company_id: Optional[str] = None
-    if settings.database_url:
+        # Limit check + company upsert run atomically (per-user advisory lock) to
+        # close a TOCTOU race where concurrent requests could both pass the count
+        # check before either committed, exceeding the plan's company limit.
+        limit_error = None
         try:
-            from services.db_service import upsert_company
-            company_id = await upsert_company(current_user["id"], body.profile)
+            company_id, limit_error = await create_company_with_limit_check(
+                current_user["id"], body.profile, sub["company_limit"]
+            )
         except Exception as exc:
             logger.warning("analyze: db upsert failed: %s", exc)
+        if limit_error:
+            raise HTTPException(status_code=402, detail=limit_error)
 
     job_id = await job_manager.create_job(
         body.profile,
@@ -255,6 +267,13 @@ async def generate_pdf_endpoint(job_id: str, current_user: dict = Depends(get_cu
 
     await assert_owns_job(job_id, current_user["id"])
     await check_endpoint_rate_limit(current_user["id"], "pdf", limit=20)
+
+    if settings.database_url:
+        from services.stripe_service import check_feature_access
+        allowed, reason = await check_feature_access(current_user["id"], "pdf")
+        if not allowed:
+            raise HTTPException(status_code=402, detail=reason)
+
     report = await job_manager.get_report(job_id)
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found or not completed.")
