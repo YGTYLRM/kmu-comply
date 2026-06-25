@@ -25,11 +25,15 @@ async def check_rate_limit(user_id: str) -> None:
     if settings.database_url:
         from db.database import AsyncSessionLocal
         from db.models import RateLimitEvent
-        from sqlalchemy import select, func, delete
+        from sqlalchemy import select, func, delete, text
 
         now_dt = datetime.utcnow()
         window_start = now_dt - timedelta(seconds=ANALYZE_WINDOW)
         async with AsyncSessionLocal() as db:
+            # Transaction-scoped advisory lock keyed per-user+endpoint — serializes
+            # concurrent requests from the same user so the count-check and the
+            # insert below can't both pass before either commits (TOCTOU close).
+            await db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": f"ratelimit:analyze:{user_id}"})
             count = (await db.execute(
                 select(func.count()).where(
                     RateLimitEvent.user_id == user_id,
@@ -104,11 +108,12 @@ async def check_endpoint_rate_limit(user_id: str, endpoint: str, limit: int, win
     if settings.database_url:
         from db.database import AsyncSessionLocal
         from db.models import RateLimitEvent
-        from sqlalchemy import select, func
+        from sqlalchemy import select, func, text
 
         now_dt = datetime.utcnow()
         window_start = now_dt - timedelta(seconds=window)
         async with AsyncSessionLocal() as db:
+            await db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": f"ratelimit:{endpoint}:{user_id}"})
             count = (await db.execute(
                 select(func.count()).where(
                     RateLimitEvent.user_id == user_id,
