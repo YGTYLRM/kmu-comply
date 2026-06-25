@@ -38,6 +38,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (isProtected && user) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.currentLevel !== aal.nextLevel) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/mfa-challenge";
+      url.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Redirect logged-in users away from auth pages
   if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register")) {
     const url = request.nextUrl.clone();
