@@ -149,14 +149,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "style-src 'self'; "
             "img-src 'self' data:; "
             "font-src 'self' data:; "
             "object-src 'none'; "
             "base-uri 'self'; "
             "frame-ancestors 'none';"
         )
-        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
         return response
 
 
