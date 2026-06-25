@@ -1,8 +1,10 @@
 services:
   chromadb:
     image: chromadb/chroma:latest
-    ports:
-      - "8001:8000"
+    # No host port mapping — chromadb has no auth enabled, so it must stay
+    # reachable only via the internal compose network (backend/worker use
+    # http://chromadb:8000). For local debugging, temporarily add back
+    # `ports: ["127.0.0.1:8001:8000"]` (loopback-only, never a public port).
     volumes:
       - chroma_data:/chroma/chroma
     environment:
