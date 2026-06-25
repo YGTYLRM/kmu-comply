@@ -235,6 +235,20 @@ class PendingRegulationUpdate(Base):
     reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
+class AdminAuditLog(Base):
+    """Records every mutating admin action — who (key fingerprint), what, on which target."""
+    __tablename__ = "admin_audit_log"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    actor_fingerprint: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    actor_ip: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    action: Mapped[str] = mapped_column(String(100), nullable=False)
+    target_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    target_id: Mapped[str] = mapped_column(String, nullable=False)
+    detail: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
 class ActionCompletion(Base):
     __tablename__ = "action_completions"
 
