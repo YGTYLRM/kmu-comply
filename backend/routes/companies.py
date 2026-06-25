@@ -229,13 +229,15 @@ async def delete_company(company_id: str, current_user: dict = Depends(get_curre
 async def delete_report(job_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a single report by job_id (GDPR Art. 17)."""
     from db.database import AsyncSessionLocal
-    from db.models import Report
+    from db.models import Company, Report
     from sqlalchemy import select, delete
 
     user_id = current_user["id"]
     async with AsyncSessionLocal() as db:
         result = await db.execute(
-            select(Report).where(Report.job_id == job_id, Report.user_id == user_id)
+            select(Report)
+            .join(Company, Company.id == Report.company_id)
+            .where(Report.job_id == job_id, Company.user_id == user_id)
         )
         report = result.scalar_one_or_none()
         if not report:
