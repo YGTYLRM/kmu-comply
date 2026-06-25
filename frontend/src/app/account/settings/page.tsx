@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, AlertTriangle, Shield, Database, User, Lock, CheckCircle2, Loader2 } from "lucide-react";
+import { Trash2, AlertTriangle, Shield, Database, User, Lock, CheckCircle2, Loader2, Smartphone, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -64,6 +64,18 @@ export default function AccountSettingsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError]     = useState<string | null>(null);
 
+  // MFA state
+  const [factors, setFactors]             = useState<{ id: string; status: string }[]>([]);
+  const [factorsLoading, setFactorsLoading] = useState(true);
+  const [enrolling, setEnrolling]         = useState(false);
+  const [qrCode, setQrCode]               = useState<string | null>(null);
+  const [secret, setSecret]               = useState<string | null>(null);
+  const [pendingFactorId, setPendingFactorId] = useState<string | null>(null);
+  const [mfaCode, setMfaCode]             = useState("");
+  const [mfaLoading, setMfaLoading]       = useState(false);
+  const [mfaError, setMfaError]           = useState<string | null>(null);
+  const [mfaSuccess, setMfaSuccess]       = useState(false);
+
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -73,6 +85,98 @@ export default function AccountSettingsPage() {
       setName(n);
     });
   }, []);
+
+  const loadFactors = async () => {
+    const supabase = createClient();
+    const { data } = await supabase.auth.mfa.listFactors();
+    setFactors(data?.totp ?? []);
+    setFactorsLoading(false);
+  };
+
+  useEffect(() => {
+    loadFactors();
+  }, []);
+
+  const handleStartEnroll = async () => {
+    setMfaError(null);
+    setMfaLoading(true);
+    try {
+      const supabase = createClient();
+      const { data: list } = await supabase.auth.mfa.listFactors();
+      const unverified = list?.totp.find((f) => (f.status as string) === "unverified");
+      if (unverified) {
+        await supabase.auth.mfa.unenroll({ factorId: unverified.id });
+      }
+      const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", issuer: "Complio" });
+      if (error) throw error;
+      setQrCode(data.totp.qr_code);
+      setSecret(data.totp.secret);
+      setPendingFactorId(data.id);
+      setEnrolling(true);
+    } catch (e: unknown) {
+      setMfaError(e instanceof Error ? e.message : "Unbekannter Fehler");
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const handleCancelEnroll = async () => {
+    if (pendingFactorId) {
+      const supabase = createClient();
+      await supabase.auth.mfa.unenroll({ factorId: pendingFactorId }).catch(() => {});
+    }
+    setEnrolling(false);
+    setQrCode(null);
+    setSecret(null);
+    setPendingFactorId(null);
+    setMfaCode("");
+    setMfaError(null);
+  };
+
+  const handleConfirmEnroll = async (e: FormEvent) => {
+    e.preventDefault();
+    if (mfaCode.length !== 6 || !pendingFactorId) return;
+    setMfaLoading(true);
+    setMfaError(null);
+    try {
+      const supabase = createClient();
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: pendingFactorId });
+      if (challengeError) throw challengeError;
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: pendingFactorId,
+        challengeId: challenge.id,
+        code: mfaCode,
+      });
+      if (verifyError) throw verifyError;
+      setEnrolling(false);
+      setQrCode(null);
+      setSecret(null);
+      setPendingFactorId(null);
+      setMfaCode("");
+      setMfaSuccess(true);
+      setTimeout(() => setMfaSuccess(false), 4000);
+      await loadFactors();
+    } catch {
+      setMfaError("Code ungültig. Bitte erneut versuchen.");
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const handleUnenroll = async (factorId: string) => {
+    setMfaLoading(true);
+    setMfaError(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.mfa.unenroll({ factorId });
+      if (error) throw error;
+      await loadFactors();
+    } catch (e: unknown) {
+      setMfaError(e instanceof Error ? e.message : "Unbekannter Fehler");
+    } finally {
+      setMfaLoading(false);
+    }
+  };
 
   const getToken = async () => {
     const supabase = createClient();
@@ -228,6 +332,106 @@ export default function AccountSettingsPage() {
               {pwLoading ? "Wird gespeichert…" : "Passwort ändern"}
             </button>
           </form>
+        </Section>
+
+        {/* Two-factor authentication */}
+        <Section>
+          <SectionHeader
+            icon={<Smartphone className="h-4 w-4 text-cyan-400" />}
+            title="Zwei-Faktor-Authentifizierung"
+            sub="Zusätzlicher Schutz für Ihr Konto"
+          />
+
+          {mfaError && <p className="text-xs text-red-400 mb-3">{mfaError}</p>}
+          {mfaSuccess && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-400 mb-3">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Zwei-Faktor-Authentifizierung aktiviert
+            </div>
+          )}
+
+          {!factorsLoading && !enrolling && (
+            <div className="flex flex-col gap-3">
+              {factors.filter((f) => f.status === "verified").map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3"
+                >
+                  <div className="flex items-center gap-2 text-sm text-slate-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> Authenticator-App aktiv
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleUnenroll(f.id)}
+                    disabled={mfaLoading}
+                    className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors disabled:opacity-40"
+                  >
+                    <X className="h-3.5 w-3.5" /> Deaktivieren
+                  </button>
+                </div>
+              ))}
+              {factors.filter((f) => f.status === "verified").length === 0 && (
+                <button
+                  type="button"
+                  onClick={handleStartEnroll}
+                  disabled={mfaLoading}
+                  className="self-start rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {mfaLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Zwei-Faktor-Authentifizierung aktivieren
+                </button>
+              )}
+            </div>
+          )}
+
+          {enrolling && qrCode && (
+            <form onSubmit={handleConfirmEnroll} className="flex flex-col gap-4">
+              <p className="text-xs text-slate-500">
+                Scannen Sie den QR-Code mit einer Authenticator-App (z. B. Google Authenticator, Authy)
+                und geben Sie den 6-stelligen Code ein.
+              </p>
+              <img
+                src={`data:image/svg+xml;utf8,${encodeURIComponent(qrCode)}`}
+                alt="QR-Code für Authenticator-App"
+                className="h-40 w-40 rounded-lg bg-white p-2"
+              />
+              {secret && (
+                <p className="text-xs text-slate-600">
+                  Manuelle Eingabe: <span className="font-mono text-slate-400 select-all">{secret}</span>
+                </p>
+              )}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-slate-500">Bestätigungscode</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+                  placeholder="000000"
+                  className="w-full max-w-[140px] rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-white tracking-widest placeholder-slate-600 outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/15 transition-all"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={mfaLoading || mfaCode.length !== 6}
+                  className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {mfaLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Bestätigen
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelEnroll}
+                  disabled={mfaLoading}
+                  className="rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-300 transition-colors disabled:opacity-40"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </form>
+          )}
         </Section>
 
         {/* GDPR rights */}
