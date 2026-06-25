@@ -9,7 +9,7 @@ from time import time
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 from config import settings
 from dependencies import check_endpoint_rate_limit
@@ -87,8 +87,29 @@ async def health_deep():
     return {"status": status, **kb}
 
 
+class QuickCheckRequest(BaseModel):
+    employee_count: int = Field(default=1, ge=1, le=1_000_000)
+    industry: str = Field(default="other", max_length=100)
+    annual_revenue_eur: Optional[float] = Field(default=None, ge=0, le=1e13)
+    balance_sheet_total_eur: Optional[float] = Field(default=None, ge=0, le=1e13)
+    annual_energy_consumption_mwh: Optional[float] = Field(default=None, ge=0, le=1e9)
+    processes_personal_data: bool = True
+    has_website: bool = True
+    processing_is_occasional: bool = False
+    processes_special_category_data: bool = False
+    is_listed_company: bool = False
+    is_aml_obligated_sector: bool = False
+    uses_ai_systems: bool = False
+    ai_systems_are_high_risk: Optional[bool] = None
+    has_supply_chain_abroad: bool = False
+    supply_chain_countries: list[str] = Field(default_factory=list, max_length=50)
+    is_critical_infrastructure_sector: bool = False
+    produces_connected_products: bool = False
+    provides_data_processing_services: bool = False
+
+
 @router.post("/api/quick-check")
-async def quick_check(request: Request):
+async def quick_check(body: QuickCheckRequest, request: Request):
     """Free applicability check — runs the deterministic threshold engine only.
 
     No LLM calls, no API credits, no authentication required.
@@ -110,53 +131,32 @@ async def quick_check(request: Request):
     if len(recent) >= RATE_LIMIT:
         raise HTTPException(status_code=429, detail="Zu viele Anfragen. Bitte versuchen Sie es später erneut.")
 
-    try:
-        body = await request.json()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid JSON body.")
-
-    try:
-        employee_count = max(1, int(body.get("employee_count", 1)))
-    except (ValueError, TypeError):
-        raise HTTPException(status_code=400, detail="employee_count must be a positive integer.")
-
     from models.company_profile import CompanyProfile
     from services.threshold_engine import determine_applicable_regulations
 
     # Build a minimal CompanyProfile from the quick-check request.
     # Fields not provided default to the conservative/safe choice (avoids false negatives).
-    industry_raw = str(body.get("industry", "other")).lower()
-
-    def _opt_float(key: str) -> float | None:
-        val = body.get(key)
-        if val is None:
-            return None
-        try:
-            return float(val)
-        except (ValueError, TypeError):
-            return None
-
     profile = CompanyProfile(
         company_name="Vorprüfung",
-        employee_count=employee_count,
-        industry=industry_raw,
+        employee_count=body.employee_count,
+        industry=body.industry.lower(),
         country="DE",
-        annual_revenue_eur=_opt_float("annual_revenue_eur"),
-        balance_sheet_total_eur=_opt_float("balance_sheet_total_eur"),
-        annual_energy_consumption_mwh=_opt_float("annual_energy_consumption_mwh"),
-        processes_personal_data=bool(body.get("processes_personal_data", True)),
-        has_website=bool(body.get("has_website", True)),
-        processing_is_occasional=bool(body.get("processing_is_occasional", False)),
-        processes_special_category_data=bool(body.get("processes_special_category_data", False)),
-        is_listed_company=bool(body.get("is_listed_company", False)),
-        is_aml_obligated_sector=bool(body.get("is_aml_obligated_sector", False)),
-        uses_ai_systems=bool(body.get("uses_ai_systems", False)),
-        ai_systems_are_high_risk=body.get("ai_systems_are_high_risk"),
-        has_supply_chain_abroad=bool(body.get("has_supply_chain_abroad", False)),
-        supply_chain_countries=body.get("supply_chain_countries") or [],
-        is_critical_infrastructure_sector=bool(body.get("is_critical_infrastructure_sector", False)),
-        produces_connected_products=bool(body.get("produces_connected_products", False)),
-        provides_data_processing_services=bool(body.get("provides_data_processing_services", False)),
+        annual_revenue_eur=body.annual_revenue_eur,
+        balance_sheet_total_eur=body.balance_sheet_total_eur,
+        annual_energy_consumption_mwh=body.annual_energy_consumption_mwh,
+        processes_personal_data=body.processes_personal_data,
+        has_website=body.has_website,
+        processing_is_occasional=body.processing_is_occasional,
+        processes_special_category_data=body.processes_special_category_data,
+        is_listed_company=body.is_listed_company,
+        is_aml_obligated_sector=body.is_aml_obligated_sector,
+        uses_ai_systems=body.uses_ai_systems,
+        ai_systems_are_high_risk=body.ai_systems_are_high_risk,
+        has_supply_chain_abroad=body.has_supply_chain_abroad,
+        supply_chain_countries=body.supply_chain_countries,
+        is_critical_infrastructure_sector=body.is_critical_infrastructure_sector,
+        produces_connected_products=body.produces_connected_products,
+        provides_data_processing_services=body.provides_data_processing_services,
     )
 
     contact_calls[ip].append(now)
@@ -364,12 +364,12 @@ async def generate_template(
 
 
 class ContactRequest(BaseModel):
-    name: str
-    email: str
-    company: Optional[str] = None
-    phone: Optional[str] = None
-    topic: Optional[str] = None
-    message: str
+    name: str = Field(..., max_length=200)
+    email: EmailStr
+    company: Optional[str] = Field(default=None, max_length=200)
+    phone: Optional[str] = Field(default=None, max_length=50)
+    topic: Optional[str] = Field(default=None, max_length=200)
+    message: str = Field(..., max_length=5000)
 
 
 @router.post("/api/contact")
@@ -388,11 +388,17 @@ async def contact(req: ContactRequest, request: Request):
     import resend
     resend.api_key = settings.resend_api_key
 
-    subject = f"Contact: {req.name}"
+    def _header_safe(value: str) -> str:
+        """Strip newlines/control chars so free-text fields can't inject extra
+        header-like content into the subject line."""
+        return "".join(ch for ch in value if ch.isprintable()).strip()
+
+    safe_name = _header_safe(req.name)
+    subject = f"Contact: {safe_name}"
     if req.topic:
-        subject += f" — {req.topic}"
+        subject += f" — {_header_safe(req.topic)}"
     if req.company:
-        subject += f" ({req.company})"
+        subject += f" ({_header_safe(req.company)})"
 
     esc_name    = html.escape(req.name)
     esc_email   = html.escape(req.email)
