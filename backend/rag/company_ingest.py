@@ -1,8 +1,10 @@
 """
 Ingests company-uploaded documents into a per-job ChromaDB collection.
 
-The collection name is  job_<first-8-chars-of-job-id>  so it stays short.
-It is deleted automatically when the job expires (JobManager.clear_job_docs).
+The collection name is  job_<full-job-id>  — the full UUID, not a truncated
+prefix, so two jobs can never collide onto the same collection and leak each
+other's documents. It is deleted automatically when the job expires
+(JobManager.clear_job_docs).
 """
 from __future__ import annotations
 
@@ -28,7 +30,7 @@ _chroma_write_lock = threading.Semaphore(1)
 
 
 def collection_name(job_id: str) -> str:
-    return f"job_{job_id[:8]}"
+    return f"job_{job_id}"
 
 
 def ingest_company_documents(job_id: str, session_id: str) -> int:
