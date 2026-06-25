@@ -42,6 +42,12 @@ function LoginInner() {
       }).catch(() => {});
     }
 
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.currentLevel !== aal.nextLevel) {
+      router.push(`/mfa-challenge?next=${encodeURIComponent(next)}`);
+      return;
+    }
+
     router.push(next);
     router.refresh();
   };
