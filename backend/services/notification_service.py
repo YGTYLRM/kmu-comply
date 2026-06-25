@@ -22,6 +22,15 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://complio.app"  # update to real domain when deployed
 
 
+def _mask_email(email: str) -> str:
+    """Mask an email for logging — keeps it traceable without persisting PII in plaintext logs."""
+    local, _, domain = email.partition("@")
+    if not domain:
+        return "***"
+    visible = local[:2]
+    return f"{visible}***@{domain}"
+
+
 def _score_color(score: float) -> str:
     if score >= 75:
         return "#10b981"  # emerald
@@ -259,11 +268,11 @@ async def send_notification_email(
                 notif.read_at = datetime.now(timezone.utc)
                 await db.commit()
 
-        logger.info("notification_service: sent %s alert to %s for %s", triggered_by, user_email, company_name)
+        logger.info("notification_service: sent %s alert to %s for %s", triggered_by, _mask_email(user_email), company_name)
         return True
 
     except Exception as exc:
-        logger.error("notification_service: failed to send email to %s: %s", user_email, exc)
+        logger.error("notification_service: failed to send email to %s: %s", _mask_email(user_email), exc)
         return False
 
 
