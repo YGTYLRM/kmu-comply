@@ -1,8 +1,14 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Defaults to .env (production credentials). Set ENV_FILE=.env.development
+# to point this process at the staging Supabase project instead.
+_ENV_FILE = os.environ.get("ENV_FILE", ".env")
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=_ENV_FILE, extra="ignore")
 
     # LLM API
     llm_api_key: str = ""
