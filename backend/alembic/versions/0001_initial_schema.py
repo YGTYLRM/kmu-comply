@@ -164,7 +164,6 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
     )
-    op.create_index("ix_jobs_user_id", "jobs", ["user_id"])
 
     op.create_table(
         "action_completions",
