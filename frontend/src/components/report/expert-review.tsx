@@ -108,7 +108,7 @@ export function ExpertReview({ report, jobId }: Props) {
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   rows={3}
-                  placeholder="e.g. We are particularly concerned about GDPR compliance and our new AI hiring tool..."
+                  placeholder="z. B. Wir haben besondere Fragen zur DSGVO-Konformität und unserem neuen KI-gestützten Einstellungsprozess..."
                   className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-slate-300 placeholder-slate-600 resize-none focus:outline-none focus:border-brand-500/50"
                 />
               </div>
