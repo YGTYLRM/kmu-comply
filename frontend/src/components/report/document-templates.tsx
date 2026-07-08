@@ -61,7 +61,7 @@ export function DocumentTemplates({ jobId }: Props) {
             <CardTitle>Document Templates</CardTitle>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">{TEMPLATES.length} templates available</span>
+            <span className="text-xs text-slate-500">{TEMPLATES.length} Vorlagen verfügbar</span>
             <ChevronDown className={`h-4 w-4 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
           </div>
         </button>
