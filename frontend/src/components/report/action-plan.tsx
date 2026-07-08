@@ -213,20 +213,20 @@ export function ActionPlan({ report }: Props) {
                             onChange={e => setWorkflow(prev => ({ ...prev, [key]: { ...getState(item.regulation, item.article_number), notes: e.target.value } }))}
                             onBlur={e => save(item.regulation, item.article_number, { notes: e.target.value })}
                             rows={2}
-                            placeholder="Add internal notes about this action..."
+                            placeholder="Interne Notizen zu dieser Maßnahme..."
                             className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs text-slate-300 placeholder-slate-600 resize-none focus:outline-none focus:border-brand-500/50"
                           />
                         </div>
                         <div>
                           <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-1">
-                            <FileText className="h-3 w-3" /> Evidence / proof of completion
+                            <FileText className="h-3 w-3" /> Nachweis / Umsetzungsbeleg
                           </label>
                           <textarea
                             value={state.evidence_note}
                             onChange={e => setWorkflow(prev => ({ ...prev, [key]: { ...getState(item.regulation, item.article_number), evidence_note: e.target.value } }))}
                             onBlur={e => save(item.regulation, item.article_number, { evidence_note: e.target.value })}
                             rows={2}
-                            placeholder="Describe what was implemented, link to document, policy version, etc."
+                            placeholder="Was wurde umgesetzt? Link zum Dokument, Richtlinienversion usw."
                             className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs text-slate-300 placeholder-slate-600 resize-none focus:outline-none focus:border-brand-500/50"
                           />
                         </div>
