@@ -435,14 +435,14 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
             badge_text = "Nein"
         rows += (
             f'<tr style="background:{bg};">'
-            f'<td style="{FONT}padding:5pt 9pt;font-weight:600;font-size:8.5pt;'
+            f'<td style="{FONT}padding:3.5pt 8pt;font-weight:600;font-size:8.5pt;'
             f'width:24%;border-bottom:1pt solid #f1f5f9;white-space:nowrap;color:{NAVY};">'
             f'{_esc(_reg_label(r.regulation.value))}</td>'
-            f'<td style="padding:5pt 9pt;text-align:center;width:13%;border-bottom:1pt solid #f1f5f9;">'
+            f'<td style="padding:3.5pt 8pt;text-align:center;width:13%;border-bottom:1pt solid #f1f5f9;">'
             f'<span style="{FONT}display:inline-block;font-size:7pt;font-weight:700;'
             f'padding:2pt 10pt;border-radius:20pt;white-space:nowrap;{badge}">{badge_text}</span></td>'
-            f'<td style="{FONT}padding:5pt 9pt;font-size:8.5pt;color:#334155;'
-            f'line-height:1.45;width:63%;border-bottom:1pt solid #f1f5f9;">'
+            f'<td style="{FONT}padding:3.5pt 8pt;font-size:8.5pt;color:#334155;'
+            f'line-height:1.38;width:63%;border-bottom:1pt solid #f1f5f9;">'
             f'{_esc(_clean(r.reason))}</td>'
             f'</tr>'
         )
@@ -467,11 +467,11 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
         f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;">'
         f'<thead><tr>'
         f'<th style="{FONT}background:#f1f5f9;color:#374151;font-size:7.5pt;font-weight:700;'
-        f'padding:6pt 9pt;text-align:left;width:24%;border-bottom:2pt solid {BORDER};">Vorschrift</th>'
+        f'padding:4.5pt 8pt;text-align:left;width:24%;border-bottom:2pt solid {BORDER};">Vorschrift</th>'
         f'<th style="{FONT}background:#f1f5f9;color:#374151;font-size:7.5pt;font-weight:700;'
-        f'padding:6pt 9pt;text-align:center;width:13%;border-bottom:2pt solid {BORDER};">Gilt</th>'
+        f'padding:4.5pt 8pt;text-align:center;width:13%;border-bottom:2pt solid {BORDER};">Gilt</th>'
         f'<th style="{FONT}background:#f1f5f9;color:#374151;font-size:7.5pt;font-weight:700;'
-        f'padding:6pt 9pt;text-align:left;width:63%;border-bottom:2pt solid {BORDER};">Begründung</th>'
+        f'padding:4.5pt 8pt;text-align:left;width:63%;border-bottom:2pt solid {BORDER};">Begründung</th>'
         f'</tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
         f'{_body_close()}</div>'
@@ -506,19 +506,19 @@ def _scores(report: ComplianceReport, logo: str) -> str:
         bg = "#fafafa" if i % 2 == 1 else "#fff"
         rows += (
             f'<tr style="background:{bg};">'
-            f'<td style="{FONT}padding:6pt 8pt;font-weight:600;font-size:8.5pt;'
+            f'<td style="{FONT}padding:4pt 7pt;font-weight:600;font-size:8.5pt;'
             f'color:{NAVY};width:30%;">{_esc(_reg_label(rs.regulation.value))}</td>'
-            f'<td style="{FONT}padding:6pt 8pt;text-align:center;font-weight:800;'
+            f'<td style="{FONT}padding:4pt 7pt;text-align:center;font-weight:800;'
             f'font-size:10pt;color:{bc};width:10%;">{rs.score_percent:.0f}%</td>'
-            f'<td style="padding:6pt 8pt;width:36%;">'
+            f'<td style="padding:4pt 7pt;width:36%;">'
             f'<div style="height:7pt;background:#f1f5f9;border-radius:10pt;overflow:hidden;">'
             f'<div style="height:7pt;width:{bw}%;background:{bc};border-radius:10pt;"></div>'
             f'</div></td>'
-            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#15803d;'
+            f'<td style="{FONT}padding:4pt 7pt;text-align:center;color:#15803d;'
             f'font-weight:700;font-size:8pt;width:8%;">{rs.compliant}</td>'
-            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#a16207;'
+            f'<td style="{FONT}padding:4pt 7pt;text-align:center;color:#a16207;'
             f'font-weight:700;font-size:8pt;width:8%;">{rs.partially_compliant}</td>'
-            f'<td style="{FONT}padding:6pt 8pt;text-align:center;color:#b91c1c;'
+            f'<td style="{FONT}padding:4pt 7pt;text-align:center;color:#b91c1c;'
             f'font-weight:700;font-size:8pt;width:8%;">{rs.non_compliant}</td>'
             f'</tr>'
         )
@@ -553,15 +553,15 @@ def _scores(report: ComplianceReport, logo: str) -> str:
         f'<table style="width:100%;border-collapse:collapse;table-layout:fixed;">'
         f'<thead><tr style="background:#f8fafc;">'
         f'<th style="{FONT}font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.5pt;'
-        f'color:{MUTED};padding:5pt 8pt;text-align:left;width:30%;border-bottom:1.5pt solid {BORDER};">Vorschrift</th>'
+        f'color:{MUTED};padding:4pt 7pt;text-align:left;width:30%;border-bottom:1.5pt solid {BORDER};">Vorschrift</th>'
         f'<th style="{FONT}font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.5pt;'
-        f'color:{MUTED};padding:5pt 8pt;text-align:center;width:10%;border-bottom:1.5pt solid {BORDER};">Score</th>'
-        f'<th style="{FONT}font-size:7pt;font-weight:700;padding:5pt 8pt;width:36%;border-bottom:1.5pt solid {BORDER};"></th>'
-        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#15803d;padding:5pt 8pt;'
+        f'color:{MUTED};padding:4pt 7pt;text-align:center;width:10%;border-bottom:1.5pt solid {BORDER};">Score</th>'
+        f'<th style="{FONT}font-size:7pt;font-weight:700;padding:4pt 7pt;width:36%;border-bottom:1.5pt solid {BORDER};"></th>'
+        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#15803d;padding:4pt 7pt;'
         f'text-align:center;width:8%;border-bottom:1.5pt solid {BORDER};">K</th>'
-        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#a16207;padding:5pt 8pt;'
+        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#a16207;padding:4pt 7pt;'
         f'text-align:center;width:8%;border-bottom:1.5pt solid {BORDER};">T</th>'
-        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#b91c1c;padding:5pt 8pt;'
+        f'<th style="{FONT}font-size:6.5pt;font-weight:700;color:#b91c1c;padding:4pt 7pt;'
         f'text-align:center;width:8%;border-bottom:1.5pt solid {BORDER};">NK</th>'
         f'</tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
@@ -803,60 +803,6 @@ def _actions(report: ComplianceReport, logo: str) -> str:
     )
 
 
-# ─── KB versions audit trail ──────────────────────────────────────────────────
-
-def _kb_versions_table(report: ComplianceReport) -> str:
-    versions = report.knowledge_base_versions or {}
-    engine_ver = _esc(report.rule_engine_version or "n/a")
-    prompt_ver = _esc(report.prompt_version or "n/a")
-
-    version_rows = (
-        f'<tr style="background:{BLUE_LIGHT};">'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#1d4ed8;">Regelmodul-Version</td>'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#1d4ed8;font-family:monospace;" colspan="3">{engine_ver}</td>'
-        f'</tr>'
-        f'<tr style="background:{BLUE_LIGHT};border-bottom:1pt solid #bfdbfe;">'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:700;color:#1d4ed8;">Prompt-Version</td>'
-        f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#1d4ed8;font-family:monospace;" colspan="3">{prompt_ver}</td>'
-        f'</tr>'
-    )
-
-    kb_rows = ""
-    for reg_key, meta in sorted(versions.items()):
-        fetched   = meta.get("fetched_at", "unbekannt")[:10]
-        src_hash  = meta.get("source_file_hash", "")
-        hash_short = src_hash[:12] if src_hash and src_hash != "unknown" else "n/a"
-        src_url   = meta.get("source_url", "")
-        label     = _REG_DISPLAY.get(reg_key, reg_key.upper())
-        url_html  = (
-            f'<a href="{_esc(src_url)}" style="color:{BLUE};text-decoration:none;">Gesetzestext</a>'
-            if src_url else "n/a"
-        )
-        kb_rows += (
-            f'<tr style="border-bottom:0.5pt solid #f1f5f9;">'
-            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;font-weight:600;color:#334155;">{_esc(label)}</td>'
-            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:{MUTED};font-family:monospace;">{_esc(fetched)}</td>'
-            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;color:#94a3b8;font-family:monospace;">{_esc(hash_short)}</td>'
-            f'<td style="padding:2.5mm 3mm;{FONT}font-size:7.5pt;">{url_html}</td>'
-            f'</tr>'
-        )
-
-    return (
-        f'<div style="margin-top:7mm;">'
-        f'<div style="{FONT}font-size:6.5pt;font-weight:700;text-transform:uppercase;'
-        f'letter-spacing:1pt;color:#94a3b8;margin-bottom:2.5mm;">Wissensdatenbank-Prüfpfad</div>'
-        f'<table style="width:100%;border-collapse:collapse;border:1pt solid {BORDER};border-radius:5pt;overflow:hidden;">'
-        f'<thead><tr style="background:#f8fafc;">'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:{MUTED};text-align:left;">Komponente</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:{MUTED};text-align:left;">Eingelesen</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:{MUTED};text-align:left;">Datei-Hash</th>'
-        f'<th style="padding:2.5mm 3mm;{FONT}font-size:7pt;font-weight:600;color:{MUTED};text-align:left;">Quelle</th>'
-        f'</tr></thead>'
-        f'<tbody>{version_rows}{kb_rows}</tbody>'
-        f'</table></div>'
-    )
-
-
 # ─── Section 6: Closing ──────────────────────────────────────────────────────
 
 def _closing(report: ComplianceReport, logo: str) -> str:
@@ -924,7 +870,6 @@ def _closing(report: ComplianceReport, logo: str) -> str:
         f'{_sec_sub("Sie kennen jetzt Ihren Compliance-Stand. Das sind die empfohlenen nächsten Schritte.")}'
         f'<div style="margin-top:2mm;">{items}</div>'
         f'{input_block}'
-        f'{_kb_versions_table(report)}'
         f'<div style="margin-top:7mm;padding-top:4mm;border-top:1pt solid #f1f5f9;'
         f'text-align:center;{FONT}font-size:7.5pt;color:#94a3b8;">'
         f'<strong style="color:{NAVY};">Complio</strong> &nbsp;·&nbsp; '
