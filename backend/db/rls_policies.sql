@@ -21,8 +21,9 @@ ALTER TABLE public.expert_review_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.rate_limit_events    ENABLE ROW LEVEL SECURITY;
 
--- Admin-only table — no user access
+-- Admin-only tables — no user access
 ALTER TABLE public.pending_regulation_updates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_audit_log            ENABLE ROW LEVEL SECURITY;
 
 -- Alembic migration tracking — internal only, no client access
 ALTER TABLE public.alembic_version           ENABLE ROW LEVEL SECURITY;
