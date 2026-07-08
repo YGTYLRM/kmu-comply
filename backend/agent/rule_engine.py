@@ -110,14 +110,14 @@ class RuleEngine:
         if applies:
             reasons = []
             if profile.processes_personal_data:
-                reasons.append("processes personal data (Art. 2 GDPR)")
+                reasons.append("verarbeitet personenbezogene Daten (Art. 2 DSGVO)")
             if profile.has_website:
-                reasons.append("operates a website (implicit personal data processing)")
+                reasons.append("betreibt eine Website (implizite Verarbeitung personenbezogener Daten)")
             if profile.employee_count >= 1:
-                reasons.append(f"employs {profile.employee_count} people (employee data processing)")
-            reason = "GDPR applies: " + "; ".join(reasons) + "."
+                reasons.append(f"beschäftigt {profile.employee_count} Mitarbeiter (Verarbeitung von Arbeitnehmerdaten)")
+            reason = "DSGVO gilt: " + "; ".join(reasons) + "."
         else:
-            reason = "GDPR does not apply: company does not process personal data and has no website or employees."
+            reason = "DSGVO gilt nicht: Unternehmen verarbeitet keine personenbezogenen Daten und hat keine Website oder Mitarbeiter."
 
         return ApplicabilityResult(
             regulation=reg,
@@ -137,11 +137,11 @@ class RuleEngine:
         conf = "HIGH" if not missing else "MEDIUM"
 
         if applies:
-            reason = "BDSG applies: German company processing personal data (BDSG §1)."
+            reason = "BDSG gilt: Deutsches Unternehmen verarbeitet personenbezogene Daten (BDSG §1)."
         elif profile.country != "DE":
-            reason = "BDSG does not apply: company is not in Germany."
+            reason = "BDSG gilt nicht: Unternehmen ist nicht in Deutschland ansässig."
         else:
-            reason = "BDSG does not apply: company does not process personal data."
+            reason = "BDSG gilt nicht: Unternehmen verarbeitet keine personenbezogenen Daten."
 
         return ApplicabilityResult(
             regulation=reg,
@@ -176,15 +176,15 @@ class RuleEngine:
         if applies:
             entity_type = "besonders wichtige Einrichtung" if profile.employee_count >= 250 else "wichtige Einrichtung"
             reason = (
-                f"NIS2 (BSIG) applies as {entity_type}: "
-                f"{profile.employee_count} employees in critical/important sector '{profile.industry}'."
+                f"NIS2 (BSIG) gilt als {entity_type}: "
+                f"{profile.employee_count} Mitarbeiter in kritischem/wichtigem Sektor '{profile.industry}'."
             )
         elif not in_scope_sector:
-            reason = f"NIS2 does not apply: industry '{profile.industry}' is not in a NIS2 critical or important sector."
+            reason = f"NIS2 gilt nicht: Branche '{profile.industry}' ist kein kritischer oder wichtiger NIS2-Sektor."
         else:
             reason = (
-                f"NIS2 does not apply: below size thresholds "
-                f"({profile.employee_count} employees < 50 minimum)."
+                f"NIS2 gilt nicht: Schwellenwerte unterschritten "
+                f"({profile.employee_count} Mitarbeiter < 50 Minimum)."
             )
 
         return ApplicabilityResult(
@@ -205,9 +205,9 @@ class RuleEngine:
         conf = "HIGH" if not missing else "LOW"
 
         reason = (
-            "EU AI Act applies: company develops or deploys AI systems (Art. 2)."
+            "EU AI Act gilt: Unternehmen entwickelt oder betreibt KI-Systeme (Art. 2)."
             if applies
-            else "EU AI Act does not apply: company does not develop or deploy AI systems."
+            else "EU AI Act gilt nicht: Unternehmen entwickelt oder betreibt keine KI-Systeme."
         )
 
         return ApplicabilityResult(
@@ -228,10 +228,10 @@ class RuleEngine:
         conf = "HIGH" if not missing else "LOW"
 
         reason = (
-            f"HinSchG applies: {profile.employee_count} employees >= 50 — "
-            f"internal whistleblower reporting channel mandatory (§12 HinSchG)."
+            f"HinSchG gilt: {profile.employee_count} Mitarbeiter >= 50 - "
+            f"interner Hinweisgeberkanal vorgeschrieben (§12 HinSchG)."
             if applies
-            else f"HinSchG does not apply: {profile.employee_count} employees < 50 threshold (§12 HinSchG)."
+            else f"HinSchG gilt nicht: {profile.employee_count} Mitarbeiter < Schwellenwert 50 (§12 HinSchG)."
         )
 
         return ApplicabilityResult(
@@ -252,9 +252,9 @@ class RuleEngine:
         conf = "HIGH" if not missing else "LOW"
 
         reason = (
-            f"LkSG applies: {profile.employee_count} employees >= 1,000 threshold (§1(1) LkSG, from 1 Jan 2024)."
+            f"LkSG gilt: {profile.employee_count} Mitarbeiter >= 1.000 Schwellenwert (§1 Abs. 1 LkSG, ab 1. Jan. 2024)."
             if applies
-            else f"LkSG does not apply: {profile.employee_count} employees < 1,000 threshold (§1(1) LkSG)."
+            else f"LkSG gilt nicht: {profile.employee_count} Mitarbeiter < 1.000 Schwellenwert (§1 Abs. 1 LkSG)."
         )
 
         return ApplicabilityResult(
@@ -290,18 +290,18 @@ class RuleEngine:
         if applies:
             parts = []
             if is_non_sme:
-                parts.append(f"{profile.employee_count} employees >= 250 (non-SME) → EDL-G §8 energy audit")
+                parts.append(f"{profile.employee_count} Mitarbeiter >= 250 (kein KMU) → EDL-G §8 Energieaudit")
             if high_energy:
-                parts.append(f"energy consumption {energy_gwh:.1f} GWh > 7.5 GWh → EnEfG §8(1) management system")
-            reason = f"EnEfG / EDL-G apply: {'; '.join(parts)}."
+                parts.append(f"Energieverbrauch {energy_gwh:.1f} GWh > 7,5 GWh → EnEfG §8 Abs. 1 Energiemanagementsystem")
+            reason = f"EnEfG / EDL-G gelten: {'; '.join(parts)}."
         else:
             energy_note = (
-                "energy consumption not provided (provide to check EnEfG §8(1))"
+                "Energieverbrauch nicht angegeben (bitte ergänzen zur Prüfung von EnEfG §8 Abs. 1)"
                 if not energy_known
-                else f"energy {energy_gwh:.1f} GWh <= 7.5 GWh"
+                else f"Energieverbrauch {energy_gwh:.1f} GWh <= 7,5 GWh"
             )
             reason = (
-                f"EnEfG / EDL-G do not apply: {profile.employee_count} employees < 250 (qualifies as SME); "
+                f"EnEfG / EDL-G gelten nicht: {profile.employee_count} Mitarbeiter < 250 (gilt als KMU); "
                 f"{energy_note}."
             )
 
@@ -338,15 +338,15 @@ class RuleEngine:
         conf = "HIGH" if (financials_known and not missing) else "MEDIUM"
 
         if applies:
-            omnibus_note = " NOTE: Omnibus simplification (>1,000 employees AND >€450M revenue) pending formal adoption — verify current scope."
+            omnibus_note = " Hinweis: Omnibus-Vereinfachung (>1.000 Mitarbeiter UND >450 Mio. Euro Umsatz) steht noch aus - aktuellen Anwendungsbereich prüfen."
             reason = (
-                f"CSRD applies: {criteria_met}/3 size criteria met "
-                f"(EU Directive 2022/2464, Art. 5).{omnibus_note}"
+                f"CSRD gilt: {criteria_met}/3 Größenkriterien erfüllt "
+                f"(EU-Richtlinie 2022/2464, Art. 5).{omnibus_note}"
             )
         else:
             reason = (
-                f"CSRD does not apply: only {criteria_met}/3 size criteria met "
-                f"(need 2/3: >250 employees, >€50M revenue, >€25M balance sheet)."
+                f"CSRD gilt nicht: nur {criteria_met}/3 Größenkriterien erfüllt "
+                f"(2 von 3 erforderlich: >250 Mitarbeiter, >50 Mio. Euro Umsatz, >25 Mio. Euro Bilanzsumme)."
             )
 
         return ApplicabilityResult(
@@ -367,10 +367,10 @@ class RuleEngine:
         conf = "HIGH"
 
         reason = (
-            f"ArbSchG applies to all employers: {profile.employee_count} employees "
-            f"(ArbSchG §1 — applies to all employers in Germany regardless of size)."
+            f"ArbSchG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeiter "
+            f"(ArbSchG §1 - gilt für alle Arbeitgeber in Deutschland unabhängig von der Größe)."
             if applies
-            else "ArbSchG does not apply: no employees reported."
+            else "ArbSchG gilt nicht: keine Mitarbeiter angegeben."
         )
 
         return ApplicabilityResult(
@@ -391,10 +391,10 @@ class RuleEngine:
         conf = "HIGH"
 
         reason = (
-            f"AGG applies to all employers: {profile.employee_count} employees. "
-            f"Anti-discrimination measures (§12 AGG) and complaints procedure (§13 AGG) mandatory."
+            f"AGG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeiter. "
+            f"Antidiskriminierungsmaßnahmen (§12 AGG) und Beschwerdestellenverfahren (§13 AGG) vorgeschrieben."
             if applies
-            else "AGG does not apply: no employees reported."
+            else "AGG gilt nicht: keine Mitarbeiter angegeben."
         )
 
         return ApplicabilityResult(
@@ -415,10 +415,10 @@ class RuleEngine:
         conf = "HIGH"
 
         reason = (
-            f"MiLoG applies to all employers: {profile.employee_count} employees. "
-            f"Statutory minimum wage (EUR 12.82/hour, 2025) and working time records (§17 MiLoG) mandatory."
+            f"MiLoG gilt für alle Arbeitgeber: {profile.employee_count} Mitarbeiter. "
+            f"Gesetzlicher Mindestlohn (12,82 Euro/Stunde, 2025) und Arbeitszeitaufzeichnungen (§17 MiLoG) vorgeschrieben."
             if applies
-            else "MiLoG does not apply: no employees reported."
+            else "MiLoG gilt nicht: keine Mitarbeiter angegeben."
         )
 
         return ApplicabilityResult(
@@ -439,10 +439,10 @@ class RuleEngine:
         conf = "HIGH" if not missing else "MEDIUM"
 
         reason = (
-            "TTDSG (§25 TDDDG) applies: company operates a website. "
-            "Prior informed consent required before setting non-essential cookies or tracking."
+            "TTDSG (§25 TDDDG) gilt: Unternehmen betreibt eine Website. "
+            "Einwilligung erforderlich vor dem Setzen nicht notwendiger Cookies oder Tracking-Maßnahmen."
             if applies
-            else "TTDSG does not apply: company has no public-facing website or app."
+            else "TTDSG gilt nicht: Unternehmen hat keine öffentliche Website oder App."
         )
 
         return ApplicabilityResult(
@@ -465,15 +465,15 @@ class RuleEngine:
 
         if applies:
             trigger = (
-                f"industry '{profile.industry}' is a GwG-obligated sector"
+                f"Branche '{profile.industry}' ist ein GwG-pflichtiger Sektor"
                 if in_gwg_sector
-                else "company self-declared as AML-obligated (is_aml_obligated_sector=true)"
+                else "Unternehmen hat sich als geldwäscherechtlich verpflichtet erklärt"
             )
-            reason = f"GwG applies: {trigger} (§2 GwG). Risk analysis, KYC, and AML officer obligations apply."
+            reason = f"GwG gilt: {trigger} (§2 GwG). Risikoanalyse, Kundensorgfaltspflichten und Geldwäschebeauftragter vorgeschrieben."
         else:
             reason = (
-                f"GwG does not apply: industry '{profile.industry}' is not in an AML-obligated sector. "
-                f"Set is_aml_obligated_sector=true if the company provides financial, crypto, legal, or gambling services."
+                f"GwG gilt nicht: Branche '{profile.industry}' ist kein geldwäscherechtlich verpflichteter Sektor. "
+                f"Feld 'geldwäschepflichtig' aktivieren, falls das Unternehmen Finanz-, Krypto-, Rechts- oder Glücksspieldienstleistungen erbringt."
             )
 
         return ApplicabilityResult(
@@ -496,14 +496,14 @@ class RuleEngine:
         if applies:
             parts = []
             if profile.produces_connected_products:
-                parts.append("manufactures connected (IoT) products (Art. 3-4)")
+                parts.append("stellt vernetzte (IoT) Produkte her (Art. 3-4)")
             if profile.provides_data_processing_services:
-                parts.append("provides cloud/data processing services (Art. 23-25)")
-            reason = f"EU Data Act applies: {'; '.join(parts)}."
+                parts.append("erbringt Cloud-/Datenverarbeitungsdienste (Art. 23-25)")
+            reason = f"EU Data Act gilt: {'; '.join(parts)}."
         else:
             reason = (
-                "EU Data Act does not apply: company does not manufacture connected products "
-                "and does not provide data processing services."
+                "EU Data Act gilt nicht: Unternehmen stellt keine vernetzten Produkte her "
+                "und erbringt keine Datenverarbeitungsdienste."
             )
 
         return ApplicabilityResult(
@@ -558,7 +558,7 @@ class RuleEngine:
                     regulation=reg_key,
                     applies=False,
                     confidence="LOW",
-                    reason=f"Rule engine error: {exc}",
+                    reason=f"Regelmotor-Fehler: {exc}",
                     required_fields=[],
                     missing_fields=[],
                 )

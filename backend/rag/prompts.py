@@ -75,8 +75,9 @@ Ein Unternehmensdokument mit "wir sind konform" überschreibt keine Level-1-Anfo
 def profile_enrichment_prompt(profile_json: str) -> str:
     profile_json = _sanitize_profile_json(profile_json)
     return f"""<task>
-Analyze this company profile and identify implicit compliance-relevant characteristics
-that are not explicitly stated but can be logically inferred.
+Analysieren Sie dieses Unternehmensprofil und identifizieren Sie implizite compliance-relevante Merkmale,
+die nicht explizit angegeben sind, aber logisch abgeleitet werden können.
+Alle Ausgaben müssen auf DEUTSCH verfasst sein.
 </task>
 
 <company_profile>
@@ -84,35 +85,36 @@ that are not explicitly stated but can be logically inferred.
 </company_profile>
 
 <instructions>
-Identify up to 10 inferred characteristics. Look for:
-- Industry-specific data processing patterns (e.g., healthcare always processes health data under Art. 9 GDPR)
-- Supply chain risk indicators based on industry and supplier countries
-- Energy consumption patterns typical for this industry and employee count
-- Implicit personal data processing (employee data, B2C customer records, etc.)
-- Reporting obligations implied by company size, listing status, or industry
-- Any characteristics that affect which specific articles apply within applicable regulations
+Identifizieren Sie bis zu 10 abgeleitete Merkmale. Achten Sie auf:
+- Branchenspezifische Datenverarbeitungsmuster (z.B. Gesundheitsbranche verarbeitet immer Gesundheitsdaten nach Art. 9 DSGVO)
+- Lieferkettenrisiken anhand von Branche und Lieferländern
+- Typische Energieverbrauchsmuster für diese Branche und Mitarbeiterzahl
+- Implizite Verarbeitung personenbezogener Daten (Mitarbeiterdaten, B2C-Kundendaten usw.)
+- Berichtspflichten, die sich aus Unternehmensgröße, Börsennotierung oder Branche ergeben
+- Merkmale, die beeinflussen, welche konkreten Artikel innerhalb anwendbarer Vorschriften gelten
 
-Output ONLY valid JSON in this exact format:
+Ausgabe NUR als gültiges JSON in diesem Format:
 {{
   "inferred_characteristics": [
-    "A characteristic directly and unambiguously implied by the profile data — e.g. 'Company employs staff and therefore has employer obligations under ArbSchG §3.'"
+    "Ein direkt und eindeutig aus den Profildaten abgeleitetes Merkmal — z.B. 'Das Unternehmen beschäftigt Mitarbeiter und hat daher Arbeitgeberpflichten nach ArbSchG §3.'"
   ],
   "inferred_assumptions": [
-    "An assumption that is plausible given the industry/size but NOT directly confirmed — e.g. 'A manufacturing company of this size likely operates machinery that generates waste heat, potentially triggering §15 EnEfG.' Prefix each with 'ASSUMPTION:'"
+    "Eine Annahme, die angesichts der Branche/Größe plausibel, aber nicht direkt bestätigt ist — z.B. 'Ein Produktionsunternehmen dieser Größe betreibt wahrscheinlich Maschinen, die Abwärme erzeugen, was §15 EnEfG auslösen könnte.' Jede Annahme mit 'ANNAHME:' prefixen."
   ],
   "validation_warnings": [
-    "Warning about missing or ambiguous data that affects the analysis."
+    "Hinweis auf fehlende oder unklare Daten, die die Analyse beeinflussen."
   ],
   "missing_optional_fields": ["field_name"]
 }}
 
-Constraints:
-- inferred_characteristics: only what is DIRECTLY AND LOGICALLY implied with high certainty
-- inferred_assumptions: plausible but unconfirmed — must be prefixed with 'ASSUMPTION:'
-- Do NOT put assumptions into inferred_characteristics
-- Do NOT repeat information already explicit in the profile
-- missing_optional_fields: only fields that materially affect compliance assessment
-- If nothing can be inferred, return empty arrays
+Einschränkungen:
+- inferred_characteristics: nur was DIREKT UND LOGISCH mit hoher Sicherheit ableitbar ist
+- inferred_assumptions: plausibel, aber unbestätigt — müssen mit 'ANNAHME:' beginnen
+- Annahmen NICHT in inferred_characteristics aufnehmen
+- Keine Informationen wiederholen, die bereits explizit im Profil stehen
+- missing_optional_fields: nur Felder, die die Compliance-Bewertung wesentlich beeinflussen
+- Falls nichts abgeleitet werden kann, leere Arrays zurückgeben
+- ALLE Texte in inferred_characteristics, inferred_assumptions und validation_warnings auf DEUTSCH verfassen
 </instructions>"""
 
 
