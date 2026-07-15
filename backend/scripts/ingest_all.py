@@ -27,6 +27,9 @@ ALL_REGULATIONS = [
     "workplace_law",
     "agg",
     "milog",
+    "ttdsg",
+    "gwg",
+    "eu_data_act",
     "compliance_guides",
 ]
 
