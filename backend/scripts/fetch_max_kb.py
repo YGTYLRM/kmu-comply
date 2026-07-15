@@ -162,7 +162,7 @@ def fetch_pdf(url: str, dest_dir: Path, filename: str, label: str, extra_headers
 
     text = extract_pdf_text(pdf_bytes)
     if not text:
-        print(f"    ERROR: could not extract text from PDF")
+        print("    ERROR: could not extract text from PDF")
         return False
 
     save_text(dest_dir, filename, f"{label}\nSource: {url}", text)
@@ -176,7 +176,7 @@ def fetch_eurlex_html(celex: str, dest_dir: Path, filename: str, label: str, lan
     if not raw:
         return False
     if "Request blocked" in raw or "Access Denied" in raw or len(raw) < 5000:
-        print(f"    EUR-Lex WAF blocked — skipping")
+        print("    EUR-Lex WAF blocked — skipping")
         return False
 
     text = strip_html(raw)

@@ -394,15 +394,12 @@ def _summary_and_applicability(report: ComplianceReport, logo: str) -> str:
             if not cleaned:
                 continue
             if cat == "critical":
-                dot_color = "#b91c1c"
                 label = "Widerspruch"
                 label_color = "#b91c1c"
             elif cat == "warning":
-                dot_color = "#a16207"
                 label = "Hinweis"
                 label_color = "#a16207"
             else:
-                dot_color = "#475569"
                 label = "Info"
                 label_color = "#64748b"
             items_html += (
