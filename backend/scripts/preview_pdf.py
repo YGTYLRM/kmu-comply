@@ -1,10 +1,11 @@
 """
-Run from backend/ to render a PDF with fake data — no LLM calls.
+Render a PDF with fake data — no LLM calls.
+Run from backend/:  python scripts/preview_pdf.py
 Output: preview_report.pdf in the backend directory.
 """
 import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.compliance_report import (
     ComplianceReport, RegulationApplicability, ComplianceGap,
