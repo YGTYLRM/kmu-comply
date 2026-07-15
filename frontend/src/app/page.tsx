@@ -366,27 +366,29 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/8 px-3.5 py-1.5 text-xs font-semibold text-brand-300 mb-6">
-                14 deutsche und EU-Vorschriften
-              </span>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/8 px-3.5 py-1.5 text-xs font-semibold text-brand-300">
+                  14 deutsche und EU-Vorschriften
+                </span>
+              </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white leading-[1.08] mb-5">
                 Kennen Sie Ihre<br />
                 <span className="text-brand-400">Compliance-Lücken?</span>
               </h1>
               <p className="text-lg text-slate-400 leading-relaxed mb-8 max-w-lg">
-                Complio prüft Ihr Unternehmen gegen 14 Gesetze und liefert einen vollständigen Bericht mit konkreten Lücken, priorisierten Maßnahmen und echten Gesetzeszitaten. In unter 10 Minuten.
+                Complio prüft Ihr Unternehmen gegen 14 Gesetze und zeigt Ihnen konkrete Lücken, priorisierte Maßnahmen und echte Gesetzeszitate — in unter 10 Minuten.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 py-3.5 text-base font-semibold text-white hover:bg-brand-500 transition-colors">
-                  Demo anfordern
+                <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 py-3.5 text-base font-semibold text-white hover:bg-brand-500 transition-colors">
+                  Jetzt starten
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-7 py-3.5 text-base font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
-                  Kostenlose Vorprüfung
+                  Kostenloser Schnellcheck
                 </Link>
               </div>
               <div className="flex flex-wrap gap-5 text-xs text-slate-500">
-                {["Antwort innerhalb 1 Werktag", "Kein Jahresvertrag", "14 Gesetze abgedeckt"].map((t) => (
+                {["Kein Jahresvertrag", "Ergebnis in unter 10 Minuten", "14 Gesetze abgedeckt"].map((t) => (
                   <span key={t} className="flex items-center gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
                     {t}
@@ -627,7 +629,7 @@ export default function HomePage() {
                   {([
                     { label: "Abgedeckte Vorschriften",                    complio: "14",             platforms: "1–3",             lawyer: "auf Anfrage" },
                     { label: "Zeit bis zum ersten Ergebnis",               complio: "~5–10 Min.",     platforms: "1–4 Wochen",      lawyer: "2–6 Wochen" },
-                    { label: "Gesamtkosten Einstieg",                      complio: "€ 129 einmalig", platforms: "€ 1.400+ (2 J.)", lawyer: "€ 600–1.500" },
+                    { label: "Einstieg",                                   complio: "kostenlos testen", platforms: "€ 1.400+ (2 J.)", lawyer: "€ 600–1.500" },
                     { label: "Vertragsbindung",                            complio: "✓",              platforms: "✗",               lawyer: "✓" },
                     { label: "Schwellenwertprüfung nach Unternehmensgröße",complio: "✓",              platforms: "◐",               lawyer: "✓" },
                     { label: "Analyse eigener Dokumente (AVV, DSGVO, ISMS)",complio: "✓",             platforms: "◐",               lawyer: "✓" },
@@ -686,6 +688,22 @@ export default function HomePage() {
           </motion.div>
 
           <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="mb-8 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-4 flex items-start gap-3 max-w-2xl mx-auto"
+          >
+            <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-300 mb-0.5">Was ist kostenlos?</p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Nach der Registrierung sehen Sie kostenlos, welche der 14 Gesetze für Ihr Unternehmen gelten und Ihren Compliance-Score je Vorschrift. Lückenanalyse, Maßnahmenplan und PDF-Bericht sind im kostenpflichtigen Plan enthalten.
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
             variants={stagger()}
             initial="hidden"
             whileInView="show"
@@ -733,6 +751,10 @@ export default function HomePage() {
               </motion.div>
             ))}
           </motion.div>
+
+          <p className="mt-6 text-center text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
+            Complio erstellt vorläufige Compliance-Einschätzungen auf Basis Ihrer Angaben. Die Ergebnisse stellen keine Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG) dar und begründen kein Mandatsverhältnis. Für rechtsverbindliche Auskünfte wenden Sie sich an einen zugelassenen Rechtsanwalt.
+          </p>
         </div>
       </section>
 
@@ -774,8 +796,8 @@ export default function HomePage() {
             <p className="text-base sm:text-lg text-slate-500 max-w-lg">
               Detailliertes Compliance-Screening über 14 deutsche und EU-Vorschriften. Kein Ersatz für Rechtsberatung.
             </p>
-            <Link href="/contact" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
-              Demo anfordern
+            <Link href="/register" className="group inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-glow-blue-sm hover:shadow-glow-blue hover:bg-brand-500 transition-all duration-300">
+              Kostenlos starten
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
             </Link>
           </motion.div>
