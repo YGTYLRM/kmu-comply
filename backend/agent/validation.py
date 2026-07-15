@@ -92,22 +92,76 @@ def verify_gap_citations(
     return warnings
 
 
-def check_evidence_quotes(gaps: list[ComplianceGap]) -> list[str]:
-    """Warn when VERIFIED gaps lack an evidence_quote.
+_WHITESPACE_RE = re.compile(r"\s+")
 
-    A VERIFIED finding claims to be backed by a retrieved chunk. If the LLM
-    did not include a verbatim quote, it may have fabricated the citation or
-    the confidence label. This function emits warnings so downstream consumers
-    (PDF, API response) can flag these gaps for manual review.
+# Ellipsis markers the LLM may use to elide text inside a quote
+_ELLIPSIS_RE = re.compile(r"\.{3}|…|\[\.\.\.\]|\[…\]")
 
-    Returns a list of warning strings. Does NOT modify the gaps — it is the
-    caller's responsibility to act on warnings (e.g. downgrade confidence).
+# Fragments shorter than this are too generic to prove the quote came from the
+# chunk ("muss", "Art. 5") — they are skipped during verification.
+_MIN_QUOTE_FRAGMENT_CHARS = 15
+
+
+def _normalize_quote(text: str) -> str:
+    """Normalize text for quote-in-chunk comparison: collapse whitespace,
+    casefold, and strip surrounding quotation marks."""
+    text = _WHITESPACE_RE.sub(" ", text).strip()
+    return text.strip('"\'„“”‚‘’«»').casefold()
+
+
+def _quote_found_in_chunks(quote: str, chunk_texts: list[str]) -> bool:
+    """True if every substantial fragment of the quote appears verbatim
+    (whitespace/case-normalized) in at least one chunk text.
+
+    Quotes may contain ellipses ("..." / "…") to elide text — each fragment
+    between ellipses is checked independently. Fragments under
+    _MIN_QUOTE_FRAGMENT_CHARS are skipped as too generic to verify.
     """
+    normalized_chunks = [_normalize_quote(t) for t in chunk_texts]
+    fragments = [
+        _normalize_quote(f)
+        for f in _ELLIPSIS_RE.split(quote)
+    ]
+    fragments = [f for f in fragments if len(f) >= _MIN_QUOTE_FRAGMENT_CHARS]
+    if not fragments:
+        # Nothing substantial enough to verify — treat as unverifiable, not as a lie
+        return True
+    return all(
+        any(frag in chunk for chunk in normalized_chunks)
+        for frag in fragments
+    )
+
+
+def check_evidence_quotes(
+    gaps: list[ComplianceGap],
+    chunks: list[RegulatoryChunk] | None = None,
+) -> list[str]:
+    """Verify evidence_quote integrity on VERIFIED/HIGH-confidence gaps.
+
+    Two checks:
+    1. HIGH-confidence gaps without an evidence_quote → downgrade to MEDIUM.
+       A VERIFIED finding claims to be backed by a retrieved chunk; if the LLM
+       cannot quote the chunk, the finding is suspect.
+    2. When chunks are provided: gaps WITH an evidence_quote whose quote does
+       not appear verbatim (whitespace/case-normalized) in any retrieved chunk
+       for that regulation → downgrade to LOW. A fabricated quote is a stronger
+       hallucination signal than a missing one.
+
+    Returns a list of warning strings and downgrades confidence in-place.
+    """
+    # Build: regulation_value → list of chunk texts for quote lookup
+    chunk_texts: dict[str, list[str]] = {}
+    for chunk in chunks or []:
+        chunk_texts.setdefault(chunk.regulation.value, []).append(chunk.text)
+
     warnings: list[str] = []
     for gap in gaps:
         if gap.status == ComplianceStatus.CANNOT_ASSESS:
             continue
-        if gap.confidence == "HIGH" and not getattr(gap, "evidence_quote", None):
+
+        quote = getattr(gap, "evidence_quote", None)
+
+        if gap.confidence == "HIGH" and not quote:
             msg = (
                 f"missing evidence_quote: {gap.regulation.value} {gap.article_number} "
                 f"is marked HIGH confidence but provides no verbatim chunk quote — "
@@ -120,6 +174,25 @@ def check_evidence_quotes(gaps: list[ComplianceGap]) -> list[str]:
                 "No verbatim source quote provided — HIGH confidence requires "
                 "a direct quotation from the retrieved regulatory text"
             )
+            continue
+
+        if quote:
+            reg_texts = chunk_texts.get(gap.regulation.value)
+            if not reg_texts:
+                continue  # no chunks for this regulation — zero-chunks guard handles it
+            if not _quote_found_in_chunks(quote, reg_texts):
+                msg = (
+                    f"fabricated evidence_quote: {gap.regulation.value} "
+                    f"{gap.article_number} quotes text that appears in no retrieved "
+                    f"chunk — downgrading confidence to LOW"
+                )
+                logger.warning("validation: %s", msg)
+                warnings.append(msg)
+                gap.confidence = "LOW"
+                gap.confidence_reason = (
+                    "Evidence quote not found in any retrieved regulatory text — "
+                    "the quotation may be fabricated; verify manually"
+                )
     return warnings
 
 

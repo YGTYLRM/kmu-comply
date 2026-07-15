@@ -234,6 +234,165 @@ class TestCitationVerification:
         assert gap_bad.confidence == "LOW"
 
 
+class TestEvidenceQuoteVerification:
+    """Tests for agent.validation.check_evidence_quotes."""
+
+    _CHUNK_TEXT = (
+        "Art. 30 Verzeichnis von Verarbeitungstätigkeiten\n\n"
+        "(1) Jeder Verantwortliche und gegebenenfalls sein Vertreter führen ein "
+        "Verzeichnis aller Verarbeitungstätigkeiten, die ihrer Zuständigkeit unterliegen."
+    )
+
+    def _make_gap(self, quote=None, confidence="HIGH", status=ComplianceStatus.NON_COMPLIANT):
+        return ComplianceGap(
+            regulation=Regulation.GDPR,
+            article_number="Art. 30",
+            article_title="Verzeichnis von Verarbeitungstätigkeiten",
+            status=status,
+            evidence="Test evidence",
+            evidence_quote=quote,
+            confidence=confidence,
+        )
+
+    def _make_chunk(self, text=None):
+        from models.compliance_report import RegulatoryChunk
+        from models.enums import ObligationType
+        return RegulatoryChunk(
+            regulation=Regulation.GDPR,
+            article_number="Art. 30",
+            title="Verzeichnis von Verarbeitungstätigkeiten",
+            text=text or self._CHUNK_TEXT,
+            obligation_type=ObligationType.MUST,
+        )
+
+    def test_genuine_quote_passes(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote="führen ein Verzeichnis aller Verarbeitungstätigkeiten")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+    def test_quote_with_different_whitespace_and_case_passes(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote="Führen ein  Verzeichnis\naller   verarbeitungstätigkeiten")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+    def test_fabricated_quote_downgraded_to_low(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote="Unternehmen müssen jährlich einen Bericht an die Behörde senden")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert len(warnings) == 1
+        assert "fabricated" in warnings[0]
+        assert gap.confidence == "LOW"
+
+    def test_ellipsis_quote_checks_each_fragment(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(
+            quote="Jeder Verantwortliche und gegebenenfalls sein Vertreter ... die ihrer Zuständigkeit unterliegen"
+        )
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+    def test_ellipsis_quote_with_one_fabricated_fragment_fails(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(
+            quote="Jeder Verantwortliche und gegebenenfalls sein Vertreter ... muss der Aufsichtsbehörde monatlich berichten"
+        )
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert len(warnings) == 1
+        assert gap.confidence == "LOW"
+
+    def test_missing_quote_on_high_confidence_downgraded_to_medium(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote=None, confidence="HIGH")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert len(warnings) == 1
+        assert "missing evidence_quote" in warnings[0]
+        assert gap.confidence == "MEDIUM"
+
+    def test_missing_quote_on_medium_confidence_no_warning(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote=None, confidence="MEDIUM")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+        assert gap.confidence == "MEDIUM"
+
+    def test_no_chunks_for_regulation_skips_quote_check(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote="irgendein erfundenes Zitat das nirgends steht")
+        warnings = check_evidence_quotes([gap], [])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+    def test_cannot_assess_skipped(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote="erfundenes Zitat", status=ComplianceStatus.CANNOT_ASSESS)
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+
+    def test_backwards_compatible_without_chunks_arg(self):
+        from agent.validation import check_evidence_quotes
+        gap = self._make_gap(quote=None, confidence="HIGH")
+        warnings = check_evidence_quotes([gap])
+        assert len(warnings) == 1
+        assert gap.confidence == "MEDIUM"
+
+    def test_short_generic_quote_not_flagged(self):
+        from agent.validation import check_evidence_quotes
+        # Fragments under the minimum length are too generic to verify — no false positive
+        gap = self._make_gap(quote="Art. 30")
+        warnings = check_evidence_quotes([gap], [self._make_chunk()])
+        assert warnings == []
+        assert gap.confidence == "HIGH"
+
+
+class TestObligationClassifier:
+    """Tests for rag.ingest._obligation negation handling."""
+
+    def test_positive_muss_is_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("Der Verantwortliche muss ein Verzeichnis führen.") == "MUST"
+
+    def test_ist_verpflichtet_is_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("Der Arbeitgeber ist verpflichtet, eine Meldestelle einzurichten.") == "MUST"
+
+    def test_muss_nicht_is_not_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("Der Betreiber muss nicht melden.") != "MUST"
+
+    def test_ist_nicht_verpflichtet_is_not_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("Das Unternehmen ist nicht verpflichtet, einen Bericht vorzulegen.") != "MUST"
+
+    def test_besteht_keine_pflicht_is_not_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("Es besteht keine Pflicht zur Benennung.") != "MUST"
+
+    def test_shall_not_is_not_must(self):
+        from rag.ingest import _obligation
+        assert _obligation("The provider shall not disclose the data.") != "MUST"
+
+    def test_negation_does_not_mask_separate_positive_obligation(self):
+        from rag.ingest import _obligation
+        text = (
+            "Der Betreiber muss nicht jährlich berichten. "
+            "Der Verantwortliche muss jedoch ein Verzeichnis führen."
+        )
+        assert _obligation(text) == "MUST"
+
+    def test_kann_is_may(self):
+        from rag.ingest import _obligation
+        assert _obligation("Die Behörde kann eine Ausnahme gewähren.") == "MAY"
+
+    def test_soll_is_should(self):
+        from rag.ingest import _obligation
+        assert _obligation("Der Arbeitgeber soll geeignete Maßnahmen treffen.") == "SHOULD"
+
+
 class TestAPIModels:
     def test_health_response_defaults(self):
         from models.api_responses import HealthResponse

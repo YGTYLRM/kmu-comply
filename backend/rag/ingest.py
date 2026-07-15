@@ -203,8 +203,22 @@ def _split_oversized(text: str, header: str) -> list[str]:
     return chunks or [text[:MAX_CHUNK_CHARS]]
 
 
+# Negated obligation phrases — must be removed before keyword matching so that
+# "muss nicht" / "ist nicht verpflichtet" / "shall not" don't classify as MUST.
+_RE_NEGATED_OBLIGATION = re.compile(
+    r"(muss(?:te)?|müssen|darf|dürfen|kann|können|soll(?:te)?n?|hat|haben)\s+"
+    r"(?:\w+\s+){0,3}?nicht\b"
+    r"|ist\s+nicht\s+(?:dazu\s+)?verpflichtet"
+    r"|sind\s+nicht\s+(?:dazu\s+)?verpflichtet"
+    r"|besteht\s+keine\s+(?:pflicht|verpflichtung)"
+    r"|(?:shall|must|may|should)\s+not\b"
+    r"|is\s+not\s+(?:required|obliged|obligated)",
+    re.IGNORECASE,
+)
+
+
 def _obligation(text: str) -> str:
-    t = text.lower()
+    t = _RE_NEGATED_OBLIGATION.sub(" ", text.lower())
     if any(w in t for w in ["muss", "müssen", "ist verpflichtet", "sind verpflichtet",
                              "hat zu", "haben zu", "must", "shall", "is required"]):
         return "MUST"

@@ -101,8 +101,9 @@ async def run_analysis(
             job_id, len(citation_warnings),
         )
 
-    # Step 4c — evidence quote check (VERIFIED findings without verbatim quotes get downgraded)
-    quote_warnings = check_evidence_quotes(gaps)
+    # Step 4c — evidence quote check: VERIFIED findings without verbatim quotes get
+    # downgraded to MEDIUM; quotes that appear in no retrieved chunk get downgraded to LOW
+    quote_warnings = check_evidence_quotes(gaps, chunks)
     if quote_warnings:
         logger.warning(
             "job %s: %d gap(s) missing evidence_quote — confidence downgraded to MEDIUM",
