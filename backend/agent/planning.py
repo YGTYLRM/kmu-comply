@@ -447,6 +447,7 @@ def _to_models(chunks: list[dict]) -> list[RegulatoryChunk]:
                 threshold=c.get("threshold"),
                 source_url=c.get("source_url"),
                 document_type=c.get("document_type", "law"),
+                legal_version_date=c.get("legal_version_date") or None,
             ))
         except Exception as exc:
             logger.warning("could not parse retrieval chunk: %s", exc)

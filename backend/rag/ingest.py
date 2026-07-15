@@ -406,6 +406,37 @@ def _chunk_fixed(text: str, regulation: str, filename: str, url: str) -> list[di
 
 
 # ---------------------------------------------------------------------------
+# Legal version (Rechtsstand) extraction
+# ---------------------------------------------------------------------------
+
+# gesetze-im-internet.de header lines, in priority order:
+#   "Stand:Zuletzt geändert durch Art. 12 Abs. 4 G v. 29.6.2026 I Nr. 197"
+#   "Stand:Geändert durch Art. 25 G v. 5.7.2021 I 3338"
+# Fallback when no amendment line exists (law never amended):
+#   "Ausfertigungsdatum: 16.07.2021"
+_RE_STAND_DATE = re.compile(
+    r"(?im)^Stand:.*?ge[äa]ndert\s+durch\b.*?\bv\.\s*(\d{1,2})\.(\d{1,2})\.(\d{4})"
+)
+_RE_AUSFERTIGUNG = re.compile(
+    r"(?im)^Ausfertigungsdatum:\s*(\d{1,2})\.(\d{1,2})\.(\d{4})"
+)
+
+
+def _legal_version_date(text: str) -> str:
+    """Extract the Rechtsstand of a statute text as an ISO date string.
+
+    Prefers the date of the last amendment (Stand: ... geändert durch ... v. D.M.YYYY)
+    over the original enactment date (Ausfertigungsdatum). Returns "" when neither
+    is found (e.g. guidance PDFs) — ChromaDB metadata must not be None.
+    """
+    m = _RE_STAND_DATE.search(text) or _RE_AUSFERTIGUNG.search(text)
+    if not m:
+        return ""
+    day, month, year = m.groups()
+    return f"{year}-{int(month):02d}-{int(day):02d}"
+
+
+# ---------------------------------------------------------------------------
 # Routing
 # ---------------------------------------------------------------------------
 
@@ -439,6 +470,7 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
     url = OFFICIAL_URLS.get(regulation, "")
     text = _load(path)
     name = path.name
+    legal_version = _legal_version_date(text)
 
     # Structured expanded files (any regulation) — split on '---' blocks
     if "_expanded" in path.stem:
@@ -464,6 +496,9 @@ def _chunks_for_file(path: Path, regulation: str) -> list[dict]:
 
     else:
         chunks = _chunk_guidance(text, regulation, name, url)
+
+    for chunk in chunks:
+        chunk["metadata"]["legal_version_date"] = legal_version
 
     return _stamp_provenance(chunks, path)
 
