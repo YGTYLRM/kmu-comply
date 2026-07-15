@@ -393,6 +393,49 @@ class TestObligationClassifier:
         assert _obligation("Der Arbeitgeber soll geeignete Maßnahmen treffen.") == "SHOULD"
 
 
+class TestLegalVersionDate:
+    """Tests for rag.ingest._legal_version_date (Rechtsstand extraction)."""
+
+    def test_stand_zuletzt_geaendert(self):
+        from rag.ingest import _legal_version_date
+        text = "Gesetz X\nStand:Zuletzt geändert durch Art. 12 Abs. 4 G v. 29.6.2026 I Nr. 197\n§ 1 ..."
+        assert _legal_version_date(text) == "2026-06-29"
+
+    def test_stand_geaendert_without_zuletzt(self):
+        from rag.ingest import _legal_version_date
+        text = "Stand:Geändert durch Art. 25 G v. 5.7.2021 I 3338"
+        assert _legal_version_date(text) == "2021-07-05"
+
+    def test_ausfertigungsdatum_fallback(self):
+        from rag.ingest import _legal_version_date
+        text = "Gesetz Y\nAusfertigungsdatum: 16.07.2021\n§ 1 ..."
+        assert _legal_version_date(text) == "2021-07-16"
+
+    def test_stand_wins_over_ausfertigungsdatum(self):
+        from rag.ingest import _legal_version_date
+        text = (
+            "Ausfertigungsdatum: 23.06.2021\n"
+            "Stand:Zuletzt geändert durch Art. 3 G v. 10.3.2026 I Nr. 64\n"
+        )
+        assert _legal_version_date(text) == "2026-03-10"
+
+    def test_no_date_returns_empty_string(self):
+        from rag.ingest import _legal_version_date
+        assert _legal_version_date("EDPB Guidelines on legitimate interests ...") == ""
+
+    def test_real_statute_files_yield_dates(self):
+        from pathlib import Path
+        from rag.ingest import DATA_DIR, _legal_version_date
+        # Every gesetze-im-internet.de full text fetched to disk must produce a date
+        for rel in ["gwg/gwg_full_text.txt", "hinschg/hinschg_full_text.txt",
+                    "lksg/lksg_full_text.txt", "milog/milog_full_text.txt"]:
+            path = Path(DATA_DIR) / rel
+            if not path.exists():
+                continue
+            date = _legal_version_date(path.read_text(encoding="utf-8"))
+            assert date and date[:2] == "20", f"{rel}: no Rechtsstand extracted"
+
+
 class TestAPIModels:
     def test_health_response_defaults(self):
         from models.api_responses import HealthResponse
