@@ -27,6 +27,11 @@ class RegulatoryChunk(BaseModel):
     threshold: Optional[str] = None
     source_url: Optional[str] = None
     document_type: str = "law"  # "law" | "guidance" — controls source authority in prompts
+    legal_version_date: Optional[str] = Field(
+        None,
+        description="Rechtsstand of the source statute as ISO date (date of last amendment, "
+                    "or enactment date if never amended); None for guidance documents",
+    )
 
 
 class ComplianceGap(BaseModel):
