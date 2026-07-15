@@ -172,6 +172,7 @@ export interface ComplianceReport {
     total_chunks: number;
     unique_articles: number;
   }>;
+  diagnostic_only?: boolean;
 }
 
 export interface StepProgress {

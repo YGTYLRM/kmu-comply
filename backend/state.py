@@ -28,3 +28,6 @@ analyze_calls_fallback: dict[str, list[float]] = defaultdict(list)
 
 # Contact endpoint rate limit (per IP, in-memory only — intentional).
 contact_calls: dict[str, list[float]] = defaultdict(list)
+
+# Quick-check endpoint rate limit (per IP, separate from contact).
+quick_check_calls: dict[str, list[float]] = defaultdict(list)

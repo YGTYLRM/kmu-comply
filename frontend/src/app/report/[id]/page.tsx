@@ -13,7 +13,7 @@ import { DocumentNudge } from "@/components/report/document-nudge";
 import { DocumentTemplates } from "@/components/report/document-templates";
 import { ExpertReview } from "@/components/report/expert-review";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown, ShieldAlert, X, BookOpen } from "lucide-react";
+import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown, ShieldAlert, X, BookOpen, Lock } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ComplianceReport } from "@/lib/types";
 
@@ -137,7 +137,15 @@ export default function ReportPage() {
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Link2 className="h-3.5 w-3.5" />}
                   {copied ? "Kopiert!" : "Link kopieren"}
                 </button>
-                {report.requires_manual_review && report.requires_manual_review.length > 0 ? (
+                {report.diagnostic_only ? (
+                  <a
+                    href="/account/billing"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-brand-500/30 bg-brand-500/[0.08] px-4 py-2 text-sm font-medium text-brand-400 hover:bg-brand-500/[0.14] transition-all duration-200"
+                  >
+                    <Lock className="h-3.5 w-3.5" />
+                    PDF freischalten
+                  </a>
+                ) : report.requires_manual_review && report.requires_manual_review.length > 0 ? (
                   <button
                     onClick={() => setPdfWarningOpen(true)}
                     className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] px-4 py-2 text-sm font-medium text-amber-400 hover:bg-amber-500/[0.14] transition-all duration-200"
@@ -272,16 +280,61 @@ export default function ReportPage() {
             </div>
           )}
 
+          {/* Free diagnostic banner */}
+          {report.diagnostic_only && (
+            <div className="rounded-xl border border-brand-500/30 bg-brand-500/[0.06] px-5 py-4 flex items-start gap-3">
+              <Lock className="h-5 w-5 text-brand-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-brand-300 mb-1">Kostenloses Diagnose-Screening</p>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sie sehen, welche Gesetze gelten und wie Ihr Score je Vorschrift aussieht.
+                  Lückenanalyse, Maßnahmenplan und PDF-Export sind im kostenpflichtigen Plan enthalten.
+                </p>
+              </div>
+              <a
+                href="/account/billing"
+                className="flex-shrink-0 inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500 transition-colors"
+              >
+                Plan auswählen
+              </a>
+            </div>
+          )}
+
           <DocumentNudge report={report} />
-          <ExecutiveSummary report={report} />
+          {!report.diagnostic_only && <ExecutiveSummary report={report} />}
           <div className="grid lg:grid-cols-2 gap-5">
             <ApplicabilityMatrix report={report} />
             <ScoreBreakdown report={report} />
           </div>
-          <GapAnalysis report={report} />
-          <ActionPlan report={report} />
-          <DocumentTemplates jobId={jobId} />
-          <ExpertReview report={report} jobId={jobId} />
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Lückenanalyse"
+              description="Sehen Sie genau, welche Anforderungen fehlen — mit Artikelzitat, Bewertung und Begründung für jeden der 14 Rechtsbereiche."
+              itemCount={report.applicable_regulations.filter(r => r.applies).length * 3}
+            />
+          ) : (
+            <GapAnalysis report={report} />
+          )}
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Priorisierter Maßnahmenplan"
+              description="Jede Lücke wird zu einer konkreten Aufgabe — mit Priorität (Kritisch / Hoch / Mittel / Niedrig), Aufwandsschätzung und Frist."
+              itemCount={report.applicable_regulations.filter(r => r.applies).length * 2}
+            />
+          ) : (
+            <ActionPlan report={report} />
+          )}
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Dokument-Vorlagen & Expertenprüfung"
+              description="Fertige Vorlagen für Datenschutzerklärung, AVV, Hinweisgeberschutz und mehr — sowie Zugang zur Expertenprüfung durch einen zugelassenen Rechtsanwalt."
+            />
+          ) : (
+            <>
+              <DocumentTemplates jobId={jobId} />
+              <ExpertReview report={report} jobId={jobId} />
+            </>
+          )}
 
           {/* Source grounding coverage */}
           {report.regulation_coverage && Object.keys(report.regulation_coverage).length > 0 && (
@@ -410,6 +463,40 @@ function SourceCoverage({ coverage }: { coverage: Record<string, { law_chunks: n
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+function LockedSection({ title, description, itemCount }: { title: string; description: string; itemCount?: number }) {
+  const rows = Math.max(itemCount ?? 3, 2);
+  return (
+    <div className="relative rounded-xl border border-white/[0.07] overflow-hidden">
+      {/* Blurred placeholder rows */}
+      <div className="px-5 py-4 flex flex-col gap-3 select-none pointer-events-none" aria-hidden>
+        {Array.from({ length: Math.min(rows, 5) }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="h-4 rounded-md bg-white/[0.05]" style={{ width: `${48 + (i % 3) * 18}%` }} />
+            <div className="h-4 rounded-md bg-white/[0.03]" style={{ width: `${20 + (i % 2) * 12}%` }} />
+          </div>
+        ))}
+      </div>
+      {/* Lock overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-dark-950/80 backdrop-blur-[2px] p-6 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/25">
+          <Lock className="h-5 w-5 text-brand-400" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-white mb-1">{title}</p>
+          <p className="text-xs text-slate-400 leading-relaxed max-w-sm">{description}</p>
+        </div>
+        <a
+          href="/account/billing"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:bg-brand-500 transition-colors"
+        >
+          <Lock className="h-3.5 w-3.5" />
+          Plan auswählen — ab €89/Monat
+        </a>
+      </div>
     </div>
   );
 }

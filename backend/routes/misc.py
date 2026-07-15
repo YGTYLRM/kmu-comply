@@ -16,7 +16,7 @@ from dependencies import check_endpoint_rate_limit
 from models import RegulationsListResponse
 from models.api_responses import RegulationInfo
 from services.auth_service import get_current_user
-from state import contact_calls
+from state import contact_calls, quick_check_calls
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -117,17 +117,16 @@ async def quick_check(body: QuickCheckRequest, request: Request):
     and why. This is the top-of-funnel feature: let prospects see the value of the
     threshold engine before paying for the full gap analysis.
 
-    Rate-limited to 20 requests per hour per IP.
+    Rate-limited to 60 requests per hour per IP.
     """
     from time import time as _time
 
-    RATE_LIMIT = 20
+    RATE_LIMIT = 60
     WINDOW = 3600
 
     ip = request.client.host if request.client else "unknown"
     now = _time()
-    # Reuse the existing contact_calls store since it has the same pattern
-    recent = [t for t in contact_calls[ip] if now - t < WINDOW]
+    recent = [t for t in quick_check_calls[ip] if now - t < WINDOW]
     if len(recent) >= RATE_LIMIT:
         raise HTTPException(status_code=429, detail="Zu viele Anfragen. Bitte versuchen Sie es später erneut.")
 
@@ -159,7 +158,7 @@ async def quick_check(body: QuickCheckRequest, request: Request):
         provides_data_processing_services=body.provides_data_processing_services,
     )
 
-    contact_calls[ip].append(now)
+    quick_check_calls[ip].append(now)
 
     _REG_DISPLAY_NAMES = {
         "gdpr_dsgvo": "GDPR / DSGVO",
@@ -274,6 +273,7 @@ async def sync_profile(current_user: dict = Depends(get_current_user)):
     from db.models import Profile
     from sqlalchemy import select
 
+    is_new = False
     async with AsyncSessionLocal() as db:
         result = await db.execute(
             select(Profile).where(Profile.id == current_user["id"])
@@ -281,6 +281,33 @@ async def sync_profile(current_user: dict = Depends(get_current_user)):
         if not result.scalar_one_or_none():
             db.add(Profile(id=current_user["id"], email=current_user["email"]))
             await db.commit()
+            is_new = True
+
+    if is_new and settings.resend_api_key:
+        try:
+            import resend
+            resend.api_key = settings.resend_api_key
+            user_email = current_user.get("email", "")
+            user_name  = html.escape(current_user.get("name") or user_email.split("@")[0])
+            resend.Emails.send({
+                "from": "Complio <onboarding@resend.dev>",
+                "to": [user_email],
+                "subject": "Willkommen bei Complio",
+                "html": (
+                    f'<div style="font-family:sans-serif;max-width:560px;color:#1e293b">'
+                    f'<h2 style="color:#1e40af">Willkommen bei Complio, {user_name}</h2>'
+                    f'<p>Ihr Konto ist aktiv. Sie können jetzt Ihr Unternehmensprofil ausfüllen und eine kostenlose Compliance-Vorprüfung starten.</p>'
+                    f'<p>Die Vorprüfung zeigt Ihnen, welche der 14 Gesetze für Ihr Unternehmen gelten und wie weit Sie je Vorschrift vom konformen Zustand entfernt sind.</p>'
+                    f'<p style="margin-top:24px">'
+                    f'<a href="https://complio.de/analyze" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Analyse starten</a>'
+                    f'</p>'
+                    f'<p style="margin-top:32px;font-size:12px;color:#94a3b8">Complio · Vorläufige Einschätzung, keine Rechtsberatung</p>'
+                    f'</div>'
+                ),
+            })
+        except Exception as exc:
+            logger.warning("welcome email failed: %s", exc)
+
     return {"ok": True}
 
 

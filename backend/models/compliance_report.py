@@ -134,3 +134,7 @@ class ComplianceReport(BaseModel):
         default_factory=list,
         description="Steps or sections that failed validation and need human review",
     )
+
+    # Set to True when the report is returned to an unsubscribed user.
+    # Gap analysis, action plan, and executive summary are stripped in this mode.
+    diagnostic_only: bool = False
