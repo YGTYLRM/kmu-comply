@@ -51,7 +51,6 @@ Run commands
     --headless -u 100 -r 20 --run-time 5m --class-picker StatusPollerUser
 """
 
-import json
 import logging
 import os
 import random
