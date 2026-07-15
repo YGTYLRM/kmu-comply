@@ -189,24 +189,20 @@ async def analyze(body: AnalyzeRequest, current_user: dict = Depends(get_current
     company_id: Optional[str] = None
     if settings.database_url:
         from services.stripe_service import get_active_subscription
-        from services.db_service import create_company_with_limit_check
-
         sub = await get_active_subscription(current_user["id"])
-        if not sub:
-            raise HTTPException(status_code=402, detail="Aktives Abonnement erforderlich. Bitte wählen Sie einen Plan unter /account/billing.")
-
-        # Limit check + company upsert run atomically (per-user advisory lock) to
-        # close a TOCTOU race where concurrent requests could both pass the count
-        # check before either committed, exceeding the plan's company limit.
-        limit_error = None
-        try:
-            company_id, limit_error = await create_company_with_limit_check(
-                current_user["id"], body.profile, sub["company_limit"]
-            )
-        except Exception as exc:
-            logger.warning("analyze: db upsert failed: %s", exc)
-        if limit_error:
-            raise HTTPException(status_code=402, detail=limit_error)
+        # Subscribed users: enforce company limit and record the company in the DB.
+        # Unsubscribed users: run the pipeline freely but get a diagnostic-only report.
+        if sub:
+            from services.db_service import create_company_with_limit_check
+            limit_error = None
+            try:
+                company_id, limit_error = await create_company_with_limit_check(
+                    current_user["id"], body.profile, sub["company_limit"]
+                )
+            except Exception as exc:
+                logger.warning("analyze: db upsert failed: %s", exc)
+            if limit_error:
+                raise HTTPException(status_code=402, detail=limit_error)
 
     job_id = await job_manager.create_job(
         body.profile,
@@ -248,6 +244,21 @@ async def get_report(job_id: str, current_user: dict = Depends(get_current_user)
             status_code=202,
             detail=f"Report not ready yet. Current status: {status.status}",
         )
+
+    # Unsubscribed users receive a diagnostic-only view:
+    # applicability matrix + score breakdown are shown; the rest is stripped.
+    if settings.database_url:
+        from services.stripe_service import get_active_subscription
+        sub = await get_active_subscription(current_user["id"])
+        if not sub:
+            return report.model_copy(update={
+                "diagnostic_only": True,
+                "executive_summary": "",
+                "gap_analysis": [],
+                "action_plan": [],
+                "retrieved_chunks": [],
+            })
+
     return report
 
 
