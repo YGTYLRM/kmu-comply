@@ -250,7 +250,7 @@ async def send_notification_email(
         subject, html_body = _build_email_html(company_name, report, triggered_by, prev_report, changed_sections)
 
         resend.Emails.send({
-            "from": "Complio Monitor <onboarding@resend.dev>",
+            "from": settings.email_from_address,
             "to": [user_email],
             "subject": subject,
             "html": html_body,

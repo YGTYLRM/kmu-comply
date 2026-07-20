@@ -46,6 +46,13 @@ class Settings(BaseSettings):
     # Email (Resend)
     resend_api_key: str = ""
     contact_email: str = ""
+    # Sender address — onboarding@resend.dev is Resend's sandbox domain, which
+    # only delivers to the account owner's own verified address. Set this to a
+    # verified custom domain sender before relying on real-user email delivery.
+    email_from_address: str = "Complio <onboarding@resend.dev>"
+
+    # Public frontend URL — used to build links in outbound emails.
+    app_base_url: str = "https://complio.de"
 
     # Stripe
     stripe_secret_key: str = ""

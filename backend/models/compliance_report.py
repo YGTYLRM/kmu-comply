@@ -52,6 +52,12 @@ class ComplianceGap(BaseModel):
     confidence: str = "HIGH"          # HIGH | MEDIUM | LOW
     confidence_reason: Optional[str] = None
     source_url: Optional[str] = None  # official source URL for this regulation
+    legal_version_date: Optional[str] = Field(
+        None,
+        description="Rechtsstand of the source statute this finding was assessed against, "
+                    "as ISO date. Attached from the matching RegulatoryChunk after LLM "
+                    "parsing — not requested from the LLM itself.",
+    )
 
 
 class ActionItem(BaseModel):

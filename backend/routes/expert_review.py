@@ -68,7 +68,7 @@ async def request_expert_review(
                 for f in (req.focus_items or [])
             ) or "Full report review"
             resend.Emails.send({
-                "from": "Complio <onboarding@resend.dev>",
+                "from": settings.email_from_address,
                 "to": [settings.contact_email],
                 "subject": f"Expert Review Request — {company_name}",
                 "html": (
