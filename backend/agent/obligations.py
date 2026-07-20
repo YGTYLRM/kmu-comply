@@ -17,6 +17,9 @@ Regulation coverage:
   EnEfG (7 obligations)         — §§8(1-2), 8(3), 9, 10, 16, 17 EnEfG + §8 EDL-G
   GwG (8 obligations)           — §§4-5, 6, 7, 8, 10-13, 15, 20, 43+45
   TTDSG (4 obligations)         — §25(1), §25(2), banner design (DSK), transparency
+  CSRD (10 obligations)         — Art. 19a/29a Accounting Directive, ESRS 1/E1/S1/S2/G1, assurance, phase-in
+  EU AI Act (8 obligations)     — Art. 5, 6+Annex III, 26(1,5,6,9), 50(1,4)
+  EU Data Act (6 obligations)   — Art. 3, 4, 5-6, 13, 23, 25
 """
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from models.company_profile import CompanyProfile
 
-OBLIGATIONS_VERSION = "v1.1.0"
+OBLIGATIONS_VERSION = "v1.2.0"
 
 
 @dataclass
@@ -1429,6 +1432,428 @@ _TTDSG_OBLIGATIONS: list[Obligation] = [
 ]
 
 
+# ── CSRD ─────────────────────────────────────────────────────────────────────
+# Applies per §check_csrd threshold logic (2 of 3: >250 employees, >€50M
+# revenue, >€25M balance sheet; or listed). Sources: Directive (EU) 2022/2464
+# (Art. 1, inserting Art. 19a/29a into the Accounting Directive 2013/34/EU) and
+# Commission Delegated Regulation (EU) 2023/2772 (ESRS 1/2 + topical standards
+# E1/S1/S2/G1), per data/regulations/csrd/csrd_directive_de.txt and
+# esrs_sector_standards_expanded.txt.
+
+_CSRD_OBLIGATIONS: list[Obligation] = [
+    Obligation(
+        id="csrd_art19a_sustainability_statement",
+        regulation="csrd",
+        article="Art. 19a/29a Bilanzrichtlinie (eingefügt durch Art. 1 RL (EU) 2022/2464)",
+        title="Sustainability Statement in the Management Report",
+        applies_when=["Company meets 2 of 3 CSRD size criteria (>250 employees, >€50M revenue, >€25M balance sheet) or is listed on an EU-regulated market"],
+        required_profile_fields=["employee_count", "annual_revenue_eur", "balance_sheet_total_eur", "is_listed_company"],
+        severity="CRITICAL",
+        actions=[
+            "Prepare a sustainability statement as a distinct, clearly identifiable section of the management report (Lagebericht), not a separate voluntary report.",
+            "File the sustainability statement with the German Federal Gazette (Bundesanzeiger) alongside the financial statements, within the same statutory deadline.",
+            "Determine the correct reporting wave and first reporting year (Wave 1/2/3) via the rule engine's CSRD threshold check — note the ongoing Omnibus threshold uncertainty flagged there.",
+            "Consult legal/audit counsel given the actively changing scope (Omnibus simplification package, Stop-the-Clock Directive (EU) 2025/794).",
+        ],
+        effort_estimate="80-200 Stunden (erstmalige Berichtserstellung)",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs1_double_materiality",
+        regulation="csrd",
+        article="ESRS 1, Kapitel 3 (Doppelte Wesentlichkeit)",
+        title="Double Materiality Assessment (DMA)",
+        applies_when=["CSRD applies to the company — DMA is the mandatory first step before determining which ESRS topics must be disclosed"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="CRITICAL",
+        actions=[
+            "Systematically identify sustainability matters and assess each against both materiality dimensions: financial materiality (inside-out — risk/opportunity to cash flows, performance, cost of capital) and impact materiality (outside-in — the company's actual/potential impact on people and the environment).",
+            "Consult stakeholders (employees, affected communities, value chain partners, users of sustainability reporting) as part of the assessment process.",
+            "Document the assessment methodology and results; disclose which topics are material and which are not, with rationale for exclusions.",
+            "Review and update the DMA at least annually — external assurance of the DMA process and results is required from the first reporting year (2024 for large PIEs).",
+        ],
+        effort_estimate="40-100 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs1_value_chain_scope",
+        regulation="csrd",
+        article="ESRS 1 (Value Chain Scope)",
+        title="Full Value Chain Reporting Scope",
+        applies_when=["CSRD applies to the company"],
+        required_profile_fields=["has_sustainability_report", "has_supply_chain_abroad"],
+        severity="HIGH",
+        actions=[
+            "Map the full value chain: upstream (suppliers), own operations (all consolidated entities), and downstream (distributors, retailers, product use and end-of-life).",
+            "Apply the proportionality principle — extend data collection into the value chain in proportion to materiality and practical feasibility; use estimates, sector averages, or proxy data where primary data is unavailable, with the estimation methodology disclosed.",
+            "Use the transitional relief for Scope 3 GHG emissions and other value chain datapoints in the first reporting years while building data collection capability.",
+            "For German companies with a supply chain also in scope of LkSG: align data collection to avoid duplicating supplier due diligence effort.",
+        ],
+        effort_estimate="40-80 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs_e1_governance_transition",
+        regulation="csrd",
+        article="ESRS E1 (Governance & Transition Plan)",
+        title="Climate Governance and Transition Plan Disclosures",
+        applies_when=["Climate change is a material topic per the DMA (typically material for most large companies)"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="HIGH",
+        actions=[
+            "Disclose board-level oversight of climate risk (responsible committee/board member, briefing frequency, link to executive remuneration) and management roles for day-to-day climate risk management — this is a mandatory ESRS 2 cross-cutting requirement regardless of materiality outcome.",
+            "Conduct climate scenario analysis covering physical and transition risks, including at minimum a 1.5°C-aligned scenario and a current-policies scenario, across short/medium/long-term horizons.",
+            "Disclose whether a climate transition plan has been adopted; if so, include decarbonisation targets (2030/2050), CapEx/OpEx allocated to the transition, locked-in emissions, and fossil fuel exposure — cross-reference EU Taxonomy alignment.",
+            "If no transition plan exists, disclose that fact plus a timeline and process for developing one.",
+        ],
+        effort_estimate="40-100 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs_e1_ghg_physical_risk",
+        regulation="csrd",
+        article="ESRS E1 (GHG Emissions & Physical Risk)",
+        title="GHG Emissions (Scope 1-3) and Physical Climate Risk",
+        applies_when=["Climate change is a material topic per the DMA"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="HIGH",
+        actions=[
+            "Disclose Scope 1 (direct) and Scope 2 (purchased energy, both market- and location-based) GHG emissions per the GHG Protocol methodology, by gas and by category.",
+            "Identify the most material Scope 3 (value chain) categories via the DMA and disclose them; full 15-category Scope 3 reporting is required from year 3, with phase-in relief in earlier years.",
+            "Disclose at least one sector-relevant GHG intensity metric, and report gross/net emissions separately — carbon offsets must not be presented as emissions reductions.",
+            "Assess acute (extreme weather) and chronic (long-term climate pattern shift) physical risks to assets, operations, and supply chain, including estimated financial impact and adaptation measures implemented.",
+        ],
+        effort_estimate="40-100 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs_s1_workforce",
+        regulation="csrd",
+        article="ESRS S1 (Own Workforce)",
+        title="Own Workforce Disclosures (Headcount, Conditions, Equal Treatment)",
+        applies_when=["Own workforce is a material topic per the DMA (typically material for all employers)"],
+        required_profile_fields=["has_sustainability_report", "employee_count"],
+        severity="HIGH",
+        actions=[
+            "Disclose headcount by employment type, working time, gender, and country, plus non-employee workers whose work the company directs.",
+            "Disclose the gender pay gap (median hourly pay ratio), collective bargaining coverage, employee turnover, and average training hours per employee.",
+            "Disclose health and safety performance: work-related fatalities, recordable accidents, lost time injury rate (LTIR), and occupational disease cases — align with DGUV/Berufsgenossenschaft data where available.",
+            "Disclose equal treatment and non-discrimination policies, pay equity measures, and parental leave return-to-work rates by gender; align with existing AGG §12/§13 preventive measures and complaints procedure for consistency.",
+        ],
+        effort_estimate="40-80 Stunden",
+        needs_expert_review=False,
+    ),
+    Obligation(
+        id="csrd_esrs_s2_value_chain_workers",
+        regulation="csrd",
+        article="ESRS S2 (Value Chain Workers)",
+        title="Value Chain Worker Rights Due Diligence",
+        applies_when=["Value chain worker rights are material per the DMA (typically manufacturing, textiles, agriculture, electronics)"],
+        required_profile_fields=["has_sustainability_report", "has_supply_chain_abroad"],
+        severity="HIGH",
+        actions=[
+            "Disclose due diligence policies covering child labour, forced labour, freedom of association, safe working conditions, and adequate wages in the value chain (upstream and downstream).",
+            "Describe the risk assessment methodology (questionnaires, audits, certification schemes) and how supplier compliance is monitored and enforced.",
+            "Describe grievance mechanisms accessible to value chain workers and the remediation process for identified violations, including escalation and last-resort supplier termination.",
+            "For companies also in scope of LkSG (≥1,000 employees): integrate existing LkSG risk analysis and complaints-procedure evidence into ESRS S2 disclosures to avoid duplicate effort.",
+        ],
+        effort_estimate="24-60 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_esrs_g1_business_conduct",
+        regulation="csrd",
+        article="ESRS G1 (Business Conduct)",
+        title="Anti-Corruption, Anti-Bribery, and Fair Competition Disclosures",
+        applies_when=["Business conduct is material per the DMA (typically material for all large companies)"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="MEDIUM",
+        actions=[
+            "Disclose anti-corruption and anti-bribery policies, the reporting channel for suspected corruption (may reuse the HinSchG whistleblower channel), and confirmed incidents/sanctions during the reporting period.",
+            "Disclose lobbying activities, political contributions, and fair-competition compliance including any confirmed anti-competitive-behaviour incidents.",
+            "Disclose supplier payment practices (average payment period, share of invoices paid beyond agreed terms) — particularly relevant given the EU Late Payments Regulation's 30-day B2B payment term.",
+            "Cross-reference existing GwG AML compliance and HinSchG whistleblower channel documentation where relevant to anti-corruption governance.",
+        ],
+        effort_estimate="16-40 Stunden",
+        needs_expert_review=False,
+    ),
+    Obligation(
+        id="csrd_assurance",
+        regulation="csrd",
+        article="Bilanzrichtlinie (Assurance) / UDRG",
+        title="External Assurance of the Sustainability Statement",
+        applies_when=["CSRD applies to the company"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="CRITICAL",
+        actions=[
+            "Engage a statutory auditor or independent assurance service provider for limited assurance of the sustainability statement from the first reporting period (2024 for large PIEs).",
+            "Prepare for the transition to reasonable assurance from reporting periods starting 1 January 2028 (or earlier if formally adopted by the EU Commission).",
+            "Ensure the assurance engagement covers ESRS compliance, the double materiality assessment process, and the tagging of information in the European Single Electronic Format (ESEF/XBRL).",
+            "Be aware that non-compliant or materially misleading sustainability reporting is enforced under the same regime as financial reporting violations (Deutsche Prüfstelle für Rechnungslegung / BaFin for listed companies), per the German UDRG transposition.",
+        ],
+        effort_estimate="24-60 Stunden (Koordination mit Prüfer)",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="csrd_phase_in",
+        regulation="csrd",
+        article="ESRS 1 (Phase-in/Übergangsbestimmungen)",
+        title="First-Year Reporting Relief (Phase-In Provisions)",
+        applies_when=["Company is reporting under CSRD for the first time (reporting periods 2024, 2025, or 2026)"],
+        required_profile_fields=["has_sustainability_report"],
+        severity="LOW",
+        actions=[
+            "Identify which phase-in reliefs apply: Scope 3 GHG category omissions with disclosed timeline, ESRS E4 (biodiversity) omission in year 1, and value chain datapoint reliefs under ESRS S1/S2/S3/S4.",
+            "For companies with fewer than 750 employees: apply the additional ESRS S1 (employee data) phase-in relief available in years 1-2.",
+            "Plan for full Scope 3 GHG disclosure across all 15 categories from year 3 of reporting.",
+            "For SME suppliers being asked for data by large customers: reference the EFRAG VSME (Voluntary SME) standard as the appropriate simplified disclosure level rather than full ESRS.",
+        ],
+        effort_estimate="4-8 Stunden",
+        needs_expert_review=False,
+    ),
+]
+
+
+# ── EU AI Act ────────────────────────────────────────────────────────────────
+# Source: Regulation (EU) 2024/1689, per threshold_engine.py::check_ai_act
+# (verified) and data/regulations/eu_ai_act/eu_ai_act_expanded.txt. Applies to
+# any company that develops (provider) or uses (deployer) AI systems in the EU
+# — no size threshold (Art. 2(1) EU AI Act).
+
+_AI_ACT_OBLIGATIONS: list[Obligation] = [
+    Obligation(
+        id="ai_act_art5_prohibited_practices",
+        regulation="eu_ai_act",
+        article="Art. 5(1)(a)-(e) EU AI Act",
+        title="Prohibited AI Practices",
+        applies_when=["Company develops, procures, or deploys any AI system — applies regardless of sector or size, in force since 2 Feb 2025"],
+        required_profile_fields=["uses_ai_systems"],
+        severity="CRITICAL",
+        actions=[
+            "Ensure no AI system uses subliminal, manipulative, or deceptive techniques that materially distort a person's behaviour and cause significant harm (Art. 5(1)(a)).",
+            "Ensure no AI system exploits vulnerabilities due to age, disability, or socioeconomic situation (Art. 5(1)(b)).",
+            "Ensure no AI system performs biometric categorisation to infer race, political opinion, trade union membership, religious belief, or sexual orientation (Art. 5(1)(c)).",
+            "Do not use real-time remote biometric identification in publicly accessible spaces, or social scoring systems — these are prohibited outright with narrow law-enforcement exceptions only (Art. 5(1)(d)-(e)).",
+        ],
+        effort_estimate="4-8 Stunden (Prüfung bestehender/geplanter KI-Systeme)",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="ai_act_art6_annex3_classification",
+        regulation="eu_ai_act",
+        article="Art. 6(1)-(2) i.V.m. Anhang III EU AI Act",
+        title="High-Risk AI System Classification",
+        applies_when=["Company develops, procures, or deploys an AI system whose classification (high-risk vs. limited/minimal risk) is not yet confirmed"],
+        required_profile_fields=["uses_ai_systems", "ai_systems_are_high_risk"],
+        severity="HIGH",
+        actions=[
+            "Classify each AI system against Annex III: employment/HR decisions, creditworthiness assessment, education/training access, law enforcement, migration, critical infrastructure, and safety components are always high-risk, independent of the perceived actual impact.",
+            "For AI systems used as a safety component of a product subject to third-party conformity assessment, treat as high-risk per Art. 6(1).",
+            "Document the classification rationale — this determines which downstream obligations (Art. 9-17 for providers, Art. 26 for deployers) apply.",
+            "Re-assess classification whenever the AI system's purpose or deployment context changes materially.",
+        ],
+        effort_estimate="8-16 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="ai_act_art26_deployer_use_and_oversight",
+        regulation="eu_ai_act",
+        article="Art. 26(1) EU AI Act",
+        title="Deployer Obligations — Use per Instructions and Human Oversight",
+        applies_when=["Company deploys a high-risk AI system developed by another party"],
+        required_profile_fields=["uses_ai_systems", "ai_systems_are_high_risk"],
+        severity="HIGH",
+        actions=[
+            "Use the high-risk AI system strictly in accordance with the provider's instructions for use (Art. 26(1)).",
+            "Assign a natural person with the competence, training, and authority to provide human oversight of the system during use.",
+            "Monitor the operation of the AI system and suspend use if it presents a risk to health, safety, or fundamental rights.",
+            "Retain the technical documentation and instructions for use provided by the AI system's provider.",
+        ],
+        effort_estimate="8-16 Stunden (Prozess-Einrichtung)",
+        needs_expert_review=False,
+    ),
+    Obligation(
+        id="ai_act_art26_5_log_retention",
+        regulation="eu_ai_act",
+        article="Art. 26(5) EU AI Act",
+        title="Retention of Automatically Generated Logs (≥6 Months)",
+        applies_when=["Company deploys a high-risk AI system that generates automatic logs under its control"],
+        required_profile_fields=["uses_ai_systems", "ai_systems_are_high_risk"],
+        severity="MEDIUM",
+        actions=[
+            "Retain logs automatically generated by the high-risk AI system for at least six months, unless a longer period is required under other applicable law (e.g. GDPR, sector-specific rules).",
+            "Ensure logs are accessible for audit and incident investigation purposes.",
+        ],
+        effort_estimate="4-8 Stunden",
+        needs_expert_review=False,
+    ),
+    Obligation(
+        id="ai_act_art26_6_inform_workers",
+        regulation="eu_ai_act",
+        article="Art. 26(6) EU AI Act",
+        title="Inform Workers' Representatives Before Deployment",
+        applies_when=["Company is an employer deploying a high-risk AI system that affects workers"],
+        required_profile_fields=["uses_ai_systems", "ai_systems_are_high_risk"],
+        severity="HIGH",
+        actions=[
+            "Inform workers' representatives and affected workers that they will be subject to the use of the high-risk AI system, before it is put into use in the workplace.",
+            "Coordinate with the Betriebsrat (works council) where one exists — this obligation intersects with German co-determination (Mitbestimmung) requirements under BetrVG §87.",
+        ],
+        effort_estimate="4-8 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="ai_act_art26_9_fria",
+        regulation="eu_ai_act",
+        article="Art. 26(9) EU AI Act",
+        title="Fundamental Rights Impact Assessment (Public Sector / HR Context)",
+        applies_when=["Company is a public-sector body, or deploys high-risk AI in HR/employment decision-making"],
+        required_profile_fields=["uses_ai_systems", "ai_systems_are_high_risk"],
+        severity="HIGH",
+        actions=[
+            "Conduct a fundamental rights impact assessment (FRIA) before deploying the high-risk AI system, covering the processes it will be used in, the categories of affected persons, specific risks of harm, and mitigation measures.",
+            "Notify the market surveillance authority of the FRIA outcome where required.",
+            "Review and update the FRIA when the deployment context changes materially.",
+        ],
+        effort_estimate="16-32 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="ai_act_art50_1_chatbot_transparency",
+        regulation="eu_ai_act",
+        article="Art. 50(1) EU AI Act",
+        title="Transparency — AI Systems Interacting With Humans",
+        applies_when=["Company deploys an AI system that interacts directly with natural persons (e.g. chatbots, voice assistants)"],
+        required_profile_fields=["uses_ai_systems"],
+        severity="MEDIUM",
+        actions=[
+            "Ensure the AI system discloses to users that they are interacting with an AI system, unless this is obvious from the circumstances or context of use.",
+            "Provide this disclosure in a clear and distinguishable manner at the latest at the time of first interaction.",
+        ],
+        effort_estimate="2-8 Stunden",
+        needs_expert_review=False,
+    ),
+    Obligation(
+        id="ai_act_art50_4_synthetic_content",
+        regulation="eu_ai_act",
+        article="Art. 50(4) EU AI Act",
+        title="Transparency — AI-Generated Synthetic Content",
+        applies_when=["Company deploys AI to generate or manipulate image, audio, or video content (synthetic content / deepfakes)"],
+        required_profile_fields=["uses_ai_systems"],
+        severity="MEDIUM",
+        actions=[
+            "Disclose that generated or manipulated content has been artificially created or altered (AI origin), in a clear and machine-readable manner where technically feasible.",
+            "Apply this to marketing, communications, and any published synthetic media — exceptions exist for evidently artistic, satirical, or fictional content with appropriate disclosure.",
+        ],
+        effort_estimate="2-8 Stunden",
+        needs_expert_review=False,
+    ),
+]
+
+
+# ── EU Data Act ──────────────────────────────────────────────────────────────
+# Source: Regulation (EU) 2023/2854, applicable from 12 September 2025, per
+# threshold_engine.py::check_eu_data_act (verified) and
+# data/regulations/eu_data_act/eu_data_act_de.txt (Art. 3-6, 13, 23, 25 read
+# directly from the fetched source text).
+
+_EU_DATA_ACT_OBLIGATIONS: list[Obligation] = [
+    Obligation(
+        id="data_act_art3_access_by_design",
+        regulation="eu_data_act",
+        article="Art. 3 EU Data Act",
+        title="Connected Products Designed for Data Access",
+        applies_when=["Company manufactures connected (IoT) products placed on the EU market"],
+        required_profile_fields=["produces_connected_products"],
+        severity="HIGH",
+        actions=[
+            "Design and manufacture connected products so that product data and related service data — including the metadata needed to interpret and use them — are accessible to the user by default, easily, securely, free of charge, in a comprehensive, structured, commonly used, and machine-readable format (Art. 3(1)).",
+            "Before a purchase, rental, or lease contract, inform the user of the type, format, and estimated volume of data the product can generate, whether it is generated continuously/in real time, and how the user can access, retrieve, or delete it (Art. 3(2)).",
+        ],
+        effort_estimate="16-40 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="data_act_art4_user_access_on_request",
+        regulation="eu_data_act",
+        article="Art. 4 EU Data Act",
+        title="Data Access on User Request",
+        applies_when=["Company is a data holder for a connected product or related service where the user cannot access data directly from the product"],
+        required_profile_fields=["produces_connected_products"],
+        severity="HIGH",
+        actions=[
+            "Where the user cannot access data directly from the connected product or related service, make readily available data (including necessary metadata) available to the user without undue delay, free of charge, in a comprehensive, commonly used, machine-readable format, on simple electronic request.",
+            "Provide the data in the same quality as available to the data holder, continuously and in real time where technically feasible.",
+        ],
+        effort_estimate="16-40 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="data_act_art5_6_third_party_sharing",
+        regulation="eu_data_act",
+        article="Art. 5-6 EU Data Act",
+        title="Third-Party Data Sharing on User Instruction / No Exclusive Use",
+        applies_when=["Company is a data holder for a connected product or related service"],
+        required_profile_fields=["produces_connected_products"],
+        severity="HIGH",
+        actions=[
+            "On a user's request, make readily available data and necessary metadata available to a designated third party without undue delay, free of charge to the user, in the same quality available to the data holder (Art. 5(1)).",
+            "Do not prevent, discourage, or restrict the user's own use of the data for lawful purposes, and do not use the data to derive insights that undermine the user's commercial position (no exclusive-use restriction, Art. 6).",
+            "Ensure any third party receiving data under Art. 5 processes it only for the purposes and conditions agreed with the user and deletes it once no longer needed (Art. 6 obligations of the receiving third party).",
+        ],
+        effort_estimate="16-40 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="data_act_art13_unfair_contract_terms",
+        regulation="eu_data_act",
+        article="Art. 13 EU Data Act",
+        title="Unfair Data-Sharing Contract Terms",
+        applies_when=["Company is party to a B2B contract governing data access, use, liability, or remedies for breach of data-related obligations"],
+        required_profile_fields=["produces_connected_products", "provides_data_processing_services"],
+        severity="MEDIUM",
+        actions=[
+            "Review data-sharing contract clauses unilaterally imposed on another company — such clauses are not binding on the other company if they are unfair (Art. 13(1)).",
+            "Ensure contract clauses do not unreasonably deviate from good commercial practice or breach good faith and fair dealing (the statutory unfairness test).",
+            "Note that clauses reflecting mandatory EU law, or default rules that would apply absent a contrary agreement, are not considered unfair (Art. 13(2)) — legal review recommended for standard-form data-sharing agreements.",
+        ],
+        effort_estimate="8-16 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="data_act_art23_switching_obstacles",
+        regulation="eu_data_act",
+        article="Art. 23 EU Data Act",
+        title="Removal of Cloud/Data-Processing Switching Obstacles",
+        applies_when=["Company provides data processing services (cloud, edge, or similar)"],
+        required_profile_fields=["provides_data_processing_services"],
+        severity="HIGH",
+        actions=[
+            "Take the measures required under Art. 25-27, 29, and 30 to enable customers to switch to another provider of the same service type, or to on-premises ICT infrastructure, or to use multiple providers concurrently.",
+            "Do not impose pre-commercial, commercial, technical, contractual, or organisational obstacles that hinder customers from switching — remove any such obstacles that currently exist.",
+        ],
+        effort_estimate="24-60 Stunden",
+        needs_expert_review=True,
+    ),
+    Obligation(
+        id="data_act_art25_switching_contract",
+        regulation="eu_data_act",
+        article="Art. 25 EU Data Act",
+        title="Switching Contract Clauses, 30-Business-Day Limit, Fee Phase-Out",
+        applies_when=["Company provides data processing services (cloud, edge, or similar)"],
+        required_profile_fields=["provides_data_processing_services"],
+        severity="HIGH",
+        actions=[
+            "Set out customer switching rights and provider switching obligations clearly in a written contract, provided to the customer before signature in a storable and reproducible form.",
+            "Enable the switching process to complete within a maximum of 30 business days of the customer's request, per the contractually specified transitional period.",
+            "Phase out and eliminate switching fees by 12 September 2027; until then, any switching charges must not exceed the provider's actual costs incurred.",
+        ],
+        effort_estimate="16-40 Stunden",
+        needs_expert_review=True,
+    ),
+]
+
+
 # ── Master registry ───────────────────────────────────────────────────────────
 
 OBLIGATION_REGISTRY: dict[str, list[Obligation]] = {
@@ -1443,6 +1868,9 @@ OBLIGATION_REGISTRY: dict[str, list[Obligation]] = {
     "enefg":         _ENEFG_OBLIGATIONS,
     "gwg":           _GWG_OBLIGATIONS,
     "ttdsg":         _TTDSG_OBLIGATIONS,
+    "csrd":          _CSRD_OBLIGATIONS,
+    "eu_ai_act":     _AI_ACT_OBLIGATIONS,
+    "eu_data_act":   _EU_DATA_ACT_OBLIGATIONS,
 }
 
 

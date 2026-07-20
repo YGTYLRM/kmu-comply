@@ -576,6 +576,7 @@ def _gap_card(g) -> str:
     defic = _esc(_clean(g.deficiency_description))
     art_n = _esc(_clean(g.article_number))
     art_t = _esc(_clean(g.article_title))
+    legal_date = getattr(g, "legal_version_date", None)
 
     conf = getattr(g, "confidence", "HIGH")
     conf_reason = getattr(g, "confidence_reason", None)
@@ -618,7 +619,13 @@ def _gap_card(g) -> str:
         f'<div style="padding:5pt 10pt;background:#f8fafc;border-bottom:1pt solid {BORDER};'
         f'display:flex;align-items:center;justify-content:space-between;gap:8pt;">'
         f'<div style="{FONT}font-size:8.5pt;font-weight:700;color:{NAVY};">'
-        f'{"" if art_n.startswith("§") or art_n.startswith("Art") else "§ "}{art_n} &nbsp;·&nbsp; {art_t}</div>'
+        f'{"" if art_n.startswith("§") or art_n.startswith("Art") else "§ "}{art_n} &nbsp;·&nbsp; {art_t}'
+        + (
+            f'<span style="{FONT}font-size:6.5pt;font-weight:400;color:#94a3b8;margin-left:6pt;">'
+            f'Rechtsstand: {_esc(legal_date)}</span>'
+            if legal_date else ""
+        )
+        + f'</div>'
         f'<div style="display:flex;align-items:center;flex-shrink:0;">'
         f'{conf_badge}'
         f'<span style="{FONT}font-size:7pt;font-weight:700;padding:2.5pt 9pt;border-radius:20pt;'

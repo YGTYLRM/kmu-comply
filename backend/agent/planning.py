@@ -9,6 +9,7 @@ Steps 2-5 of the analysis pipeline.
 """
 import json
 import logging
+import re
 from functools import lru_cache
 
 import anthropic
@@ -22,12 +23,15 @@ from models.compliance_report import (
     RegulatoryChunk,
 )
 from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
+from agent.obligations import get_obligations
 from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
 from rag.retrieval import deduplicate, retrieve, rerank_cross_encoder
 from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
+
+_RE_CITATION = re.compile(r"^(§|Art(ikel|\.)?)\s*\d")
 
 _PRIORITY_ORDER = {
     Priority.CRITICAL: 0,
@@ -238,10 +242,45 @@ def retrieve_regulatory_context(
             )
             low_confidence_regulations.append(reg_key)
 
-        deduped = deduplicate(raw)
-        reranked = rerank_cross_encoder(query, deduped, top_n=5)
-        all_chunks.extend(_to_models(reranked))
-        logger.debug("step 3: %s — %d chunks selected (cross-encoder reranked)", reg_key, len(reranked))
+        # Obligation-driven augmentation: additive, never replaces generic raw.
+        # get_obligations() returns [] for the 3 regulations without registry
+        # entries (csrd, eu_ai_act, eu_data_act) — clean no-op fallback there.
+        obligations = get_obligations(reg_key)
+        obligation_chunks: list[dict] = []
+        for ob in obligations:
+            ob_query = f"{ob.article} {ob.title}"
+            ob_candidates = retrieve(ob_query, [reg_key], top_k=8)
+            # Prefer chunks with a real statute citation (§ N / Artikel N) over
+            # guidance-slug chunks (e.g. "bafa_lksg_risk_analysis_methodology")
+            # for this specific obligation — explanatory guidance prose tends to
+            # outrank terse law text in semantic search, which would defeat the
+            # point of an obligation-targeted lookup (guaranteeing the actual law
+            # text is present). document_type isn't a reliable signal here: some
+            # ingestion paths (separator-block guidance files) mislabel guidance
+            # content as "law".
+            law_hits = [c for c in ob_candidates if _RE_CITATION.match(c.get("article_number", ""))][:3]
+            obligation_chunks.extend(law_hits or ob_candidates[:3])
+
+        # Rerank the generic pool on its own, capped at 5 (today's baseline
+        # behaviour). Obligation-targeted law chunks are deliberately NOT run
+        # through this rerank — reranking against the single generic per-
+        # regulation query would re-bury them under guidance text for the same
+        # reason the per-obligation query needed the citation preference above,
+        # defeating the guarantee this augmentation exists to provide.
+        deduped_generic = deduplicate(raw)
+        reranked_generic = rerank_cross_encoder(query, deduped_generic, top_n=5)
+
+        # deduplicate() returns results sorted by score descending, so this cap
+        # keeps the highest-scoring distinct articles and bounds gap-analysis
+        # prompt growth (mirrors the original flat-cap ceiling).
+        deduped_obligation = deduplicate(obligation_chunks)[:15]
+        combined = deduplicate(reranked_generic + deduped_obligation)
+
+        all_chunks.extend(_to_models(combined))
+        logger.debug(
+            "step 3: %s — %d chunks selected (%d generic + %d obligation-augmented, deduped)",
+            reg_key, len(combined), len(reranked_generic), len(deduped_obligation),
+        )
 
     return all_chunks, empty_regulations, low_confidence_regulations
 
@@ -307,6 +346,13 @@ async def run_gap_analysis(
             prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures,
             tool=_TOOL_GAP_ANALYSIS, tool_result_key="gaps",
         )
+
+        # Attach Rechtsstand from the matching source chunk — not requested from
+        # the LLM; the model only echoes article_number, so look it up ourselves.
+        legal_dates = {c.article_number: c.legal_version_date for c in reg_chunks if c.legal_version_date}
+        for gap in gaps:
+            gap.legal_version_date = legal_dates.get(gap.article_number)
+
         all_gaps.extend(gaps)
 
     return all_gaps
