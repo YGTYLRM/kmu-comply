@@ -290,7 +290,7 @@ async def sync_profile(current_user: dict = Depends(get_current_user)):
             user_email = current_user.get("email", "")
             user_name  = html.escape(current_user.get("name") or user_email.split("@")[0])
             resend.Emails.send({
-                "from": "Complio <onboarding@resend.dev>",
+                "from": settings.email_from_address,
                 "to": [user_email],
                 "subject": "Willkommen bei Complio",
                 "html": (
@@ -299,7 +299,7 @@ async def sync_profile(current_user: dict = Depends(get_current_user)):
                     f'<p>Ihr Konto ist aktiv. Sie können jetzt Ihr Unternehmensprofil ausfüllen und eine kostenlose Compliance-Vorprüfung starten.</p>'
                     f'<p>Die Vorprüfung zeigt Ihnen, welche der 14 Gesetze für Ihr Unternehmen gelten und wie weit Sie je Vorschrift vom konformen Zustand entfernt sind.</p>'
                     f'<p style="margin-top:24px">'
-                    f'<a href="https://complio.de/analyze" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Analyse starten</a>'
+                    f'<a href="{settings.app_base_url}/analyze" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Analyse starten</a>'
                     f'</p>'
                     f'<p style="margin-top:32px;font-size:12px;color:#94a3b8">Complio · Vorläufige Einschätzung, keine Rechtsberatung</p>'
                     f'</div>'
@@ -459,7 +459,7 @@ async def contact(req: ContactRequest, request: Request):
     )
 
     resend.Emails.send({
-        "from": "Complio <onboarding@resend.dev>",
+        "from": settings.email_from_address,
         "to": [settings.contact_email],
         "reply_to": req.email,
         "subject": subject,

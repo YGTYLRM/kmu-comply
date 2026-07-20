@@ -152,3 +152,65 @@ class TestTtdsgCoverage:
         ob = get_obligation_by_id("ttdsg_banner_design_dsk")
         text = " ".join(ob.actions).lower()
         assert "reject" in text
+
+
+class TestCsrdCoverage:
+    """CSRD obligations must cover the reporting duty, DMA, topical ESRS standards, and assurance."""
+
+    def test_csrd_has_ten_obligations(self):
+        assert len(get_obligations("csrd")) == 10
+
+    def test_csrd_covers_core_topics(self):
+        ids = " | ".join(ob.id for ob in get_obligations("csrd"))
+        for topic in ["art19a", "double_materiality", "e1_ghg", "s1_workforce", "s2_value_chain", "g1_business_conduct", "assurance"]:
+            assert topic in ids, f"CSRD topic '{topic}' not covered"
+
+    def test_double_materiality_obligation_covers_both_dimensions(self):
+        ob = get_obligation_by_id("csrd_esrs1_double_materiality")
+        text = " ".join(ob.actions).lower()
+        assert "financial materiality" in text
+        assert "impact materiality" in text
+
+    def test_assurance_obligation_mentions_limited_and_reasonable(self):
+        ob = get_obligation_by_id("csrd_assurance")
+        text = " ".join(ob.actions).lower()
+        assert "limited assurance" in text
+        assert "reasonable assurance" in text
+
+
+class TestAiActCoverage:
+    """AI Act obligations must cover prohibitions, classification, deployer duties, and transparency."""
+
+    def test_ai_act_has_eight_obligations(self):
+        assert len(get_obligations("eu_ai_act")) == 8
+
+    def test_ai_act_covers_core_articles(self):
+        articles = " | ".join(ob.article for ob in get_obligations("eu_ai_act"))
+        for section in ["Art. 5", "Art. 6", "Art. 26(1)", "Art. 26(5)", "Art. 26(6)", "Art. 26(9)", "Art. 50(1)", "Art. 50(4)"]:
+            assert section in articles, f"AI Act section '{section}' not covered"
+
+    def test_prohibited_practices_obligation_lists_all_five(self):
+        ob = get_obligation_by_id("ai_act_art5_prohibited_practices")
+        assert "5(1)(a)" in ob.article and "(e)" in ob.article
+
+    def test_fria_obligation_targets_public_and_hr_context(self):
+        ob = get_obligation_by_id("ai_act_art26_9_fria")
+        text = " ".join(ob.applies_when).lower()
+        assert "public" in text or "hr" in text.lower()
+
+
+class TestEuDataActCoverage:
+    """EU Data Act obligations must cover connected-product access duties and cloud switching."""
+
+    def test_eu_data_act_has_six_obligations(self):
+        assert len(get_obligations("eu_data_act")) == 6
+
+    def test_eu_data_act_covers_core_articles(self):
+        articles = " | ".join(ob.article for ob in get_obligations("eu_data_act"))
+        for section in ["Art. 3", "Art. 4", "Art. 5-6", "Art. 13", "Art. 23", "Art. 25"]:
+            assert section in articles, f"EU Data Act section '{section}' not covered"
+
+    def test_switching_contract_obligation_mentions_30_business_days(self):
+        ob = get_obligation_by_id("data_act_art25_switching_contract")
+        text = " ".join(ob.actions)
+        assert "30 business days" in text or "30-business-day" in ob.title.lower() or "30 business" in text
