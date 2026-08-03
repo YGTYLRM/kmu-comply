@@ -255,9 +255,9 @@ def retrieve_regulatory_context(
             # for this specific obligation — explanatory guidance prose tends to
             # outrank terse law text in semantic search, which would defeat the
             # point of an obligation-targeted lookup (guaranteeing the actual law
-            # text is present). document_type isn't a reliable signal here: some
-            # ingestion paths (separator-block guidance files) mislabel guidance
-            # content as "law".
+            # text is present). Citation format, not document_type, drives this:
+            # even correctly-labeled "law" chunks (e.g. ESRS-style references)
+            # don't always carry a § N/Artikel N citation.
             law_hits = [c for c in ob_candidates if _RE_CITATION.match(c.get("article_number", ""))][:3]
             obligation_chunks.extend(law_hits or ob_candidates[:3])
 
