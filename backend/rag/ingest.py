@@ -362,11 +362,67 @@ def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[d
 
     chunks: list[dict] = []
     for key, item in best.items():
+        esrs_chunks = _chunk_esrs_sections(item["text"], regulation, filename, url)
+        if esrs_chunks is not None:
+            # This "Article" body is actually the ESRS delegated-regulation annex
+            # (its internal structure uses ESRS N / ESRS EN / ESRS SN headers, not
+            # further Article N markers, so the outer regex swallowed the whole
+            # annex into one match) — use the real per-standard sections instead
+            # of shipping it all under one misleading "Article N" label.
+            chunks.extend(esrs_chunks)
+            continue
         header = f"{item['label']} {item['num']} {item['title']}"
         for i, sub in enumerate(_split_oversized(item["text"], header)):
             chunks.append(_make_chunk(sub, regulation, key, item["title"], "law",
                                       filename, url, str(i + 1) if i else ""))
     return chunks
+
+
+def _chunk_esrs_sections(text: str, regulation: str, filename: str, url: str) -> list[dict] | None:
+    """Split ESRS delegated-regulation Annex I content by its real per-standard
+    sections (ESRS 1, ESRS 2, ESRS E1-E5, ESRS S1-S4, ESRS G1).
+
+    The raw EUR-Lex text repeats each "ESRS <code>" header many times — once in
+    the top-level table of contents, once in a standards overview, dozens of
+    times in cross-reference/datapoint appendix tables and the glossary index —
+    with only its real body following the *last and largest* occurrence of each
+    code. All these mentions share identical formatting, so they can't be told
+    apart by the header line alone; only by how much distinct content follows
+    before the next header. Real bodies run hundreds of thousands of characters,
+    every TOC/appendix mention under a few thousand — a two-orders-of-magnitude
+    gap, so picking the occurrence with the largest gap-to-next-match per code
+    reliably finds the real section. Returns None (fall back to generic
+    Article-based chunking) if this structure isn't present at all.
+    """
+    matches = list(re.finditer(r"(?m)^[ \t]*ESRS ([A-Z0-9]+)[ \t]*$", text))
+    if len(matches) < 3:
+        return None
+
+    best_idx: dict[str, int] = {}
+    best_gap: dict[str, int] = {}
+    for i, m in enumerate(matches):
+        code = m.group(1)
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        gap = end - m.start()
+        if gap > best_gap.get(code, -1):
+            best_gap[code] = gap
+            best_idx[code] = i
+
+    chunks: list[dict] = []
+    for code, i in sorted(best_idx.items(), key=lambda kv: matches[kv[1]].start()):
+        m = matches[i]
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        body = text[m.start():end].strip()
+        if len(body) < 500:
+            continue  # not a real section body after all — skip rather than mislabel
+        lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
+        title = lines[1] if len(lines) > 1 else f"ESRS {code}"
+        key = f"ESRS {code}"
+        header = f"{key} {title}"
+        for j, sub in enumerate(_split_oversized(body, header)):
+            chunks.append(_make_chunk(sub, regulation, key, title, "law",
+                                      filename, url, str(j + 1) if j else ""))
+    return chunks or None
 
 
 def _chunk_guidance(text: str, regulation: str, filename: str, url: str) -> list[dict]:
