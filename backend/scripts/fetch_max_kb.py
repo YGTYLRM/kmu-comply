@@ -17,6 +17,7 @@ Priority targets:
 Run from backend/:  python scripts/fetch_max_kb.py [--regulation <name>] [--dry-run]
 """
 import argparse
+import gzip
 import html as html_module
 import io
 import re
@@ -59,10 +60,20 @@ def fetch_bytes(url: str, timeout: int = 45, extra_headers: dict = None) -> byte
     req = urllib.request.Request(url, headers=h)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.read()
+            raw = r.read()
     except Exception as e:
         print(f"    ERROR fetching {url}: {e}")
         return None
+    # Some CDNs (observed on EUR-Lex/CloudFront) send gzip bytes even when
+    # Accept-Encoding: identity was requested. Detect by magic number rather
+    # than trusting Content-Encoding, since urllib won't auto-decompress here.
+    if raw[:2] == b"\x1f\x8b":
+        try:
+            raw = gzip.decompress(raw)
+        except OSError as e:
+            print(f"    ERROR gunzipping {url}: {e}")
+            return None
+    return raw
 
 
 def fetch_html(url: str, timeout: int = 45) -> str | None:
@@ -70,9 +81,16 @@ def fetch_html(url: str, timeout: int = 45) -> str | None:
     if raw is None:
         return None
     try:
-        return raw.decode("utf-8", errors="replace")
+        text = raw.decode("utf-8", errors="replace")
     except Exception:
-        return raw.decode("latin-1", errors="replace")
+        text = raw.decode("latin-1", errors="replace")
+    # A high ratio of U+FFFD means we're decoding bytes that were never valid
+    # text in the first place (e.g. an undetected compressed/binary payload) —
+    # bail instead of silently saving unusable garbage.
+    if len(text) > 0 and text.count("�") / len(text) > 0.01:
+        print(f"    ERROR: {text.count(chr(0xFFFD))} replacement chars in {len(text)} — payload isn't valid text")
+        return None
+    return text
 
 
 def strip_html(html_text: str) -> str:
@@ -184,6 +202,9 @@ def fetch_eurlex_html(celex: str, dest_dir: Path, filename: str, label: str, lan
     if len(text) < 2000:
         print(f"    WARNING: only {len(text)} chars — may be empty")
         return False
+    if article_count == 0:
+        print("    ERROR: 0 articles found — page structure didn't match expected pattern, refusing to save")
+        return False
 
     save_text(dest_dir, filename, f"{label}\nSource: {url}", text)
     print(f"    Found {article_count} articles")
@@ -251,31 +272,18 @@ TASKS = [
     },
 
     # ── CSRD / ESRS ──────────────────────────────────────────────────────────
+    # NOTE: CELEX:32023R2772's HTML rendering puts ALL topical standards
+    # (ESRS 1, ESRS 2, E1-E5, S1-S4, G1) inside a single "ANNEX I", with
+    # "ANNEX II" holding the glossary — there is no separate Annex III/XI/XV
+    # per standard as earlier task labels assumed. Fetch once; per-topic
+    # chunk-level splitting (if wanted) belongs in rag/ingest.py, not here.
     {
         "regulation": "csrd",
-        "name": "ESRS E1 — Climate Change",
+        "name": "ESRS full text — all topical standards + glossary",
         "type": "eurlex",
         "celex": "32023R2772",
-        "filename": "esrs_e1_climate.txt",
-        "label": "ESRS E1 — Climate Change (Commission Delegated Regulation EU 2023/2772, Annex III)",
-        "lang": "EN",
-    },
-    {
-        "regulation": "csrd",
-        "name": "ESRS S1 — Own Workforce",
-        "type": "eurlex",
-        "celex": "32023R2772",
-        "filename": "esrs_s1_own_workforce.txt",
-        "label": "ESRS S1 — Own Workforce (Commission Delegated Regulation EU 2023/2772, Annex XI)",
-        "lang": "EN",
-    },
-    {
-        "regulation": "csrd",
-        "name": "ESRS G1 — Business Conduct",
-        "type": "eurlex",
-        "celex": "32023R2772",
-        "filename": "esrs_g1_business_conduct.txt",
-        "label": "ESRS G1 — Business Conduct (Commission Delegated Regulation EU 2023/2772, Annex XV)",
+        "filename": "esrs_annexes_full_text.txt",
+        "label": "ESRS — European Sustainability Reporting Standards, full text incl. all topical standards (ESRS 1, ESRS 2, E1-E5, S1-S4, G1) and glossary (Commission Delegated Regulation EU 2023/2772, Annex I + Annex II)",
         "lang": "EN",
     },
     {
