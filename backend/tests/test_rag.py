@@ -102,6 +102,83 @@ class TestRetrieve:
         assert results == []
 
 
+class TestChromaSegmentReaderRecovery:
+    """retrieve() must survive a ChromaDB segment-reader crash by resetting
+    the client and retrying once — see rag.retrieval._reset_chroma_client().
+    Observed for real: in a long-lived process, querying a collection again
+    after ~7+ other distinct collections were queried in between can raise
+    chromadb.errors.InternalError('...hnsw segment reader: Nothing found on
+    disk'), permanently, for that collection, in that process. A fresh
+    client object does NOT recover it — only clearing chromadb's process-wide
+    shared-system cache does. This test verifies the retry control flow with
+    a fake client (no need to actually trigger the real chromadb condition,
+    which requires 7+ real collections)."""
+
+    def test_retries_and_recovers_after_segment_reader_error(self, monkeypatch):
+        import chromadb.errors as cerrors
+        from backend.rag import retrieval as retrieval_module
+
+        calls = {"query": 0}
+
+        class FakeCollection:
+            def count(self):
+                return 10
+
+            def query(self, **kwargs):
+                calls["query"] += 1
+                if calls["query"] == 1:
+                    raise cerrors.InternalError(
+                        "Error executing plan: Internal error: Error creating "
+                        "hnsw segment reader: Nothing found on disk"
+                    )
+                return {
+                    "documents": [["Sample statute text about data protection."]],
+                    "metadatas": [[{"regulation": "bdsg", "article_number": "§ 1", "title": "t"}]],
+                    "distances": [[0.1]],
+                }
+
+        class FakeClient:
+            def get_collection(self, name):
+                return FakeCollection()
+
+        reset_calls = {"n": 0}
+        monkeypatch.setattr(retrieval_module, "_chroma_client", lambda: FakeClient())
+        monkeypatch.setattr(
+            retrieval_module, "_reset_chroma_client",
+            lambda: reset_calls.__setitem__("n", reset_calls["n"] + 1),
+        )
+
+        results = retrieval_module.retrieve("test query", ["bdsg"], top_k=5)
+
+        assert reset_calls["n"] == 1, "expected exactly one reset-and-retry"
+        assert len(results) == 1
+        assert results[0]["article_number"] == "§ 1"
+
+    def test_gives_up_gracefully_if_retry_also_fails(self, monkeypatch):
+        """If the retry after reset still fails, skip that regulation rather
+        than propagating — a whole gap analysis shouldn't crash because one
+        regulation's collection stayed broken."""
+        import chromadb.errors as cerrors
+        from backend.rag import retrieval as retrieval_module
+
+        class AlwaysFailsCollection:
+            def count(self):
+                return 10
+
+            def query(self, **kwargs):
+                raise cerrors.InternalError("still broken")
+
+        class FakeClient:
+            def get_collection(self, name):
+                return AlwaysFailsCollection()
+
+        monkeypatch.setattr(retrieval_module, "_chroma_client", lambda: FakeClient())
+        monkeypatch.setattr(retrieval_module, "_reset_chroma_client", lambda: None)
+
+        results = retrieval_module.retrieve("test query", ["bdsg"], top_k=5)
+        assert results == []
+
+
 # ---------------------------------------------------------------------------
 # retrieve() — semantic correctness
 # ---------------------------------------------------------------------------

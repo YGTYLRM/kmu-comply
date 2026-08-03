@@ -59,6 +59,28 @@ def _chroma_client():
     return _chroma
 
 
+def _reset_chroma_client() -> None:
+    """Force a full reconnect after a segment-reader crash (see retrieve()).
+
+    Observed in this environment: chromadb's embedded PersistentClient keeps a
+    per-process vector-segment reader cache with limited capacity. Once a
+    long-lived process (a Celery worker handling many companies over its
+    lifetime, each touching a different subset of the 14 regulation
+    collections) has queried enough *distinct* collections, re-querying one
+    queried earlier can fail with `InternalError: Error creating hnsw segment
+    reader: Nothing found on disk` — permanently, for that collection, in that
+    process. Recreating just the Python PersistentClient object does NOT
+    recover it (the broken state lives below the Python client); only
+    clearing chromadb's process-wide shared-system cache and reconnecting
+    does. Verified this fully recovers the collection and holds up across
+    repeated crash/reset cycles.
+    """
+    global _chroma
+    from chromadb.api.shared_system_client import SharedSystemClient
+    SharedSystemClient.clear_system_cache()
+    _chroma = None
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -102,7 +124,6 @@ def retrieve(
 
     query_embedding = embed_query(query)
     query_terms = [t for t in re.sub(r'[^\w\s]', ' ', query.lower()).split() if len(t) > 2]
-    client = _chroma_client()
     results: list[dict] = []
 
     for regulation in regulations:
@@ -111,13 +132,14 @@ def retrieve(
             logger.warning("Unknown regulation key: %s", regulation)
             continue
 
+        client = _chroma_client()
         try:
             collection = client.get_collection(collection_name)
+            count = collection.count()
         except Exception:
             logger.warning("Collection not found: %s (not yet indexed?)", collection_name)
             continue
 
-        count = collection.count()
         if count == 0:
             logger.warning("Empty collection: %s", collection_name)
             continue
@@ -127,11 +149,35 @@ def retrieve(
         # Fetch more raw results to allow BM25 re-ranking to surface additional relevant chunks
         raw_k = min(k * 3, count)
 
-        res = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=raw_k,
-            include=["documents", "metadatas", "distances"],
-        )
+        try:
+            res = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=raw_k,
+                include=["documents", "metadatas", "distances"],
+            )
+        except Exception as exc:
+            # See _reset_chroma_client() — a stale segment-reader cache in a
+            # long-lived process can break a previously-healthy collection.
+            # Reconnect and retry once before giving up on this regulation.
+            logger.warning(
+                "retrieve: query failed for %s (%s) — resetting ChromaDB client and retrying once",
+                collection_name, exc,
+            )
+            _reset_chroma_client()
+            client = _chroma_client()
+            try:
+                collection = client.get_collection(collection_name)
+                res = collection.query(
+                    query_embeddings=[query_embedding],
+                    n_results=raw_k,
+                    include=["documents", "metadatas", "distances"],
+                )
+            except Exception as retry_exc:
+                logger.error(
+                    "retrieve: %s still failing after client reset (%s), skipping",
+                    collection_name, retry_exc,
+                )
+                continue
 
         for doc, meta, dist in zip(
             res["documents"][0],
