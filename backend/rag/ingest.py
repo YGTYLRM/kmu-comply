@@ -178,29 +178,55 @@ def _strip_gesetze_noise(text: str) -> str:
 
 
 def _split_oversized(text: str, header: str) -> list[str]:
-    """Split a chunk that exceeds MAX_CHUNK_CHARS by Absatz markers."""
-    if len(text) <= MAX_CHUNK_CHARS:
-        return [text]
+    """Split a chunk that exceeds MAX_CHUNK_CHARS by Absatz markers.
 
-    # Split on Absatz boundaries, keeping the marker with its paragraph
-    parts = re.split(r"(?m)(?=^\(\d+\))", text)
-    if len(parts) < 2:
-        # No Absatz markers — hard split at midpoint word boundary
-        words = text.split()
-        mid = len(words) // 2
-        return [" ".join(words[:mid]), header + "\n" + " ".join(words[mid:])]
+    Iterative (not recursive) with a hard progress guarantee on every step:
+    a body with sparse/lopsided Absatz markers (e.g. a couple of tiny numbered
+    items followed by megabytes of unstructured prose — observed on EUR-Lex
+    delegated-regulation Annexes) can make the Absatz split a near no-op
+    (one giant piece barely smaller than the input), which previously either
+    shipped a multi-MB "chunk" straight to the embedding model (silently
+    truncated and discarding the rest) or, in an earlier fix attempt, recursed
+    forever trying to re-split that same-sized piece and blew the recursion
+    limit. Every accepted split here must shrink the largest resulting piece
+    by at least 10%; anything less falls back to a word-midpoint split, which
+    always halves.
+    """
+    result: list[str] = []
+    queue: list[str] = [text]
+    while queue:
+        piece = queue.pop(0)
+        if len(piece) <= MAX_CHUNK_CHARS:
+            result.append(piece)
+            continue
 
-    chunks: list[str] = []
-    current = ""
-    for part in parts:
-        if current and len(current) + len(part) > MAX_CHUNK_CHARS:
-            chunks.append(current.strip())
-            current = header + "\n" + part
-        else:
-            current += part
-    if current.strip():
-        chunks.append(current.strip())
-    return chunks or [text[:MAX_CHUNK_CHARS]]
+        # Split on Absatz boundaries, keeping the marker with its paragraph
+        parts = [p for p in re.split(r"(?m)(?=^\(\d+\))", piece) if p.strip()]
+        sub: list[str] | None = None
+        if len(parts) >= 2:
+            sub = []
+            current = ""
+            for part in parts:
+                if current and len(current) + len(part) > MAX_CHUNK_CHARS:
+                    sub.append(current.strip())
+                    current = header + "\n" + part
+                else:
+                    current += part
+            if current.strip():
+                sub.append(current.strip())
+            if not sub or len(sub) < 2 or max(len(s) for s in sub) > len(piece) * 0.9:
+                sub = None
+
+        if sub is None:
+            words = piece.split()
+            if len(words) < 2:
+                result.append(piece[:MAX_CHUNK_CHARS])
+                continue
+            mid = len(words) // 2
+            sub = [" ".join(words[:mid]), header + "\n" + " ".join(words[mid:])]
+
+        queue = sub + queue
+    return result
 
 
 # Negated obligation phrases — must be removed before keyword matching so that
@@ -364,10 +390,29 @@ def _chunk_guidance(text: str, regulation: str, filename: str, url: str) -> list
     return chunks
 
 
+# _expanded.txt files whose content is administrative/interpretive guidance
+# (BAFA/BaFin/BSI/DSK/BfDI guidance, CJEU case law) rather than primary statute
+# text. Everything else under _expanded.txt is a curated statute reference and
+# stays "law". Drives agent/planning.py's _SOURCE_AUTHORITY labelling — getting
+# this wrong tells the LLM/report that non-binding guidance is binding law.
+_GUIDANCE_EXPANDED_FILES = {
+    "dsk_bdsg_guidance_expanded.txt",
+    "cjeu_gdpr_rulings_expanded.txt",
+    "dsk_gdpr_orientations_expanded.txt",
+    "bafa_enefg_obligations_expanded.txt",
+    "dena_energy_audit_guidance_expanded.txt",
+    "bafin_gwg_guidance_expanded.txt",
+    "bafa_lksg_guidance_expanded.txt",
+    "bsi_nis2_guidance_expanded.txt",
+    "dsk_cookie_guidance_expanded.txt",
+}
+
+
 def _chunk_separator_blocks(text: str, regulation: str, filename: str, url: str) -> list[dict]:
     """Chunk files structured as blocks separated by '---' markers.
     Used for *_expanded.txt files where each block covers one article/provision."""
     import re as _re
+    document_type = "guidance" if filename in _GUIDANCE_EXPANDED_FILES else "law"
     blocks = [b.strip() for b in text.split("---") if b.strip()]
     chunks = []
     for block in blocks:
@@ -384,7 +429,7 @@ def _chunk_separator_blocks(text: str, regulation: str, filename: str, url: str)
             if line.startswith("Title:"):
                 title = line.replace("Title:", "").strip()
                 break
-        chunks.append(_make_chunk(block, regulation, article_number, title, "law", filename, url))
+        chunks.append(_make_chunk(block, regulation, article_number, title, document_type, filename, url))
     return chunks
 
 
