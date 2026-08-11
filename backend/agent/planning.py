@@ -394,7 +394,7 @@ async def run_gap_analysis(
 
 # ── Step 5 ────────────────────────────────────────────────────────────────────
 
-_ACTION_PLAN_BATCH_SIZE = 50
+_ACTION_PLAN_BATCH_SIZE = 20
 _ACTION_PLAN_TOKEN_LIMIT = 50_000  # ~200k chars; above this we batch
 
 
@@ -414,10 +414,17 @@ async def generate_action_plan(
     profile_json = profile.model_dump_json(indent=2)
     gaps_json = json.dumps([g.model_dump() for g in actionable], indent=2, default=str)
 
-    # Estimate token count (~4 chars/token). Batch if prompt would be too large.
-    if len(gaps_json) // 4 > _ACTION_PLAN_TOKEN_LIMIT:
+    # Batch if the input prompt would be too large (~4 chars/token), OR if the
+    # number of actionable items alone risks truncating the *output* — each
+    # detailed action item runs ~250-300 tokens, so an unbatched call for
+    # dozens of items can silently hit max_tokens mid-generation. When Anthropic
+    # truncates a forced tool_choice call this way, the SDK can still yield a
+    # structurally valid but empty/partial tool result with no error raised,
+    # so this isn't just an input-size problem — it also needs an item-count
+    # cap independent of how verbose the gap evidence text happens to be.
+    if len(gaps_json) // 4 > _ACTION_PLAN_TOKEN_LIMIT or len(actionable) > _ACTION_PLAN_BATCH_SIZE:
         logger.info(
-            "generate_action_plan: %d gaps exceeds token limit — batching in groups of %d",
+            "generate_action_plan: %d gaps — batching in groups of %d",
             len(actionable), _ACTION_PLAN_BATCH_SIZE,
         )
         all_actions: list[ActionItem] = []
@@ -688,6 +695,12 @@ async def _async_llm_call(
                 if tool_block is None:
                     raise ValueError("model did not return a tool_use block")
                 raw_list = tool_block.input.get(tool_result_key, [])
+                if not raw_list:
+                    logger.warning(
+                        "%s: DEBUG empty %r from tool call — stop_reason=%r, full tool_block.input=%r, other content blocks=%r",
+                        step_name, tool_result_key, response.stop_reason, tool_block.input,
+                        [b.type for b in response.content],
+                    )
                 return parse_fn(json.dumps(raw_list))
             else:
                 text = response.content[0].text.strip()
