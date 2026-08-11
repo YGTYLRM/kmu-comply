@@ -31,11 +31,16 @@ from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
 
-_RE_CITATION = re.compile(r"^(§|Art(ikel|\.)?)\s*\d")
+_RE_CITATION = re.compile(r"^(§|Art(ikel|\.)?)\s*\d|^ESRS\s+\S")
 
 # Extracts bare section/article numbers from a citation string, e.g.
 # "§ 7 GwG" -> {"7"}, "§§ 4-5 GwG" -> {"4", "5"}, "Art. 6-7 DSGVO" -> {"6", "7"}.
 _RE_CITATION_NUM = re.compile(r"(?:§§?|Art(?:ikel|\.)?)\s*(\d+[a-z]?)(?:\s*-\s*(\d+[a-z]?))?", re.IGNORECASE)
+
+# ESRS citations use their own code system (e.g. "ESRS E1", "ESRS 1"), not
+# §/Art numbers — matched and namespaced separately so "ESRS 1" can never
+# collide with an unrelated bare "§ 1"/"Art. 1" citation.
+_RE_ESRS_CODE = re.compile(r"ESRS\s+([A-Za-z]?\d+)", re.IGNORECASE)
 
 
 def _citation_numbers(text: str) -> set[str]:
@@ -44,6 +49,8 @@ def _citation_numbers(text: str) -> set[str]:
         numbers.add(m.group(1).lower())
         if m.group(2):
             numbers.add(m.group(2).lower())
+    for m in _RE_ESRS_CODE.finditer(text):
+        numbers.add("esrs" + m.group(1).lower())
     return numbers
 
 _PRIORITY_ORDER = {
@@ -256,8 +263,8 @@ def retrieve_regulatory_context(
             low_confidence_regulations.append(reg_key)
 
         # Obligation-driven augmentation: additive, never replaces generic raw.
-        # get_obligations() returns [] for the 3 regulations without registry
-        # entries (csrd, eu_ai_act, eu_data_act) — clean no-op fallback there.
+        # get_obligations() returns [] for any regulation without a registry
+        # entry — clean no-op fallback there.
         obligations = get_obligations(reg_key)
         obligation_chunks: list[dict] = []
         for ob in obligations:

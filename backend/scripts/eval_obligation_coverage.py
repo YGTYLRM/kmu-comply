@@ -85,11 +85,17 @@ _PROFILE_MAP: dict[str, CompanyProfile] = {
 
 _RE_CITATION_NUM = re.compile(r"(?:§§?|Art(?:ikel|\.)?)\s*(\d+[a-z]?)(?:\s*-\s*(\d+[a-z]?))?", re.IGNORECASE)
 
+# ESRS citations (csrd) use their own code system (e.g. "ESRS E1", "ESRS 1"),
+# not §/Art numbers — matched and namespaced separately so "ESRS 1" can never
+# collide with an unrelated bare "§ 1"/"Art. 1" citation.
+_RE_ESRS_CODE = re.compile(r"ESRS\s+([A-Za-z]?\d+)", re.IGNORECASE)
+
 
 def _citation_numbers(text: str) -> set[str]:
     """Extract bare section/article numbers from a citation string, ignoring
     trailing law-name suffixes and Absatz/subsection detail. '§ 4 LkSG' -> {'4'};
-    '§§ 4-5 GwG' -> {'4','5'}; 'Art. 30 DSGVO' -> {'30'}; 'Artikel 30' -> {'30'}.
+    '§§ 4-5 GwG' -> {'4','5'}; 'Art. 30 DSGVO' -> {'30'}; 'Artikel 30' -> {'30'};
+    'ESRS E1 (GHG Emissions)' -> {'esrse1'}.
     Returns an empty set for non-citation strings (e.g. guidance slugs like
     'bafa_lksg_risk_analysis_methodology'), which correctly never match."""
     numbers: set[str] = set()
@@ -97,6 +103,8 @@ def _citation_numbers(text: str) -> set[str]:
         numbers.add(m.group(1).lower())
         if m.group(2):
             numbers.add(m.group(2).lower())
+    for m in _RE_ESRS_CODE.finditer(text):
+        numbers.add("esrs" + m.group(1).lower())
     return numbers
 
 
