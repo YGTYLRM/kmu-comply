@@ -54,8 +54,7 @@ async def create_checkout(
 
 @router.get("/api/billing")
 async def get_billing(current_user: dict = Depends(get_current_user)):
-    stripe_active = settings.stripe_enabled or bool(settings.stripe_secret_key)
-    if not stripe_active:
+    if not settings.stripe_enabled:
         return {"subscription": None, "stripe_enabled": False}
     from services.stripe_service import get_active_subscription
 
