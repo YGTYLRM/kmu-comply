@@ -43,7 +43,7 @@ export function ProcessingView() {
       try {
         const status = await api.getStatus(jobId);
         setSteps(status.steps);
-        if (status.status === "completed") {
+        if (status.status === "completed" || status.status === "partial") {
           clearInterval(intervalRef.current!);
           const prevJobId = sessionStorage.getItem("kmu_prev_job_id");
           sessionStorage.removeItem("kmu_prev_job_id");
