@@ -377,7 +377,7 @@ async def run_gap_analysis(
             inferred_assumptions=getattr(profile, "inferred_assumptions", []),
         )
         gaps = await _async_llm_call(
-            prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures,
+            prompt, _parse_gaps, f"gap_analysis:{reg_key}", failures, max_tokens=8192,
             tool=_TOOL_GAP_ANALYSIS, tool_result_key="gaps",
         )
 
@@ -694,13 +694,21 @@ async def _async_llm_call(
                 )
                 if tool_block is None:
                     raise ValueError("model did not return a tool_use block")
-                raw_list = tool_block.input.get(tool_result_key, [])
-                if not raw_list:
-                    logger.warning(
-                        "%s: DEBUG empty %r from tool call — stop_reason=%r, full tool_block.input=%r, other content blocks=%r",
-                        step_name, tool_result_key, response.stop_reason, tool_block.input,
-                        [b.type for b in response.content],
+                if response.stop_reason == "max_tokens":
+                    # Anthropic can still hand back a structurally valid but
+                    # incomplete/empty tool_use block when a forced tool_choice
+                    # call is cut off mid-generation - no exception is raised by
+                    # the SDK for this. Left alone, that silently looks like a
+                    # legitimate empty result (e.g. "zero compliance gaps
+                    # found"), which is worse than an error: it reads as a
+                    # clean bill of health when nothing was actually analysed.
+                    # Route it through the same retry/failure path as a real
+                    # API error instead of returning early.
+                    raise ValueError(
+                        f"response truncated at max_tokens={max_tokens} before "
+                        f"completing tool call (partial input: {tool_block.input!r})"
                     )
+                raw_list = tool_block.input.get(tool_result_key, [])
                 return parse_fn(json.dumps(raw_list))
             else:
                 text = response.content[0].text.strip()
