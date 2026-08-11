@@ -69,6 +69,13 @@ export function GapAnalysis({ report }: Props) {
                           Art. {gap.article_number}
                         </span>
                         <span className="text-sm font-medium text-slate-300">{gap.article_title}</span>
+                        {gap.legal_version_date && (
+                          <span className="text-[10px] text-slate-600" title="Rechtsstand — date of the source statute's last amendment">
+                            Rechtsstand: {new Date(gap.legal_version_date).toLocaleDateString("de-DE", {
+                              day: "numeric", month: "short", year: "numeric",
+                            })}
+                          </span>
+                        )}
                         {gap.source_url && (
                           <a
                             href={gap.source_url}

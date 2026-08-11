@@ -315,6 +315,7 @@ export default function PrintPage() {
 
         .gap-article { font-weight: 700; font-size: 9pt; color: #0f172a; }
         .gap-title { font-size: 9pt; color: #334155; }
+        .gap-legal-date { font-size: 7pt; color: #94a3b8; margin-left: auto; }
 
         .gap-evidence {
           margin-top: 2mm;
@@ -750,6 +751,13 @@ export default function PrintPage() {
                         </span>
                         <span className="gap-article">{g.article_number}</span>
                         <span className="gap-title">{g.article_title}</span>
+                        {g.legal_version_date && (
+                          <span className="gap-legal-date">
+                            Rechtsstand: {new Date(g.legal_version_date).toLocaleDateString("de-DE", {
+                              day: "numeric", month: "short", year: "numeric",
+                            })}
+                          </span>
+                        )}
                       </div>
 
                       {g.evidence && (
