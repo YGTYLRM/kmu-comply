@@ -639,12 +639,12 @@ export default function HomePage() {
                     { label: "Monitoring bei Gesetzesänderungen",          complio: "✓",              platforms: "✓",               lawyer: "✗" },
                     { label: "Rechtsverbindliche Auskunft",                complio: "✗",              platforms: "✗",               lawyer: "✓" },
                   ] as const).map(({ label, complio, platforms, lawyer }) => {
-                    const cell = (val: string, highlight: boolean) => {
+                    const cell = (col: string, val: string, highlight: boolean) => {
                       const isCheck = val === "✓";
                       const isCross = val === "✗";
                       const isPartial = val === "◐";
                       return (
-                        <td key={val + label} className={`py-3.5 px-6 text-center text-sm ${highlight ? "bg-brand-500/[0.04]" : ""}`}>
+                        <td key={col} className={`py-3.5 px-6 text-center text-sm ${highlight ? "bg-brand-500/[0.04]" : ""}`}>
                           <span className={
                             isCheck ? "text-emerald-400 font-bold"
                             : isCross ? "text-red-500/60"
@@ -660,9 +660,9 @@ export default function HomePage() {
                     return (
                       <tr key={label} className="hover:bg-white/[0.02] transition-colors">
                         <td className="py-3.5 px-6 text-slate-300 font-medium text-sm">{label}</td>
-                        {cell(complio, true)}
-                        {cell(platforms, false)}
-                        {cell(lawyer, false)}
+                        {cell("complio", complio, true)}
+                        {cell("platforms", platforms, false)}
+                        {cell("lawyer", lawyer, false)}
                       </tr>
                     );
                   })}
