@@ -114,6 +114,7 @@ export interface ComplianceGap {
   confidence: "HIGH" | "MEDIUM" | "LOW";
   confidence_reason?: string;
   source_url?: string;
+  legal_version_date?: string;
 }
 
 export interface ActionItem {
