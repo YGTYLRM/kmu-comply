@@ -39,14 +39,17 @@ _COLLECTION_TOP_K: dict[str, int] = {
 _DEFAULT_TOP_K = 6
 _SIMILARITY_FLOOR = 0.35   # drop chunks below this cosine similarity (too far from query)
 
-# Matches a real statute citation (§ N, Art./Artikel N, Article N, ESRS N) as
-# an article_number value. Discursive guidance prose (BAFA/BaFin/etc.) tends
-# to embed closer to natural-language questions than terse law text does —
+# Matches a real statute citation (§ N, Art./Artikel/Article N, ESRS N) as an
+# article_number value. Discursive guidance prose (BAFA/BaFin/etc.) tends to
+# embed closer to natural-language questions than terse law text does —
 # without this, guidance systematically outranks the correct statute article
 # for ordinary "what must a company do" queries (observed worst on lksg: 5%
 # top-5 accuracy in the full retrieval_eval.json baseline). This is a modest,
 # additive nudge toward statute text, not an override — see STATUTE_BONUS.
-_RE_STATUTE_CITATION = re.compile(r"^(§|Art(ikel|icle|\.)?)\s*\d|^ESRS\s+\S")
+# The citation marker may be preceded by a regulation-name prefix (some
+# source files use subsection-level headers like "nis2 Art. 23(4)"), so we
+# search rather than anchor strictly to the start of the string.
+_RE_STATUTE_CITATION = re.compile(r"(?:^|\s)(§|Art(ikel|icle|\.)?)\s*\d|(?:^|\s)ESRS\s+\S")
 _STATUTE_BONUS = 0.2
 
 logger = logging.getLogger(__name__)
@@ -198,7 +201,7 @@ def retrieve(
             if dense_score < _SIMILARITY_FLOOR:
                 continue  # drop below threshold
             bm25 = _bm25_score(query_terms, doc)
-            is_statute = bool(_RE_STATUTE_CITATION.match(meta.get("article_number", "")))
+            is_statute = bool(_RE_STATUTE_CITATION.search(meta.get("article_number", "")))
             # Combined score: weights sum to 1.0 (56% dense / 24% BM25 / 20%
             # statute bonus) so the max stays in [0, 1] whether or not the
             # bonus applies — same dense:BM25 ratio as before, just rescaled
