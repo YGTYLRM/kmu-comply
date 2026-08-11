@@ -33,6 +33,19 @@ logger = logging.getLogger(__name__)
 
 _RE_CITATION = re.compile(r"^(§|Art(ikel|\.)?)\s*\d")
 
+# Extracts bare section/article numbers from a citation string, e.g.
+# "§ 7 GwG" -> {"7"}, "§§ 4-5 GwG" -> {"4", "5"}, "Art. 6-7 DSGVO" -> {"6", "7"}.
+_RE_CITATION_NUM = re.compile(r"(?:§§?|Art(?:ikel|\.)?)\s*(\d+[a-z]?)(?:\s*-\s*(\d+[a-z]?))?", re.IGNORECASE)
+
+
+def _citation_numbers(text: str) -> set[str]:
+    numbers: set[str] = set()
+    for m in _RE_CITATION_NUM.finditer(text):
+        numbers.add(m.group(1).lower())
+        if m.group(2):
+            numbers.add(m.group(2).lower())
+    return numbers
+
 _PRIORITY_ORDER = {
     Priority.CRITICAL: 0,
     Priority.HIGH: 1,
@@ -250,16 +263,30 @@ def retrieve_regulatory_context(
         for ob in obligations:
             ob_query = f"{ob.article} {ob.title}"
             ob_candidates = retrieve(ob_query, [reg_key], top_k=8)
-            # Prefer chunks with a real statute citation (§ N / Artikel N) over
-            # guidance-slug chunks (e.g. "bafa_lksg_risk_analysis_methodology")
-            # for this specific obligation — explanatory guidance prose tends to
-            # outrank terse law text in semantic search, which would defeat the
-            # point of an obligation-targeted lookup (guaranteeing the actual law
-            # text is present). Citation format, not document_type, drives this:
-            # even correctly-labeled "law" chunks (e.g. ESRS-style references)
-            # don't always carry a § N/Artikel N citation.
+            # Prefer the chunk whose article_number is the exact statute this
+            # obligation cites, over just any statute-formatted chunk. On small
+            # collections a handful of broad/foundational articles (e.g. gwg's
+            # § 1 "Begriffsbestimmungen") semantically dominate nearly every
+            # query in that collection, crowding out the actually-cited article
+            # (e.g. § 7) from the top of a purely-semantic ranking even though
+            # it's present in the corpus — exact citation-number matching
+            # sidesteps that by looking it up directly instead of hoping
+            # semantic similarity favours it.
+            target_numbers = _citation_numbers(ob.article)
+            exact_hits = [
+                c for c in ob_candidates
+                if target_numbers & _citation_numbers(c.get("article_number", ""))
+            ][:3]
+            # Fallback: prefer chunks with a real statute citation (§ N / Artikel
+            # N) over guidance-slug chunks (e.g. "bafa_lksg_risk_analysis_
+            # methodology") — explanatory guidance prose tends to outrank terse
+            # law text in semantic search, which would defeat the point of an
+            # obligation-targeted lookup (guaranteeing the actual law text is
+            # present). Citation format, not document_type, drives this: even
+            # correctly-labeled "law" chunks (e.g. ESRS-style references) don't
+            # always carry a § N/Artikel N citation.
             law_hits = [c for c in ob_candidates if _RE_CITATION.match(c.get("article_number", ""))][:3]
-            obligation_chunks.extend(law_hits or ob_candidates[:3])
+            obligation_chunks.extend(exact_hits or law_hits or ob_candidates[:3])
 
         # Rerank the generic pool on its own, capped at 5 (today's baseline
         # behaviour). Obligation-targeted law chunks are deliberately NOT run
