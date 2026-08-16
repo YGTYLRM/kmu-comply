@@ -81,7 +81,7 @@ export default function PrintPage() {
   const date = new Date(report.generated_at).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
   const applicable = report.applicable_regulations.filter(r => r.applies);
   const notApplicable = report.applicable_regulations.filter(r => !r.applies);
-  const scored = report.regulation_scores.filter(s => s.total_requirements > 0);
+  const scored = report.regulation_scores;
   const byReg: Record<string, typeof report.gap_analysis> = {};
   report.gap_analysis.forEach(g => { (byReg[g.regulation] ??= []).push(g); });
   const prioOrder: Record<Priority, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
@@ -682,7 +682,14 @@ export default function PrintPage() {
               </tr>
             </thead>
             <tbody>
-              {scored.map(s => (
+              {scored.map(s => s.total_requirements === 0 ? (
+                <tr key={s.regulation}>
+                  <td style={{ fontWeight: 700, color: "#0a1637" }}>{REGULATION_LABEL[s.regulation] ?? s.regulation}</td>
+                  <td colSpan={6} style={{ color: "#94a3b8", fontStyle: "italic" }}>
+                    No findings returned — analysis incomplete, not compliant
+                  </td>
+                </tr>
+              ) : (
                 <tr key={s.regulation}>
                   <td style={{ fontWeight: 700, color: "#0a1637" }}>{REGULATION_LABEL[s.regulation] ?? s.regulation}</td>
                   <td style={{ textAlign: "center", fontWeight: 800, fontSize: "11pt", color: scoreColor(s.score_percent) }}>
