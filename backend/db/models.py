@@ -4,7 +4,10 @@ from typing import Optional
 
 from sqlalchemy import String, Boolean, Float, Integer, DateTime, JSON, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from pgvector.sqlalchemy import Vector
 from db.database import Base
+
+EMBEDDING_DIM = 1024  # intfloat/multilingual-e5-large
 
 
 def _now():
@@ -286,3 +289,46 @@ class Notification(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     user: Mapped["Profile"] = relationship(back_populates="notifications")
+
+
+class RegulationChunk(Base):
+    """Phase 0 of the ChromaDB -> pgvector migration — not yet read from or
+    written to by the retrieval/ingestion pipeline (see rag/ingest.py,
+    rag/retrieval.py, which still use ChromaDB). `collection` mirrors
+    rag/ingest.py's REGULATION_COLLECTIONS values."""
+    __tablename__ = "regulation_chunks"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    collection: Mapped[str] = mapped_column(String(50), nullable=False)
+    regulation: Mapped[str] = mapped_column(String(50), nullable=False)
+    article_number: Mapped[str] = mapped_column(String(50), nullable=False)
+    paragraph: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    title: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    document_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    obligation_type: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    source_file: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    legal_version_date: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    fetched_at: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    source_file_hash: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    content_hash: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
+    metadata_extra: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
+
+
+class CompanyDocChunk(Base):
+    """Phase 0 of the ChromaDB -> pgvector migration, dynamic per-job side.
+    Not yet read from or written to — rag/company_ingest.py still owns this
+    data via ChromaDB's job_{job_id} collections."""
+    __tablename__ = "company_doc_chunks"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    job_id: Mapped[str] = mapped_column(String, nullable=False)
+    source_file: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
+    metadata_extra: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
