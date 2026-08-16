@@ -639,12 +639,22 @@ def _upsert_pgvector_chunks(
     stale on re-ingestion when a file's chunk count changes.
 
     No-ops if DATABASE_URL isn't configured (e.g. local dev without Postgres).
+    Never raises — a pgvector write failure (e.g. a source file with invalid
+    UTF-8 content, which Postgres validates strictly and ChromaDB does not)
+    must not abort ingestion into the ChromaDB collection that's actually
+    serving retrieval today. Logged and skipped instead.
     """
     from config import settings
     if not settings.database_url:
         return
     import asyncio
-    asyncio.run(_upsert_pgvector_chunks_async(collection_name, regulation, batch, embeddings))
+    try:
+        asyncio.run(_upsert_pgvector_chunks_async(collection_name, regulation, batch, embeddings))
+    except Exception as exc:
+        logger.warning(
+            "pgvector dual-write failed for %s (%d chunks) — skipped, ChromaDB write above "
+            "already succeeded: %s", collection_name, len(batch), exc,
+        )
 
 
 async def _upsert_pgvector_chunks_async(
