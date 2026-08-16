@@ -654,6 +654,8 @@ async def _async_llm_call(
     max_tokens: int = 4096,
     tool: dict | None = None,
     tool_result_key: str | None = None,
+    model: str | None = None,
+    system: str | None = None,
 ) -> list:
     """
     Async LLM call with structured output parsing.
@@ -663,6 +665,11 @@ async def _async_llm_call(
     fence-stripping and json.loads() fragility.  The structured dict at
     `tool_result_key` is serialised back to a JSON string so that `parse_fn`
     (which expects a JSON string) remains unchanged.
+
+    `model`/`system` default to the main analysis model and persona — pass
+    overrides for lightweight auxiliary checks (e.g. a cheap Haiku verification
+    pass) that shouldn't use the main model or its German compliance-consultant
+    system prompt.
     """
     import asyncio
     if not settings.llm_api_key:
@@ -675,10 +682,10 @@ async def _async_llm_call(
     for attempt in range(max_attempts):
         try:
             kwargs: dict = dict(
-                model=settings.llm_model,
+                model=model or settings.llm_model,
                 max_tokens=max_tokens,
                 temperature=0,
-                system=SYSTEM_PERSONA,
+                system=system if system is not None else SYSTEM_PERSONA,
                 messages=[{"role": "user", "content": prompt}],
             )
             if tool:

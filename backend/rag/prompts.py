@@ -374,6 +374,36 @@ Constraints:
 </instructions>"""
 
 
+def entailment_check_prompt(pairs_json: str) -> str:
+    return f"""<task>
+For each item below, a compliance finding cites a verbatim quote from a regulatory text as
+support for its assigned status. The quote has already been verified to actually appear in
+the source text — your job is different: verify that the quote's CONTENT actually supports
+the assigned status, rather than being a real quote taken out of context or unrelated to the
+conclusion drawn from it.
+</task>
+
+<items>
+{pairs_json}
+</items>
+
+<instructions>
+For each item, classify the relationship between "quote" and "status" as exactly one of:
+- SUPPORTS: the quote's content substantiates the assigned status for this company
+- CONTRADICTS: the quote's content actually points to a different status than the one assigned
+  (e.g. the quote describes an exemption that applies, or an obligation the company evidently
+  meets, but status says NON_COMPLIANT; or the quote imposes an obligation but status says COMPLIANT)
+- UNRELATED: the quote is real but doesn't address the specific requirement the status was assigned for
+
+Output ONLY a valid JSON array, one entry per item, in the same order as given:
+[
+  {{"gap_index": 0, "verdict": "SUPPORTS", "reason": "one short sentence"}}
+]
+
+Keep "reason" to one short sentence. Do not restate the quote.
+</instructions>"""
+
+
 def executive_summary_prompt(
     company_name: str,
     applicable_count: int,
