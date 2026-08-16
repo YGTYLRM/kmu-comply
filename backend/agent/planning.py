@@ -667,7 +667,7 @@ async def _async_llm_call(
     (which expects a JSON string) remains unchanged.
 
     `model`/`system` default to the main analysis model and persona — pass
-    overrides for lightweight auxiliary checks (e.g. a cheap Haiku verification
+    overrides for lightweight auxiliary checks (e.g. a cheap verification
     pass) that shouldn't use the main model or its German compliance-consultant
     system prompt.
     """

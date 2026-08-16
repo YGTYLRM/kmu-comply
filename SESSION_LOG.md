@@ -2146,6 +2146,55 @@ Full checkout flow built end-to-end:
 
 ---
 
+## Session 29 — 2026-08-16 to 2026-08-17 — Stripe webhook was completely broken, pgvector migration Phase 0–2, corrupted KB source file
+
+**Branch:** `feat/polish`
+**Commit:** `021b383`
+
+### Context
+
+Continuation session, largely self-directed against the backlog left from the previous (2026-08-11/12) session: a score-breakdown display bug, an event-loop-blocking bug, a new small-model entailment check, a full local Stripe test-mode walkthrough (blocked since day one by an unset webhook secret), and — at the user's explicit go-ahead — the first phases of the ChromaDB→pgvector migration that had been sitting on the backlog since project inception.
+
+### Changes
+
+#### Score breakdown silently dropping regulations with zero gap items
+- `backend/agent/actions.py` — `_compute_scores` unconditionally skipped any applicable regulation whose gap analysis returned zero items, making "not applicable", "100% compliant", and "analysis silently returned nothing" all render identically (absent from the panel). Now every applicable regulation gets a score entry; `total_requirements == 0` renders as an explicit "no findings — incomplete" state in all three consumers (`score-breakdown.tsx`, `pdf_generator.py`, print view) instead of vanishing. `_weighted_score` now excludes these entries from the overall average instead of counting them as 0%-compliant.
+
+#### Document-upload injection guard blocking the event loop
+- `backend/routes/analysis.py` — `classify_document_for_injection()` makes a blocking (non-async) Anthropic call, but ran directly inside `async def upload_documents`, stalling the *entire* event loop (all concurrent requests on that worker, not just the uploader) whenever a file tripped the keyword pre-filter. Fixed with `loop.run_in_executor`.
+
+#### Small-model entailment check for gap evidence quotes
+- `backend/agent/validation.py` — new `verify_evidence_entailment()`, wired as pipeline step 4d in `compliance_agent.py`. The existing `check_evidence_quotes()` only verified a quote appears verbatim in the source chunk (string match) — a real quote could still be cherry-picked out of context and not actually support the assigned compliance status. Adds a batched cheap-model pass (one call per report, not per gap) classifying each eligible gap's quote as SUPPORTS/CONTRADICTS/UNRELATED, downgrading confidence to LOW on a mismatch. Verified against the live model with a synthetic exemption-clause quote misapplied to a NON_COMPLIANT finding.
+- `backend/agent/planning.py` — `_async_llm_call` extended with optional `model`/`system` overrides so the entailment check reuses the existing retry/tool-use plumbing with a cheap model and no system persona, instead of duplicating it.
+
+#### Stripe subscription webhook — had never worked
+- Ran a full local Stripe test-mode walkthrough (installed `stripe-cli` to a session-scratch dir — no admin rights on this machine; `stripe listen` + a real hosted Checkout completion driven with Playwright using the `4242…` test card) specifically because `STRIPE_WEBHOOK_SECRET` being unset had left this path completely untested since the integration was first built. Found a chain of bugs meaning **no customer could have ever had a subscription actually activate**:
+  - `backend/services/stripe_service.py` — `event["data"]["object"]` is a `stripe.StripeObject`, not a dict; its `__getattr__` forwards unknown attributes (including `"get"` itself) to `__getitem__`, so every `.get(...)` call in `handle_webhook` and its `_on_*` handlers raised `AttributeError`. Fixed via `.to_dict()` at the top of the handler.
+  - `stripe` was never in the root `requirements.txt` — a fresh install would `ImportError` the moment any billing code ran. Added.
+  - `current_period_end` came back `None` even after the above fix: Stripe moved this field off the top-level `Subscription` object onto each subscription item. The account billing page only renders "renews on…" if this is set — silently never shown to any real subscriber. Fixed with an `items.data[0].current_period_end` fallback.
+  - That surfaced a second latent bug: the epoch was converted to a tz-*aware* datetime, but the `subscriptions.current_period_end` column is `TIMESTAMP WITHOUT TIME ZONE` — asyncpg rejects tz-aware values there. Also removed two redundant, equally-broken explicit `updated_at = datetime.now(timezone.utc)` assignments (the model's `onupdate=_now` already handles this correctly with a naive datetime).
+  - `backend/routes/billing.py` — the webhook's exception handler only logged `str(exc)`, no traceback, which is why none of the above was previously diagnosable from logs. Switched to `logger.exception`.
+  - Verified end-to-end after every fix by resending the same real `checkout.session.completed` event via `stripe events resend <id>` and re-checking `GET /api/billing` until it showed the correct plan, status, and `current_period_end`. Test user and DB rows cleaned up afterward.
+
+#### ChromaDB → pgvector migration, Phase 0–2 (all passed)
+Multi-day rearchitecture, planned and executed in phases with hard eval gates rather than a big-bang swap — see `~/.claude/plans/twinkly-honking-harp.md` (not in this repo) for the full phased design.
+- **Phase 0 — schema** (`09ec677`): `regulation_chunks` (one table, `collection` discriminator column, covers all 15 static regulation collections) + `company_doc_chunks` (dynamic per-job docs, separate lifecycle). Verified against the actual Supabase project rather than assumed: pgvector 0.8.0 available (HNSW-capable, not yet enabled), embedding dimension 1024 (confirmed by calling the model, not trusting its name). Migration tested upgrade→downgrade→upgrade clean.
+- **Phase 1 — dual-write ingestion** (`db72ae5`, resilience fix `cb028cf`): `rag/ingest.py::ingest_regulation()`'s chunking/embedding logic unchanged; only the storage step gained a second write to pgvector, deduped on `(collection, source_file, content_hash)` via `ON CONFLICT DO UPDATE` — replacing ChromaDB's positional chunk IDs (which go stale on re-ingestion when a file's chunk count changes). A pgvector write failure now logs and skips the batch instead of crashing the whole ingestion run (found live — see below).
+- **Phase 2 — shadow read + eval-diff gate** (`ab81065`): `rag/retrieval.py::retrieve_pgvector()` mirrors `retrieve()`'s scoring pipeline exactly (score floor, BM25 approximation, statute-citation bonus) — only the raw ANN fetch differs, via `pgvector.sqlalchemy`'s `Vector.cosine_distance()`. Not used by the live pipeline; `retrieve()` is still the only path anything downstream calls. Runs on a persistent background-thread event loop rather than `asyncio.run()` per call (needed for repeated eval-harness calls). **Gate result: all 42 CI cases from `tests/test_retrieval_eval.py` diffed case-by-case against both backends — identical 38/42 pass rate, zero cases flipped in either direction, and all 4 known ranking-gap cases reproduce as failing on both backends** (bug-compatible, not silently "fixed" as an unreviewed side effect). All 15 regulation collections backfilled into pgvector (5,916 chunks total) via the Phase 1 path.
+
+#### Corrupted GDPR recitals source file, silently served for months
+- `backend/data/regulations/gdpr/gdpr_recitals.txt` turned out to be corrupted binary content, not text (`file` reported "data"; contained a NUL byte). **ChromaDB has no content validation on ingestion and had been silently chunking and serving this as `document_type="guidance"` in the live `gdpr_dsgvo` collection** — retrievable and passable to the LLM as evidence during real GDPR compliance analysis. Predates this session; only surfaced because Postgres's strict UTF-8 validation rejected it during the pgvector backfill, which is exactly the kind of check ChromaDB never had. Re-fetched the real text (all 173 recitals) directly from EUR-Lex (the source URL was still correctly recorded in the corrupted file's own header), saved as `gdpr_recitals_expanded.txt` using the `_expanded.txt`-per-block convention for proper `Recital N` chunking, and corrected `document_type` from `"guidance"` to `"law"` (recitals are official EU regulation text in the same Official Journal act as the articles, not third-party guidance — affects the LLM prompt's source-authority hierarchy). Deleted the 8 orphaned corrupted chunks from ChromaDB, re-ingested: 172 clean chunks now in both backends, verified readable with correct numbering.
+
+### Open problems / blockers for next session
+
+- **Live production Stripe is blocked on a real-world question, not code**: the user is a student in Germany and unsure whether they can register the legal entity Stripe's onboarding seems to require right now. Worth knowing before assuming this is unblockable: Stripe DE supports an "individual/sole proprietor" account type — this generally does **not** require incorporating a GmbH/UG, just a `Gewerbeanmeldung` (trade registration, often same-day, ~€20–60) and a tax number from the Finanzamt, and the `Kleinunternehmerregelung` (§19 UStG) simplifies VAT for low revenue. Whether this is actually workable depends on citizenship/visa status (EU citizens: generally fine; non-EU student visas: often need Ausländerbehörde approval for self-employment) — not resolved this session, needs the user to verify with their Studierendenwerk/IHK/a Steuerberater, not something to act on from AI-generated general information.
+- **Deploy**: no host chosen (Railway/Fly/Render/VPS all still just named options), no production Supabase project provisioned (current DB is `complio-staging`), several required env vars (`ADMIN_API_KEY`, `DOCUMENT_ENCRYPTION_KEY`, `ALLOWED_ORIGINS`, `BASE_URL`, `SENTRY_DSN`) don't exist in any env file yet.
+- **Trust/methodology page**: doesn't exist at all (no route, no stub) — needs the user's content/positioning before it's a coding task.
+- **pgvector Phase 3–4** (dynamic company-doc cutover, then static cutover + removing the ChromaDB-only `_reset_chroma_client` workaround): deliberately not started this session — a live retrieval-backend cutover should get its own dedicated review, not be rushed through inline. Phase 0–2 groundwork (schema, dual-write, shadow-read, full backfill) is done and gate-verified, so Phase 3–4 has a clean, low-risk starting point whenever picked up.
+- **Standing, deliberately unfixed**: 4 CI retrieval-quality edge cases (`lksg-001`, `lksg-002`, `csrd-002`, `gwg-003` — guidance prose occasionally outranks the correct terse statute article) and 1 flaky embedding-nondeterminism test. Prior explicit decision: do not patch the shared retrieve/rerank path without new eval evidence, since a narrow fix risks shifting ranking elsewhere with no coverage to catch it.
+
+---
+
 ## Session 27 — 2026-05-22 — Bug fixes: auth, subscription gating, report listing, dashboard
 
 **Branch:** `feat/polish`

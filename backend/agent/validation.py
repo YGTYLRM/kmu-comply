@@ -241,7 +241,7 @@ async def verify_evidence_entailment(
     context, or one that actually supports the opposite conclusion, passes the string
     check but fails here.
 
-    Batches all eligible gaps into a single Haiku call (not one call per gap) to keep
+    Batches all eligible gaps into a single cheap-model call (not one call per gap) to keep
     cost/latency down. On LLM failure, logs and skips without downgrading confidence —
     this is an additional safety net, not a required step, and a transient failure here
     must never block report generation.
