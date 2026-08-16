@@ -73,6 +73,7 @@ async def upload_documents(
     from services.document_store import document_store
     from services.injection_guard import classify_document_for_injection
 
+    loop = asyncio.get_running_loop()
     session_id = document_store.create_session(current_user["id"])
     saved: list[str] = []
     errors: list[str] = []
@@ -96,7 +97,9 @@ async def upload_documents(
                         content[-chunk:],
                     ]
                     preview_text = "\n".join(p.decode("utf-8", errors="replace") for p in parts)
-                is_safe, reason = classify_document_for_injection(preview_text, source_name=filename)
+                is_safe, reason = await loop.run_in_executor(
+                    None, classify_document_for_injection, preview_text, filename
+                )
                 if not is_safe:
                     errors.append(f"'{filename}' was rejected: {reason}")
                     continue
