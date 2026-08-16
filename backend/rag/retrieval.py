@@ -223,6 +223,162 @@ def retrieve(
     return results
 
 
+# ---------------------------------------------------------------------------
+# pgvector shadow-read path (migration Phase 2) — not used by the live
+# pipeline yet. agent/planning.py and everything downstream of retrieve()
+# still calls the ChromaDB path above exclusively. This exists to let
+# tests/test_retrieval_eval.py and scripts/eval_obligation_coverage.py be
+# run against both backends and diffed case-by-case before any cutover.
+# ---------------------------------------------------------------------------
+
+import asyncio
+import threading
+
+
+class _AsyncLoopThread:
+    """A persistent background event loop in its own thread.
+
+    retrieve_pgvector() is a sync function (matching retrieve()'s signature,
+    so eval harnesses can call either without changing their own sync/async
+    shape) called repeatedly — once per eval case, up to 261 times in the
+    full suite. asyncio.run() per call would create+tear down a whole engine
+    and connection each time (see rag/ingest.py's dual-write for that exact
+    failure mode when connections from a closed loop get reused). Running
+    every call on one persistent loop in a background thread instead lets a
+    single engine/connection pool be created once and reused correctly.
+    """
+    def __init__(self):
+        self._loop = asyncio.new_event_loop()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def _run(self):
+        asyncio.set_event_loop(self._loop)
+        self._loop.run_forever()
+
+    def run(self, coro):
+        return asyncio.run_coroutine_threadsafe(coro, self._loop).result()
+
+
+_loop_thread: _AsyncLoopThread | None = None
+_pg_engine = None
+
+
+def _get_loop_thread() -> _AsyncLoopThread:
+    global _loop_thread
+    if _loop_thread is None:
+        _loop_thread = _AsyncLoopThread()
+    return _loop_thread
+
+
+async def _get_pg_engine():
+    global _pg_engine
+    if _pg_engine is None:
+        from sqlalchemy.ext.asyncio import create_async_engine
+        _pg_engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+    return _pg_engine
+
+
+async def _pg_query_one(collection_name: str, query_embedding: list[float], raw_k: int) -> list[dict]:
+    from sqlalchemy import select, func
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from db.models import RegulationChunk
+
+    engine = await _get_pg_engine()
+    async with AsyncSession(engine) as db:
+        count = (await db.execute(
+            select(func.count()).where(RegulationChunk.collection == collection_name)
+        )).scalar_one()
+        if count == 0:
+            return []
+        k = min(raw_k, count)
+
+        distance = RegulationChunk.embedding.cosine_distance(query_embedding)
+        stmt = (
+            select(RegulationChunk, distance.label("distance"))
+            .where(RegulationChunk.collection == collection_name)
+            .order_by(distance)
+            .limit(k)
+        )
+        rows = (await db.execute(stmt)).all()
+
+    out = []
+    for chunk, dist in rows:
+        out.append({
+            "text": chunk.content,
+            "distance": dist,
+            "regulation": chunk.regulation,
+            "article_number": chunk.article_number,
+            "paragraph": chunk.paragraph,
+            "title": chunk.title,
+            "document_type": chunk.document_type,
+            "obligation_type": chunk.obligation_type,
+            "source_file": chunk.source_file,
+            "source_url": chunk.source_url,
+            "legal_version_date": chunk.legal_version_date,
+            "fetched_at": chunk.fetched_at,
+            "source_file_hash": chunk.source_file_hash,
+            "content_hash": chunk.content_hash,
+        })
+    return out
+
+
+def retrieve_pgvector(
+    query: str,
+    regulations: list[str],
+    top_k: int | None = None,
+) -> list[dict]:
+    """pgvector-backed mirror of retrieve() — identical post-processing
+    (score floor, BM25 approximation, statute-citation bonus), only the raw
+    ANN fetch differs (SQL cosine-distance query instead of collection.query()).
+    Returns the same dict shape as retrieve() so downstream code (dedup,
+    rerank, citation-matching in agent/planning.py) needs zero changes."""
+    if not regulations:
+        return []
+
+    query_embedding = embed_query(query)
+    query_terms = [t for t in re.sub(r'[^\w\s]', ' ', query.lower()).split() if len(t) > 2]
+    results: list[dict] = []
+
+    for regulation in regulations:
+        collection_name = REGULATION_COLLECTIONS.get(regulation)
+        if not collection_name:
+            logger.warning("Unknown regulation key: %s", regulation)
+            continue
+
+        k = top_k if top_k is not None else _COLLECTION_TOP_K.get(collection_name, _DEFAULT_TOP_K)
+        raw_k = k * 3
+
+        rows = _get_loop_thread().run(_pg_query_one(collection_name, query_embedding, raw_k))
+        if not rows:
+            logger.warning("Empty collection (pgvector): %s", collection_name)
+            continue
+
+        for row in rows:
+            dense_score = round(1.0 - row["distance"], 4)
+            if dense_score < _SIMILARITY_FLOOR:
+                continue
+            doc = row["text"]
+            bm25 = _bm25_score(query_terms, doc)
+            is_statute = bool(_RE_STATUTE_CITATION.search(row.get("article_number", "") or ""))
+            combined = round(
+                0.56 * dense_score + 0.24 * bm25 + (_STATUTE_BONUS if is_statute else 0.0),
+                4,
+            )
+            meta = {k2: v for k2, v in row.items() if k2 not in ("text", "distance")}
+            results.append({
+                "text":        doc,
+                "score":       combined,
+                "dense_score": dense_score,
+                "bm25_score":  bm25,
+                "collection":  collection_name,
+                **meta,
+            })
+
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results
+
+
 def deduplicate(chunks: list[dict]) -> list[dict]:
     """For each (regulation, article_number) pair keep the highest-scoring chunk."""
     best: dict[tuple, dict] = {}
