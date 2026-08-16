@@ -300,9 +300,14 @@ def _compute_scores(
     for reg_app in applicability:
         if not reg_app.applies:
             continue
+        # Always include applicable regulations, even with zero gap items — a
+        # regulation with total_requirements=0 signals "no findings returned"
+        # (failed/incomplete analysis), not "not applicable". Silently
+        # omitting it here is indistinguishable from a clean bill of health,
+        # the exact failure mode already fixed for gap analysis/action plan
+        # truncation (see run_gap_analysis's max_tokens handling) — the score
+        # breakdown must not reintroduce it.
         reg_gaps = [g for g in gaps if g.regulation == reg_app.regulation]
-        if not reg_gaps:
-            continue
         total = len(reg_gaps)
         compliant     = sum(1 for g in reg_gaps if g.status == ComplianceStatus.COMPLIANT)
         partial       = sum(1 for g in reg_gaps if g.status == ComplianceStatus.PARTIALLY_COMPLIANT)
@@ -313,8 +318,9 @@ def _compute_scores(
         assessed = compliant + partial + non_compliant
         score = round((compliant * 100 + partial * 50) / assessed, 1) if assessed else 0.0
 
-        # Assessment completeness: proportion of items that could be assessed
-        completeness = round(assessed / total * 100, 1) if total else 100.0
+        # Assessment completeness: proportion of items that could be assessed.
+        # total=0 means nothing was assessed at all — 0%, not 100%.
+        completeness = round(assessed / total * 100, 1) if total else 0.0
 
         scores.append(RegulationScore(
             regulation=reg_app.regulation,
@@ -334,6 +340,8 @@ def _weighted_score(reg_scores: list[RegulationScore]) -> float:
     total_weight = 0.0
     weighted_sum = 0.0
     for s in reg_scores:
+        if s.total_requirements == 0:
+            continue  # no findings returned — exclude, don't count as 0% compliant
         w = 1.5 if s.regulation in _HIGH_WEIGHT else 1.0
         weighted_sum += s.score_percent * w
         total_weight += w
