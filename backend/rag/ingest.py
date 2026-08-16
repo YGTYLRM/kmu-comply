@@ -625,6 +625,97 @@ def _chroma_client():
     return _chroma
 
 
+def _upsert_pgvector_chunks(
+    collection_name: str, regulation: str, batch: list[dict], embeddings: list[list[float]],
+) -> None:
+    """Phase 1 of the ChromaDB -> pgvector migration: write the same chunks to
+    the new pgvector-backed table alongside the existing ChromaDB write below.
+    ChromaDB remains the source of truth read by rag/retrieval.py until a
+    later migration phase — this call is purely additive and never affects
+    what ingest_regulation returns or how retrieval behaves today.
+
+    Deduped on (collection, source_file, content_hash) rather than reusing
+    ChromaDB's positional ids (f"{regulation}_{path.stem}_{i+j}"), which go
+    stale on re-ingestion when a file's chunk count changes.
+
+    No-ops if DATABASE_URL isn't configured (e.g. local dev without Postgres).
+    """
+    from config import settings
+    if not settings.database_url:
+        return
+    import asyncio
+    asyncio.run(_upsert_pgvector_chunks_async(collection_name, regulation, batch, embeddings))
+
+
+async def _upsert_pgvector_chunks_async(
+    collection_name: str, regulation: str, batch: list[dict], embeddings: list[list[float]],
+) -> None:
+    import uuid
+    from datetime import datetime as _dt
+    from sqlalchemy.dialects.postgresql import insert as pg_insert
+    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from config import settings
+    from db.models import RegulationChunk
+
+    # A dedicated, short-lived engine rather than db.database's module-level
+    # singleton: ingest_regulation is a sync function called once per batch
+    # from CLI scripts / thread-pool executors, each wrapped in its own
+    # asyncio.run() (a new event loop per call). Reusing the app's shared
+    # engine — whose connection pool binds to whichever loop first used it —
+    # across separate asyncio.run() calls hits "Event loop is closed" the
+    # moment a pooled connection from a prior (now-closed) loop is reused.
+    # Created and disposed within this same asyncio.run() call, so its pool
+    # never outlives the loop it was created on.
+    engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+    rows = []
+    for c, emb in zip(batch, embeddings):
+        m = c["metadata"]
+        rows.append(dict(
+            id=str(uuid.uuid4()),
+            collection=collection_name,
+            regulation=regulation,
+            article_number=m.get("article_number", ""),
+            paragraph=m.get("paragraph") or None,
+            title=m.get("title"),
+            document_type=m.get("document_type", "law"),
+            obligation_type=m.get("obligation_type"),
+            source_file=m.get("source_file"),
+            source_url=m.get("source_url"),
+            legal_version_date=m.get("legal_version_date"),
+            fetched_at=m.get("fetched_at"),
+            source_file_hash=m.get("source_file_hash"),
+            content_hash=m.get("content_hash"),
+            content=c["text"],
+            embedding=emb,
+        ))
+
+    try:
+        async with AsyncSessionLocal() as db:
+            stmt = pg_insert(RegulationChunk).values(rows)
+            stmt = stmt.on_conflict_do_update(
+                index_elements=["collection", "source_file", "content_hash"],
+                set_=dict(
+                    article_number=stmt.excluded.article_number,
+                    paragraph=stmt.excluded.paragraph,
+                    title=stmt.excluded.title,
+                    document_type=stmt.excluded.document_type,
+                    obligation_type=stmt.excluded.obligation_type,
+                    source_url=stmt.excluded.source_url,
+                    legal_version_date=stmt.excluded.legal_version_date,
+                    fetched_at=stmt.excluded.fetched_at,
+                    content=stmt.excluded.content,
+                    embedding=stmt.excluded.embedding,
+                    updated_at=_dt.utcnow(),
+                ),
+            )
+            await db.execute(stmt)
+            await db.commit()
+    finally:
+        await engine.dispose()
+
+
 def ingest_regulation(
     regulation: str,
     source_dir: Path | None = None,
@@ -691,6 +782,7 @@ def ingest_regulation(
                 documents=texts,
                 metadatas=[c["metadata"] for c in batch],
             )
+            _upsert_pgvector_chunks(collection_name, regulation, batch, embeddings)
 
         logger.info("  %d chunks from %s", len(chunks), path.name)
         total += len(chunks)
