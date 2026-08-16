@@ -268,19 +268,37 @@ async def handle_webhook(payload: bytes, signature: str) -> None:
     etype = event["type"]
     logger.info("stripe: event %s", etype)
 
+    # event["data"]["object"] is a stripe.StripeObject, not a plain dict — its
+    # __getattr__ forwards ANY unknown attribute (including "get" itself) to
+    # __getitem__, so obj.get(...) raises AttributeError instead of behaving
+    # like dict.get(). Convert to a plain dict once here so every handler
+    # below can use ordinary dict semantics.
+    obj = event["data"]["object"].to_dict()
+
     if etype == "checkout.session.completed":
-        session = event["data"]["object"]
-        if session.get("mode") == "subscription":
-            await _on_subscription_created(session)
+        if obj.get("mode") == "subscription":
+            await _on_subscription_created(obj)
 
     elif etype in ("customer.subscription.updated", "customer.subscription.created"):
-        await _on_subscription_updated(event["data"]["object"])
+        await _on_subscription_updated(obj)
 
     elif etype == "customer.subscription.deleted":
-        await _on_subscription_canceled(event["data"]["object"])
+        await _on_subscription_canceled(obj)
 
     elif etype == "invoice.payment_failed":
-        await _on_payment_failed(event["data"]["object"])
+        await _on_payment_failed(obj)
+
+
+def _period_end(sub: dict) -> Optional[int]:
+    """Stripe moved current_period_end off the top-level Subscription object
+    onto each subscription item (a subscription can now have items with
+    independently-timed billing cycles) — the top-level field is always None
+    under current API versions. Read it from the first item instead."""
+    top = sub.get("current_period_end")
+    if top is not None:
+        return top
+    items = sub.get("items", {}).get("data", [])
+    return items[0].get("current_period_end") if items else None
 
 
 async def _on_subscription_created(session: dict) -> None:
@@ -289,7 +307,7 @@ async def _on_subscription_created(session: dict) -> None:
     if not user_id or not sub_id:
         return
     stripe = _stripe()
-    sub    = stripe.Subscription.retrieve(sub_id)
+    sub    = stripe.Subscription.retrieve(sub_id).to_dict()
     plan   = sub.get("metadata", {}).get("plan", "starter")
     await _upsert_sub(
         user_id=user_id,
@@ -297,7 +315,7 @@ async def _on_subscription_created(session: dict) -> None:
         sub_id=sub_id,
         plan=plan,
         status=sub["status"],
-        period_end=sub.get("current_period_end"),
+        period_end=_period_end(sub),
     )
     logger.info("stripe: subscription created user=%s plan=%s", user_id, plan)
 
@@ -309,7 +327,7 @@ async def _on_subscription_updated(sub: dict) -> None:
         customer_id=sub.get("customer"),
         plan=plan,
         status=sub["status"],
-        period_end=sub.get("current_period_end"),
+        period_end=_period_end(sub),
     )
 
 
@@ -320,7 +338,7 @@ async def _on_subscription_canceled(sub: dict) -> None:
         customer_id=sub.get("customer"),
         plan=plan,
         status="canceled",
-        period_end=sub.get("current_period_end"),
+        period_end=_period_end(sub),
     )
 
 
@@ -366,7 +384,10 @@ async def _upsert_sub(
     from db.database import AsyncSessionLocal
     from db.models import Subscription
     from sqlalchemy import select
-    period_dt = datetime.fromtimestamp(period_end, tz=timezone.utc) if period_end else None
+    # current_period_end is DateTime (naive) — the `subscriptions` table stores
+    # everything as TIMESTAMP WITHOUT TIME ZONE (see db/models.py's _now()),
+    # and asyncpg rejects a tz-aware datetime bound to that column type.
+    period_dt = datetime.fromtimestamp(period_end, tz=timezone.utc).replace(tzinfo=None) if period_end else None
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(Subscription).where(Subscription.user_id == user_id))
         sub = result.scalar_one_or_none()
@@ -376,7 +397,9 @@ async def _upsert_sub(
             sub.plan                   = plan
             sub.status                 = status
             sub.current_period_end     = period_dt
-            sub.updated_at             = datetime.now(timezone.utc)
+            # updated_at: no explicit assignment needed — Subscription.updated_at
+            # has onupdate=_now (a naive datetime.utcnow(), matching the column
+            # type); setting a tz-aware value here previously broke the UPDATE.
         else:
             db.add(Subscription(
                 user_id=user_id, stripe_customer_id=customer_id,
@@ -393,7 +416,10 @@ async def _upsert_sub_by_stripe_id(
     from db.database import AsyncSessionLocal
     from db.models import Subscription
     from sqlalchemy import select
-    period_dt = datetime.fromtimestamp(period_end, tz=timezone.utc) if period_end else None
+    # current_period_end is DateTime (naive) — the `subscriptions` table stores
+    # everything as TIMESTAMP WITHOUT TIME ZONE (see db/models.py's _now()),
+    # and asyncpg rejects a tz-aware datetime bound to that column type.
+    period_dt = datetime.fromtimestamp(period_end, tz=timezone.utc).replace(tzinfo=None) if period_end else None
     async with AsyncSessionLocal() as db:
         result = await db.execute(
             select(Subscription).where(Subscription.stripe_subscription_id == sub_id)
@@ -404,5 +430,5 @@ async def _upsert_sub_by_stripe_id(
             sub.current_period_end = period_dt
             if plan:
                 sub.plan = plan
-            sub.updated_at = datetime.now(timezone.utc)
+            # updated_at: handled by the model's onupdate=_now, see _upsert_sub.
             await db.commit()
