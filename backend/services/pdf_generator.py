@@ -496,11 +496,23 @@ def _scores(report: ComplianceReport, logo: str) -> str:
             f'</div></td>'
         )
 
+    checked_count = sum(1 for rs in report.regulation_scores if rs.total_requirements > 0)
+
     rows = ""
     for i, rs in enumerate(report.regulation_scores):
+        bg = "#fafafa" if i % 2 == 1 else "#fff"
+        if rs.total_requirements == 0:
+            rows += (
+                f'<tr style="background:{bg};">'
+                f'<td style="{FONT}padding:4pt 7pt;font-weight:600;font-size:8.5pt;'
+                f'color:{NAVY};width:30%;">{_esc(_reg_label(rs.regulation.value))}</td>'
+                f'<td colspan="4" style="{FONT}padding:4pt 7pt;font-size:8pt;color:{MUTED};">'
+                f'Keine Ergebnisse zurückgegeben — Analyse unvollständig, nicht konform</td>'
+                f'</tr>'
+            )
+            continue
         bc = _score_color(rs.score_percent)
         bw = min(100.0, max(0.0, rs.score_percent))
-        bg = "#fafafa" if i % 2 == 1 else "#fff"
         rows += (
             f'<tr style="background:{bg};">'
             f'<td style="{FONT}padding:4pt 7pt;font-weight:600;font-size:8.5pt;'
@@ -538,7 +550,7 @@ def _scores(report: ComplianceReport, logo: str) -> str:
         f'<div style="{FONT}font-size:11pt;font-weight:700;color:{NAVY};margin-bottom:2mm;">'
         f'Gesamt-Compliance-Score</div>'
         f'<div style="{FONT}font-size:8pt;color:{MUTED};line-height:1.6;">'
-        f'{len(report.regulation_scores)} Vorschriften geprüft &nbsp;·&nbsp; '
+        f'{checked_count} Vorschriften geprüft &nbsp;·&nbsp; '
         f'{n_t} Anforderungen bewertet &nbsp;·&nbsp; '
         f'{len(report.gap_analysis)} Lücken gefunden</div>'
         f'</div></div>'
