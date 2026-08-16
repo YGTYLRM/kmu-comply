@@ -7,6 +7,7 @@ Empty list means the report passed all checks.
 verify_gap_citations(gaps, chunks) cross-checks LLM-generated article citations
 against actually-retrieved chunks to detect hallucinated article numbers.
 """
+import json
 import logging
 import re
 
@@ -14,6 +15,38 @@ from models.compliance_report import ComplianceGap, ComplianceReport, Regulatory
 from models.enums import ComplianceStatus, Priority, Regulation
 
 logger = logging.getLogger(__name__)
+
+_ENTAILMENT_MODEL = "claude-haiku-4-5-20251001"  # cheap check, not the main analysis model
+
+_TOOL_ENTAILMENT_CHECK = {
+    "name": "submit_entailment_check",
+    "description": "Submit entailment verdicts for a batch of compliance gap evidence quotes.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "verdicts": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gap_index": {"type": "integer"},
+                        "verdict": {"type": "string", "enum": ["SUPPORTS", "CONTRADICTS", "UNRELATED"]},
+                        "reason": {"type": "string"},
+                    },
+                    "required": ["gap_index", "verdict", "reason"],
+                },
+            }
+        },
+        "required": ["verdicts"],
+    },
+}
+
+
+def _parse_entailment_verdicts(text: str) -> list[dict]:
+    data = json.loads(text)
+    if not isinstance(data, list):
+        raise ValueError(f"expected JSON array, got {type(data).__name__}")
+    return data
 
 _DATA_PROTECTION_REGS = {Regulation.GDPR, Regulation.BDSG}
 
@@ -193,6 +226,80 @@ def check_evidence_quotes(
                     "Evidence quote not found in any retrieved regulatory text — "
                     "the quotation may be fabricated; verify manually"
                 )
+    return warnings
+
+
+async def verify_evidence_entailment(
+    gaps: list[ComplianceGap],
+    failures: list[str],
+) -> list[str]:
+    """Semantic check: does each gap's evidence_quote actually support its assigned status?
+
+    Runs only on gaps that already passed check_evidence_quotes' string-match check
+    (real, verbatim evidence_quote, confidence not already LOW) — this is an additional
+    entailment layer on top of that check, not a replacement. A real quote taken out of
+    context, or one that actually supports the opposite conclusion, passes the string
+    check but fails here.
+
+    Batches all eligible gaps into a single Haiku call (not one call per gap) to keep
+    cost/latency down. On LLM failure, logs and skips without downgrading confidence —
+    this is an additional safety net, not a required step, and a transient failure here
+    must never block report generation.
+    """
+    eligible = [
+        g for g in gaps
+        if g.evidence_quote and g.confidence != "LOW"
+        and g.status != ComplianceStatus.CANNOT_ASSESS
+    ]
+    if not eligible:
+        return []
+
+    pairs = [
+        {
+            "gap_index": i,
+            "regulation": g.regulation.value,
+            "article_number": g.article_number,
+            "status": g.status.value,
+            "quote": g.evidence_quote,
+        }
+        for i, g in enumerate(eligible)
+    ]
+
+    from agent.planning import _async_llm_call
+    from rag.prompts import entailment_check_prompt
+
+    prompt = entailment_check_prompt(json.dumps(pairs, ensure_ascii=False))
+    local_failures: list[str] = []
+    verdicts = await _async_llm_call(
+        prompt, _parse_entailment_verdicts, "entailment_check", local_failures,
+        max_tokens=2048, tool=_TOOL_ENTAILMENT_CHECK, tool_result_key="verdicts",
+        model=_ENTAILMENT_MODEL, system="",
+    )
+    if local_failures:
+        # Safety net, not a required step — log but don't propagate into the
+        # report's requires_manual_review the way a real analysis failure would.
+        logger.warning("entailment_check: LLM call failed, skipping check: %s", local_failures)
+        return []
+
+    warnings: list[str] = []
+    for v in verdicts:
+        idx = v.get("gap_index")
+        verdict = v.get("verdict")
+        if not isinstance(idx, int) or not (0 <= idx < len(eligible)) or verdict not in ("CONTRADICTS", "UNRELATED"):
+            continue
+        gap = eligible[idx]
+        reason = v.get("reason", "")
+        msg = (
+            f"evidence quote does not support status: {gap.regulation.value} {gap.article_number} "
+            f"— entailment check returned {verdict}: {reason}"
+        )
+        logger.warning("validation: %s", msg)
+        warnings.append(msg)
+        gap.confidence = "LOW"
+        gap.confidence_reason = (
+            f"Evidence quote is genuinely present in the source text but does not appear to "
+            f"support the assigned status ({verdict.lower()}) — verify manually. {reason}"
+        )
     return warnings
 
 

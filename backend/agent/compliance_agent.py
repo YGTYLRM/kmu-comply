@@ -16,7 +16,12 @@ from agent.planning import (
     run_gap_analysis,
 )
 from agent.profiling import enrich_profile
-from agent.validation import check_evidence_quotes, validate_report, verify_gap_citations
+from agent.validation import (
+    check_evidence_quotes,
+    validate_report,
+    verify_evidence_entailment,
+    verify_gap_citations,
+)
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
 from models.enums import AnalysisStep
@@ -108,6 +113,16 @@ async def run_analysis(
         logger.warning(
             "job %s: %d gap(s) missing evidence_quote — confidence downgraded to MEDIUM",
             job_id, len(quote_warnings),
+        )
+
+    # Step 4d — entailment check: a cheap Haiku pass verifying that quotes which
+    # passed the string-match check (step 4c) actually support their assigned
+    # status, not just appear verbatim out of context. Best-effort — never blocks.
+    entailment_warnings = await verify_evidence_entailment(gaps, failures=[])
+    if entailment_warnings:
+        logger.warning(
+            "job %s: %d gap(s) failed entailment check — confidence downgraded to LOW",
+            job_id, len(entailment_warnings),
         )
 
     # Step 5 — action plan
