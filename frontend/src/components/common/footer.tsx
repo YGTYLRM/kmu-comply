@@ -14,6 +14,7 @@ export function Footer() {
             <Link href="/impressum" className="hover:text-slate-400 transition-colors">Impressum</Link>
             <Link href="/datenschutz" className="hover:text-slate-400 transition-colors">Datenschutz</Link>
             <Link href="/agb" className="hover:text-slate-400 transition-colors">AGB</Link>
+            <Link href="/methodik" className="hover:text-slate-400 transition-colors">Methodik</Link>
             <Link href="/contact" className="hover:text-slate-400 transition-colors">Kontakt</Link>
           </nav>
           <p className="text-xs text-slate-700">
