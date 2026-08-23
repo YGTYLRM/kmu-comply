@@ -1,345 +1,188 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Header
-from pydantic import BaseModel
-from typing import Optional
-from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+import logging
+import sys
 from contextlib import asynccontextmanager
 
-from config import settings
-from models import (
-    CompanyProfile,
-    AnalyzeResponse,
-    StatusResponse,
-    ComplianceReport,
-    ProfileValidationResponse,
-    RegulationsListResponse,
-    HealthResponse,
-    ErrorResponse,
-    JobStatus,
-)
-from services.job_manager import JobManager
-from services.threshold_engine import determine_applicable_regulations
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
-job_manager = JobManager(ttl_seconds=settings.job_ttl_seconds)
+from config import settings
+from routes.admin import router as admin_router
+from routes.analysis import router as analysis_router
+from routes.billing import router as billing_router
+from routes.companies import router as companies_router
+from routes.completions import router as completions_router
+from routes.expert_review import router as expert_review_router
+from routes.misc import router as misc_router
+from routes.notifications import router as notifications_router
+from routes.scanning import router as scanning_router
+from state import job_manager
+
+if settings.sentry_dsn:
+    import sentry_sdk
+    from sentry_sdk.integrations.asyncio import AsyncioIntegration
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        integrations=[FastApiIntegration(), AsyncioIntegration()],
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s — %(message)s")
+logger = logging.getLogger(__name__)
+
+
+def _check_production_config() -> None:
+    if settings.environment != "production":
+        return
+    errors = []
+    if not settings.chroma_server_url:
+        errors.append(
+            "CHROMA_SERVER_URL must be set in production — ChromaDB embedded mode "
+            "is single-writer and will corrupt under concurrent access."
+        )
+    if not settings.document_encryption_key:
+        errors.append(
+            "DOCUMENT_ENCRYPTION_KEY must be set in production — without it, "
+            "uploaded documents use an ephemeral key lost on restart."
+        )
+    if not settings.admin_api_key:
+        errors.append(
+            "ADMIN_API_KEY must be set in production — without it, the regulation "
+            "update approval API is inaccessible."
+        )
+    if not settings.database_url:
+        errors.append(
+            "DATABASE_URL must be set in production — rate limiting, report "
+            "persistence, and job ownership require PostgreSQL."
+        )
+    if errors:
+        print("\n[STARTUP ERROR] Production config validation failed:\n", file=sys.stderr)
+        for e in errors:
+            print(f"  ✗ {e}\n", file=sys.stderr)
+        sys.exit(1)
+
+
+def _cleanup_orphaned_chroma_collections() -> None:
+    try:
+        import chromadb
+        from rag.ingest import CHROMA_DIR
+        from state import job_manager
+        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        candidates = [c.name for c in client.list_collections() if c.name.startswith("job_")]
+        orphans = []
+        for name in candidates:
+            job_id = name[len("job_"):]
+            # Skip collections whose job is still active in memory
+            if job_id in job_manager._jobs:
+                continue
+            orphans.append(name)
+        for name in orphans:
+            client.delete_collection(name)
+        if orphans:
+            logger.info("startup: deleted %d orphaned job collections: %s", len(orphans), orphans)
+    except Exception as exc:
+        logger.warning("startup: orphan cleanup failed: %s", exc)
+
+
+async def _document_purge_loop():
+    """Periodically purge expired document sessions (runs every hour)."""
+    from services.document_store import document_store
+    while True:
+        await asyncio.sleep(3600)
+        try:
+            purged = document_store.purge_expired(settings.document_ttl_seconds)
+            if purged:
+                logger.info("document purge: cleaned %d expired session(s)", purged)
+        except Exception as exc:
+            logger.warning("document purge failed: %s", exc)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _check_production_config()
+    _cleanup_orphaned_chroma_collections()
+    from services.document_store import document_store
+    document_store.recover_sessions()
     await job_manager.start()
+    purge_task = asyncio.create_task(_document_purge_loop())
     yield
+    purge_task.cancel()
     await job_manager.stop()
+    from services.pdf_generator import close_browser
+    close_browser()
 
 
 app = FastAPI(
-    title="KMU-Comply API",
+    title="Complio API",
     description="Autonomous regulatory compliance analysis for German SMEs",
     version="0.1.0",
     lifespan=lifespan,
 )
 
+_allowed_origins = [
+    o.strip()
+    for o in (settings.allowed_origins or "http://localhost:3000,http://localhost:3001").split(",")
+    if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Admin-Key", "Stripe-Signature"],
 )
 
 
-@app.get("/api/health", response_model=HealthResponse)
-async def health():
-    return HealthResponse(
-        status="ok",
-        chromadb="not_connected",
-        embedding_model=settings.embedding_model,
-    )
-
-
-@app.post("/api/profile/validate", response_model=ProfileValidationResponse)
-async def validate_profile(profile: CompanyProfile):
-    """Validate a company profile without running analysis."""
-    from models.company_profile import EnrichedCompanyProfile
-
-    warnings: list[str] = []
-    missing: list[str] = []
-
-    if profile.annual_revenue_eur is None:
-        missing.append("annual_revenue_eur")
-        warnings.append("Annual revenue not provided — CSRD and EnEfG applicability may be incomplete.")
-    if profile.balance_sheet_total_eur is None:
-        missing.append("balance_sheet_total_eur")
-        warnings.append("Balance sheet not provided — CSRD applicability may be incomplete.")
-    if profile.annual_energy_consumption_mwh is None:
-        missing.append("annual_energy_consumption_mwh")
-        warnings.append("Energy consumption not provided — EnEfG energy management requirements cannot be assessed.")
-
-    enriched = EnrichedCompanyProfile(
-        **profile.model_dump(),
-        missing_optional_fields=missing,
-        validation_warnings=warnings,
-    )
-    return ProfileValidationResponse(
-        valid=True,
-        errors=[],
-        warnings=warnings,
-        enriched_profile=enriched.model_dump(),
-    )
-
-
-class AnalyzeRequest(BaseModel):
-    profile: CompanyProfile
-    doc_session_id: Optional[str] = None
-
-
-@app.post("/api/documents")
-async def upload_documents(files: list[UploadFile] = File(...)):
-    """Upload company documents before analysis. Returns a doc_session_id."""
-    from services.document_store import document_store
-
-    session_id = document_store.create_session()
-    saved: list[str] = []
-    errors: list[str] = []
-
-    for f in files:
-        try:
-            content = await f.read()
-            name = document_store.save_file(session_id, f.filename or "upload", content)
-            saved.append(name)
-        except ValueError as e:
-            errors.append(str(e))
-
-    if not saved and errors:
-        document_store.clear(session_id)
-        raise HTTPException(status_code=400, detail="; ".join(errors))
-
-    return {
-        "doc_session_id": session_id,
-        "files_saved": saved,
-        "errors": errors,
-    }
-
-
-@app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(body: AnalyzeRequest, x_access_token: Optional[str] = Header(None)):
-    """Submit a company profile for compliance analysis. Returns a job_id."""
-    if settings.stripe_enabled:
-        from services.stripe_service import validate_token
-        if not x_access_token or not validate_token(x_access_token):
-            raise HTTPException(status_code=402, detail="Valid payment required to run a screening.")
-    job_id = await job_manager.create_job(body.profile, doc_session_id=body.doc_session_id)
-    return AnalyzeResponse(
-        job_id=job_id,
-        status=JobStatus.PENDING,
-        message="Analysis job created. Use GET /api/status/{job_id} to track progress.",
-    )
-
-
-@app.get("/api/status/{job_id}", response_model=StatusResponse)
-async def get_status(job_id: str):
-    status = job_manager.get_status(job_id)
-    if status is None:
-        raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
-    return status
-
-
-@app.get("/api/report/{job_id}", response_model=ComplianceReport)
-async def get_report(job_id: str):
-    report = job_manager.get_report(job_id)
-    if report is None:
-        status = job_manager.get_status(job_id)
-        if status is None:
-            raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
-        raise HTTPException(
-            status_code=202,
-            detail=f"Report not ready yet. Current status: {status.status}",
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self'; "
+            "img-src 'self' data:; "
+            "font-src 'self' data:; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "frame-ancestors 'none';"
         )
-    return report
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+        return response
 
 
-@app.get("/api/report/{job_id}/profile")
-async def get_profile(job_id: str):
-    """Return the original company profile submitted for this job (for re-assessment pre-fill)."""
-    from services.report_store import load_profile
-    profile = load_profile(job_id)
-    if profile is None:
-        raise HTTPException(status_code=404, detail="Profile not found for this job.")
-    return profile
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        import asyncio
+        try:
+            return await asyncio.wait_for(call_next(request), timeout=60.0)
+        except asyncio.TimeoutError:
+            from fastapi.responses import JSONResponse
+            return JSONResponse({"detail": "Request timed out"}, status_code=504)
 
 
-@app.post("/api/report/{job_id}/pdf")
-async def generate_pdf_endpoint(job_id: str):
-    import asyncio
-    from fastapi.responses import Response
-    from services.pdf_generator import generate_pdf as _gen_pdf
+app.add_middleware(TimeoutMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+# Extract real client IP from X-Forwarded-For when behind a reverse proxy.
+# In production, restrict to your actual proxy IPs via PROXY_TRUSTED_HOSTS env var.
+_trusted = [h.strip() for h in (settings.proxy_trusted_hosts or "*").split(",") if h.strip()]
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=_trusted if _trusted != ["*"] else "*")
 
-    report = job_manager.get_report(job_id)
-    if report is None:
-        raise HTTPException(status_code=404, detail="Report not found or not completed.")
-
-    loop = asyncio.get_running_loop()
-    pdf_bytes = await loop.run_in_executor(None, _gen_pdf, report)
-    filename  = f"complio-{report.company_name.replace(' ', '-')[:40]}.pdf"
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
-
-
-@app.get("/api/reports")
-async def list_reports():
-    """List all persisted reports, newest first. Returns summary metadata only."""
-    from services.report_store import list_recent
-    return {"reports": list_recent()}
-
-
-@app.get("/api/regulations", response_model=RegulationsListResponse)
-async def list_regulations():
-    from models.api_responses import RegulationInfo
-
-    regs = [
-        RegulationInfo(
-            id="gdpr_dsgvo",
-            name="GDPR / DSGVO",
-            description="General Data Protection Regulation",
-            document_count=0,
-        ),
-        RegulationInfo(
-            id="lksg",
-            name="LkSG",
-            description="Supply Chain Due Diligence Act",
-            document_count=0,
-        ),
-        RegulationInfo(
-            id="enefg",
-            name="EnEfG",
-            description="Energy Efficiency Act",
-            document_count=0,
-        ),
-        RegulationInfo(
-            id="csrd",
-            name="CSRD",
-            description="Corporate Sustainability Reporting Directive",
-            document_count=0,
-        ),
-        RegulationInfo(
-            id="bdsg",
-            name="BDSG",
-            description="Federal Data Protection Act (Bundesdatenschutzgesetz)",
-            document_count=0,
-        ),
-    ]
-    return RegulationsListResponse(regulations=regs)
-
-
-class ContactRequest(BaseModel):
-    name: str
-    email: str
-    company: Optional[str] = None
-    phone: Optional[str] = None
-    topic: Optional[str] = None
-    message: str
-
-
-@app.post("/api/contact")
-async def contact(req: ContactRequest):
-    if not settings.resend_api_key or not settings.contact_email:
-        raise HTTPException(status_code=503, detail="Contact not configured.")
-
-    import resend
-    resend.api_key = settings.resend_api_key
-
-    subject = f"Contact: {req.name}"
-    if req.topic:
-        subject += f" — {req.topic}"
-    if req.company:
-        subject += f" ({req.company})"
-
-    rows = [
-        ("Name",    req.name),
-        ("Email",   req.email),
-        ("Company", req.company or "Not provided"),
-        ("Phone",   req.phone   or "Not provided"),
-        ("Topic",   req.topic   or "Not specified"),
-    ]
-
-    rows_html = "".join(
-        f'<tr><td style="padding:8px 12px 8px 0;color:#64748b;font-size:13px;white-space:nowrap;vertical-align:top">{k}</td>'
-        f'<td style="padding:8px 0;font-size:14px;color:#0f172a">{v}</td></tr>'
-        for k, v in rows
-    )
-
-    html = f"""
-    <div style="font-family:sans-serif;max-width:580px;margin:0 auto;padding:32px 24px">
-      <div style="margin-bottom:24px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;margin-bottom:8px">
-          Complio — New Contact
-        </div>
-        <h2 style="margin:0;font-size:20px;color:#0f172a">{req.name} got in touch</h2>
-      </div>
-
-      <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
-        {rows_html}
-      </table>
-
-      <div style="background:#f8fafc;border-radius:10px;padding:16px 20px">
-        <p style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px">Message</p>
-        <p style="font-size:14px;color:#1e293b;line-height:1.7;white-space:pre-wrap;margin:0">{req.message}</p>
-      </div>
-
-      <p style="margin-top:24px;font-size:12px;color:#94a3b8">
-        Reply directly to this email to respond to {req.name}.
-      </p>
-    </div>
-    """
-
-    resend.Emails.send({
-        "from": "Complio <onboarding@resend.dev>",
-        "to": [settings.contact_email],
-        "reply_to": req.email,
-        "subject": subject,
-        "html": html,
-    })
-
-    return {"ok": True}
-
-
-# ── Stripe ────────────────────────────────────────────────────────────────────
-
-class CheckoutRequest(BaseModel):
-    plan: str                   # "starter" | "professional"
-    success_url: str
-    cancel_url: str
-
-
-@app.post("/api/checkout")
-async def create_checkout(req: CheckoutRequest):
-    if not settings.stripe_secret_key:
-        raise HTTPException(status_code=503, detail="Payments not configured.")
-    from services.stripe_service import create_checkout_session
-    try:
-        url = create_checkout_session(req.plan, req.success_url, req.cancel_url)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    return {"url": url}
-
-
-@app.get("/api/checkout/verify")
-async def verify_checkout(session_id: str):
-    """Success page calls this to exchange a Stripe session_id for an access token."""
-    if not settings.stripe_secret_key:
-        raise HTTPException(status_code=503, detail="Payments not configured.")
-    from services.stripe_service import verify_session
-    token = verify_session(session_id)
-    if not token:
-        raise HTTPException(status_code=402, detail="Payment not confirmed.")
-    return {"token": token}
-
-
-@app.post("/api/webhook/stripe")
-async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
-    if not settings.stripe_webhook_secret:
-        raise HTTPException(status_code=503, detail="Webhook not configured.")
-    payload = await request.body()
-    from services.stripe_service import handle_webhook
-    token = handle_webhook(payload, stripe_signature or "")
-    return {"received": True}
+app.include_router(analysis_router)
+app.include_router(companies_router)
+app.include_router(completions_router)
+app.include_router(notifications_router)
+app.include_router(expert_review_router)
+app.include_router(billing_router)
+app.include_router(admin_router)
+app.include_router(misc_router)
+app.include_router(scanning_router)

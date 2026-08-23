@@ -1,9 +1,12 @@
 """
-Systematic downloader for gesetze-im-internet.de full-text law files.
-Fetches official German federal law texts and saves them to regulation directories.
+Systematic downloader for gesetze-im-internet.de and EUR-Lex full-text law files.
+Fetches official German federal and EU regulation texts and saves them to regulation directories.
 
-Usage:  python fetch_laws.py
+Usage:
+  python fetch_laws.py                  # download all new laws
+  python fetch_laws.py --eur-lex        # also attempt EUR-Lex downloads (may be blocked by WAF)
 """
+import argparse
 import re
 import html as html_module
 import urllib.request
@@ -40,12 +43,27 @@ LAWS_TO_FETCH = [
     ("compliance_guides", "owig_1968",   "OWiG — Ordnungswidrigkeitengesetz (Administrative Offences Act, fines)"),
     # ── Digital / Telecom ────────────────────────────────────────────────────
     ("compliance_guides", "tkg_2021",    "TKG 2021 — Telekommunikationsgesetz (Telecommunications Act)"),
+    # ── Digital / Privacy (new named regulations) ────────────────────────────
+    ("ttdsg", "ttdsg",          "TTDSG — Telekommunikation-Telemedien-Datenschutzgesetz (Cookie/ePrivacy Act)"),
+    ("gwg",   "gwg_2017",       "GwG — Geldwäschegesetz (Anti-Money Laundering Act)"),
     # ── Environmental / Product ──────────────────────────────────────────────
     ("compliance_guides", "battg",       "BattG — Batteriegesetz (Batteries Act)"),
     ("compliance_guides", "elektrog_2015", "ElektroG — Elektro- und Elektronikgeraetegesetz (WEEE)"),
     ("compliance_guides", "krwg",        "KrWG — Kreislaufwirtschaftsgesetz (Waste Management Act)"),
     ("compliance_guides", "whg_2009",    "WHG — Wasserhaushaltsgesetz (Water Resources Management Act)"),
     ("compliance_guides", "bimschg",     "BImSchG — Bundes-Immissionsschutzgesetz (Federal Emissions Protection Act)"),
+]
+
+# EUR-Lex regulations — downloaded separately because EUR-Lex has different structure
+# and may be blocked by WAF. Pass --eur-lex flag to attempt these downloads.
+# CELEX number → (dest_dir, output_filename, label)
+EUR_LEX_LAWS = [
+    (
+        "eu_data_act",
+        "eu_data_act_full.txt",
+        "EU Data Act — Regulation (EU) 2023/2854 on harmonised rules on fair access to and use of data",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202302854",
+    ),
 ]
 
 def get_full_text_url(prefix: str) -> str | None:
@@ -112,7 +130,43 @@ def download_law(prefix: str, dest_dir: Path, label: str) -> bool:
         return False
 
 
+def download_eur_lex(dest_dir: Path, filename: str, label: str, url: str) -> bool:
+    dest_file = dest_dir / filename
+    if dest_file.exists():
+        print(f"  SKIP {filename}: already downloaded")
+        return True
+
+    print(f"  Downloading: {label}")
+    print(f"  URL: {url}")
+    req = urllib.request.Request(url, headers=HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=45) as r:
+            body = r.read()
+            # Detect WAF block: EUR-Lex returns 202 + empty body when challenged
+            if len(body) < 500:
+                print(f"  BLOCKED by WAF (response too short: {len(body)} bytes).")
+                print(f"  Download manually: {url}")
+                print(f"  Save as: {dest_file}")
+                return False
+            raw = body.decode("utf-8", errors="replace")
+        text = strip_html(raw)
+        header = f"{label}\nSource: {url}\n\n"
+        dest_file.write_text(header + text, encoding="utf-8")
+        size = len(text) // 1024
+        print(f"  Saved: {filename} ({size}KB)")
+        return True
+    except Exception as e:
+        print(f"  ERROR: {e}")
+        print(f"  Download manually: {url}")
+        print(f"  Save as: {dest_file}")
+        return False
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--eur-lex", action="store_true", help="Also attempt EUR-Lex downloads")
+    args = parser.parse_args()
+
     ok, skip, fail = 0, 0, 0
     for dest_coll, prefix, label in LAWS_TO_FETCH:
         dest_dir = BASE_DIR / dest_coll
@@ -123,7 +177,6 @@ if __name__ == "__main__":
         print(f"\n{prefix} -> {dest_coll}/")
         result = download_law(prefix, dest_dir, label)
         if result:
-            # Check if file was newly created or skipped
             fname = dest_dir / f"{prefix}_text.txt"
             if "already downloaded" in str(result):
                 skip += 1
@@ -132,7 +185,22 @@ if __name__ == "__main__":
         else:
             fail += 1
 
+    if args.eur_lex:
+        print("\n-- EUR-Lex downloads --")
+        for dest_coll, filename, label, url in EUR_LEX_LAWS:
+            dest_dir = BASE_DIR / dest_coll
+            if not dest_dir.exists():
+                print(f"SKIP {filename}: directory {dest_dir} does not exist")
+                fail += 1
+                continue
+            print(f"\n{filename} -> {dest_coll}/")
+            result = download_eur_lex(dest_dir, filename, label, url)
+            if result:
+                skip += 1
+            else:
+                fail += 1
+
     print(f"\n{'='*50}")
     print(f"Done: {ok} downloaded, {skip} skipped, {fail} failed")
     print("\nRun ingest next:")
-    print('  python -c "from rag.ingest import ingest_regulation; [ingest_regulation(r, reset=True) for r in [\'arbschg\', \'compliance_guides\']]"')
+    print("  python scripts/ingest_regulations.py --regulation all --reset")

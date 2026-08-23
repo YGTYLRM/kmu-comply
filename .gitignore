@@ -20,10 +20,17 @@ ENV/
 # Environment variables
 .env
 .env.local
+.env.development
 .env.production
 
 # ChromaDB data
 backend/data/chroma_db/
+
+# Uploaded document sessions (persistent vault, not committed)
+backend/data/documents/
+
+# Local DB/chroma backups (large binaries, stay on disk only)
+backend/data/backups/
 
 # Pytest
 .pytest_cache/
@@ -46,8 +53,13 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 frontend/.env.local
+frontend/.env.development.local
 frontend/.env.production
 frontend/tsconfig.tsbuildinfo
+
+# Supabase CLI local project link state
+supabase/.temp/
+backend/supabase/.temp/
 
 # Root-level dev tools (puppeteer etc.)
 node_modules/
@@ -70,3 +82,8 @@ backend/data/reports/
 
 # Model cache (HuggingFace)
 .cache/
+
+# Downloaded font files (run scripts/download_fonts.py to regenerate)
+backend/assets/fonts/*.woff2
+backend/assets/fonts/inter_css.py
+backend/backend/
