@@ -29,6 +29,9 @@ backend/data/chroma_db/
 # Uploaded document sessions (persistent vault, not committed)
 backend/data/documents/
 
+# Local DB/chroma backups (large binaries, stay on disk only)
+backend/data/backups/
+
 # Pytest
 .pytest_cache/
 .coverage
