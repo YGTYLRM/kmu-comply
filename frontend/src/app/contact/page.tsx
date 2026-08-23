@@ -11,9 +11,9 @@ import {
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const TOPICS = [
-  "Demo anfragen: Starter",
-  "Demo anfragen: Professional",
-  "Enterprise-Preise",
+  "Angebot anfordern: Starter",
+  "Angebot anfordern: Professional",
+  "Angebot anfordern: Enterprise",
   "API-Zugang",
   "Individueller Regelungsumfang",
   "Partnerschaft / Reseller",
@@ -22,9 +22,9 @@ const TOPICS = [
 ];
 
 const PLAN_TOPIC: Record<string, string> = {
-  starter:      "Demo anfragen: Starter",
-  professional: "Demo anfragen: Professional",
-  enterprise:   "Enterprise-Preise",
+  starter:      "Angebot anfordern: Starter",
+  professional: "Angebot anfordern: Professional",
+  enterprise:   "Angebot anfordern: Enterprise",
 };
 
 const NEXT_STEPS = [
