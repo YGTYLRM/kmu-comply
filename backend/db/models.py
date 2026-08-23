@@ -292,10 +292,11 @@ class Notification(Base):
 
 
 class RegulationChunk(Base):
-    """Phase 0 of the ChromaDB -> pgvector migration — not yet read from or
-    written to by the retrieval/ingestion pipeline (see rag/ingest.py,
-    rag/retrieval.py, which still use ChromaDB). `collection` mirrors
-    rag/ingest.py's REGULATION_COLLECTIONS values."""
+    """pgvector-backed mirror of the static regulation collections. Written
+    by rag/ingest.py alongside ChromaDB (dual-write); read by the live
+    pipeline via rag/retrieval.py::retrieve_pgvector when
+    settings.pgvector_retrieval_enabled is true (see config.py). `collection`
+    mirrors rag/ingest.py's REGULATION_COLLECTIONS values."""
     __tablename__ = "regulation_chunks"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
