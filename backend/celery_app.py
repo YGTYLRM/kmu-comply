@@ -12,6 +12,16 @@ Or with the helper script:
 """
 from celery import Celery
 from config import settings
+from observability import init_sentry
+
+# Separate process from uvicorn and worker.py — this is where the actual
+# 6-step analysis pipeline runs when REDIS_URL is set (tasks.py), so it's
+# the most important process to have this wired: the historical "gap
+# analysis silently returned zero items" / "action plan silently empty"
+# bugs both lived in code that runs here.
+if settings.sentry_dsn:
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    init_sentry([CeleryIntegration()])
 
 _broker = settings.redis_url or "redis://localhost:6379/0"
 
