@@ -26,7 +26,8 @@ services:
       - report_data:/app/data/reports
       - staging_data:/app/data/staging
     env_file:
-      - backend/.env
+      - path: backend/.env
+        required: false
     environment:
       - CHROMA_SERVER_URL=http://chromadb:8000
       - ENVIRONMENT=production
@@ -44,7 +45,8 @@ services:
       - report_data:/app/data/reports
       - staging_data:/app/data/staging
     env_file:
-      - backend/.env
+      - path: backend/.env
+        required: false
     environment:
       - CHROMA_SERVER_URL=http://chromadb:8000
       - ENVIRONMENT=production
