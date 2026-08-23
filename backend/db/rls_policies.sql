@@ -21,6 +21,10 @@ ALTER TABLE public.expert_review_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.rate_limit_events    ENABLE ROW LEVEL SECURITY;
 
+-- pgvector chunk tables — no user_id column, backend (service_role) only
+ALTER TABLE public.regulation_chunks    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.company_doc_chunks   ENABLE ROW LEVEL SECURITY;
+
 -- Admin-only tables — no user access
 ALTER TABLE public.pending_regulation_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_audit_log            ENABLE ROW LEVEL SECURITY;
@@ -137,5 +141,6 @@ CREATE POLICY "expert_review_requests: own rows only"
 -- No SELECT/INSERT/UPDATE/DELETE policies = only service_role can access
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- jobs, rate_limit_events, pending_regulation_updates: no policies added
+-- jobs, rate_limit_events, pending_regulation_updates, regulation_chunks,
+-- company_doc_chunks: no policies added
 -- (RLS enabled but no USING clause = all client requests denied by default)
