@@ -1,13 +1,16 @@
 """
 Ingests company-uploaded documents into a per-job ChromaDB collection.
 
-The collection name is  job_<first-8-chars-of-job-id>  so it stays short.
-It is deleted automatically when the job expires (JobManager.clear_job_docs).
+The collection name is  job_<full-job-id>  — the full UUID, not a truncated
+prefix, so two jobs can never collide onto the same collection and leak each
+other's documents. It is deleted automatically when the job expires
+(JobManager.clear_job_docs).
 """
 from __future__ import annotations
 
 import logging
 import re
+import threading
 from pathlib import Path
 
 import chromadb
@@ -21,47 +24,75 @@ logger = logging.getLogger(__name__)
 _MAX_CHUNK_CHARS = 1_200
 _MIN_CHUNK_CHARS = 60
 
+# SQLite (embedded ChromaDB) is single-writer. Serialize writes when not using
+# the HTTP server, otherwise concurrent jobs corrupt the database.
+_chroma_write_lock = threading.Semaphore(1)
+
 
 def collection_name(job_id: str) -> str:
-    return f"job_{job_id[:8]}"
+    return f"job_{job_id}"
 
 
-def ingest_company_documents(job_id: str, file_paths: list[Path]) -> int:
+def ingest_company_documents(job_id: str, session_id: str) -> int:
     """
-    Extract, chunk, embed, and index company documents.
+    Decrypt, extract, chunk, embed, and index company documents for a job.
     Returns the number of chunks indexed (0 if no files).
+
+    Files are read via document_store.read_file() which decrypts them in memory —
+    plaintext bytes never touch disk outside of the temp store.
     """
-    if not file_paths:
+    from services.document_store import document_store
+    enc_paths = document_store.list_files(session_id)
+    if not enc_paths:
         return 0
 
-    col_name = collection_name(job_id)
-    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = client.get_or_create_collection(
+    from rag.ingest import _chroma_client
+    col_name   = collection_name(job_id)
+    collection = _chroma_client().get_or_create_collection(
         name=col_name,
         metadata={"hnsw:space": "cosine"},
     )
 
     total = 0
-    for path in file_paths:
+    for enc_path in enc_paths:
+        # Derive the original filename by stripping the .enc suffix
+        original_name = enc_path.stem  # e.g. "policy.pdf"
         try:
-            text = _extract(path)
-            chunks = _chunk(text, path.name)
+            plaintext = document_store.read_file(session_id, original_name)
+            text = _extract_bytes(plaintext, original_name)
+
+            # Secondary injection check on extracted text (catches PDF-encoded injections)
+            from services.injection_guard import classify_document_for_injection
+            is_safe, reason = classify_document_for_injection(text, source_name=original_name)
+            if not is_safe:
+                logger.warning("company_ingest: blocked %s from RAG pipeline: %s", original_name, reason)
+                continue
+
+            chunks = _chunk(text, original_name)
             if not chunks:
                 continue
 
             texts = [c["text"] for c in chunks]
             embeddings = embed_passages(texts)
-            ids = [f"{col_name}_{path.stem}_{i}" for i in range(len(chunks))]
-            collection.upsert(
-                ids=ids,
-                embeddings=embeddings,
-                documents=texts,
-                metadatas=[c["metadata"] for c in chunks],
-            )
-            logger.info("company doc %s: %d chunks", path.name, len(chunks))
+            ids = [f"{col_name}_{Path(original_name).stem}_{i}" for i in range(len(chunks))]
+            from config import settings
+            _lock = _chroma_write_lock if not settings.chroma_server_url else None
+            if _lock:
+                _lock.acquire()
+            try:
+                collection.upsert(
+                    ids=ids,
+                    embeddings=embeddings,
+                    documents=texts,
+                    metadatas=[c["metadata"] for c in chunks],
+                )
+            finally:
+                if _lock:
+                    _lock.release()
+            logger.info("company doc %s: %d chunks", original_name, len(chunks))
             total += len(chunks)
         except Exception as exc:
-            logger.warning("company doc %s: skipped (%s)", path.name, exc)
+            logger.warning("company doc %s: skipped (%s)", original_name, exc)
 
     logger.info("job %s: %d company doc chunks indexed in %s", job_id, total, col_name)
     return total
@@ -123,12 +154,15 @@ def delete_company_docs(job_id: str) -> None:
 
 # ── Text extraction ────────────────────────────────────────────────────────────
 
-def _extract(path: Path) -> str:
-    if path.suffix.lower() == ".pdf":
-        with pdfplumber.open(str(path)) as pdf:
+def _extract_bytes(content: bytes, filename: str) -> str:
+    """Extract text from decrypted file bytes without touching disk."""
+    suffix = Path(filename).suffix.lower()
+    if suffix == ".pdf":
+        import io
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
             pages = [p.extract_text() or "" for p in pdf.pages]
         return "\n\n".join(p.strip() for p in pages if p.strip())
-    return path.read_text(encoding="utf-8", errors="replace")
+    return content.decode("utf-8", errors="replace")
 
 
 # ── Chunking ───────────────────────────────────────────────────────────────────

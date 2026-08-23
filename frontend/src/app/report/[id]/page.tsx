@@ -10,8 +10,10 @@ import { ScoreBreakdown } from "@/components/report/score-breakdown";
 import { GapAnalysis } from "@/components/report/gap-analysis";
 import { ActionPlan } from "@/components/report/action-plan";
 import { DocumentNudge } from "@/components/report/document-nudge";
+import { DocumentTemplates } from "@/components/report/document-templates";
+import { ExpertReview } from "@/components/report/expert-review";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Loader2, ArrowLeft, Download, AlertTriangle, Link2, Check, RefreshCw, TrendingUp, TrendingDown, Minus, Database, ChevronDown, ShieldAlert, X, BookOpen, Lock } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ComplianceReport } from "@/lib/types";
 
@@ -25,6 +27,7 @@ export default function ReportPage() {
   const [prevReport, setPrevReport] = useState<ComplianceReport | null>(null);
   const [headerOpacity, setHeaderOpacity] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [pdfWarningOpen, setPdfWarningOpen] = useState(false);
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -55,7 +58,7 @@ export default function ReportPage() {
           <div className="h-12 w-12 rounded-2xl bg-brand-500/10 border border-brand-500/25 flex items-center justify-center shadow-glow-blue-sm">
             <Loader2 className="h-6 w-6 animate-spin text-brand-400" />
           </div>
-          <p className="text-sm text-slate-500">Loading your report…</p>
+          <p className="text-sm text-slate-500">Bericht wird geladen…</p>
         </div>
       </div>
     );
@@ -71,22 +74,22 @@ export default function ReportPage() {
         </div>
         <div className="text-center max-w-sm">
           <h2 className="text-lg font-bold text-white mb-2">
-            {isNotFound ? "Report not found" : isOffline ? "Cannot reach server" : "Something went wrong"}
+            {isNotFound ? "Bericht nicht gefunden" : isOffline ? "Server nicht erreichbar" : "Etwas ist schiefgelaufen"}
           </h2>
           <p className="text-sm text-slate-500 leading-relaxed">
             {isNotFound
-              ? "This report could not be found. The link may be invalid or the report was never completed."
+              ? "Dieser Bericht wurde nicht gefunden. Der Link ist möglicherweise ungültig oder das Screening wurde nicht abgeschlossen."
               : isOffline
-              ? "The backend server is not responding. Make sure it is running on port 8000 and refresh."
-              : (error ?? "An unexpected error occurred.")}
+              ? "Der Server antwortet nicht. Bitte stellen Sie sicher, dass er auf Port 8000 läuft und laden Sie die Seite neu."
+              : (error ?? "Ein unerwarteter Fehler ist aufgetreten.")}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Button variant="outline" onClick={() => loadReport()}>
-            Try again
+            Erneut versuchen
           </Button>
           <Button onClick={() => router.push("/analyze")}>
-            New screening
+            Neues Screening
           </Button>
         </div>
       </div>
@@ -119,8 +122,8 @@ export default function ReportPage() {
                 <div>
                   <h1 className="text-xl font-bold text-white tracking-tight">{report.company_name}</h1>
                   <p className="text-sm text-slate-500 mt-0.5">
-                    Preliminary Screening ·{" "}
-                    {new Date(report.generated_at).toLocaleDateString("en-GB", {
+                    Compliance-Screening ·{" "}
+                    {new Date(report.generated_at).toLocaleDateString("de-DE", {
                       day: "numeric", month: "short", year: "numeric",
                     })}
                   </p>
@@ -132,24 +135,42 @@ export default function ReportPage() {
                   className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
                 >
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Link2 className="h-3.5 w-3.5" />}
-                  {copied ? "Copied!" : "Copy link"}
+                  {copied ? "Kopiert!" : "Link kopieren"}
                 </button>
-                <a
-                  href={`/report/${jobId}/print`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Download PDF
-                </a>
+                {report.diagnostic_only ? (
+                  <a
+                    href="/account/billing"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-brand-500/30 bg-brand-500/[0.08] px-4 py-2 text-sm font-medium text-brand-400 hover:bg-brand-500/[0.14] transition-all duration-200"
+                  >
+                    <Lock className="h-3.5 w-3.5" />
+                    PDF freischalten
+                  </a>
+                ) : report.requires_manual_review && report.requires_manual_review.length > 0 ? (
+                  <button
+                    onClick={() => setPdfWarningOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] px-4 py-2 text-sm font-medium text-amber-400 hover:bg-amber-500/[0.14] transition-all duration-200"
+                  >
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    Unvollständiger Bericht
+                  </button>
+                ) : (
+                  <a
+                    href={`/report/${jobId}/print`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    PDF herunterladen
+                  </a>
+                )}
                 <Button variant="outline" size="sm" onClick={() => router.push(`/analyze?from=${jobId}`)}>
                   <RefreshCw className="h-3.5 w-3.5" />
-                  Re-run
+                  Neu ausführen
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => router.push("/analyze")}>
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  New screening
+                  Neues Screening
                 </Button>
               </div>
             </motion.div>
@@ -165,22 +186,317 @@ export default function ReportPage() {
           className="flex flex-col gap-5"
         >
           {prevReport && <DeltaBanner current={report} prev={prevReport} prevJobId={prevJobId!} />}
+
+          {/* Partial report warning */}
+          {report.requires_manual_review && report.requires_manual_review.length > 0 && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] px-5 py-4">
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-amber-300 mb-1">
+                    Unvollständiger Bericht: {report.requires_manual_review.length} Schritt{report.requires_manual_review.length !== 1 ? "e" : ""} erfordern manuelle Prüfung
+                  </p>
+                  <p className="text-xs text-slate-400 leading-relaxed mb-2">
+                    Die folgenden Analyseschritte sind fehlgeschlagen und die Ergebnisse können unvollständig sein.
+                    Verwenden Sie diesen Bericht nicht ohne Überprüfung der Lücken für Compliance-Entscheidungen.
+                  </p>
+                  <ul className="flex flex-wrap gap-2">
+                    {report.requires_manual_review.map(step => (
+                      <li key={step} className="rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-0.5 text-xs text-amber-400 font-mono">
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PDF blocked modal */}
+          {pdfWarningOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+              <div className="w-full max-w-md rounded-2xl border border-amber-500/25 bg-dark-900 p-6 shadow-2xl">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <ShieldAlert className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <h3 className="text-base font-bold text-white">PDF-Export gesperrt</h3>
+                  </div>
+                  <button onClick={() => setPdfWarningOpen(false)} className="text-slate-600 hover:text-slate-300 transition-colors">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                  Dieser Bericht ist unvollständig: {report.requires_manual_review?.length} Analyseschritt{(report.requires_manual_review?.length ?? 0) !== 1 ? "e" : ""} fehlgeschlagen.
+                  Der Export eines unvollständigen Berichts kann irreführend sein und sollte nicht an Prüfer oder Rechtsberater weitergegeben werden.
+                </p>
+                <p className="text-xs text-slate-500 mb-5">
+                  Fehlgeschlagene Schritte: <span className="text-amber-400">{report.requires_manual_review?.join(", ")}</span>
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setPdfWarningOpen(false)}
+                    className="flex-1 rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                  <a
+                    href={`/report/${jobId}/print`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setPdfWarningOpen(false)}
+                    className="flex-1 text-center rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-medium text-amber-400 hover:bg-amber-500/20 transition-colors"
+                  >
+                    Trotzdem exportieren (nicht empfohlen)
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Profile completeness warning — shown when < 70% of relevant fields were answered */}
+          {report.profile_completeness && report.profile_completeness.score_percent < 70 && (
+            <div className="rounded-xl border border-orange-500/30 bg-orange-500/[0.06] px-5 py-4 flex gap-3 items-start">
+              <AlertTriangle className="h-4 w-4 text-orange-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-orange-300 mb-1">
+                  Berichtsvollständigkeit: {report.profile_completeness.score_percent}%
+                </p>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {report.profile_completeness.unanswered_count === 1
+                    ? `${report.profile_completeness.unanswered_count} compliance-relevantes Feld wurde nicht angegeben.`
+                    : `${report.profile_completeness.unanswered_count} compliance-relevante Felder wurden nicht angegeben.`}{" "}
+                  Einige Ergebnisse basieren möglicherweise auf Annahmen statt auf bestätigten Daten.{" "}
+                  <button
+                    onClick={() => router.push(`/analyze?from=${jobId}`)}
+                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors"
+                  >
+                    Mit mehr Daten neu ausführen
+                  </button>{" "}
+                  für mehr Genauigkeit.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Free diagnostic banner */}
+          {report.diagnostic_only && (
+            <div className="rounded-xl border border-brand-500/30 bg-brand-500/[0.06] px-5 py-4 flex items-start gap-3">
+              <Lock className="h-5 w-5 text-brand-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-brand-300 mb-1">Kostenloses Diagnose-Screening</p>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sie sehen, welche Gesetze gelten und wie Ihr Score je Vorschrift aussieht.
+                  Lückenanalyse, Maßnahmenplan und PDF-Export sind im kostenpflichtigen Plan enthalten.
+                </p>
+              </div>
+              <a
+                href="/account/billing"
+                className="flex-shrink-0 inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500 transition-colors"
+              >
+                Plan auswählen
+              </a>
+            </div>
+          )}
+
           <DocumentNudge report={report} />
-          <ExecutiveSummary report={report} />
+          {!report.diagnostic_only && <ExecutiveSummary report={report} />}
           <div className="grid lg:grid-cols-2 gap-5">
             <ApplicabilityMatrix report={report} />
             <ScoreBreakdown report={report} />
           </div>
-          <GapAnalysis report={report} />
-          <ActionPlan report={report} />
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Lückenanalyse"
+              description="Sehen Sie genau, welche Anforderungen fehlen — mit Artikelzitat, Bewertung und Begründung für jeden der 14 Rechtsbereiche."
+              itemCount={report.applicable_regulations.filter(r => r.applies).length * 3}
+            />
+          ) : (
+            <GapAnalysis report={report} />
+          )}
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Priorisierter Maßnahmenplan"
+              description="Jede Lücke wird zu einer konkreten Aufgabe — mit Priorität (Kritisch / Hoch / Mittel / Niedrig), Aufwandsschätzung und Frist."
+              itemCount={report.applicable_regulations.filter(r => r.applies).length * 2}
+            />
+          ) : (
+            <ActionPlan report={report} />
+          )}
+          {report.diagnostic_only ? (
+            <LockedSection
+              title="Dokument-Vorlagen & Expertenprüfung"
+              description="Fertige Vorlagen für Datenschutzerklärung, AVV, Hinweisgeberschutz und mehr — sowie Zugang zur Expertenprüfung durch einen zugelassenen Rechtsanwalt."
+            />
+          ) : (
+            <>
+              <DocumentTemplates jobId={jobId} />
+              <ExpertReview report={report} jobId={jobId} />
+            </>
+          )}
+
+          {/* Source grounding coverage */}
+          {report.regulation_coverage && Object.keys(report.regulation_coverage).length > 0 && (
+            <SourceCoverage coverage={report.regulation_coverage} />
+          )}
+
+          {/* Legal database versions */}
+          {report.knowledge_base_versions && Object.keys(report.knowledge_base_versions).length > 0 && (
+            <KnowledgeBaseVersions versions={report.knowledge_base_versions} />
+          )}
 
           {/* Legal disclaimer */}
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-5 py-4">
-            <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Preliminary screening only — not legal advice</p>
+            <p className="text-xs text-amber-400/80 font-semibold uppercase tracking-widest mb-1">Vorläufiges Screening, keine Rechtsberatung</p>
             <p className="text-xs text-slate-500 leading-relaxed">{report.disclaimer}</p>
           </div>
         </motion.div>
       </main>
+    </div>
+  );
+}
+
+const REG_DISPLAY: Record<string, string> = {
+  gdpr_dsgvo: "GDPR / DSGVO", bdsg: "BDSG", nis2: "NIS2", eu_ai_act: "EU AI Act",
+  hinschg: "HinSchG", workplace_law: "Employment & Workplace Law", agg: "AGG",
+  milog: "MiLoG", lksg: "LkSG", enefg: "EnEfG / EDL-G", csrd: "CSRD",
+  ttdsg: "TTDSG / TDDDG", gwg: "GwG", eu_data_act: "EU Data Act",
+};
+
+function KnowledgeBaseVersions({ versions }: { versions: Record<string, { fetched_at: string; source_file_hash: string; source_url: string }> }) {
+  const [open, setOpen] = useState(false);
+  const entries = Object.entries(versions);
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-white/[0.02]">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <Database className="h-3.5 w-3.5 text-slate-500" />
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Rechtsquellen-Versionen</span>
+          <span className="text-xs text-slate-600">welche Gesetzesversion für diesen Bericht verwendet wurde</span>
+        </div>
+        <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="border-t border-white/[0.05] px-5 pb-4 pt-3">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-slate-600 uppercase tracking-wider">
+                <th className="text-left pb-2 font-medium">Vorschrift</th>
+                <th className="text-left pb-2 font-medium">Abgerufen am</th>
+                <th className="text-left pb-2 font-medium">Datei-Hash</th>
+                <th className="text-left pb-2 font-medium">Quelle</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.03]">
+              {entries.map(([reg, meta]) => (
+                <tr key={reg}>
+                  <td className="py-1.5 pr-4 text-slate-300 font-medium">{REG_DISPLAY[reg] ?? reg}</td>
+                  <td className="py-1.5 pr-4 text-slate-500 font-mono">
+                    {meta.fetched_at !== "unknown" ? meta.fetched_at.split("T")[0] : "unknown"}
+                  </td>
+                  <td className="py-1.5 pr-4 text-slate-600 font-mono">{meta.source_file_hash.slice(0, 8)}</td>
+                  <td className="py-1.5 text-slate-600">
+                    {meta.source_url
+                      ? <a href={meta.source_url} target="_blank" rel="noopener noreferrer" className="hover:text-brand-400 transition-colors underline underline-offset-2">offizieller Text</a>
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-3 text-xs text-slate-600 leading-relaxed">
+            Dieser Bericht wurde auf Basis der oben aufgeführten Rechtstexte erstellt. Wenn eine Vorschrift nach dem angezeigten Datum geändert wurde, starten Sie das Screening erneut für eine aktualisierte Bewertung.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SourceCoverage({ coverage }: { coverage: Record<string, { law_chunks: number; guidance_chunks: number; total_chunks: number; unique_articles: number }> }) {
+  const [open, setOpen] = useState(false);
+  const entries = Object.entries(coverage).sort((a, b) => b[1].total_chunks - a[1].total_chunks);
+  const maxChunks = Math.max(...entries.map(([, v]) => v.total_chunks), 1);
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-white/[0.02]">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <BookOpen className="h-3.5 w-3.5 text-slate-500" />
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Quellenabdeckung</span>
+          <span className="text-xs text-slate-600">wie viele Gesetzestexte pro Regelwerk ausgewertet wurden</span>
+        </div>
+        <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="border-t border-white/[0.05] px-5 pb-5 pt-3 flex flex-col gap-3">
+          {entries.map(([reg, v]) => (
+            <div key={reg}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-slate-300">{REG_DISPLAY[reg] ?? reg}</span>
+                <span className="text-xs text-slate-500 font-mono">
+                  {v.total_chunks} Abschnitte · {v.unique_articles} Artikel
+                </span>
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-brand-500/60"
+                  style={{ width: `${(v.total_chunks / maxChunks) * 100}%` }}
+                />
+              </div>
+              <div className="flex gap-3 mt-1">
+                <span className="text-[10px] text-slate-600">{v.law_chunks} Gesetzestexte</span>
+                <span className="text-[10px] text-slate-600">{v.guidance_chunks} Leitlinien</span>
+              </div>
+            </div>
+          ))}
+          <p className="text-xs text-slate-600 leading-relaxed mt-1">
+            Zeigt, wie viele Wissensbank-Abschnitte pro Regelwerk abgerufen wurden. Mehr Abschnitte bedeuten eine breitere Quellenbasis für die Bewertung.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LockedSection({ title, description, itemCount }: { title: string; description: string; itemCount?: number }) {
+  const rows = Math.max(itemCount ?? 3, 2);
+  return (
+    <div className="relative rounded-xl border border-white/[0.07] overflow-hidden">
+      {/* Blurred placeholder rows */}
+      <div className="px-5 py-4 flex flex-col gap-3 select-none pointer-events-none" aria-hidden>
+        {Array.from({ length: Math.min(rows, 5) }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="h-4 rounded-md bg-white/[0.05]" style={{ width: `${48 + (i % 3) * 18}%` }} />
+            <div className="h-4 rounded-md bg-white/[0.03]" style={{ width: `${20 + (i % 2) * 12}%` }} />
+          </div>
+        ))}
+      </div>
+      {/* Lock overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-dark-950/80 backdrop-blur-[2px] p-6 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/25">
+          <Lock className="h-5 w-5 text-brand-400" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-white mb-1">{title}</p>
+          <p className="text-xs text-slate-400 leading-relaxed max-w-sm">{description}</p>
+        </div>
+        <a
+          href="/account/billing"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-glow-blue-sm hover:bg-brand-500 transition-colors"
+        >
+          <Lock className="h-3.5 w-3.5" />
+          Plan auswählen — ab €89/Monat
+        </a>
+      </div>
     </div>
   );
 }
@@ -215,22 +531,22 @@ function DeltaBanner({ current, prev, prevJobId }: { current: ComplianceReport; 
           : <Minus className="h-5 w-5 text-slate-500 flex-shrink-0" />}
         <div>
           <p className="text-sm font-semibold text-white">
-            {delta > 0 ? `+${absD}%` : delta < 0 ? `-${absD}%` : "No change"}{" "}
+            {delta > 0 ? `+${absD}%` : delta < 0 ? `-${absD}%` : "Keine Änderung"}{" "}
             <span className={`${deltaColor}`}>
-              {delta > 0 ? "improvement" : delta < 0 ? "decline" : "in score"}
+              {delta > 0 ? "Verbesserung" : delta < 0 ? "Rückgang" : "im Score"}
             </span>
-            {" "}since previous screening
+            {" "}seit dem letzten Screening
           </p>
           <p className="text-xs text-slate-500 mt-0.5">
-            {improved > 0 && `${improved} gap${improved !== 1 ? "s" : ""} resolved`}
+            {improved > 0 && `${improved} Lücke${improved !== 1 ? "n" : ""} behoben`}
             {improved > 0 && regressed > 0 && " · "}
-            {regressed > 0 && `${regressed} gap${regressed !== 1 ? "s" : ""} regressed`}
-            {improved === 0 && regressed === 0 && "No gap status changes"}
+            {regressed > 0 && `${regressed} Lücke${regressed !== 1 ? "n" : ""} verschlechtert`}
+            {improved === 0 && regressed === 0 && "Keine Statusänderungen bei Lücken"}
           </p>
         </div>
       </div>
       <a href={`/report/${prevJobId}`} className="text-xs text-slate-500 hover:text-slate-300 transition-colors underline underline-offset-2 flex-shrink-0">
-        View previous report
+        Vorherigen Bericht ansehen
       </a>
     </div>
   );

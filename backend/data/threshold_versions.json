@@ -1,0 +1,285 @@
+{
+  "_meta": {
+    "description": "Machine-readable record of every legal threshold used in threshold_engine.py. Update whenever a threshold changes. Reports stamp their generated_at date so you can always reconstruct which version was in effect.",
+    "format": "regulation → list of threshold entries",
+    "last_full_review": "2026-05-19"
+  },
+  "gdpr_dsgvo": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to any company processing personal data of EU residents",
+      "value": "any processing",
+      "source": "GDPR Art. 2, Art. 3",
+      "valid_from": "2018-05-25",
+      "last_verified": "2026-05-19",
+      "code_function": "check_gdpr",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "dpo_required",
+      "description": "DPO required if ≥20 employees constantly in automated data processing",
+      "value": 20,
+      "unit": "employees (constantly in automated processing)",
+      "source": "BDSG §38(1)",
+      "valid_from": "2018-05-25",
+      "last_verified": "2026-05-19",
+      "code_function": "check_gdpr",
+      "confidence": "MEDIUM",
+      "caveat": "'constantly' (ständig) is approximated. Exact count of employees in automated processing roles needed for accuracy."
+    },
+    {
+      "threshold": "processing_records",
+      "description": "Records of processing activities required",
+      "value": "250+ employees OR non-occasional processing OR special category data",
+      "source": "GDPR Art. 30(5)",
+      "valid_from": "2018-05-25",
+      "last_verified": "2026-05-19",
+      "code_function": "check_gdpr",
+      "confidence": "HIGH"
+    }
+  ],
+  "bdsg": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to companies in Germany processing personal data",
+      "value": "company in Germany + personal data processing",
+      "source": "BDSG §1",
+      "valid_from": "2018-05-25",
+      "last_verified": "2026-05-19",
+      "code_function": "check_bdsg",
+      "confidence": "HIGH"
+    }
+  ],
+  "nis2": [
+    {
+      "threshold": "besonders_wichtige_einrichtung",
+      "description": "Annex I sector + ≥250 employees or ≥€50M revenue",
+      "employees": 250,
+      "revenue_eur": 50000000,
+      "source": "BSIG §28(6), NIS2 Annex I",
+      "valid_from": "2024-10-17",
+      "last_verified": "2026-05-19",
+      "code_function": "check_nis2",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "wichtige_einrichtung",
+      "description": "Annex I/II sector + ≥50 employees or ≥€10M revenue",
+      "employees": 50,
+      "revenue_eur": 10000000,
+      "source": "BSIG §28(7), NIS2 Annex II",
+      "valid_from": "2024-10-17",
+      "last_verified": "2026-05-19",
+      "code_function": "check_nis2",
+      "confidence": "HIGH",
+      "caveat": "NIS2UmsuCG (German transposition law) entered into force 2025-12-06. Thresholds based on BSIG 2023."
+    }
+  ],
+  "eu_ai_act": [
+    {
+      "threshold": "gpai_rules_active",
+      "description": "GPAI rules active date",
+      "value": "2025-08-02",
+      "source": "EU AI Act Art. 113(2)",
+      "valid_from": "2025-08-02",
+      "last_verified": "2026-05-19",
+      "code_function": "check_ai_act",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "high_risk_obligations_active",
+      "description": "High-risk AI system obligations active date",
+      "value": "2026-08-02",
+      "source": "EU AI Act Art. 113(2)",
+      "valid_from": "2026-08-02",
+      "last_verified": "2026-05-19",
+      "code_function": "check_ai_act",
+      "confidence": "MEDIUM",
+      "caveat": "Digital Omnibus proposal may delay Annex III obligations to 2027-12-02. Pending formal adoption in EU Official Journal."
+    }
+  ],
+  "hinschg": [
+    {
+      "threshold": "reporting_channel_required",
+      "description": "Internal reporting channel required",
+      "value": 50,
+      "unit": "employees",
+      "source": "HinSchG §12(2)",
+      "valid_from": "2023-07-02",
+      "last_verified": "2026-05-19",
+      "code_function": "check_hinschg",
+      "confidence": "HIGH"
+    }
+  ],
+  "lksg": [
+    {
+      "threshold": "in_scope",
+      "description": "LkSG applies",
+      "value": 1000,
+      "unit": "employees (including group subsidiaries and Leiharbeitnehmer >6 months)",
+      "source": "LkSG §1(1), §2(6)",
+      "valid_from": "2024-01-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_lksg",
+      "confidence": "HIGH",
+      "caveat": "Employee counting includes Leiharbeitnehmer assigned >6 months and controlled group subsidiaries. Borderline cases need legal analysis."
+    }
+  ],
+  "enefg": [
+    {
+      "threshold": "non_sme_gate",
+      "description": "Non-SME classification (triggers EDL-G audit obligation)",
+      "value": "≥250 employees OR >€50M revenue OR >€43M balance sheet (2 of 3 not required — any one triggers)",
+      "source": "EU Commission Recommendation 2003/361/EC, EDL-G §8",
+      "valid_from": "2024-01-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_enefg",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "energy_management_system",
+      "description": "Certified EnMS (ISO 50001/EMAS) mandatory — satisfies EDL-G audit",
+      "value": 7500,
+      "unit": "MWh annual energy consumption (strictly greater than)",
+      "source": "EnEfG §8(1) — 'mehr als 7,5 Gigawattstunden'",
+      "valid_from": "2023-11-18",
+      "last_verified": "2026-05-19",
+      "code_function": "check_enefg",
+      "confidence": "HIGH"
+    }
+  ],
+  "csrd": [
+    {
+      "threshold": "large_company",
+      "description": "CSRD large company — 2 of 3 size criteria",
+      "employees": 250,
+      "revenue_eur": 50000000,
+      "balance_sheet_eur": 25000000,
+      "source": "CSRD Directive 2022/2464 Art. 3",
+      "valid_from": "2023-01-05",
+      "last_verified": "2026-05-19",
+      "code_function": "check_csrd",
+      "confidence": "LOW",
+      "caveat": "EU Council February 2026 Omnibus agreement proposes raising to >1,000 employees AND >€450M revenue. Not yet formally in force. Reports flag this uncertainty."
+    },
+    {
+      "threshold": "wave_2_reporting_year",
+      "description": "Wave 2 first reporting financial year (postponed)",
+      "value": "FY2027 (report by 30 June 2028)",
+      "source": "Directive (EU) 2025/794 stop-the-clock postponement",
+      "valid_from": "2025-04-07",
+      "last_verified": "2026-05-19",
+      "code_function": "check_csrd",
+      "confidence": "HIGH"
+    }
+  ],
+  "arbschg": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to all employers with ≥1 employee",
+      "value": 1,
+      "unit": "employees",
+      "source": "ArbSchG §1(1), exception §1(2) for private households",
+      "valid_from": "1996-08-21",
+      "last_verified": "2026-05-19",
+      "code_function": "check_arbschg",
+      "confidence": "HIGH"
+    }
+  ],
+  "agg": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to all employers",
+      "value": 1,
+      "unit": "employees",
+      "source": "AGG §6",
+      "valid_from": "2006-08-18",
+      "last_verified": "2026-05-19",
+      "code_function": "check_agg",
+      "confidence": "HIGH"
+    }
+  ],
+  "milog": [
+    {
+      "threshold": "minimum_wage",
+      "description": "Statutory minimum wage per hour",
+      "value": 13.90,
+      "unit": "EUR per hour (gross)",
+      "source": "MiLoG §1(2), 4. MiLoGV (Mindestlohnverordnung)",
+      "valid_from": "2026-01-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_milog",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "minimum_wage_2027",
+      "description": "Announced minimum wage increase",
+      "value": 14.60,
+      "unit": "EUR per hour (gross)",
+      "source": "Mindestlohnkommission recommendation, BMAS announcement",
+      "valid_from": "2027-01-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_milog",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "documentation_threshold",
+      "description": "Working time documentation required for employees earning ≤ this monthly amount",
+      "value": 2000,
+      "unit": "EUR per month (gross)",
+      "source": "MiLoG §17(1)",
+      "valid_from": "2019-01-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_milog",
+      "confidence": "HIGH"
+    }
+  ],
+  "ttdsg": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to any website operator",
+      "value": "any website",
+      "source": "TTDSG §25",
+      "valid_from": "2021-12-01",
+      "last_verified": "2026-05-19",
+      "code_function": "check_ttdsg",
+      "confidence": "HIGH"
+    }
+  ],
+  "gwg": [
+    {
+      "threshold": "auto_trigger_sectors",
+      "description": "GwG obligations auto-trigger for these sectors",
+      "value": ["finance", "real_estate", "banking", "crypto", "gambling", "insurance"],
+      "source": "GwG §2",
+      "valid_from": "2017-06-26",
+      "last_verified": "2026-05-19",
+      "code_function": "check_gwg",
+      "confidence": "HIGH"
+    },
+    {
+      "threshold": "self_declaration_sectors",
+      "description": "Must self-declare AML obligation (is_aml_obligated_sector=true)",
+      "value": ["lawyers", "notaries", "accountants", "tax_advisors", "auditors", "trustees"],
+      "source": "GwG §2(1) Nr. 10, 11, 12",
+      "valid_from": "2017-06-26",
+      "last_verified": "2026-05-19",
+      "code_function": "check_gwg",
+      "confidence": "MEDIUM",
+      "caveat": "Self-declaration sectors not automatically detected. User must set is_aml_obligated_sector=true."
+    }
+  ],
+  "eu_data_act": [
+    {
+      "threshold": "applicability",
+      "description": "Applies to manufacturers of connected products and digital service providers",
+      "value": "device manufacturers, digital service providers",
+      "source": "EU Data Act Art. 1, Regulation (EU) 2023/2854",
+      "valid_from": "2025-09-12",
+      "last_verified": "2026-05-19",
+      "code_function": "check_eu_data_act",
+      "confidence": "MEDIUM",
+      "caveat": "EU Data Act entered into application September 2025. Limited enforcement guidance available; obligations still being clarified."
+    }
+  ]
+}

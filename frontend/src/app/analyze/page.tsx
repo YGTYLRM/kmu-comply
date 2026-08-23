@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, ShieldCheck, FileText, Bell } from "lucide-react";
 import { StepIndicator } from "@/components/profile-form/step-indicator";
 import { Step1Company } from "@/components/profile-form/step1-company";
 import { Step2Financials } from "@/components/profile-form/step2-financials";
@@ -17,10 +17,12 @@ import { Step7Privacy } from "@/components/profile-form/step7-privacy";
 import { Step8Security } from "@/components/profile-form/step8-security";
 import { Step9Workplace } from "@/components/profile-form/step9-workplace";
 import { Step6Documents } from "@/components/profile-form/step6-documents";
+import { Step10Digital } from "@/components/profile-form/step10-digital";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import type { CompanyProfile } from "@/lib/types";
+import { Lock } from "lucide-react";
 
 const optNum = (label: string) =>
   z.preprocess(
@@ -90,16 +92,29 @@ const schema = z.object({
   has_supplier_code_of_conduct:         optBool,
   has_supplier_risk_assessment:         optBool,
   has_lksg_complaints_procedure:        optBool,
+  // TTDSG / TDDDG
+  has_website:                          optBool,
+  has_cookie_banner:                    optBool,
+  has_cookie_policy:                    optBool,
+  // GwG
+  is_aml_obligated_sector:              optBool,
+  has_aml_risk_analysis:                optBool,
+  has_aml_officer:                      optBool,
+  has_kyc_procedures:                   optBool,
+  // EU Data Act
+  produces_connected_products:          optBool,
+  provides_data_processing_services:    optBool,
+  has_data_access_mechanism:            optBool,
   existing_compliance_notes:            z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof schema>;
 
-const STEP_LABELS = ["Company", "Financials", "Data", "Supply & Energy", "Governance", "Policies", "Security", "Workplace", "Documents"];
+const STEP_LABELS = ["Unternehmen", "Finanzen", "Datenschutz", "Lieferkette", "Governance", "Richtlinien", "Sicherheit", "Personal", "Digital", "Dokumente"];
 
 const STEP_FIELDS: (keyof ProfileFormData)[][] = [
   ["company_name", "industry", "employee_count"],
-  [], [], [], [], [], [], [], [],
+  [], [], [], [], [], [], [], [], [],
 ];
 
 function toProfile(data: ProfileFormData): CompanyProfile {
@@ -162,11 +177,24 @@ function toProfile(data: ProfileFormData): CompanyProfile {
     has_supplier_code_of_conduct:         data.has_supplier_code_of_conduct,
     has_supplier_risk_assessment:         data.has_supplier_risk_assessment,
     has_lksg_complaints_procedure:        data.has_lksg_complaints_procedure,
+    // TTDSG
+    has_website:                          data.has_website,
+    has_cookie_banner:                    data.has_cookie_banner,
+    has_cookie_policy:                    data.has_cookie_policy,
+    // GwG
+    is_aml_obligated_sector:             data.is_aml_obligated_sector,
+    has_aml_risk_analysis:               data.has_aml_risk_analysis,
+    has_aml_officer:                     data.has_aml_officer,
+    has_kyc_procedures:                  data.has_kyc_procedures,
+    // EU Data Act
+    produces_connected_products:          data.produces_connected_products,
+    provides_data_processing_services:    data.provides_data_processing_services,
+    has_data_access_mechanism:            data.has_data_access_mechanism,
     existing_compliance_notes:            data.existing_compliance_notes || undefined,
   };
 }
 
-const STEP_TITLES = ["Company", "Financials", "Data Protection", "Supply Chain & Energy", "Governance", "Privacy & Policies", "Security & Technology", "Workplace & HR", "Documents"];
+const STEP_TITLES = ["Unternehmen", "Finanzen", "Datenschutz", "Lieferkette & Energie", "Governance", "Datenschutz & Richtlinien", "Sicherheit & Technologie", "Personal & HR", "Digital & AML", "Dokumente"];
 
 function AnalyzeInner() {
   const router       = useRouter();
@@ -178,11 +206,8 @@ function AnalyzeInner() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [prefilling, setPrefilling]   = useState(!!fromJobId);
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_STRIPE_ENABLED !== "true") return;
-    const token = localStorage.getItem("complio_access_token");
-    if (!token) router.replace("/#pricing");
-  }, [router]);
+  const [billingLoading, setBillingLoading] = useState(true);
+  const [paywalled, setPaywalled] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
@@ -193,6 +218,15 @@ function AnalyzeInner() {
       processes_personal_data: undefined,
     },
   });
+
+  useEffect(() => {
+    api.getBilling()
+      .then(({ subscription, stripe_enabled }) => {
+        if (stripe_enabled && !subscription) setPaywalled(true);
+      })
+      .catch(() => { /* fail open — backend enforces */ })
+      .finally(() => setBillingLoading(false));
+  }, []);
 
   useEffect(() => {
     if (!fromJobId) return;
@@ -252,6 +286,16 @@ function AnalyzeInner() {
           has_supplier_code_of_conduct:         p.has_supplier_code_of_conduct,
           has_supplier_risk_assessment:         p.has_supplier_risk_assessment,
           has_lksg_complaints_procedure:        p.has_lksg_complaints_procedure,
+          has_website:                          p.has_website,
+          has_cookie_banner:                    p.has_cookie_banner,
+          has_cookie_policy:                    p.has_cookie_policy,
+          is_aml_obligated_sector:              p.is_aml_obligated_sector,
+          has_aml_risk_analysis:                p.has_aml_risk_analysis,
+          has_aml_officer:                      p.has_aml_officer,
+          has_kyc_procedures:                   p.has_kyc_procedures,
+          produces_connected_products:          p.produces_connected_products,
+          provides_data_processing_services:    p.provides_data_processing_services,
+          has_data_access_mechanism:            p.has_data_access_mechanism,
           existing_compliance_notes:            p.existing_compliance_notes ?? "",
         });
       })
@@ -282,11 +326,73 @@ function AnalyzeInner() {
       const msg = err instanceof Error ? err.message : "Submission failed";
       const isOffline = msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("network");
       setSubmitError(isOffline
-        ? "Cannot reach the server. Make sure the backend is running and try again."
+        ? "Server nicht erreichbar. Stellen Sie sicher, dass das Backend läuft, und versuchen Sie es erneut."
         : msg
       );
     }
   });
+
+  if (billingLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-dark-950">
+        <div className="text-slate-500 text-sm">Wird geladen…</div>
+      </div>
+    );
+  }
+
+  if (paywalled) {
+    return (
+      <div className="min-h-screen bg-dark-950 pt-24 pb-16">
+        <div className="mx-auto max-w-lg px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center text-center gap-6 pt-12"
+          >
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/20">
+              <ShieldCheck className="h-8 w-8 text-brand-400" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl font-black text-white tracking-tight">
+                Ihr Screening wartet
+              </h1>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Wählen Sie einen Plan und starten Sie in weniger als 5 Minuten Ihr erstes Compliance-Screening.
+              </p>
+            </div>
+
+            <div className="w-full rounded-2xl border border-white/[0.07] bg-dark-900/60 p-5 text-left flex flex-col gap-3">
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Was Sie erhalten</p>
+              {[
+                { icon: <FileText className="h-4 w-4 text-emerald-400" />, text: "14 Gesetze automatisch geprüft: DSGVO, NIS2, EU AI Act und mehr" },
+                { icon: <ShieldCheck className="h-4 w-4 text-emerald-400" />, text: "Vollständige Lückenanalyse mit priorisiertem Maßnahmenplan" },
+                { icon: <Bell className="h-4 w-4 text-emerald-400" />, text: "Automatische Benachrichtigung bei relevanten Gesetzesänderungen" },
+                { icon: <CheckCircle2 className="h-4 w-4 text-emerald-400" />, text: "PDF-Bericht zum Teilen mit Beratern oder der Geschäftsführung" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
+                  <p className="text-sm text-slate-300">{item.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="/account/billing"
+              className="w-full rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-brand-500 transition-all shadow-glow-blue-sm hover:shadow-glow-blue text-center"
+            >
+              Plan auswählen & Screening starten →
+            </a>
+
+            <a href="/dashboard" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              Zurück zum Dashboard
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-dark-950 pt-24">
@@ -300,10 +406,10 @@ function AnalyzeInner() {
             className="text-center"
           >
             <h1 className="text-xl font-bold text-white tracking-tight">
-              {fromJobId ? "Re-run Screening" : "Company Profile"}
+              {fromJobId ? "Screening wiederholen" : "Unternehmensprofil"}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              {prefilling ? "Loading previous profile…" : `Step ${step} of 9: ${STEP_TITLES[step - 1]}`}
+              {prefilling ? "Vorheriges Profil wird geladen…" : `Schritt ${step} von 10: ${STEP_TITLES[step - 1]}`}
             </p>
           </motion.div>
           <StepIndicator steps={STEP_LABELS} current={step} />
@@ -330,43 +436,65 @@ function AnalyzeInner() {
                   {step === 6 && <Step7Privacy      form={form} />}
                   {step === 7 && <Step8Security     form={form} />}
                   {step === 8 && <Step9Workplace    form={form} />}
-                  {step === 9 && <Step6Documents    files={files} onChange={setFiles} />}
+                  {step === 9 && <Step10Digital     form={form} />}
+                  {step === 10 && <Step6Documents   files={files} onChange={setFiles} />}
 
-                  {submitError && (
-                    <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-400">{submitError}</p>
+                  {submitError && (() => {
+                    const isPaywall = submitError.toLowerCase().includes("abonnement") || submitError.toLowerCase().includes("subscription");
+                    return isPaywall ? (
+                      <div className="mt-5 rounded-xl bg-amber-500/10 border border-amber-500/25 px-4 py-4 flex flex-col gap-3">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-amber-300">Abonnement erforderlich</p>
+                            <p className="text-xs text-amber-400/70 mt-0.5">
+                              Das Compliance-Screening ist nur für aktive Abonnenten verfügbar.
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href="/account/billing"
+                          className="self-start rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-black hover:bg-amber-400 transition-colors"
+                        >
+                          Plan auswählen →
+                        </a>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setSubmitError(null)}
-                        className="self-start text-xs text-red-400/70 hover:text-red-300 underline transition-colors"
-                      >
-                        Dismiss and try again
-                      </button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="mt-5 rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-4 flex flex-col gap-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-red-400">{submitError}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSubmitError(null)}
+                          className="self-start text-xs text-red-400/70 hover:text-red-300 underline transition-colors"
+                        >
+                          Schließen und erneut versuchen
+                        </button>
+                      </div>
+                    );
+                  })()}
 
                   <div className="mt-7 flex justify-between items-center pt-5 border-t border-white/[0.06]">
                     {step > 1 ? (
                       <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-                        ← Back
+                        ← Zurück
                       </Button>
                     ) : (
                       <div />
                     )}
-                    {step < 9 ? (
+                    {step < 10 ? (
                       <Button type="button" onClick={advance} size="md">
-                        Continue →
+                        Weiter →
                       </Button>
                     ) : (
                       <Button type="submit" size="md" disabled={form.formState.isSubmitting}>
                         {form.formState.isSubmitting
-                          ? files.length > 0 ? "Uploading docs…" : "Submitting…"
+                          ? files.length > 0 ? "Dokumente werden hochgeladen…" : "Wird gesendet…"
                           : files.length > 0
-                            ? `Run screening with ${files.length} doc${files.length !== 1 ? "s" : ""} →`
-                            : "Run screening →"}
+                            ? `Screening mit ${files.length} Dok${files.length !== 1 ? "." : "."} starten →`
+                            : "Screening starten →"}
                       </Button>
                     )}
                   </div>
@@ -384,7 +512,7 @@ export default function AnalyzePage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-slate-500 text-sm">Loading…</div>
+        <div className="text-slate-500 text-sm">Wird geladen…</div>
       </div>
     }>
       <AnalyzeInner />
