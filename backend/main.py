@@ -18,19 +18,13 @@ from routes.expert_review import router as expert_review_router
 from routes.misc import router as misc_router
 from routes.notifications import router as notifications_router
 from routes.scanning import router as scanning_router
+from observability import init_sentry
 from state import job_manager
 
 if settings.sentry_dsn:
-    import sentry_sdk
     from sentry_sdk.integrations.asyncio import AsyncioIntegration
     from sentry_sdk.integrations.fastapi import FastApiIntegration
-    sentry_sdk.init(
-        dsn=settings.sentry_dsn,
-        environment=settings.environment,
-        integrations=[FastApiIntegration(), AsyncioIntegration()],
-        traces_sample_rate=0.1,
-        send_default_pii=False,
-    )
+    init_sentry([FastApiIntegration(), AsyncioIntegration()])
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s — %(message)s")
 logger = logging.getLogger(__name__)
@@ -59,6 +53,13 @@ def _check_production_config() -> None:
         errors.append(
             "DATABASE_URL must be set in production — rate limiting, report "
             "persistence, and job ownership require PostgreSQL."
+        )
+    if not settings.sentry_dsn:
+        errors.append(
+            "SENTRY_DSN must be set in production — this project's worst bugs "
+            "historically (corrupted KB content served for months, gap analysis "
+            "silently returning zero items) were silent failures nobody was "
+            "watching for, not crashes. Don't deploy blind to that again."
         )
     if errors:
         print("\n[STARTUP ERROR] Production config validation failed:\n", file=sys.stderr)
