@@ -1,12 +1,13 @@
 name: CodeQL
 
+# Disabled from auto-triggering (2026-08-23): code scanning upload requires
+# GitHub Advanced Security on a private repo, which isn't enabled here, so
+# every run failed with "Code scanning is not enabled for this repository."
+# Re-add push/pull_request/schedule triggers once Advanced Security (or a
+# public repo) makes the upload step viable. workflow_dispatch keeps a
+# manual "Run workflow" button available in the meantime.
 on:
-  push:
-    branches: [main, dev]
-  pull_request:
-    branches: [main, dev]
-  schedule:
-    - cron: "0 3 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
