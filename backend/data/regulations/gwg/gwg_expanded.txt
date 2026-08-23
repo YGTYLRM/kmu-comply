@@ -1,0 +1,49 @@
+Geldwäschegesetz (GwG) — Anti-Money Laundering Act
+Gesetz ueber das Aufspueren von Gewinnen aus schweren Straftaten
+vom 23. Juni 2017 (BGBl. I S. 1822)
+Source: https://www.gesetze-im-internet.de/gwg_2017/
+
+---
+
+compliance_guides GwG §1
+Title: Purpose and scope — prevention of money laundering and terrorist financing
+Obligation: MUST
+Threshold: Obligated entities listed in §2 GwG operating in Germany
+Text: The Geldwäschegesetz (GwG) implements the EU Anti-Money Laundering Directives (AMLD) in Germany. It requires designated businesses and professions to implement risk-based anti-money laundering (AML) and counter-terrorist financing (CTF) measures. The law is enforced by sector-specific supervisory authorities: BaFin for financial institutions, the Bundesrechtsanwaltskammer for lawyers, IHK/HwK for real estate agents and certain other businesses, and the Zollkriminalamt for certain goods traders. Obligated entities that fail to comply face significant administrative fines and reputational damage. The GwG requirements are proportionate to the money laundering risk of the business model — higher risk activities require more intensive measures.
+Keywords: GwG, Geldwäsche, anti-money laundering, AML, terrorist financing, BaFin, obligated entities, supervisory authority, risk-based
+
+---
+
+compliance_guides GwG §2
+Title: Obligated entities — 16 categories of businesses subject to AML obligations
+Obligation: MUST
+Threshold: Businesses and professionals in the 16 categories listed in §2(1) GwG
+Text: The following are obligated entities under the GwG and must comply with all AML/CTF obligations: (1) credit institutions (banks, savings banks); (2) financial service providers; (3) payment institutions and e-money institutions; (4) agents of payment institutions; (5) investment management companies; (6) insurance companies offering life insurance; (7) insurance intermediaries for life insurance; (8) capital management companies; (9) lawyers, notaries, and other legal professionals when providing specified services (managing client assets, establishing companies, real estate transactions, tax advice); (10) accountants and auditors; (11) tax advisors; (12) real estate agents; (13) goods dealers for cash transactions over EUR 10,000; (14) art dealers for transactions over EUR 10,000; (15) gambling operators; (16) cryptocurrency service providers. Many professional services such as IT companies, manufacturers, and retail businesses are NOT obligated entities under GwG unless they fall into one of these categories.
+Keywords: verpflichtete Unternehmen, obligated entities, §2 GwG, banks, lawyers, notaries, real estate agents, tax advisors, accountants, gambling, crypto
+
+---
+
+compliance_guides GwG §4
+Title: Risk management — risk analysis and internal safeguards mandatory for all obligated entities
+Obligation: MUST
+Threshold: All obligated entities under §2 GwG
+Text: Every obligated entity must establish effective risk management (wirksames Risikomanagement) proportionate to its nature, size, and activities to prevent money laundering and terrorist financing. Risk management consists of two components: (1) a risk analysis (§5 GwG) documenting the entity's money laundering risks based on its customers, geographic reach, products, services, and transactions; and (2) internal safeguards (§6 GwG) including internal policies, controls, and procedures. A member of the management board or a senior manager must be designated as responsible for AML compliance (Geldwäschebeauftragter — AML officer) in larger obligated entities. The AML officer must report directly to senior management. Risk management must be reviewed and updated regularly, at least when business activities change materially.
+Keywords: Risikomanagement, risk management, risk analysis, Risikoanalyse, internal safeguards, Geldwäschebeauftragter, AML officer, §4 GwG, §5 GwG, §6 GwG
+
+---
+
+compliance_guides GwG §10
+Title: Customer due diligence — mandatory KYC for all business relationships and transactions
+Obligation: MUST
+Threshold: All obligated entities; applies to every business relationship and specified transactions
+Text: Obligated entities must conduct customer due diligence (Sorgfaltspflichten) for every business relationship and for specified transactions. The five core due diligence measures are: (1) identify and verify the contracting party (name, date of birth, address, identity document); (2) identify any person acting on behalf of the customer and verify their authorisation; (3) identify the beneficial owner (wirtschaftlich Berechtigter) — the natural person who ultimately owns or controls the customer entity — and take reasonable measures to verify their identity; (4) identify the purpose and intended nature of the business relationship; and (5) continuously monitor the business relationship and keep customer information up to date. Simplified due diligence applies for low-risk customers; enhanced due diligence (verstaerkte Sorgfaltspflichten) applies for high-risk customers including politically exposed persons (PEPs). If due diligence cannot be completed, the business relationship must not be established or must be terminated.
+Keywords: Sorgfaltspflichten, KYC, customer due diligence, beneficial owner, wirtschaftlich Berechtigter, PEP, simplified, enhanced, §10 GwG, business relationship
+
+---
+
+compliance_guides GwG §43
+Title: Reporting obligation — suspicious transactions must be reported to the Financial Intelligence Unit
+Obligation: MUST
+Threshold: All obligated entities; applies when suspicion of money laundering or terrorist financing exists
+Text: Obligated entities must immediately file a suspicious transaction report (Verdachtsmeldung) with the Financial Intelligence Unit (FIU — Zentralstelle fuer Finanztransaktionsuntersuchungen) at the Zollkriminalamt when they know, suspect, or have reasonable grounds to suspect that assets are derived from criminal activity or are connected to terrorist financing. The report must be filed before executing the transaction where possible. The business relationship or transaction must be suspended until the FIU responds or 3 business days have elapsed. Obligated entities and their employees must not inform the customer (tipping off prohibition). Failure to file a required suspicious transaction report is an administrative offence subject to fines of up to EUR 150,000 or, for systematic and serious violations, up to EUR 5 million or 10% of annual turnover.
+Keywords: Verdachtsmeldung, suspicious transaction report, FIU, Zentralstelle fuer Finanztransaktionsuntersuchungen, tipping off, §43 GwG, reporting obligation, 3 business days, administrative fine

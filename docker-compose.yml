@@ -1,14 +1,14 @@
-version: "3.9"
-
 services:
   chromadb:
     image: chromadb/chroma:latest
-    ports:
-      - "8001:8000"
+    # No host port mapping — chromadb has no auth enabled, so it must stay
+    # reachable only via the internal compose network (backend/worker use
+    # http://chromadb:8000). For local debugging, temporarily add back
+    # `ports: ["127.0.0.1:8001:8000"]` (loopback-only, never a public port).
     volumes:
       - chroma_data:/chroma/chroma
     environment:
-      - ALLOW_RESET=true
+      - ALLOW_RESET=false
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
       interval: 10s
@@ -17,18 +17,41 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - report_data:/app/data/reports
+      - staging_data:/app/data/staging
     env_file:
-      - .env
+      - backend/.env
+    environment:
+      - CHROMA_SERVER_URL=http://chromadb:8000
+      - ENVIRONMENT=production
     depends_on:
       chromadb:
         condition: service_healthy
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      - ./backend:/app
+      - report_data:/app/data/reports
+      - staging_data:/app/data/staging
+    env_file:
+      - backend/.env
+    environment:
+      - CHROMA_SERVER_URL=http://chromadb:8000
+      - ENVIRONMENT=production
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    command: python worker.py
 
   frontend:
     build:
@@ -36,14 +59,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     depends_on:
       - backend
 
 volumes:
   chroma_data:
+  report_data:
+  staging_data:

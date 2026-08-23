@@ -225,13 +225,15 @@ Abschnitt 1
 Allgemeine Vorschriften
 
  
-§ 1 Abfallwirtschaftliche Ziele
+§ 1
+Abfallwirtschaftliche Ziele
  
 
 Dieses Gesetz legt Anforderungen an die Produktverantwortung nach § 23 des Kreislaufwirtschaftsgesetzes für Elektro- und Elektronikgeräte fest. Es bezweckt vorrangig die Vermeidung von Abfällen von Elektro- und Elektronikgeräten und darüber hinaus die Vorbereitung zur Wiederverwendung, das Recycling und andere Formen der Verwertung solcher Abfälle, um die zu beseitigende Abfallmenge zu reduzieren und dadurch die Effizienz der Ressourcennutzung zu verbessern. Um diese abfallwirtschaftlichen Ziele zu erreichen, soll das Gesetz das Marktverhalten der Verpflichteten regeln.
 
  
-§ 2 Anwendungsbereich
+§ 2
+Anwendungsbereich
  
 
 (1) Dieses Gesetz gilt für sämtliche Elektro- und Elektronikgeräte. Sie sind in die folgenden Kategorien unterteilt: 1.
@@ -276,7 +278,8 @@ medizinische Geräte und In-vitro-Diagnostika, bei denen jeweils zu erwarten ist
 (3) Soweit dieses Gesetz keine abweichenden Vorschriften enthält, sind das Kreislaufwirtschaftsgesetz, mit Ausnahme von § 17 Absatz 4 und § 54, und diejenigen Rechtsverordnungen in der jeweils geltenden Fassung anzuwenden, die auf der Grundlage des Kreislaufwirtschaftsgesetzes oder des bis zum 31. Mai 2012 geltenden Kreislaufwirtschafts- und Abfallgesetzes erlassen wurden. Die §§ 27, 47 Absatz 1 bis 6, § 50 Absatz 3, § 59 Absatz 1 Satz 1 und Absatz 2 sowie die §§ 60, 62 und 66 des Kreislaufwirtschaftsgesetzes gelten entsprechend. Rechtsvorschriften, die besondere Anforderungen an die Bewirtschaftung von Altgeräten oder an die Produktkonzeption enthalten, sowie solche, die aus Gründen der Sicherheit im Zusammenhang mit der Beförderung gefährlicher Güter erlassen sind, bleiben unberührt. Die Nachweispflichten nach § 50 Absatz 1 des Kreislaufwirtschaftsgesetzes gelten nicht für die Überlassung von Altgeräten an Einrichtungen zur Erfassung und Erstbehandlung von Altgeräten. Abweichend von Satz 1 gelten § 17 Absatz 4 Satz 1 und § 54 des Kreislaufwirtschaftsgesetzes für aus Altgeräten ausgebaute Bauteile, Unterbaugruppen und Verbrauchsmaterialien.
 
  
-§ 3 Begriffsbestimmungen
+§ 3
+Begriffsbestimmungen
  
 
 Im Sinne dieses Gesetzes sind 1.
@@ -452,7 +455,8 @@ Abschnitt 2
 Pflichten beim Inverkehrbringen von Elektro- und Elektronikgeräten
 
  
-§ 4 Produktkonzeption
+§ 4
+Produktkonzeption
  
 
 (1) Hersteller haben ihre Elektro- und Elektronikgeräte möglichst so zu gestalten, dass insbesondere die Wiederverwendung, die Demontage und die Verwertung von Altgeräten, ihren Bauteilen und Werkstoffen berücksichtigt und erleichtert werden. Elektro- und Elektronikgeräte, die vollständig oder teilweise mit Batterien oder Akkumulatoren betrieben werden können, sind möglichst so zu gestalten, dass Altbatterien und Altakkumulatoren durch Endnutzer problemlos und zerstörungsfrei entnommen werden können. Sind Altbatterien oder Altakkumulatoren nicht problemlos durch den Endnutzer entnehmbar, sind die Elektro- und Elektronikgeräte so zu gestalten, dass die Altbatterien und Altakkumulatoren problemlos und zerstörungsfrei und mit handelsüblichem Werkzeug durch vom Hersteller unabhängiges Fachpersonal entnommen werden können.
@@ -468,7 +472,8 @@ deren oder dessen sichere Entnahme.
 Satz 1 gilt nicht für Elektro- und Elektronikgeräte nach Absatz 3.
 
  
-§ 5 Einrichten der Gemeinsamen Stelle
+§ 5
+Einrichten der Gemeinsamen Stelle
  
 
 (1) Die Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte sind verpflichtet, eine Gemeinsame Stelle einzurichten.
@@ -476,7 +481,8 @@ Satz 1 gilt nicht für Elektro- und Elektronikgeräte nach Absatz 3.
 (2) Ist die Gemeinsame Stelle nicht eingerichtet oder nimmt sie ihre Aufgaben nach § 31 Absatz 5 Satz 1 oder Absatz 7 Satz 1 und 3 nicht wahr, ist jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter verpflichtet, den öffentlich-rechtlichen Entsorgungsträgern die Kosten für die Sammlung, Sortierung und Entsorgung seiner Altgeräte zu erstatten. Die nach Landesrecht zuständige Behörde setzt die Kosten durch Verwaltungsakt fest.
 
  
-§ 6 Registrierung
+§ 6
+Registrierung
  
 
 (1) Bevor ein Hersteller Elektro- oder Elektronikgeräte in Verkehr bringt, ist er oder im Fall der Bevollmächtigung nach § 8 sein Bevollmächtigter verpflichtet, sich bei der zuständigen Behörde mit der Geräteart und Marke registrieren zu lassen. Der Registrierungsantrag muss die Angaben nach Anlage 2 enthalten. Dem Registrierungsantrag ist oder sind 1.
@@ -495,7 +501,8 @@ Fulfilment-Dienstleister die Lagerhaltung, Verpackung, Adressierung oder den Ver
 (3) Jeder Hersteller ist verpflichtet, beim Anbieten und auf Rechnungen seine Registrierungsnummer anzugeben.
 
  
-§ 7 Finanzierungsgarantie
+§ 7
+Finanzierungsgarantie
  
 
 (1) Jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter ist verpflichtet, der zuständigen Behörde kalenderjährlich eine insolvenzsichere Garantie für die Finanzierung der Rücknahme und Entsorgung der Elektro- und Elektronikgeräte nachzuweisen, die der Hersteller nach dem 13. August 2005 im Geltungsbereich dieses Gesetzes in Verkehr bringt oder gebracht hat und die in privaten Haushalten genutzt werden können. Die Garantie hat den Rückgriffsanspruch der Gemeinsamen Stelle gemäß § 34 Absatz 2 zu sichern.
@@ -515,7 +522,8 @@ Eine Bürgschaft oder Garantie auf erstes Anfordern kann auch formularmäßig ü
 (4) Der Hersteller darf die Kosten für die Entsorgung von Elektro- und Elektronikgeräten gegenüber dem Endkunden nicht ausweisen.
 
  
-§ 7a Rücknahmekonzept
+§ 7a
+Rücknahmekonzept
  
 
 (1) Jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 jeder Bevollmächtigte ist verpflichtet, der zuständigen Behörde für die Rücknahme und Entsorgung der Elektro- und Elektronikgeräte, für die er glaubhaft macht, dass sie ausschließlich in anderen als privaten Haushalten genutzt werden oder dass solche Geräte gewöhnlich nicht in privaten Haushalten genutzt werden, ein Rücknahmekonzept vorzulegen.
@@ -530,7 +538,8 @@ die Möglichkeit der Endnutzer, auf die Rückgabemöglichkeiten nach Nummer 1 zu
 (3) Änderungen am Rücknahmekonzept sind der zuständigen Behörde unverzüglich durch den Hersteller oder im Fall der Bevollmächtigung nach § 8 durch den Bevollmächtigten mitzuteilen.
 
  
-§ 8 Niederlassungspflicht, Beauftragung und Benennung eines Bevollmächtigten
+§ 8
+Niederlassungspflicht, Beauftragung und Benennung eines Bevollmächtigten
  
 
 (1) Ein Hersteller im Sinne von § 3 Nummer 9 Buchstabe a bis c, der keine Niederlassung im Geltungsbereich dieses Gesetzes hat, muss einen Bevollmächtigten beauftragen. Jeder Hersteller darf nur einen Bevollmächtigten beauftragen. Die Beauftragung hat schriftlich und in deutscher Sprache zu erfolgen und muss mindestens drei Monate wirksam sein.
@@ -544,7 +553,8 @@ die Möglichkeit der Endnutzer, auf die Rückgabemöglichkeiten nach Nummer 1 zu
 (5) Eine natürliche oder juristische Person oder rechtsfähige Personengesellschaft, die im Geltungsbereich dieses Gesetzes niedergelassen ist und Geräte gewerbsmäßig unter Verwendung von Fernkommunikationsmitteln in einem anderen Mitgliedstaat der Europäischen Union, in dem sie nicht niedergelassen ist, unmittelbar für Endnutzer bereitstellt, ist verpflichtet, vor der Bereitstellung auf dem Markt dieses Mitgliedstaates eine dort niedergelassene natürliche oder juristische Person oder rechtsfähige Personengesellschaft zu bevollmächtigen, die dort für die Erfüllung ihrer Pflichten nach der Richtlinie 2012/19/EU des Europäischen Parlaments und des Rates vom 4. Juli 2012 über Elektro- und Elektronik-Altgeräte (ABl. L 197 vom 24.7.2012, S. 38) verantwortlich ist.
 
  
-§ 9 Kennzeichnung
+§ 9
+Kennzeichnung
  
 
 (1) Elektro- und Elektronikgeräte, die nach den in § 3 Nummer 4 genannten Zeitpunkten in Verkehr gebracht werden, sind vor dem Inverkehrbringen auf dem europäischen Markt dauerhaft so zu kennzeichnen, dass der Hersteller eindeutig zu identifizieren ist und festgestellt werden kann, dass das Gerät nach dem jeweiligen in § 3 Nummer 4 genannten Zeitpunkt erstmals auf dem europäischen Markt in Verkehr gebracht wurde.
@@ -555,7 +565,8 @@ Abschnitt 3
 Sammlung und Rücknahme
 
  
-§ 10 Getrennte Erfassung
+§ 10
+Getrennte Erfassung
  
 
 (1) Endnutzer von Altgeräten haben diese einer vom unsortierten Siedlungsabfall getrennten Erfassung zuzuführen. Sie haben Altbatterien, die nicht vom Altgerät umschlossen sind, sowie Lampen, die zerstörungsfrei aus dem Altgerät entnommen werden können, vor der Abgabe an einer Erfassungsstelle vom Altgerät zerstörungsfrei zu trennen. Satz 2 gilt nicht, soweit nach § 14 Absatz 4 Satz 4 oder Absatz 5 Satz 2 und 3 Altgeräte separiert werden, um sie für die Wiederverwendung vorzubereiten.
@@ -565,7 +576,8 @@ Sammlung und Rücknahme
 (3) Ab dem 1. Januar 2019 soll das Gesamtgewicht der erfassten Altgeräte in jedem Kalenderjahr mindestens 65 Prozent des Durchschnittsgewichts der Elektro- und Elektronikgeräte, die in den drei Kalendervorjahren in Verkehr gebracht wurden, betragen.
 
  
-§ 11 Verordnungsermächtigungen
+§ 11
+Verordnungsermächtigungen
  
 
 Die Bundesregierung wird ermächtigt, durch Rechtsverordnung mit Zustimmung des Bundesrates 1.
@@ -578,13 +590,15 @@ Unterabschnitt 1
 Sammlung und Rücknahme von Altgeräten aus privaten Haushalten
 
  
-§ 12 Berechtigte für die Erfassung von Altgeräten aus privaten Haushalten
+§ 12
+Berechtigte für die Erfassung von Altgeräten aus privaten Haushalten
  
 
 Die Erfassung von Altgeräten aus privaten Haushalten darf nur von öffentlich-rechtlichen Entsorgungsträgern, Vertreibern, Herstellern oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigten sowie von Betreibern von nach § 21 zertifizierten Erstbehandlungsanlagen vorgenommen werden. Öffentlich-rechtliche Entsorgungsträger, Vertreiber und Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte dürfen mit der Sammlung und Rücknahme auch Dritte beauftragen.
 
  
-§ 13 Sammlung durch die öffentlich-rechtlichen Entsorgungsträger
+§ 13
+Sammlung durch die öffentlich-rechtlichen Entsorgungsträger
  
 
 (1) Die öffentlich-rechtlichen Entsorgungsträger richten im Rahmen ihrer Pflichten nach § 20 des Kreislaufwirtschaftsgesetzes Sammelstellen ein, an denen Altgeräte aus privaten Haushalten ihres Gebietes angeliefert werden können (Bringsystem). § 14 Absatz 2 gilt entsprechend. Altgeräte aus privaten Haushalten, die von Gewerbetreibenden oder Vertreibern angeliefert werden, gelten als Altgeräte aus privaten Haushalten des Gebietes des öffentlich-rechtlichen Entsorgungsträgers, in dem der Gewerbetreibende oder Vertreiber seine Niederlassung hat.
@@ -598,7 +612,8 @@ Die Erfassung von Altgeräten aus privaten Haushalten darf nur von öffentlich-r
 (5) Die öffentlich-rechtlichen Entsorgungsträger können die kostenlose Annahme von Altgeräten ablehnen, die auf Grund einer Verunreinigung eine Gefahr für die Gesundheit und Sicherheit von Menschen darstellen. Satz 1 gilt insbesondere, sofern asbesthaltige Nachtspeicherheizgeräte nicht ordnungsgemäß durch Fachpersonal abgebaut und verpackt wurden oder beschädigt beim öffentlich-rechtlichen Entsorgungsträger angeliefert werden. Bei Anlieferungen von mehr als 20 Geräten der Gruppen 1, 4 und 6 nach § 14 Absatz 1 Satz 1 sind Anlieferungsort und -zeitpunkt vorab mit dem öffentlich-rechtlichen Entsorgungsträger abzustimmen. Die Überlassungspflichten privater Haushaltungen nach § 17 Absatz 1 Satz 1 des Kreislaufwirtschaftsgesetzes und die Entsorgungspflichten der öffentlich-rechtlichen Entsorgungsträger für Abfälle aus privaten Haushaltungen nach § 20 Absatz 1 und 3 des Kreislaufwirtschaftsgesetzes bleiben von den Sätzen 1 und 2 unberührt.
 
  
-§ 14 Bereitstellen der abzuholenden Altgeräte durch die öffentlich-rechtlichen Entsorgungsträger
+§ 14
+Bereitstellen der abzuholenden Altgeräte durch die öffentlich-rechtlichen Entsorgungsträger
  
 
 (1) Die öffentlich-rechtlichen Entsorgungsträger stellen die von den Herstellern oder im Fall der Bevollmächtigung nach § 8 von deren Bevollmächtigten abzuholenden Altgeräte an von ihnen eingerichteten Übergabestellen in folgenden Gruppen in geeigneten Behältnissen unentgeltlich bereit: 1.
@@ -624,7 +639,8 @@ In der Gruppe 4 sind Nachtspeicherheizgeräte, die Asbest oder sechswertiges Chr
 (5) Ein nach Landesrecht für die Verwertung und Beseitigung von Altgeräten zuständiger öffentlich-rechtlicher Entsorgungsträger kann sämtliche Altgeräte einer Gruppe für jeweils mindestens zwei Jahre von der Bereitstellung zur Abholung ausnehmen (Optierung). Abweichend von Absatz 4 Satz 1 ist im Fall der Optierung eine Separierung von Altgeräten in der optierten Gruppe zulässig. Er hat die Altgeräte nach Satz 1 zur Wiederverwendung vorzubereiten oder nach § 20 Absatz 2 bis 4 und § 22 Absatz 1 zu behandeln und zu verwerten.
 
  
-§ 15 Aufstellen von Behältnissen durch die Hersteller oder deren Bevollmächtigte
+§ 15
+Aufstellen von Behältnissen durch die Hersteller oder deren Bevollmächtigte
  
 
 (1) Die Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte müssen die Behältnisse nach § 14 unentgeltlich aufstellen und abdecken. Satz 1 gilt nicht im Fall des § 14 Absatz 5. Die öffentlich-rechtlichen Entsorgungsträger können das Aufstellen nicht abdeckbarer Behältnisse ablehnen und melden die Ablehnung der zuständigen Behörde. In diesem Fall gilt das Behältnis als nicht aufgestellt.
@@ -640,7 +656,8 @@ In der Gruppe 4 sind Nachtspeicherheizgeräte, die Asbest oder sechswertiges Chr
 (6) Die Bundesregierung wird ermächtigt durch Rechtsverordnung mit Zustimmung des Bundesrates weitergehende Anforderungen an die Behältnisse, in denen die Altgeräte gesammelt und transportiert werden sollen, festzulegen.
 
  
-§ 16 Rücknahmepflicht der Hersteller
+§ 16
+Rücknahmepflicht der Hersteller
  
 
 (1) Der Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter ist verpflichtet, die nach § 14 Absatz 1 Satz 1 bereitgestellten Behältnisse entsprechend der Zuweisung der zuständigen Behörde nach § 38 Absatz 3 Satz 1 unverzüglich abzuholen, spätestens jedoch mit Ablauf der Nachfrist nach § 38 Absatz 3 Satz 2. Für die Abholung der zugewiesenen Behältnisse gelten Absatz 5 Satz 1 und § 13 Absatz 5 Satz 1 entsprechend.
@@ -654,7 +671,8 @@ In der Gruppe 4 sind Nachtspeicherheizgeräte, die Asbest oder sechswertiges Chr
 (5) Die Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte können freiwillig individuelle oder kollektive Rücknahmesysteme für die unentgeltliche Rückgabe von Altgeräten aus privaten Haushalten einrichten und betreiben, sofern diese Systeme im Einklang mit den Zielen nach § 1 stehen. Absatz 2 gilt entsprechend. Rücknahmestellen dieser Rücknahmesysteme dürfen weder an Sammel- noch an Übergabestellen der öffentlich-rechtlichen Entsorgungsträger nach § 13 Absatz 1 eingerichtet und betrieben werden. Bei der Rücknahme nach Satz 1 gilt § 14 Absatz 2 entsprechend.
 
  
-§ 17 Rücknahmepflicht der Vertreiber
+§ 17
+Rücknahmepflicht der Vertreiber
  
 
 (1) Vertreiber mit einer Verkaufsfläche für Elektro- und Elektronikgeräte von mindestens 400 Quadratmetern sowie Vertreiber von Lebensmitteln mit einer Gesamtverkaufsfläche von mindestens 800 Quadratmetern, die mehrmals im Kalenderjahr oder dauerhaft Elektro- und Elektronikgeräte anbieten und auf dem Markt bereitstellen, sind verpflichtet, 1.
@@ -681,7 +699,8 @@ nach seiner Absicht zu befragen, bei der Auslieferung des neuen Geräts ein Altg
 (5) Übergeben die Vertreiber zurückgenommene Altgeräte oder deren Bauteile nicht den Herstellern, im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigten oder den öffentlich-rechtlichen Entsorgungsträgern, sind sie verpflichtet, die Altgeräte zur Wiederverwendung vorzubereiten oder nach § 20 Absatz 2 bis 4 und § 22 Absatz 1 zu behandeln und zu verwerten. Für die Übergabe, Behandlung und Entsorgung von Altgeräten nach Satz 1 darf der Vertreiber kein Entgelt von privaten Haushalten verlangen.
 
  
-§ 17a Rücknahme durch zertifizierte Erstbehandlungsanlagen
+§ 17a
+Rücknahme durch zertifizierte Erstbehandlungsanlagen
  
 
 (1) Betreiber von nach § 21 zertifizierten Erstbehandlungsanlagen können sich freiwillig an der Rücknahme von Altgeräten beteiligen. Macht ein Betreiber einer Erstbehandlungsanlage von dieser Möglichkeit Gebrauch, 1.
@@ -695,7 +714,8 @@ Die Rücknahme ist auf solche Altgeräte zu beschränken, für deren Behandlung 
 (3) Der Betreiber der Erstbehandlungsanlage ist verpflichtet, die nach Absatz 1 zurückgenommenen Altgeräte oder deren Bauteile für die Wiederverwendung vorzubereiten oder nach § 20 Absatz 2 bis 4 und § 22 Absatz 1 zu behandeln und zu verwerten.
 
  
-§ 17b Kooperation zwischen öffentlich-rechtlichen Entsorgungsträgern und zertifizierten Erstbehandlungsanlagen
+§ 17b
+Kooperation zwischen öffentlich-rechtlichen Entsorgungsträgern und zertifizierten Erstbehandlungsanlagen
  
 
 (1) Öffentlich-rechtliche Entsorgungsträger und Betreiber von Erstbehandlungsanlagen, die nach § 21 Absatz 2 und 4 für die Vorbereitung zur Wiederverwendung zertifiziert sind, können zum Zweck der Vorbereitung zur Wiederverwendung von Altgeräten eine Kooperation vereinbaren.
@@ -710,7 +730,8 @@ Angaben zum Zugangsrecht von Beschäftigten der Erstbehandlungsanlage zur Sammel
 (4) Ergibt die Prüfung des Betreibers der Erstbehandlungsanlage, dass sich ein Altgerät nicht für die Vorbereitung zur Wiederverwendung eignet, hat dieser das Altgerät dem öffentlich-rechtlichen Entsorgungsträger unentgeltlich wieder zu überlassen.
 
  
-§ 18 Informationspflichten gegenüber den privaten Haushalten
+§ 18
+Informationspflichten gegenüber den privaten Haushalten
  
 
 (1) Die öffentlich-rechtlichen Entsorgungsträger informieren die privaten Haushalte über Abfallvermeidungsmaßnahmen sowie die Pflicht nach § 10 Absatz 1 Satz 1 und 2. Sie informieren die privaten Haushalte darüber hinaus über1.
@@ -767,7 +788,8 @@ die Bedeutung des Symbols nach Anlage 3.
 Die Informationen sind den Elektro- und Elektronikgeräten in schriftlicher Form beizufügen. Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte haben jährlich Informationen in Bezug auf die Erfüllung der quantitativen Zielvorgaben nach § 10 Absatz 3 und § 22 Absatz 1 zu veröffentlichen sowie diese Informationen zusätzlich auf der Website des Herstellers gut sichtbar und leicht auffindbar zu veröffentlichen. Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte haben jährlich Informationen in Bezug auf die Erfüllung der quantitativen Zielvorgaben nach § 10 Absatz 3 und § 22 Absatz 1 zu veröffentlichen.
 
  
-§ 18a Kennzeichnung und Hinweispflichten an Sammel- und Rücknahmestellen
+§ 18a
+Kennzeichnung und Hinweispflichten an Sammel- und Rücknahmestellen
  
 
 (1) Die nach § 12 Berechtigten haben dafür zu sorgen, dass von ihnen eingerichtete Sammel- und Rücknahmestellen gegenüber den Endnutzern durch das Symbol nach Anlage 3a kenntlich gemacht sind.
@@ -782,7 +804,8 @@ Unterabschnitt 2
 Rücknahme von Altgeräten anderer Nutzer als privater Haushalte
 
  
-§ 19 Rücknahme durch den Hersteller
+§ 19
+Rücknahme durch den Hersteller
  
 
 (1) Jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 jeder Bevollmächtigte ist verpflichtet, für Altgeräte anderer Nutzer als privater Haushalte ab den in § 3 Nummer 4 genannten Zeitpunkten eine zumutbare Möglichkeit zur Rückgabe zu schaffen. Eine Verpflichtung der Endnutzer zur Überlassung der Altgeräte an den Hersteller besteht nicht.
@@ -794,7 +817,8 @@ Rücknahme von Altgeräten anderer Nutzer als privater Haushalte
 (4) Der Hersteller oder im Fall der Bevollmächtigung nach § 8 der Bevollmächtigte ist verpflichtet, die finanziellen und organisatorischen Mittel vorzuhalten, um seinen Pflichten nach den Absätzen 1 bis 3 nachzukommen. Sie haben zur Bewertung ihrer Finanzverwaltung, die auch die finanziellen Mittel zur Erfüllung ihrer Pflichten nach dieser Vorschrift, insbesondere nach den Absätzen 1 und 3 umfassen muss, geeignete Mechanismen zur Selbstkontrolle einzurichten.
 
  
-§ 19a Informationspflichten der Hersteller
+§ 19a
+Informationspflichten der Hersteller
  
 
 Jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 jeder Bevollmächtigte informiert die Endnutzer von Altgeräten anderer Nutzer als privater Haushalte über die Pflichten nach § 10 Absatz 1 Satz 1 und 2. Die Informationen sind der Warensendung von Elektro- und Elektronikgeräten in schriftlicher Form beizufügen sowie zusätzlich gut sicht- und auffindbar in den von ihnen verwendeten Darstellungsmedien zu veröffentlichen. Er informiert die Endnutzer darüber hinaus über 1.
@@ -808,7 +832,8 @@ Abschnitt 4
 Behandlungs- und Verwertungspflichten, Verbringung
 
  
-§ 20 Behandlung und Beseitigung
+§ 20
+Behandlung und Beseitigung
  
 
 (1) Altgeräte sind vor der Durchführung weiterer Verwertungs- oder Beseitigungsmaßnahmen einer Erstbehandlung zuzuführen. Vor der Erstbehandlung ist zu prüfen, ob das Altgerät oder einzelne Bauteile einer Vorbereitung zur Wiederverwendung zugeführt werden können. Diese Prüfung ist durchzuführen, soweit sie technisch möglich und wirtschaftlich zumutbar ist.
@@ -825,7 +850,8 @@ dem Abfallverbringungsgesetz vom 19. Juli 2007 (BGBl. I S. 1462), das zuletzt du
 (4) Altgeräte, die nicht entsprechend den Anforderungen der Absätze 1 und 2 behandelt wurden, dürfen nicht beseitigt werden.
 
  
-§ 21 Zertifizierung
+§ 21
+Zertifizierung
  
 
 (1) Die Erstbehandlung von Altgeräten darf ausschließlich durch zertifizierte Erstbehandlungsanlagen durchgeführt werden.
@@ -882,7 +908,8 @@ Absatz 7 Satz 3 bleibt unberührt. Im Fall des Satzes 1 kann das Betriebstagebuc
 1 Konformitätsbewertung – Anforderungen an Stellen, die Managementsysteme auditieren und zertifizieren, Ausgabe November 2015, zu beziehen über die Beuth Verlag GmbH, Berlin.2 Qualitätsmanagementsysteme – Anforderungen, Ausgabe November 2015, zu beziehen über die Beuth Verlag GmbH, Berlin.3 Leiten und Lenken für den nachhaltigen Erfolg einer Organisation – ein Qualitätsmanagementansatz, Ausgabe Dezember 2009, zu beziehen über die Beuth Verlag GmbH, Berlin.
 
  
-§ 22 Verwertung
+§ 22
+Verwertung
  
 
 (1) Altgeräte sind so zu behandeln, dass 1.
@@ -926,7 +953,8 @@ die Ausfuhr entsprechend § 20 Absatz 3 erfolgt und
 der Exporteur im Einklang mit der Verordnung (EG) Nr. 1013/2006 und der Verordnung (EG) Nr. 1418/2007 bewiesen hat, dass die Behandlung unter Bedingungen erfolgt ist, die den Anforderungen nach § 20 gleichwertig sind.
 
  
-§ 23 Anforderungen an die Verbringung
+§ 23
+Anforderungen an die Verbringung
  
 
 (1) Gebrauchte Elektro- und Elektronikgeräte, bei denen es sich möglicherweise um Altgeräte handelt, dürfen nur nach Maßgabe der Anlage 6 in den, aus dem und durch den Geltungsbereich dieses Gesetzes verbracht werden.
@@ -946,7 +974,8 @@ In diesem Fall gelten die Artikel 24 und 25 der Verordnung (EG) Nr. 1013/2006.
 (5) Die zuständigen Behörden nach § 14 Absatz 1 und 2 Satz 1 des Abfallverbringungsgesetzes überwachen die Verbringung von Altgeräten, insbesondere Ausfuhren aus der Europäischen Union, gemäß der Verordnung (EG) Nr. 1013/2006, der Verordnung (EG) Nr. 1418/2007 und dem Abfallverbringungsgesetz. § 11 Absatz 2 Satz 2 und 3 des Abfallverbringungsgesetzes gilt entsprechend.
 
  
-§ 24 Verordnungsermächtigungen
+§ 24
+Verordnungsermächtigungen
  
 
 Die Bundesregierung wird ermächtigt, durch Rechtsverordnung mit Zustimmung des Bundesrates 1.
@@ -963,7 +992,8 @@ Abschnitt 5
 Anzeige-, Mitteilungs- und Informationspflichten
 
  
-§ 25 Anzeigepflichten der öffentlich-rechtlichen Entsorgungsträger und der Betreiber von Erstbehandlungsanlagen
+§ 25
+Anzeigepflichten der öffentlich-rechtlichen Entsorgungsträger und der Betreiber von Erstbehandlungsanlagen
  
 
 (1) Jeder öffentlich-rechtliche Entsorgungsträger hat die von ihm eingerichteten Übergabestellen der zuständigen Behörde anzuzeigen. Änderungen im Hinblick auf die angezeigten Übergabestellen sind unverzüglich anzuzeigen. Die Absicht der Optierung nach § 14 Absatz 5 Satz 1 hat der nach Landesrecht für die Verwertung und Beseitigung von Altgeräten zuständige öffentlich-rechtliche Entsorgungsträger der zuständigen Behörde sechs Monate vor Beginn der eigenverantwortlichen Entsorgung anzuzeigen. Der Anzeige sind die Anschrift sowie Kontaktinformationen des optierenden öffentlich-rechtlichen Entsorgungsträgers beizufügen.
@@ -971,7 +1001,8 @@ Anzeige-, Mitteilungs- und Informationspflichten
 (2) Betreiber einer Erstbehandlungsanlage haben der zuständigen Behörde für jeden zertifizierten Standort die Behandlungstätigkeit anzuzeigen, bevor sie diese aufnehmen. Die Anzeige muss die Anschrift sowie die Kontaktinformationen des Betreibers, das Zertifikat nach § 21 und Angaben über die Art der Tätigkeiten sowie die behandelten Kategorien enthalten. Nach der Anzeige erfolgte Erneuerungen des Zertifikats sind der zuständigen Behörde unverzüglich zu übermitteln. Die Aufgabe der Behandlungstätigkeit ist der zuständigen Behörde unverzüglich mitzuteilen.
 
  
-§ 26 Mitteilungspflichten der öffentlich-rechtlichen Entsorgungsträger
+§ 26
+Mitteilungspflichten der öffentlich-rechtlichen Entsorgungsträger
  
 
 (1) Jeder öffentlich-rechtliche Entsorgungsträger hat der Gemeinsamen Stelle im Fall der Optierung nach § 14 Absatz 5 Satz 1 Folgendes mitzuteilen: 1.
@@ -995,7 +1026,8 @@ Bei diesen Mitteilungen sind in den Kategorien 4 und 5 Photovoltaikmodule und an
 (4) Ist die Gemeinsame Stelle nicht eingerichtet, teilt der öffentlich-rechtliche Entsorgungsträger die Daten nach den Absätzen 1 bis 3 der zuständigen Behörde mit.
 
  
-§ 27 Mitteilungspflichten der Hersteller
+§ 27
+Mitteilungspflichten der Hersteller
  
 
 (1) Jeder Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter hat der Gemeinsamen Stelle zu den in Absatz 2 genannten Zeitpunkten unter Angabe seiner Registrierungsnummer und des Berichtszeitraumes Folgendes gemäß den Sätzen 2 und 3 mitzuteilen: 1.
@@ -1031,7 +1063,8 @@ Bei diesen Mitteilungen sind in den Kategorien 4 und 5 Photovoltaikmodule und an
 (5) Ist die Gemeinsame Stelle nicht eingerichtet, teilt der Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter die Daten nach den Absätzen 1 bis 4 der zuständigen Behörde mit.
 
  
-§ 28 Informationspflichten der Hersteller gegenüber Wiederverwendungseinrichtungen und Behandlungsanlagen
+§ 28
+Informationspflichten der Hersteller gegenüber Wiederverwendungseinrichtungen und Behandlungsanlagen
  
 
 (1) Jeder Hersteller hat den Wiederverwendungseinrichtungen und den Behandlungsanlagen Informationen über die Wiederverwendung, die Vorbereitung zur Wiederverwendung und die Behandlung für jeden in Verkehr gebrachten Typ neuer Elektro- und Elektronikgeräte kostenlos zur Verfügung zu stellen.
@@ -1041,7 +1074,8 @@ Bei diesen Mitteilungen sind in den Kategorien 4 und 5 Photovoltaikmodule und an
 (3) Aus den Informationen muss sich ergeben, welche verschiedenen Bauteile und Werkstoffe die Elektro- und Elektronikgeräte enthalten und an welcher Stelle sich in den Elektro- und Elektronikgeräten gefährliche Stoffe und Gemische befinden. Die Pflicht nach Satz 1 besteht nur, soweit dies für die Wiederverwendungseinrichtungen und die Behandlungsanlagen erforderlich ist, um den Bestimmungen dieses Gesetzes nachkommen zu können.
 
  
-§ 29 Mitteilungspflichten der Vertreiber
+§ 29
+Mitteilungspflichten der Vertreiber
  
 
 (1) Jeder Vertreiber hat der Gemeinsamen Stelle im Fall des § 17 Absatz 5 bis zum 30. April des folgenden Kalenderjahres Folgendes gemäß Satz 2 mitzuteilen: 1.
@@ -1065,7 +1099,8 @@ Bei diesen Mitteilungen sind in den Kategorien 4 und 5 Photovoltaikmodule und an
 (4) Ist die Gemeinsame Stelle nicht eingerichtet, teilt der Vertreiber die Daten nach den Absätzen 1 bis 3 der zuständigen Behörde mit.
 
  
-§ 30 Mitteilungspflichten der Betreiber von Erstbehandlungsanlagen
+§ 30
+Mitteilungspflichten der Betreiber von Erstbehandlungsanlagen
  
 
 (1) Jeder Betreiber einer Erstbehandlungsanlage hat im Fall der Rücknahme nach § 17a, der Übernahme nach § 17b und der Entsorgung im Auftrag von Endnutzern nach § 19 Absatz 2 Satz 2 der Gemeinsamen Stelle bis zum Ablauf des 30. April des folgenden Kalenderjahres Folgendes gemäß den Sätzen 2 und 3 mitzuteilen: 1.
@@ -1090,7 +1125,8 @@ Abschnitt 6
 Gemeinsame Stelle
 
  
-§ 31 Aufgaben der Gemeinsamen Stelle
+§ 31
+Aufgaben der Gemeinsamen Stelle
  
 
 (1) Die Gemeinsame Stelle unterstützt die zuständige Behörde bei der Vorbereitung ihrer Entscheidungen nach § 15 Absatz 4 Satz 1 und § 37 Absatz 1, 5 und 6 sowie § 38 Absatz 3 und 4. Sie ist verpflichtet, der zuständigen Behörde Auskunft zu erteilen über die Mitteilungen der öffentlich-rechtlichen Entsorgungsträger nach § 26, der Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigter nach § 27, der Vertreiber nach § 29 sowie der Betreiber von Erstbehandlungsanlagen nach § 30 und über die Berechnung nach den Absätzen 5 bis 7. Die Gemeinsame Stelle unterrichtet die öffentlich-rechtlichen Entsorgungsträger, Hersteller oder im Fall der Bevollmächtigung nach § 8 deren Bevollmächtigte, Vertreiber und Betreiber von Erstbehandlungsanlagen in geeigneter Weise über die Aufgaben und Pflichten aus diesem Gesetz. Die Gemeinsame Stelle informiert die Endnutzer über 1.
@@ -1124,7 +1160,8 @@ seinem Anteil am Gesamtgewicht von Elektro- und Elektronikgeräten pro Gerätear
 (8) Die Absätze 5 bis 7 gelten für die Berechnung der Verpflichtung zum Aufstellen von neuen Behältnissen nach § 15 Absatz 4 Satz 1 entsprechend.
 
  
-§ 32 Mitteilungen der Gemeinsamen Stelle an das Umweltbundesamt, Landesbehörden und andere öffentliche Stellen
+§ 32
+Mitteilungen der Gemeinsamen Stelle an das Umweltbundesamt, Landesbehörden und andere öffentliche Stellen
  
 
 (1) Die Gemeinsame Stelle erstellt jährlich ein Verzeichnis sämtlicher registrierter Hersteller und Bevollmächtigter und leitet dieses dem Umweltbundesamt zu.
@@ -1168,7 +1205,8 @@ Bei diesen Mitteilungen sind in den Kategorien 4 und 5 Photovoltaikmodule und an
 (5) Für die Zusammenarbeit und den Informationsaustausch mit Behörden und Stellen anderer Mitgliedstaaten der Europäischen Union zum Vollzug der Richtlinie 2012/19/EU, insbesondere mit Registern anderer Mitgliedstaaten, gelten die §§ 8a bis 8e des Verwaltungsverfahrensgesetzes entsprechend. Zur Zusammenarbeit und zum Informationsaustausch gehört auch die Gewährung des Zugangs zu den einschlägigen Unterlagen und Informationen über die Ergebnisse von Inspektionen. Für die Zusammenarbeit und den Informationsaustausch sind vorrangig elektronische Kommunikationsmittel zu nutzen.
 
  
-§ 33 Befugnisse der Gemeinsamen Stelle
+§ 33
+Befugnisse der Gemeinsamen Stelle
  
 
 (1) Die Gemeinsame Stelle ist berechtigt, die Zuordnung der Geräte zu den Gerätearten festzulegen. Sie legt bei einer Neuzuordnung der Geräte zu den Gerätearten fest, welchen Gerätearten der Neuzuordnung die Gerätearten der bisherigen Zuordnung für die Zukunft entsprechen. Diese Entsprechung wirkt auch für die unter der bisherigen Zuordnung gestellten Garantien nach § 7 Absatz 1. Sie kann für die Mitteilungen nach § 26 Absatz 1 bis 3, § 27 Absatz 1 bis 4, § 29 Absatz 1 bis 4 und § 30 Absatz 1 und 2 die Übermittlungsform, eine bestimmte Verschlüsselung und einheitliche Datenformate vorgeben. Die Vorgaben sind auf den Internetseiten der Gemeinsamen Stelle zu veröffentlichen.
@@ -1190,7 +1228,8 @@ Einrichtung des Beirats nach § 35 Absatz 2
 entstehen. Dieser Anspruch richtet sich im Fall der Beleihung gegen die Beliehene. Kosten im Sinne des § 9 Absatz 1 des Bundesgebührengesetzes sind auch die nach Satz 1 zu ersetzenden Kosten.
 
  
-§ 34 Rückgriffsanspruch der Gemeinsamen Stelle
+§ 34
+Rückgriffsanspruch der Gemeinsamen Stelle
  
 
 (1) Sofern in einer bestimmten Geräteart die Registrierung des letzten registrierten Herstellers oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigten, der die Berechnung seiner Verpflichtung gemäß § 31 Absatz 5 Satz 3 Nummer 2 gewählt hat, aufgehoben wird, erstattet die Gemeinsame Stelle den öffentlich-rechtlichen Entsorgungsträgern kalenderjährlich die Kosten für die Entsorgung derjenigen Altgeräte dieser Geräteart, die keine historischen Altgeräte sind. Die Erstattungspflicht nach Satz 1 gilt nicht, soweit der öffentlich-rechtliche Entsorgungsträger nach § 14 Absatz 5 Satz 1 und § 25 Absatz 1 Satz 3 für die Gruppe optiert hat, in der Altgeräte dieser Geräteart erfasst werden.
@@ -1206,7 +1245,8 @@ entstehen. Dieser Anspruch richtet sich im Fall der Beleihung gegen die Beliehen
 (6) Ist die Gemeinsame Stelle nicht eingerichtet oder nimmt sie die Aufgaben nach Absatz 1 nicht wahr, ist im Fall des Absatzes 1 jeder ehemalige Hersteller verpflichtet, den öffentlich-rechtlichen Entsorgungsträgern die Kosten für die Entsorgung der Altgeräte entsprechend dem Rückgriffsanspruch der Gemeinsamen Stelle zu erstatten. Die nach Landesrecht zuständige Behörde setzt die Kosten durch Verwaltungsakt fest.
 
  
-§ 35 Organisation der Gemeinsamen Stelle
+§ 35
+Organisation der Gemeinsamen Stelle
  
 
 (1) Die Gemeinsame Stelle muss durch Satzung, Gesellschaftsvertrag oder sonstige Regelung 1.
@@ -1225,13 +1265,15 @@ Abschnitt 7
 Zuständige Behörde
 
  
-§ 36 Zuständige Behörde
+§ 36
+Zuständige Behörde
  
 
 Zuständige Behörde ist das Umweltbundesamt.
 
  
-§ 37 Aufgaben der zuständigen Behörde im Zusammenhang mit der Registrierung
+§ 37
+Aufgaben der zuständigen Behörde im Zusammenhang mit der Registrierung
  
 
 (1) Die zuständige Behörde registriert den Hersteller auf dessen Antrag mit der Marke, der Firma, dem Ort der Niederlassung oder dem Sitz, der Anschrift, dem Namen des Vertretungsberechtigten sowie der Geräteart und erteilt eine Registrierungsnummer. Im Fall des § 8 Absatz 1 und 2 registriert die zuständige Behörde den Bevollmächtigten mit den in Satz 1 genannten Angaben sowie den Kontaktdaten des vertretenen Herstellers und erteilt je vertretenem Hersteller eine Registrierungsnummer. Ist eine Garantie nach § 7 Absatz 1 erforderlich, darf die Registrierung nur erfolgen, wenn sie der Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigter nachweist. Sofern der Hersteller Elektro- oder Elektronikgeräte in Verkehr zu bringen beabsichtigt, für die er glaubhaft macht, dass sie ausschließlich in anderen als privaten Haushalten oder gewöhnlich nicht in privaten Haushalten genutzt werden, darf die Registrierung nur erteilt werden, wenn ein Rücknahmekonzept nach § 7a durch den Hersteller oder im Fall der Bevollmächtigung nach § 8 durch den Bevollmächtigten vorgelegt wurde.
@@ -1267,7 +1309,8 @@ der Antragsteller die zur ordnungsgemäßen Erfüllung der Herstellerpflichten n
 Die Zulassung ist auf die nach Ausstattung und Organisation des Bevollmächtigten tragbare Höchstzahl von Registrierungen zu begrenzen.
 
  
-§ 38 Weitere Aufgaben der zuständigen Behörde
+§ 38
+Weitere Aufgaben der zuständigen Behörde
  
 
 (1) Die zuständige Behörde teilt der Gemeinsamen Stelle die von ihr registrierten Hersteller und Bevollmächtigten mit. Sie übermittelt dabei die Angaben nach § 37 Absatz 1 Satz 1 und 2 und teilt die nach § 6 Absatz 1 Satz 4 angezeigten Änderungen mit. Die zuständige Behörde übermittelt der Gemeinsamen Stelle die Garantienachweise nach § 7 Absatz 1. Sie teilt der Gemeinsamen Stelle darüber hinaus mit, welche Registrierungen aufgehoben wurden, sobald die Aufhebung bestandskräftig ist. Die Mitteilungen der zuständigen Behörde an die Gemeinsame Stelle haben den Formatvorgaben nach § 33 Absatz 1 Satz 4 zu entsprechen.
@@ -1285,13 +1328,15 @@ Für diese Meldungen und Anzeigen gilt § 37 Absatz 3 Satz 1 bis 4 entsprechend.
 (4) Die zuständige Behörde entscheidet auf Vorlage der Gemeinsamen Stelle nach § 31 Absatz 6 Satz 7 gegenüber dem Hersteller oder im Fall der Bevollmächtigung nach § 8 dessen Bevollmächtigten über die Berücksichtigung oder Anrechnung mitgeteilter Mengen bei der Berechnung nach § 31 Absatz 5.
 
  
-§ 38a Vollständig automatisierter Erlass von Verwaltungsakten
+§ 38a
+Vollständig automatisierter Erlass von Verwaltungsakten
  
 
 Verwaltungsakte der zuständigen Behörde nach § 15 Absatz 4 Satz 1 und nach den §§ 37 und 38 können unbeschadet des § 24 Absatz 1 Satz 3 des Verwaltungsverfahrensgesetzes vollständig durch automatische Einrichtungen erlassen werden, sofern kein Anlass besteht, den Einzelfall durch Amtsträger zu bearbeiten.
 
  
-§ 39 Zusammenarbeit mit anderen Behörden
+§ 39
+Zusammenarbeit mit anderen Behörden
  
 
 (1) Die zuständige Behörde ist befugt, anderen nach Landesrecht für den Vollzug dieses Gesetzes zuständigen Behörden und öffentlich-rechtlichen Entsorgungsträgern auf deren Verlangen die zur Erfüllung ihrer jeweiligen Aufgabe erforderlichen Auskünfte und Angaben mitzuteilen. Die Kosten für eine solche Mitteilung sind ihr zu erstatten, soweit die Auskünfte und Angaben nicht für den Vollzug dieses Gesetzes erforderlich sind oder diese nur mit unverhältnismäßig großem Aufwand zusammengestellt werden können.
@@ -1302,7 +1347,8 @@ Abschnitt 8
 Beleihung
 
  
-§ 40 Ermächtigung zur Beleihung
+§ 40
+Ermächtigung zur Beleihung
  
 
 (1) Die zuständige Behörde wird ermächtigt, eine juristische Person des Privatrechts, eine rechtsfähige Personengesellschaft oder eine andere geeignete Stelle, die von Herstellern und Bevollmächtigten als Gemeinsame Stelle errichtet wird, mit den Aufgaben nach § 15 Absatz 4 Satz 1 und den §§ 37 bis 39 zu beleihen. Die Aufgaben schließen die Vollstreckung, die Rücknahme und den Widerruf der hierzu ergehenden Verwaltungsakte ein. § 33 Absatz 2 gilt nicht, sofern zur Vollstreckung einer Anordnung nach § 15 Absatz 4 Satz 1 oder § 38 Absatz 3 Satz 1 der Abschluss oder die Vermittlung von Verträgen mit Entsorgungsunternehmen erforderlich ist. Die zu Beleihende hat die notwendige Gewähr für die ordnungsgemäße Erfüllung der ihr übertragenen Aufgaben zu bieten. Sie bietet die notwendige Gewähr, wenn 1.
@@ -1318,7 +1364,8 @@ Die Beliehene darf nur die in diesem Gesetz genannten und durch die Beleihung ü
 (3) Die Beleihung ist durch die zuständige Behörde im Bundesanzeiger bekannt zu machen.
 
  
-§ 41 Aufsicht
+§ 41
+Aufsicht
  
 
 (1) Die Beliehene untersteht der Rechts- und Fachaufsicht der zuständigen Behörde.
@@ -1328,7 +1375,8 @@ Die Beliehene darf nur die in diesem Gesetz genannten und durch die Beleihung ü
 (3) Die zuständige Behörde kann von der Beliehenen Ersatz für die Kosten verlangen, die ihr für die Rechts- und Fachaufsicht nach Absatz 1 entstehen. Der Anspruch darf der Höhe nach die im Haushaltsplan des Bundes für die Durchführung der Rechts- und Fachaufsicht veranschlagten Einnahmen nicht übersteigen.
 
  
-§ 42 Beendigung der Beleihung
+§ 42
+Beendigung der Beleihung
  
 
 (1) Die Beleihung endet, wenn die Beliehene aufgelöst ist.
@@ -1341,13 +1389,15 @@ Abschnitt 9
 Schlussbestimmungen
 
  
-§ 43 Beauftragung Dritter
+§ 43
+Beauftragung Dritter
  
 
 Soweit sich die nach diesem Gesetz Verpflichteten zur Erfüllung ihrer Pflichten Dritter bedienen, gilt § 22 Satz 2 und 3 des Kreislaufwirtschaftsgesetzes entsprechend.
 
  
-§ 44 Widerspruch und Klage
+§ 44
+Widerspruch und Klage
  
 
 (1) Gegen Verwaltungsakte nach § 15 Absatz 4 Satz 1 oder § 38 Absatz 3 ist ein Widerspruchsverfahren ausgeschlossen.
@@ -1355,7 +1405,8 @@ Soweit sich die nach diesem Gesetz Verpflichteten zur Erfüllung ihrer Pflichten
 (2) Die Klage gegen eine Anordnung nach § 15 Absatz 4 Satz 1 oder nach § 38 Absatz 3 hat keine aufschiebende Wirkung.
 
  
-§ 45 Bußgeldvorschriften
+§ 45
+Bußgeldvorschriften
  
 
 (1) Ordnungswidrig handelt, wer vorsätzlich oder fahrlässig 1.
@@ -1410,7 +1461,8 @@ entgegen § 27 Absatz 1 Satz 1, § 29 Absatz 1 Satz 1 oder § 30 Absatz 1 Satz 1
 (4) In den Fällen des Absatzes 3 Satz 1 fließen auch die im gerichtlichen Verfahren angeordneten Geldbußen und die Geldbeträge, deren Einziehung nach § 29a des Gesetzes über Ordnungswidrigkeiten gerichtlich angeordnet wurde, derjenigen Bundeskasse zu, die auch die der Staatskasse auferlegten Kosten trägt.
 
  
-§ 46 Übergangsvorschriften
+§ 46
+Übergangsvorschriften
  
 
 (1) Vertreiber von elektronischen Zigaretten oder elektronischen Tabakerhitzern, die nach § 17 Absatz 1a zur Rücknahme verpflichtet sind, müssen die Rücknahmestellen bis zum Ablauf des 30. Juni 2026 einrichten. Vertreiber, die nach dem 30. Juni 2026 keine elektronischen Zigaretten oder elektronischen Tabakerhitzer mehr anbieten, sind nicht zur Rücknahme verpflichtet.

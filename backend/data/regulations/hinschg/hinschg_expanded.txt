@@ -95,7 +95,7 @@ Keywords: anonymous reporting, anonymity, reporting channel, operator obligation
 
 ---
 
-hinschg §19(1)
+hinschg §17(1)
 Title: Operator must confirm receipt of report to reporting person within 7 days
 Obligation: MUST
 Threshold: All operators of internal reporting channels under §12
@@ -104,7 +104,7 @@ Keywords: receipt confirmation, 7-day deadline, acknowledgement, reporting chann
 
 ---
 
-hinschg §19(2)
+hinschg §17(2)
 Title: Operator must provide feedback to reporting person within 3 months on follow-up measures
 Obligation: MUST
 Threshold: All operators of internal reporting channels under §12
@@ -113,7 +113,7 @@ Keywords: feedback obligation, 3-month deadline, follow-up measures, reporting p
 
 ---
 
-hinschg §21(1)
+hinschg §36(1)
 Title: Prohibition of reprisals against reporting persons — dismissal, demotion, discrimination
 Obligation: MUST
 Threshold: All employers and other persons subject to HinSchG; applies to all reporting persons within scope
@@ -122,7 +122,7 @@ Keywords: reprisal prohibition, retaliation ban, dismissal, demotion, discrimina
 
 ---
 
-hinschg §21(2)
+hinschg §36(2)
 Title: Reversal of burden of proof in reprisal claims
 Obligation: MUST
 Threshold: Employers defending reprisal claims brought by reporting persons
@@ -131,7 +131,7 @@ Keywords: burden of proof reversal, reprisal claim, causation, employer defence,
 
 ---
 
-hinschg §27
+hinschg §37
 Title: Right to claim damages suffered as a result of reprisals
 Obligation: MUST
 Threshold: Employers who have subjected reporting persons to unlawful reprisals
@@ -149,7 +149,7 @@ Keywords: reporting person liability, no immunity, co-offender, mitigation, pros
 
 ---
 
-hinschg §36
+hinschg §42
 Title: Competent supervisory authority is the Bundesamt fuer Justiz (Federal Office of Justice)
 Obligation: MUST
 Threshold: All employers and operators of reporting channels subject to HinSchG; Bundesamt fuer Justiz as authority
@@ -167,7 +167,7 @@ Keywords: administrative fine, Bußgeld, €20,000, €50,000, penalty, reprisal
 
 ---
 
-hinschg §36 Documentation
+hinschg §11
 Title: Documentation of reports — minimum 3-year retention period
 Obligation: MUST
 Threshold: All operators of internal reporting channels under §12
