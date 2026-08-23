@@ -34,11 +34,12 @@ def profile_it_agency():
 
 @pytest.fixture
 def profile_manufacturer():
-    """Profile 2: Medium manufacturer — 500 employees, supply chain in Asia, high energy."""
+    """Profile 2: Large manufacturer — 1200 employees, supply chain in Asia, high energy.
+    Employee count >= 1000 so LkSG applies directly (§1(1) LkSG)."""
     return CompanyProfile(
         company_name="MaschBau AG",
         industry="manufacturing",
-        employee_count=500,
+        employee_count=1200,
         annual_revenue_eur=75_000_000,
         balance_sheet_total_eur=40_000_000,
         processes_personal_data=True,

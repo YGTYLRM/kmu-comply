@@ -1,0 +1,17 @@
+.git
+.github
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+backend/.env
+backend/data/chroma_db
+backend/data/reports
+backend/data/staging
+frontend/node_modules
+frontend/.next
+frontend/.env.local
+*.png
+*.pdf
+*.md
+node_modules
