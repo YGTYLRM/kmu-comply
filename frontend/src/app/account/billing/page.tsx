@@ -11,17 +11,17 @@ const BASE = "";
 const PLAN_LABELS: Record<string, { name: string; price: string; features: string[] }> = {
   starter: {
     name: "Starter",
-    price: "€129 / Bericht",
+    price: "Auf Anfrage",
     features: ["Einmaliges Compliance-Screening", "Alle 14 Vorschriften", "Vollständige Lückenanalyse", "E-Mail-Benachrichtigungen"],
   },
   professional: {
     name: "Professional",
-    price: "€249 / Monat",
+    price: "Auf Anfrage",
     features: ["Unbegrenzte Screenings", "Alle 14 Vorschriften", "Vollständige Lückenanalyse", "Priorisierter Maßnahmenplan", "Berichtshistorie"],
   },
   enterprise: {
     name: "Enterprise",
-    price: "Individuell",
+    price: "Auf Anfrage",
     features: ["Unbegrenzte Einheiten", "Individueller Umfang", "Alle 14 Vorschriften", "Dedizierter Ansprechpartner"],
   },
 };

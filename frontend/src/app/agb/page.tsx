@@ -61,57 +61,32 @@ export default function AGBPage() {
           <section>
             <h2 className="text-white font-semibold text-base mb-4">§ 3 Vertragsschluss</h2>
             <p>
-              Der Nutzungsvertrag kommt durch Abschluss des digitalen Registrierungs- und
-              Bestellprozesses auf complio.de zustande. Mit Absenden der Bestellung gibt der Nutzer
-              ein verbindliches Angebot ab; der Vertrag wird durch Bestätigung per E-Mail oder
-              durch Freischaltung des Dienstes durch Complio angenommen.
+              Der Nutzungsvertrag kommt nicht durch einen automatisierten Online-Bestellprozess
+              zustande. Interessenten fordern über complio.de ein individuelles Angebot an; der
+              Vertrag kommt erst durch beiderseitige Bestätigung des im Angebot festgelegten
+              Leistungsumfangs und Preises zustande (in Textform, z. B. per E-Mail).
             </p>
             <p className="mt-3">
-              Für den Starter-Tarif (Einzelbericht) gilt die Bestellung als einmaliger Auftrag ohne
-              automatische Verlängerung. Abonnement-Tarife (Professional, Enterprise) laufen für die
-              vereinbarte Laufzeit und verlängern sich automatisch um einen weiteren Monat, sofern
-              keine Kündigung erfolgt.
+              Die konkrete Vertragslaufzeit (Einzelauftrag oder Abonnement mit automatischer
+              Verlängerung) wird im jeweiligen Angebot festgelegt.
             </p>
           </section>
 
           <section>
             <h2 className="text-white font-semibold text-base mb-4">§ 4 Tarife, Preise und Zahlung</h2>
-            <p>Die nachfolgenden Tarife sind zum Zeitpunkt des Vertragsschlusses maßgeblich:</p>
-            <div className="mt-4 rounded-lg border border-white/[0.07] overflow-hidden">
-              <table className="w-full text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-white/[0.07] bg-white/[0.02]">
-                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Tarif</th>
-                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Preis (netto)</th>
-                    <th className="text-left text-slate-300 font-semibold py-3 px-4">Leistungsumfang</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.05]">
-                  <tr>
-                    <td className="py-3 px-4 text-slate-300 font-medium">Starter</td>
-                    <td className="py-3 px-4">€ 129,00 / Einzelbericht</td>
-                    <td className="py-3 px-4">Einmaliges Screening, alle 14 Vorschriften, PDF-Bericht, 60 Tage Zugriff</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 text-slate-300 font-medium">Professional</td>
-                    <td className="py-3 px-4">€ 249,00 / Monat</td>
-                    <td className="py-3 px-4">Unbegrenzte Screenings, alle 14 Vorschriften, Berichtshistorie, E-Mail-Support</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 text-slate-300 font-medium">Enterprise</td>
-                    <td className="py-3 px-4">Individuell vereinbart</td>
-                    <td className="py-3 px-4">Multi-Einheiten, API-Zugang, individueller Umfang, SLA, Ansprechpartner</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <p>
+              Complio bietet die Tarife Starter, Professional und Enterprise an. Der Leistungsumfang
+              je Tarif ist auf complio.de/#pricing beschrieben. Aktuell werden keine pauschalen
+              Listenpreise angeboten — der Preis wird individuell im Angebot auf Anfrage genannt und
+              gilt erst nach beiderseitiger Bestätigung gemäß § 3.
+            </p>
             <p className="mt-4">
-              Alle Preise verstehen sich zuzüglich der gesetzlichen Umsatzsteuer. Die Abrechnung
-              erfolgt im Voraus. Zahlungen werden über Stripe Inc. abgewickelt. Bei Zahlungsverzug
-              ist Complio berechtigt, den Zugang zum Dienst nach vorheriger Ankündigung zu sperren.
-              Complio behält sich das Recht vor, Preise mit einer Ankündigungsfrist von 30 Tagen
-              zu ändern; bestehende Abonnements sind bis zum Ende der laufenden Abrechnungsperiode
-              nicht betroffen.
+              Alle Preise verstehen sich zuzüglich der gesetzlichen Umsatzsteuer, sofern im Angebot
+              nicht anders angegeben. Die Zahlungsmodalitäten werden im jeweiligen Angebot festgelegt.
+              Bei Zahlungsverzug ist Complio berechtigt, den Zugang zum Dienst nach vorheriger
+              Ankündigung zu sperren. Complio behält sich das Recht vor, Preise für neue Angebote
+              jederzeit anzupassen; bestehende Verträge sind davon bis zum Ende der vereinbarten
+              Laufzeit nicht betroffen.
             </p>
           </section>
 
