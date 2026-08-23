@@ -52,7 +52,16 @@ logger = logging.getLogger("worker")
 
 async def main() -> None:
     from config import settings
+    from observability import init_sentry
     from services.scheduler import start_scheduler, stop_scheduler
+
+    # Separate process from uvicorn — main.py's Sentry init doesn't cover
+    # this one. Without it, a scheduled job (regulation re-ingestion,
+    # re-assessments) that starts throwing has nothing watching it here.
+    if settings.sentry_dsn:
+        from sentry_sdk.integrations.asyncio import AsyncioIntegration
+        init_sentry([AsyncioIntegration()])
+        logger.info("worker: sentry initialised")
 
     # Initialise DB connection (same as web server startup)
     if settings.database_url:
