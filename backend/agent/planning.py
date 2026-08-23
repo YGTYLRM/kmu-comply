@@ -26,10 +26,29 @@ from models.enums import ComplianceStatus, ObligationType, Priority, Regulation
 from agent.obligations import get_obligations
 from rag.company_ingest import retrieve_company_docs
 from rag.prompts import SYSTEM_PERSONA, action_plan_prompt, gap_analysis_prompt
-from rag.retrieval import deduplicate, retrieve, rerank_cross_encoder
+from rag.retrieval import deduplicate, retrieve as _retrieve_chroma, retrieve_pgvector, rerank_cross_encoder
 from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
+
+
+def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> list[dict]:
+    """Static-regulation retrieval entry point used by this module.
+
+    Dispatches to pgvector or ChromaDB per settings.pgvector_retrieval_enabled
+    (pgvector migration Phase 4 cutover) — see config.py for the eval-gate
+    numbers behind the default. rag.retrieval.retrieve/retrieve_pgvector stay
+    independently importable so eval scripts can still diff both backends
+    directly.
+
+    Falls back to ChromaDB when no DATABASE_URL is configured — local dev
+    and fresh clones have historically never needed Postgres for retrieval
+    (see .dev-notes.md's ChromaDB-only setup_data.py flow), and this flag
+    flipping to true shouldn't force that requirement on them.
+    """
+    if settings.pgvector_retrieval_enabled and settings.database_url:
+        return retrieve_pgvector(query, regulations, top_k)
+    return _retrieve_chroma(query, regulations, top_k)
 
 _RE_CITATION = re.compile(r"^(§|Art(ikel|\.)?)\s*\d|^ESRS\s+\S")
 
