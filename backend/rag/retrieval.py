@@ -7,8 +7,10 @@ RAG retrieval module.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
+import threading
 from functools import lru_cache
 
 import chromadb
@@ -230,9 +232,6 @@ def retrieve(
 # tests/test_retrieval_eval.py and scripts/eval_obligation_coverage.py be
 # run against both backends and diffed case-by-case before any cutover.
 # ---------------------------------------------------------------------------
-
-import asyncio
-import threading
 
 
 class _AsyncLoopThread:
