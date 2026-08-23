@@ -2266,3 +2266,47 @@ All user-facing text in the compliance screening form was still in English. The 
   - **Anzeigename** section: input pre-filled from `supabase.auth.getUser()` metadata, saves via `supabase.auth.updateUser({ data: { name } })`, shows green "Name gespeichert" confirmation for 3 s
   - **Passwort ändern** section: new-password + confirm fields with client-side validation (min 8 chars, must match), saves via `supabase.auth.updateUser({ password })`, shows success confirmation, clears fields
   - GDPR rights info, data retention overview, and account deletion section retained unchanged
+
+---
+
+## Session 30 — 2026-08-23 — RLS gap, CI actually broken since Session 29, pgvector Phase 4 cutover, Stripe paused
+
+**Branch:** `feat/polish` (merged forward to `dev` and `main` after every commit today)
+
+### Context
+
+User-flagged Supabase warning (RLS off on the two pgvector chunk tables) plus a broad "finish the open items list" request. Along the way, discovered CI had been silently red since Session 29 and CodeQL had never once passed on `main`/`dev`, both invisible until `main`/`dev` actually got pushed to today for the first time in a while. Also: user's LLM API balance went negative mid-session — killed a running real-LLM integration test immediately and made no further LLM calls for the rest of the session. Ended with a request to pause Stripe and switch pricing to a request-a-quote model until after the user's university term.
+
+### Changes
+
+#### RLS enabled on regulation_chunks / company_doc_chunks
+`ALTER TABLE ... ENABLE ROW LEVEL SECURITY` applied directly against both the production and `complio-staging` Supabase projects (no policies, same pattern as `jobs`/`rate_limit_events` — service_role-only tables). `backend/db/rls_policies.sql` and `backend/scripts/apply_rls.py --verify` updated to track both tables going forward.
+
+#### Nightly local backups
+`backend/scripts/backup_nightly.py` wraps the existing `backup_db.py`/`backup_chroma.py` with 14-day retention pruning. Installed `pg_dump` via `scoop` (no admin rights available on this machine) since it wasn't on PATH. Registered as a Windows Scheduled Task (`register_backup_task.ps1` → `run_nightly_backup.bat`, daily 02:00) and verified with a manual trigger — both a `.dump` and a `.tar.gz` landed correctly, task result code 0. Off-host shipping (S3/Backblaze) is explicitly not done — needs real credentials the assistant doesn't have.
+
+#### Methodology page
+New `/methodik` route, linked from the footer. Explains the deterministic threshold engine vs. RAG retrieval vs. LLM gap analysis split, the verbatim-quote + entailment double-check on evidence, and states the known retrieval-quality edge cases plainly instead of hiding them.
+
+#### CI was broken since Session 29 — fixed
+- `backend/rag/retrieval.py` — `import asyncio`/`import threading` were mid-file (added during the Phase 2 pgvector work), tripping ruff's E402. Moved to the top.
+- `docker-compose.yml` — `env_file: backend/.env` made `docker compose config --quiet` fail in CI since `.env` is correctly gitignored and doesn't exist in a clean checkout. Switched to the long-form `env_file: [{path: ..., required: false}]` syntax; real deploys still load it when present.
+- `.github/workflows/codeql.yml` — added `actions: read` for CodeQL's own telemetry call, but the real blocker turned out to be that this is a **private repo without GitHub Advanced Security**, so `code scanning is not enabled for this repository` fails every run regardless. Per the user's explicit call, disabled the auto-triggers (`push`/`pull_request`/`schedule`) and left `workflow_dispatch` only, with a comment explaining how to re-enable once Advanced Security (or a public repo) makes it viable. This had literally never passed once on `main`/`dev` — those branches just hadn't been pushed to since the workflow was added.
+- Confirmed via `gh run list`/`gh run view` after each fix rather than assuming — all three branches green on the real CI (lint + tests + typecheck) workflow by the end.
+
+#### pgvector migration Phase 4 — static regulation retrieval cutover
+`backend/config.py` — new `pgvector_retrieval_enabled: bool = True` flag (instant rollback by flipping to false). `backend/agent/planning.py` — `retrieve()` now dispatches to `rag.retrieval.retrieve_pgvector` when the flag is on and `DATABASE_URL` is actually set (falls back to ChromaDB otherwise, so local dev / fresh clones without Postgres configured don't break — this wasn't a hard requirement before today). Re-verified against the **full 261-case** `retrieval_eval.json` (not just the 42-case CI subset used for the Session 29 gate) immediately before flipping the default: 200/261 ChromaDB vs. 201/261 pgvector, zero regressions, one case flipped pass. Unit tests + eval tests pass; **the real end-to-end LLM pipeline test (`test_pipeline.py -m integration`) was started but killed mid-run** when the user's API balance went negative, so this cutover is live but not yet verified against a real full analysis run. Company-doc (per-job upload) retrieval is untouched — still ChromaDB only; discovered today that dual-write for `company_doc_chunks` was never actually built despite the table existing since Phase 0, so Phase 3 of the original plan is bigger than previously assumed.
+
+#### Stripe paused, pricing switched to request-a-quote
+User's call: Stripe won't get finished until after their university term, so self-serve checkout is off the table for now. `frontend/src/app/page.tsx` — `PricingCTA` stripped down to a single `Link` to `/contact?plan=...` for every tier (was: Stripe checkout call, or a `/register` fallback, or an enterprise-only contact link). All three plan prices now show "Auf Anfrage" instead of fixed `€129`/`€249`. `frontend/src/app/contact/page.tsx` — topic labels changed from "Demo anfragen" to "Angebot anfordern" to match. `frontend/src/app/agb/page.tsx` §3/§4 rewritten — previously described an automated digital order process with a fixed price table and Stripe billing, which no longer matches reality; now describes individually agreed offers. `frontend/src/app/account/billing/page.tsx` price labels updated for consistency (this branch is currently dead code since `stripe_enabled` is false, but worth keeping accurate). Backend gating logic (`routes/analysis.py`) was deliberately left untouched — unsubscribed users already get a free diagnostic-only report with no working checkout path forward, which now correctly doubles as the top of the request-a-quote funnel.
+
+#### Misc
+`backend/db/models.py` — `RegulationChunk`'s docstring still said "not yet read from" after the Phase 4 cutover landed; fixed.
+
+### Open problems / blockers for next session
+
+- **pgvector cutover needs real verification**: run `pytest tests/test_pipeline.py -m integration` (and ideally a manual full screening through the UI) once the user's API credits are restored. Rollback is `pgvector_retrieval_enabled=false` in `backend/config.py` if anything looks wrong.
+- **CodeQL is off**: re-enable triggers in `.github/workflows/codeql.yml` if/when GitHub Advanced Security gets turned on for this private repo (or it goes public).
+- **Off-host backups**: still local-disk-only. Needs S3/Backblaze credentials to go further.
+- **Deploy**: still nothing hosted anywhere — see Phase 8 status in `.dev-notes.md`, unchanged this session.
+- **Stripe**: intentionally dormant per the user, revisit after their university term ends. Codebase itself untouched (still fully wired, just not linked from the UI) so turning it back on later is cheap.
