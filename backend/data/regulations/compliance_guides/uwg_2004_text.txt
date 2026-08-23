@@ -1,4 +1,4 @@
-UWG — Gesetz gegen den unlauteren Wettbewerb (Unfair Competition)
+UWG — Gesetz gegen den unlauteren Wettbewerb
 Source: https://www.gesetze-im-internet.de/uwg_2004/BJNR141400004.html
 
 UWG - Gesetz gegen den unlauteren Wettbewerb
@@ -20,7 +20,7 @@ UWG - Gesetz gegen den unlauteren Wettbewerb
 
  
 Gesetz gegen den unlauteren Wettbewerb  (UWG)
-
+Nichtamtliches Inhaltsverzeichnis
 UWG
 
 Ausfertigungsdatum: 03.07.2004
@@ -28,11 +28,13 @@ Ausfertigungsdatum: 03.07.2004
 
 Vollzitat:
 
-"Gesetz gegen den unlauteren Wettbewerb in der Fassung der Bekanntmachung vom 3. März 2010 (BGBl. I S. 254), das zuletzt durch Artikel 1 des Gesetzes vom 12. Februar 2026 (BGBl. 2026 I Nr. 43) geändert worden ist"
+"Gesetz gegen den unlauteren Wettbewerb in der Fassung der Bekanntmachung vom 3. März 2010 (BGBl. I S. 254), das zuletzt durch Artikel 6 des Gesetzes vom 12. Mai 2026 (BGBl. 2026 I Nr. 139) geändert worden ist"
 
 Stand:Neugefasst durch Bek. v. 3.3.2010 I 254;
 
  Zuletzt geändert durch Art. 1 G vom 12.2.2026 I Nr. 43
+
+Hinweis:Änderung durch Art. 6 G v. 12.5.2026 I Nr. 139 textlich nachgewiesen, dokumentarisch noch nicht abschließend bearbeitet
 
 Näheres zur Standangabe finden Sie im Menü unter Hinweise
 
@@ -60,7 +62,7 @@ Fußnote
 Kapitel 1
 Allgemeine Bestimmungen
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 1 Zweck des Gesetzes; Anwendungsbereich
  
 
@@ -68,7 +70,7 @@ Allgemeine Bestimmungen
 
 (2) Vorschriften zur Regelung besonderer Aspekte unlauterer geschäftlicher Handlungen gehen bei der Beurteilung, ob eine unlautere geschäftliche Handlung vorliegt, den Regelungen dieses Gesetzes vor.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 2 Begriffsbestimmungen
  
 
@@ -97,7 +99,7 @@ Allgemeine Bestimmungen
 
 (2) Für den Verbraucherbegriff ist § 13 des Bürgerlichen Gesetzbuchs entsprechend anwendbar.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 3 Verbot unlauterer geschäftlicher Handlungen
  
 
@@ -109,13 +111,13 @@ Allgemeine Bestimmungen
 
 (4) Bei der Beurteilung von geschäftlichen Handlungen gegenüber Verbrauchern ist auf den durchschnittlichen Verbraucher oder, wenn sich die geschäftliche Handlung an eine bestimmte Gruppe von Verbrauchern wendet, auf ein durchschnittliches Mitglied dieser Gruppe abzustellen. Geschäftliche Handlungen, die für den Unternehmer vorhersehbar das wirtschaftliche Verhalten nur einer eindeutig identifizierbaren Gruppe von Verbrauchern wesentlich beeinflussen, die auf Grund von geistigen oder körperlichen Beeinträchtigungen, Alter oder Leichtgläubigkeit im Hinblick auf diese geschäftlichen Handlungen oder die diesen zugrunde liegenden Waren oder Dienstleistungen besonders schutzbedürftig sind, sind aus der Sicht eines durchschnittlichen Mitglieds dieser Gruppe zu beurteilen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 3a Rechtsbruch
  
 
 Unlauter handelt, wer einer gesetzlichen Vorschrift zuwiderhandelt, die auch dazu bestimmt ist, im Interesse der Marktteilnehmer das Marktverhalten zu regeln, und der Verstoß geeignet ist, die Interessen von Verbrauchern, sonstigen Marktteilnehmern oder Mitbewerbern spürbar zu beeinträchtigen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 4 Mitbewerberschutz
  
 
@@ -134,7 +136,7 @@ die für die Nachahmung erforderlichen Kenntnisse oder Unterlagen unredlich erla
 4.
 Mitbewerber gezielt behindert.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 4a Aggressive geschäftliche Handlungen
  
 
@@ -158,7 +160,7 @@ belastende oder unverhältnismäßige Hindernisse nichtvertraglicher Art, mit de
 Drohungen mit rechtlich unzulässigen Handlungen.
 Zu den Umständen, die nach Nummer 3 zu berücksichtigen sind, zählen insbesondere geistige und körperliche Beeinträchtigungen, das Alter, die geschäftliche Unerfahrenheit, die Leichtgläubigkeit, die Angst und die Zwangslage von Verbrauchern.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5 Irreführende geschäftliche Handlungen
  
 
@@ -188,7 +190,7 @@ mit ihr eine Ware in einem Mitgliedstaat der Europäischen Union als identisch m
 
 (5) Es wird vermutet, dass es irreführend ist, mit der Herabsetzung eines Preises zu werben, sofern der Preis nur für eine unangemessen kurze Zeit gefordert worden ist. Ist streitig, ob und in welchem Zeitraum der Preis gefordert worden ist, so trifft die Beweislast denjenigen, der mit der Preisherabsetzung geworben hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5a Irreführung durch Unterlassen
  
 
@@ -211,7 +213,7 @@ alle Maßnahmen des Unternehmers, um dem Verbraucher oder sonstigen Marktteilneh
 
 (4) Unlauter handelt auch, wer den kommerziellen Zweck einer geschäftlichen Handlung nicht kenntlich macht, sofern sich dieser nicht unmittelbar aus den Umständen ergibt, und das Nichtkenntlichmachen geeignet ist, den Verbraucher oder sonstigen Marktteilnehmer zu einer geschäftlichen Entscheidung zu veranlassen, die er andernfalls nicht getroffen hätte. Ein kommerzieller Zweck liegt bei einer Handlung zugunsten eines fremden Unternehmens nicht vor, wenn der Handelnde kein Entgelt oder keine ähnliche Gegenleistung für die Handlung von dem fremden Unternehmen erhält oder sich versprechen lässt. Der Erhalt oder das Versprechen einer Gegenleistung wird vermutet, es sei denn der Handelnde macht glaubhaft, dass er eine solche nicht erhalten hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5b Wesentliche Informationen
  
 
@@ -238,7 +240,7 @@ Die Informationen nach Satz 1 müssen von der Anzeige der Suchergebnisse aus unm
 
 (4) Als wesentlich im Sinne des § 5a Absatz 1 gelten auch solche Informationen, die dem Verbraucher auf Grund unionsrechtlicher Verordnungen oder nach Rechtsvorschriften zur Umsetzung unionsrechtlicher Richtlinien für kommerzielle Kommunikation einschließlich Werbung und Marketing nicht vorenthalten werden dürfen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 5c Verbotene Verletzung von Verbraucherinteressen durch unlautere geschäftliche Handlungen
  
 
@@ -258,7 +260,7 @@ eine geschäftliche Handlung die tatsächlichen Voraussetzungen eines der in Abs
 2.
 auf die geschäftliche Handlung das nationale Recht eines anderen Mitgliedstaates der Europäischen Union anwendbar ist, welches eine Vorschrift enthält, die der jeweiligen in Absatz 2 genannten Vorschrift entspricht.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 6 Vergleichende Werbung
  
 
@@ -277,7 +279,7 @@ die Waren, Dienstleistungen, Tätigkeiten oder persönlichen oder geschäftliche
 6.
 eine Ware oder Dienstleistung als Imitation oder Nachahmung einer unter einem geschützten Kennzeichen vertriebenen Ware oder Dienstleistung darstellt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 7 Unzumutbare Belästigungen
  
 
@@ -304,7 +306,7 @@ der Kunde der Verwendung nicht widersprochen hat und
 4.
 der Kunde bei Erhebung der Adresse und bei jeder Verwendung klar und deutlich darauf hingewiesen wird, dass er der Verwendung jederzeit widersprechen kann, ohne dass hierfür andere als die Übermittlungskosten nach den Basistarifen entstehen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 7a Einwilligung in Telefonwerbung
  
 
@@ -315,7 +317,7 @@ der Kunde bei Erhebung der Adresse und bei jeder Verwendung klar und deutlich da
 Kapitel 2
 Rechtsfolgen
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8 Beseitigung und Unterlassung
  
 
@@ -336,13 +338,13 @@ den Industrie- und Handelskammern, den nach der Handwerksordnung errichteten Org
 
 (5) § 13 des Unterlassungsklagengesetzes ist entsprechend anzuwenden; in § 13 Absatz 1 und 3 Satz 2 des Unterlassungsklagengesetzes treten an die Stelle der dort aufgeführten Ansprüche nach dem Unterlassungsklagengesetz die Ansprüche nach dieser Vorschrift. Macht eine anspruchsberechtigte Stelle nach Absatz 3 Nummer 3 Ansprüche nach Absatz 1 gerichtlich geltend, so sind die §§ 5a und 6a des Unterlassungsklagengesetzes entsprechend anzuwenden. Im Übrigen findet das Unterlassungsklagengesetz keine Anwendung, es sei denn, es liegt ein Fall des § 2a des Unterlassungsklagengesetzes vor.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8a Anspruchsberechtigte bei einem Verstoß gegen die Verordnung (EU) 2019/1150
  
 
 Anspruchsberechtigt nach § 8 Absatz 1 sind bei einem Verstoß gegen die Verordnung (EU) 2019/1150 des Europäischen Parlaments und des Rates vom 20. Juni 2019 zur Förderung von Fairness und Transparenz für gewerbliche Nutzer von Online-Vermittlungsdiensten (ABl. L 186 vom 11.7.2019, S. 57) abweichend von § 8 Absatz 3 die Verbände, Organisationen und öffentlichen Stellen, die die Voraussetzungen des Artikels 14 Absatz 3 und 4 der Verordnung (EU) 2019/1150 erfüllen.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8b Liste der qualifizierten Wirtschaftsverbände
  
 
@@ -363,7 +365,7 @@ seinen Mitgliedern keine Zuwendungen aus dem Verbandsvermögen gewährt werden u
 
 (3) Die Vorschriften für qualifizierte Verbraucherverbände in § 4 Absatz 3 und 4 und in den §§ 4a bis 4c und 4f des Unterlassungsklagengesetzes sind auf die qualifizierten Wirtschaftsverbände entsprechend anzuwenden. Ergänzend zu den Berichtspflichten der qualifizierten Wirtschaftsverbände nach § 4b Absatz 1 Satz 1 Nummer 1 des Unterlassungsklagengesetzes sind auch die Anzahl der gestellten Anträge auf Erlass von einstweiligen Verfügungen und die Anzahl der erhobenen Klagen zur Durchsetzung der in dieser Vorschrift genannten Ansprüche anzugeben.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 8c Verbot der missbräuchlichen Geltendmachung von Ansprüchen; Haftung
  
 
@@ -386,7 +388,7 @@ wegen einer Zuwiderhandlung, für die mehrere Zuwiderhandelnde verantwortlich si
 
 (3) Im Fall der missbräuchlichen Geltendmachung von Ansprüchen kann der Anspruchsgegner vom Anspruchsteller Ersatz der für seine Rechtsverteidigung erforderlichen Aufwendungen fordern. Weitergehende Ersatzansprüche bleiben unberührt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 9 Schadensersatz
  
 
@@ -396,7 +398,7 @@ wegen einer Zuwiderhandlung, für die mehrere Zuwiderhandelnde verantwortlich si
 
 (3) Gegen verantwortliche Personen von periodischen Druckschriften kann der Anspruch auf Schadensersatz nach den Absätzen 1 und 2 nur bei einer vorsätzlichen Zuwiderhandlung geltend gemacht werden.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 10 Gewinnabschöpfung
  
 
@@ -412,7 +414,7 @@ wegen einer Zuwiderhandlung, für die mehrere Zuwiderhandelnde verantwortlich si
 
 (6) Die Gläubiger können vom Bundesamt für Justiz Ersatz der Aufwendungen verlangen, die für eine Finanzierung des gerichtlichen Verfahrens durch einen gewerblichen Prozessfinanzierer entstanden sind, wenn das Bundesamt für Justiz vor Einleitung des gerichtlichen Verfahrens die Inanspruchnahme dieser Finanzierung bewilligt hat. Das Bundesamt für Justiz bewilligt die Inanspruchnahme der Finanzierung, wenn die beabsichtigte Rechtsverfolgung unter Berücksichtigung der gesamten Umstände nicht missbräuchlich ist und die Aufwendungen für den Prozessfinanzierer üblich und angemessen sind.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 11 Verjährung
  
 
@@ -430,7 +432,7 @@ der Gläubiger von den den Anspruch begründenden Umständen und der Person des 
 Kapitel 3
 Verfahrensvorschriften
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 12 Einstweiliger Rechtsschutz; Veröffentlichungsbefugnis; Streitwertminderung
  
 
@@ -447,7 +449,7 @@ der Rechtsanwalt der begünstigten Partei, soweit die außergerichtlichen Kosten
 
 (4) Der Antrag nach Absatz 3 kann vor der Geschäftsstelle des Gerichts zur Niederschrift erklärt werden. Er ist vor der Verhandlung zur Hauptsache anzubringen. Danach ist er nur zulässig, wenn der angenommene oder festgesetzte Streitwert später durch das Gericht heraufgesetzt wird. Vor der Entscheidung über den Antrag ist der Gegner zu hören.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 13 Abmahnung; Unterlassungsverpflichtung; Haftung
  
 
@@ -473,7 +475,7 @@ sonstigen Verstößen gegen die Verordnung (EU) 2016/679 des Europäischen Parla
 
 (5) Soweit die Abmahnung unberechtigt ist oder nicht den Anforderungen des Absatzes 2 entspricht oder soweit entgegen Absatz 4 ein Anspruch auf Aufwendungsersatz geltend gemacht wird, hat der Abgemahnte gegen den Abmahnenden einen Anspruch auf Ersatz der für seine Rechtsverteidigung erforderlichen Aufwendungen. Der Anspruch nach Satz 1 ist beschränkt auf die Höhe des Aufwendungsersatzanspruchs, die der Abmahnende geltend macht. Bei einer unberechtigten Abmahnung ist der Anspruch nach Satz 1 ausgeschlossen, wenn die fehlende Berechtigung der Abmahnung für den Abmahnenden zum Zeitpunkt der Abmahnung nicht erkennbar war. Weitergehende Ersatzansprüche bleiben unberührt.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 13a Vertragsstrafe
  
 
@@ -494,7 +496,7 @@ wirtschaftliches Interesse des Abgemahnten an erfolgten und zukünftigen Verstö
 
 (5) Ist lediglich eine Vertragsstrafe vereinbart, deren Höhe noch nicht beziffert wurde, kann der Abgemahnte bei Uneinigkeit über die Höhe auch ohne Zustimmung des Abmahnenden eine Einigungsstelle nach § 15 anrufen. Das Gleiche gilt, wenn der Abgemahnte nach Absatz 4 nur eine Vertragsstrafe in angemessener Höhe schuldet. Ist ein Verfahren vor der Einigungsstelle anhängig, so ist eine erst nach Anrufung der Einigungsstelle erhobene Klage nicht zulässig.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 14 Sachliche und örtliche Zuständigkeit; Verordnungsermächtigung
  
 
@@ -510,7 +512,7 @@ es sei denn, der Beklagte hat im Inland keinen allgemeinen Gerichtsstand.
 
 (4) Abweichend von den Absätzen 1 bis 3 richtet sich die Zuständigkeit für bürgerliche Rechtsstreitigkeiten, mit denen ein Anspruch nach § 9 Absatz 2 Satz 1 geltend gemacht wird, nach den allgemeinen Vorschriften.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 15 Einigungsstellen
  
 
@@ -538,7 +540,7 @@ es sei denn, der Beklagte hat im Inland keinen allgemeinen Gerichtsstand.
 
 (12) Abweichend von Absatz 2 Satz 1 kann in den Ländern Brandenburg, Mecklenburg-Vorpommern, Sachsen, Sachsen-Anhalt und Thüringen die Einigungsstelle auch mit einem Rechtskundigen als Vorsitzendem besetzt werden, der die Befähigung zum Berufsrichter nach dem Recht der Deutschen Demokratischen Republik erworben hat.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 15a Überleitungsvorschrift zum Gesetz zur Stärkung des fairen Wettbewerbs
  
 
@@ -549,7 +551,7 @@ es sei denn, der Beklagte hat im Inland keinen allgemeinen Gerichtsstand.
 Kapitel 4
 Straf- und Bußgeldvorschriften
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 16 Strafbare Werbung
  
 
@@ -557,11 +559,11 @@ Straf- und Bußgeldvorschriften
 
 (2) Wer es im geschäftlichen Verkehr unternimmt, Verbraucher zur Abnahme von Waren, Dienstleistungen oder Rechten durch das Versprechen zu veranlassen, sie würden entweder vom Veranstalter selbst oder von einem Dritten besondere Vorteile erlangen, wenn sie andere zum Abschluss gleichartiger Geschäfte veranlassen, die ihrerseits nach der Art dieser Werbung derartige Vorteile für eine entsprechende Werbung weiterer Abnehmer erlangen sollen, wird mit Freiheitsstrafe bis zu zwei Jahren oder mit Geldstrafe bestraft.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 §§ 17 u. 18 (weggefallen)
  
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 19 Bußgeldvorschriften bei einem weitverbreiteten Verstoß und einem weitverbreiteten Verstoß mit Unions-Dimension
  
 
@@ -578,7 +580,7 @@ die Bundesanstalt für Finanzdienstleistungsaufsicht bei einer Zuwiderhandlung, 
 3.
 die nach Landesrecht zuständige Behörde bei einer Zuwiderhandlung, die sich auf die Tätigkeit eines Unternehmens im Sinne des § 2 Nummer 4 des EU-Verbraucherschutzdurchführungsgesetzes bezieht.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 § 20 Bußgeldvorschriften
  
 
@@ -597,7 +599,7 @@ entgegen § 8b Absatz 3 in Verbindung mit § 4b Absatz 1 Satz 1 des Unterlassung
 
 (3) Verwaltungsbehörde im Sinne des § 36 Absatz 1 Nummer 1 des Gesetzes über Ordnungswidrigkeiten ist in den Fällen des Absatzes 1 Nummer 1 und 2 die Bundesnetzagentur für Elektrizität, Gas, Telekommunikation, Post und Eisenbahnen, in den übrigen Fällen das Bundesamt für Justiz.
 
- 
+ Nichtamtliches Inhaltsverzeichnis
 Anhang (zu § 3 Absatz 3)
  
 

@@ -53,13 +53,22 @@ export default function PrintPage() {
   const [error,  setError]  = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${BASE}/api/report/${jobId}`)
-      .then(r => r.json())
-      .then(d => {
+    (async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+        const r = await fetch(`${BASE}/api/report/${jobId}`, { headers });
+        if (!r.ok) { setError(`HTTP ${r.status}`); return; }
+        const d = await r.json();
         setReport(d);
         setTimeout(() => window.print(), 1500);
-      })
-      .catch(e => setError(String(e)));
+      } catch (e) {
+        setError(String(e));
+      }
+    })();
   }, [jobId]);
 
   if (error) return <div style={{ padding: 40, fontFamily: "Inter, sans-serif", color: "#dc2626" }}>Error: {error}</div>;
@@ -69,10 +78,10 @@ export default function PrintPage() {
     </div>
   );
 
-  const date = new Date(report.generated_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const date = new Date(report.generated_at).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
   const applicable = report.applicable_regulations.filter(r => r.applies);
   const notApplicable = report.applicable_regulations.filter(r => !r.applies);
-  const scored = report.regulation_scores.filter(s => s.total_requirements > 0);
+  const scored = report.regulation_scores;
   const byReg: Record<string, typeof report.gap_analysis> = {};
   report.gap_analysis.forEach(g => { (byReg[g.regulation] ??= []).push(g); });
   const prioOrder: Record<Priority, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
@@ -306,6 +315,7 @@ export default function PrintPage() {
 
         .gap-article { font-weight: 700; font-size: 9pt; color: #0f172a; }
         .gap-title { font-size: 9pt; color: #334155; }
+        .gap-legal-date { font-size: 7pt; color: #94a3b8; margin-left: auto; }
 
         .gap-evidence {
           margin-top: 2mm;
@@ -672,7 +682,14 @@ export default function PrintPage() {
               </tr>
             </thead>
             <tbody>
-              {scored.map(s => (
+              {scored.map(s => s.total_requirements === 0 ? (
+                <tr key={s.regulation}>
+                  <td style={{ fontWeight: 700, color: "#0a1637" }}>{REGULATION_LABEL[s.regulation] ?? s.regulation}</td>
+                  <td colSpan={6} style={{ color: "#94a3b8", fontStyle: "italic" }}>
+                    No findings returned — analysis incomplete, not compliant
+                  </td>
+                </tr>
+              ) : (
                 <tr key={s.regulation}>
                   <td style={{ fontWeight: 700, color: "#0a1637" }}>{REGULATION_LABEL[s.regulation] ?? s.regulation}</td>
                   <td style={{ textAlign: "center", fontWeight: 800, fontSize: "11pt", color: scoreColor(s.score_percent) }}>
@@ -723,7 +740,7 @@ export default function PrintPage() {
               <div key={reg}>
                 <div className="reg-heading">
                   {REGULATION_LABEL[reg] ?? reg}
-                  <span className="reg-desc">{REG_DESC[reg] ? ` — ${REG_DESC[reg]}` : ""}</span>
+                  <span className="reg-desc">{REG_DESC[reg] ? ` · ${REG_DESC[reg]}` : ""}</span>
                   <span style={{ float: "right", fontSize: "7.5pt", fontWeight: 400, color: "#64748b" }}>
                     {ok > 0 && <span style={{ color: "#059669" }}>{ok} compliant &nbsp;</span>}
                     {pc > 0 && <span style={{ color: "#b45309" }}>{pc} partial &nbsp;</span>}
@@ -741,6 +758,13 @@ export default function PrintPage() {
                         </span>
                         <span className="gap-article">{g.article_number}</span>
                         <span className="gap-title">{g.article_title}</span>
+                        {g.legal_version_date && (
+                          <span className="gap-legal-date">
+                            Rechtsstand: {new Date(g.legal_version_date).toLocaleDateString("de-DE", {
+                              day: "numeric", month: "short", year: "numeric",
+                            })}
+                          </span>
+                        )}
                       </div>
 
                       {g.evidence && (

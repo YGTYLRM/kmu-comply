@@ -3,7 +3,6 @@ Unit tests for the deterministic threshold engine.
 All threshold decisions must be code-driven, never LLM-driven.
 """
 
-import pytest
 from services.threshold_engine import (
     check_gdpr,
     check_lksg,
@@ -147,8 +146,15 @@ class TestLkSG:
     def test_applies_to_large_listed(self, profile_large_listed):
         assert check_lksg(profile_large_listed).applies is True
 
-    def test_does_not_apply_to_manufacturer_500(self, profile_manufacturer):
-        assert check_lksg(profile_manufacturer).applies is False
+    def test_does_not_apply_to_manufacturer_500(self):
+        profile = CompanyProfile(
+            company_name="SmallMfg GmbH",
+            industry="manufacturing",
+            employee_count=500,
+            processes_personal_data=False,
+            has_supply_chain_abroad=True,
+        )
+        assert check_lksg(profile).applies is False
 
     def test_reason_cites_paragraph(self):
         profile = CompanyProfile(
@@ -158,7 +164,7 @@ class TestLkSG:
             processes_personal_data=False,
         )
         result = check_lksg(profile)
-        assert "§1(1)" in result.reason
+        assert "§1 Abs. 1 LkSG" in result.reason
         assert "LkSG" in result.reason
 
 
@@ -173,7 +179,7 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
 
     def test_audit_not_required_below_250_employees_low_revenue(self):
         profile = CompanyProfile(
@@ -184,7 +190,7 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is False
+        assert result.edl_g_audit_required is False
 
     def test_audit_required_by_revenue_above_50m(self):
         profile = CompanyProfile(
@@ -195,14 +201,18 @@ class TestEnEfG:
             processes_personal_data=False,
         )
         result = check_enefg(profile)
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
 
     def test_energy_management_required_at_7500_mwh(self):
+        # EnEfG §8(1): "mehr als 7,5 Gigawattstunden" — strictly greater than 7.5 GWh.
+        # 7,500 MWh = exactly 7.5 GWh → does NOT trigger (threshold is >7.5, not >=7.5).
+        # 7,501 MWh > 7.5 GWh → triggers. Test uses 7,501 to reflect the actual law text.
+        # Also: EnEfG §8(1) applies to ANY company >7.5 GWh, not just non-SMEs.
         profile = CompanyProfile(
             company_name="Energy Corp",
             industry="manufacturing",
-            employee_count=50,
-            annual_energy_consumption_mwh=7500,
+            employee_count=300,
+            annual_energy_consumption_mwh=7501,
             processes_personal_data=False,
         )
         result = check_enefg(profile)
@@ -210,32 +220,35 @@ class TestEnEfG:
 
     def test_energy_management_not_required_below_7500_mwh(self):
         profile = CompanyProfile(
-            company_name="Small Energy",
+            company_name="Big Energy",
             industry="manufacturing",
-            employee_count=50,
+            employee_count=300,
             annual_energy_consumption_mwh=7499,
             processes_personal_data=False,
         )
         result = check_enefg(profile)
         assert result.energy_management_required is False
 
-    def test_waste_heat_required_at_2500_mwh(self):
+    def test_waste_heat_required_for_nonsme(self):
+        # All non-SMEs get waste_heat_reporting_required=True — the 200 kW technical
+        # threshold (EnEfG §15) cannot be derived from a company profile alone
         profile = CompanyProfile(
             company_name="Factory",
             industry="manufacturing",
-            employee_count=50,
+            employee_count=300,
             annual_energy_consumption_mwh=2500,
             processes_personal_data=False,
         )
         result = check_enefg(profile)
         assert result.waste_heat_reporting_required is True
 
-    def test_waste_heat_not_required_below_2500_mwh(self):
+    def test_waste_heat_not_required_for_sme(self):
+        # SMEs are exempt from EnEfG entirely
         profile = CompanyProfile(
             company_name="Small Factory",
             industry="manufacturing",
             employee_count=50,
-            annual_energy_consumption_mwh=2499,
+            annual_energy_consumption_mwh=2500,
             processes_personal_data=False,
         )
         result = check_enefg(profile)
@@ -244,13 +257,28 @@ class TestEnEfG:
     def test_manufacturer_profile_applies(self, profile_manufacturer):
         result = check_enefg(profile_manufacturer)
         assert result.applies is True
-        assert result.energy_audit_required is True
+        assert result.edl_g_audit_required is True
         assert result.energy_management_required is True
         assert result.waste_heat_reporting_required is True
 
     def test_it_agency_does_not_apply(self, profile_it_agency):
         result = check_enefg(profile_it_agency)
         assert result.applies is False
+
+    def test_sme_with_high_energy_triggers_enefg_8(self):
+        # EnEfG §8(1) applies to ANY company >7.5 GWh — not just non-SMEs.
+        # Previous code incorrectly excluded SMEs from this obligation.
+        profile = CompanyProfile(
+            company_name="Energy-Intensive SME",
+            industry="manufacturing",
+            employee_count=80,  # SME: <250 employees
+            annual_energy_consumption_mwh=10_000,  # 10 GWh > 7.5 GWh
+            processes_personal_data=False,
+        )
+        result = check_enefg(profile)
+        assert result.applies is True
+        assert result.energy_management_required is True  # EnEfG §8(1) triggered
+        assert result.edl_g_audit_required is False  # EDL-G §8 only for non-SMEs
 
 
 # ── CSRD ──────────────────────────────────────────────────────────────────────
@@ -361,11 +389,16 @@ class TestBDSG:
 # ── Integration: determine_applicable_regulations ────────────────────────────
 
 class TestDetermineApplicableRegulations:
-    def test_returns_all_five_regulations(self, profile_it_agency):
+    def test_returns_all_regulations(self, profile_it_agency):
         results = determine_applicable_regulations(profile_it_agency)
-        assert len(results) == 5
+        assert len(results) == 14
         regs = {r.regulation for r in results}
-        assert regs == {Regulation.GDPR, Regulation.LKSG, Regulation.ENEFG, Regulation.CSRD, Regulation.BDSG}
+        assert regs == {
+            Regulation.GDPR, Regulation.LKSG, Regulation.ENEFG, Regulation.CSRD,
+            Regulation.BDSG, Regulation.NIS2, Regulation.AI_ACT, Regulation.HINSCHG,
+            Regulation.ARBSCHG, Regulation.AGG, Regulation.MILOG,
+            Regulation.TTDSG, Regulation.GWG, Regulation.EU_DATA_ACT,
+        }
 
     def test_it_agency_only_gdpr_and_bdsg_apply(self, profile_it_agency):
         results = determine_applicable_regulations(profile_it_agency)
@@ -378,7 +411,17 @@ class TestDetermineApplicableRegulations:
     def test_large_listed_all_regulations_apply(self, profile_large_listed):
         results = determine_applicable_regulations(profile_large_listed)
         applicable = {r.regulation for r in results if r.applies}
-        assert applicable == {Regulation.GDPR, Regulation.LKSG, Regulation.ENEFG, Regulation.CSRD, Regulation.BDSG}
+        # All regulations apply to a large listed company except AI Act (no AI systems in profile)
+        assert Regulation.GDPR in applicable
+        assert Regulation.LKSG in applicable
+        assert Regulation.ENEFG in applicable
+        assert Regulation.CSRD in applicable
+        assert Regulation.BDSG in applicable
+        assert Regulation.NIS2 in applicable
+        assert Regulation.HINSCHG in applicable
+        assert Regulation.ARBSCHG in applicable
+        assert Regulation.AGG in applicable
+        assert Regulation.MILOG in applicable
 
     def test_freelancer_minimal_obligations(self, profile_freelancer):
         results = determine_applicable_regulations(profile_freelancer)
