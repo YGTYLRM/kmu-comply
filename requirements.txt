@@ -2,7 +2,7 @@
 fastapi>=0.111.0
 uvicorn[standard]>=0.29.0
 pydantic>=2.7.0
-pydantic-settings>=2.14.2  # GHSA-4xgf-cpjx-pc3j fixed here
+pydantic-settings>=2.15.0  # GHSA-4xgf-cpjx-pc3j fixed here
 email-validator>=2.0.0
 python-dotenv>=1.0.0
 
