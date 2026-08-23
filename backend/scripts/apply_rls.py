@@ -26,7 +26,7 @@ FROM pg_tables
 WHERE schemaname = 'public'
   AND tablename IN ('companies', 'reports', 'jobs', 'notifications', 'subscriptions',
                     'action_completions', 'expert_review_requests', 'rate_limit_events',
-                    'alembic_version')
+                    'alembic_version', 'regulation_chunks', 'company_doc_chunks')
 ORDER BY tablename;
 """
 
