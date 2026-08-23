@@ -36,7 +36,7 @@ pytest-asyncio>=0.23.0
 pytest-cov>=5.0.0
 
 # Dev utilities
-ruff>=0.4.0
+ruff>=0.16.3
 python-multipart>=0.0.31  # CVE-2026-53538/53539/53540 fixed here
 
 # Email
