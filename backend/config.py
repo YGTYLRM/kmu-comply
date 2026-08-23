@@ -64,6 +64,15 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""  # Full admin key — bypasses RLS, never expose to clients
     database_url: str = ""
 
+    # pgvector migration Phase 4 cutover — static regulation retrieval reads
+    # from pgvector (rag.retrieval.retrieve_pgvector) instead of ChromaDB when
+    # true. Re-verified against the full 261-case retrieval_eval.json before
+    # flipping default to true: 200/261 (chroma) vs 201/261 (pgvector), zero
+    # regressions. Flip to false to roll back to ChromaDB instantly if pgvector
+    # misbehaves in production. Company-doc retrieval (per-job uploads) is
+    # unaffected — still ChromaDB-only, dual-write for that was never built.
+    pgvector_retrieval_enabled: bool = True
+
     # Observability
     sentry_dsn: str = ""   # Set to enable Sentry error tracking
 
