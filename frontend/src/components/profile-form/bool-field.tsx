@@ -36,7 +36,7 @@ export function BoolField({ label, hint, value, onChange, error }: BoolFieldProp
             >
               {value === opt && <span className="h-2 w-2 rounded-full bg-white" />}
             </span>
-            {opt ? "Yes" : "No"}
+            {opt ? "Ja" : "Nein"}
           </button>
         ))}
       </div>

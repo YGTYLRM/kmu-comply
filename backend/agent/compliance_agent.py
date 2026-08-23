@@ -16,7 +16,12 @@ from agent.planning import (
     run_gap_analysis,
 )
 from agent.profiling import enrich_profile
-from agent.validation import validate_report
+from agent.validation import (
+    check_evidence_quotes,
+    validate_report,
+    verify_evidence_entailment,
+    verify_gap_citations,
+)
 from models.company_profile import CompanyProfile
 from models.compliance_report import ComplianceReport
 from models.enums import AnalysisStep
@@ -51,7 +56,7 @@ async def run_analysis(
     # Step 1 — profile enrichment
     notify(AnalysisStep.PROFILE_VALIDATION)
     logger.info("job %s step 1: profile enrichment", job_id)
-    enriched = await loop.run_in_executor(None, enrich_profile, profile)
+    enriched = await enrich_profile(profile)
 
     # Step 2 — applicability (deterministic, no LLM)
     notify(AnalysisStep.APPLICABILITY_DETERMINATION)
@@ -61,41 +66,74 @@ async def run_analysis(
     # Step 3 — RAG retrieval + optional company doc ingestion
     notify(AnalysisStep.ARTICLE_RETRIEVAL)
     logger.info("job %s step 3: article retrieval", job_id)
-    chunks = await loop.run_in_executor(
+    chunks, empty_regs, low_conf_regs = await loop.run_in_executor(
         None, retrieve_regulatory_context, enriched, applicability
     )
+    if empty_regs:
+        logger.warning(
+            "job %s: %d regulation(s) have empty KB — will produce CANNOT_ASSESS: %s",
+            job_id, len(empty_regs), empty_regs,
+        )
+    if low_conf_regs:
+        failures.extend(
+            f"low KB coverage for {r} (<5 chunks) — findings may be incomplete"
+            for r in low_conf_regs
+        )
 
-    # Ingest company documents if provided
+    # Ingest company documents if provided (decrypted in memory via document_store)
     if doc_session_id:
         from rag.company_ingest import ingest_company_documents
         from services.document_store import document_store
-        file_paths = document_store.list_files(doc_session_id)
-        if file_paths:
-            logger.info("job %s: ingesting %d company documents", job_id, len(file_paths))
+        if document_store.list_files(doc_session_id):
+            logger.info("job %s: ingesting company documents from session %s", job_id, doc_session_id)
             await loop.run_in_executor(
-                None, ingest_company_documents, job_id, file_paths
+                None, ingest_company_documents, job_id, doc_session_id
             )
 
     # Step 4 — gap analysis (with company doc evidence if available)
+    # Regulations with empty KB are passed separately — they get CANNOT_ASSESS
+    # without calling the LLM, preventing ungrounded legal citation hallucination.
     notify(AnalysisStep.GAP_ANALYSIS)
     logger.info("job %s step 4: gap analysis", job_id)
-    gaps = await loop.run_in_executor(
-        None, run_gap_analysis, enriched, chunks, failures, job_id
-    )
+    gaps = await run_gap_analysis(enriched, chunks, failures, job_id, empty_regs)
+
+    # Step 4b — citation verification (cross-check LLM citations against retrieved chunks)
+    citation_warnings = verify_gap_citations(gaps, chunks)
+    if citation_warnings:
+        failures.extend(citation_warnings)
+        logger.warning(
+            "job %s: %d unverified citation(s) — confidence downgraded, flagged for review",
+            job_id, len(citation_warnings),
+        )
+
+    # Step 4c — evidence quote check: VERIFIED findings without verbatim quotes get
+    # downgraded to MEDIUM; quotes that appear in no retrieved chunk get downgraded to LOW
+    quote_warnings = check_evidence_quotes(gaps, chunks)
+    if quote_warnings:
+        logger.warning(
+            "job %s: %d gap(s) missing evidence_quote — confidence downgraded to MEDIUM",
+            job_id, len(quote_warnings),
+        )
+
+    # Step 4d — entailment check: a cheap Haiku pass verifying that quotes which
+    # passed the string-match check (step 4c) actually support their assigned
+    # status, not just appear verbatim out of context. Best-effort — never blocks.
+    entailment_warnings = await verify_evidence_entailment(gaps, failures=[])
+    if entailment_warnings:
+        logger.warning(
+            "job %s: %d gap(s) failed entailment check — confidence downgraded to LOW",
+            job_id, len(entailment_warnings),
+        )
 
     # Step 5 — action plan
     notify(AnalysisStep.ACTION_PLAN)
     logger.info("job %s step 5: action plan", job_id)
-    actions = await loop.run_in_executor(
-        None, generate_action_plan, enriched, gaps, failures
-    )
+    actions = await generate_action_plan(enriched, gaps, failures)
 
     # Step 6 — report assembly
     notify(AnalysisStep.REPORT_ASSEMBLY)
     logger.info("job %s step 6: report assembly", job_id)
-    report = await loop.run_in_executor(
-        None, assemble_report, job_id, enriched, applicability, chunks, gaps, actions, failures
-    )
+    report = await assemble_report(job_id, enriched, applicability, chunks, gaps, actions, failures)
 
     # Self-validation
     issues = validate_report(report)

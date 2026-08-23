@@ -44,7 +44,7 @@ export function Select({
             error && "border-red-500/50"
           )}
         >
-          <RadixSelect.Value placeholder={placeholder ?? "Select…"} />
+          <RadixSelect.Value placeholder={placeholder ?? "Auswählen…"} />
           <ChevronDown className="h-4 w-4 text-slate-500 ml-2 flex-shrink-0" />
         </RadixSelect.Trigger>
         <RadixSelect.Portal>

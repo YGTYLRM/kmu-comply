@@ -10,12 +10,12 @@ import type { StepProgress, AnalysisStep } from "@/lib/types";
 import { CheckCircle2, Circle, Loader2, XCircle } from "lucide-react";
 
 const STEP_LABELS: Record<AnalysisStep, string> = {
-  profile_validation:          "Validating profile",
-  applicability_determination: "Determining applicable regulations",
-  article_retrieval:           "Retrieving regulation articles",
-  gap_analysis:                "Analysing compliance gaps",
-  action_plan:                 "Building action plan",
-  report_assembly:             "Assembling report",
+  profile_validation:          "Profil wird validiert",
+  applicability_determination: "Anwendbare Vorschriften werden bestimmt",
+  article_retrieval:           "Gesetzesartikel werden abgerufen",
+  gap_analysis:                "Compliance-Lücken werden analysiert",
+  action_plan:                 "Maßnahmenplan wird erstellt",
+  report_assembly:             "Bericht wird zusammengestellt",
 };
 
 const STEP_ORDER: AnalysisStep[] = [
@@ -43,7 +43,7 @@ export function ProcessingView() {
       try {
         const status = await api.getStatus(jobId);
         setSteps(status.steps);
-        if (status.status === "completed") {
+        if (status.status === "completed" || status.status === "partial") {
           clearInterval(intervalRef.current!);
           const prevJobId = sessionStorage.getItem("kmu_prev_job_id");
           sessionStorage.removeItem("kmu_prev_job_id");
@@ -51,10 +51,10 @@ export function ProcessingView() {
           router.push(dest);
         } else if (status.status === "failed") {
           clearInterval(intervalRef.current!);
-          setError(status.error ?? "Analysis failed. Please try again.");
+          setError(status.error ?? "Analyse fehlgeschlagen. Bitte erneut versuchen.");
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Connection error");
+        setError(e instanceof Error ? e.message : "Verbindungsfehler");
         clearInterval(intervalRef.current!);
       }
     };
@@ -95,7 +95,7 @@ export function ProcessingView() {
             }
           </div>
           <h1 className="text-xl font-bold text-white">
-            {error ? "Something went wrong" : "Running your compliance screening"}
+            {error ? "Etwas ist schiefgelaufen" : "Ihr Compliance-Screening läuft"}
           </h1>
           <AnimatePresence mode="wait">
             <motion.p
@@ -106,7 +106,7 @@ export function ProcessingView() {
               transition={{ duration: 0.25 }}
               className="text-sm text-slate-500 mt-1"
             >
-              {runningStep ? STEP_LABELS[runningStep] : "This usually takes 1 to 2 minutes"}
+              {runningStep ? STEP_LABELS[runningStep] : "Dauert in der Regel 1 bis 2 Minuten"}
             </motion.p>
           </AnimatePresence>
         </div>
@@ -114,7 +114,7 @@ export function ProcessingView() {
         {/* Progress bar */}
         <div className="w-full">
           <div className="flex justify-between text-xs text-slate-600 mb-2">
-            <span>Progress</span>
+            <span>Fortschritt</span>
             <span>{progressPct}%</span>
           </div>
           <Progress value={progressPct} className="h-2" />
@@ -173,17 +173,17 @@ export function ProcessingView() {
               <XCircle className="h-6 w-6 text-red-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-red-300 mb-1">Analysis failed</p>
+              <p className="text-sm font-semibold text-red-300 mb-1">Analyse fehlgeschlagen</p>
               <p className="text-xs text-red-400/70 leading-relaxed">{error}</p>
               {error.toLowerCase().includes("connection") || error.toLowerCase().includes("fetch") ? (
-                <p className="text-xs text-slate-600 mt-2">Make sure the backend server is running on port 8000.</p>
+                <p className="text-xs text-slate-600 mt-2">Stellen Sie sicher, dass der Backend-Server auf Port 8000 läuft.</p>
               ) : null}
             </div>
             <button
               onClick={() => router.push("/analyze")}
               className="rounded-xl bg-red-500/15 border border-red-500/25 px-5 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-500/25 transition-colors"
             >
-              Start a new screening
+              Neues Screening starten
             </button>
           </motion.div>
         )}
