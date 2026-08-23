@@ -2310,3 +2310,39 @@ User's call: Stripe won't get finished until after their university term, so sel
 - **Off-host backups**: still local-disk-only. Needs S3/Backblaze credentials to go further.
 - **Deploy**: still nothing hosted anywhere — see Phase 8 status in `.dev-notes.md`, unchanged this session.
 - **Stripe**: intentionally dormant per the user, revisit after their university term ends. Codebase itself untouched (still fully wired, just not linked from the UI) so turning it back on later is cheap.
+
+---
+
+## Session 30b — 2026-08-23 — Sentry actually wired everywhere, Sentry project connected, MVP-readiness council
+
+**Branch:** `feat/polish` (merged forward to `dev` and `main`)
+
+### Context
+
+Continuation of Session 30, same day. User pushed on two things: is Sentry actually covering the whole app (it wasn't), and a full multi-perspective evaluation of whether the codebase/stack is genuinely MVP-ready, not just feature-complete. No LLM calls were made against the app's own Anthropic key this session — the developer's balance was negative and is being topped up tomorrow; the council evaluation below used the assistant's own model/session budget, not the app's `LLM_API_KEY`.
+
+### Changes
+
+#### Sentry wired into all three backend processes, not just the web server
+Found that `sentry_sdk.init()` only ever ran in `main.py` — `worker.py` (the APScheduler process: regulation change detection, scheduled re-assessments) and `celery_app.py` (runs the real 6-step analysis pipeline when `REDIS_URL` is set) had zero Sentry coverage. New `backend/observability.py` centralizes init logic across all three. `event_level` set to `WARNING` instead of Sentry's default `ERROR`, deliberately — this project's worst bugs (see Session 29/30 above) were silent degradations logged at `logger.warning()`, not exceptions; default Sentry config would have missed every one of them. `send_default_pii=False` preserved, matching the existing disclosure in `datenschutz/page.tsx`. Added `SENTRY_DSN` to the existing hard production-startup check in `main.py::_check_production_config()` — the app now refuses to boot with `ENVIRONMENT=production` if it's unset. Verified (not assumed): installed `sentry-sdk` locally, confirmed all three integration classes (FastAPI, Asyncio, Celery) import cleanly, ran a real `init_sentry()` call and confirmed the client activates, directly tested the production-startup check fails closed on a missing DSN and no-ops in dev.
+
+#### Real Sentry project connected
+User created a Sentry project and provided the DSN. Added to both `backend/.env` (production) and `backend/.env.development` (staging) — gitignored, never committed. Sent a real test event (`sentry_sdk.capture_message`) and confirmed it actually reached the project (event id `7a0d39b39e5c4a5ca1c03f33ac042c34`) before calling it done.
+
+#### MVP-readiness council evaluation
+Ran the `llm-council` skill (5 independent advisor perspectives + anonymized peer review + chairman synthesis) against the full codebase/stack/bug-history context. Full verdict is in the conversation transcript; key points worth carrying into next session:
+
+- **Consensus (4 of 5 advisors, independently):** do not deploy to real users, and do not turn Stripe back on, until the killed end-to-end pgvector+LLM integration test (`tests/test_pipeline.py -m integration`) actually completes clean. This is the single highest-priority open item.
+- **Consensus (3 advisors independently, unprompted):** Sentry does not address this project's actual historical bug class — none of the headline bugs (corrupted KB file, gap analysis/action plan silently returning zero, score breakdown silently dropping regulations) ever threw an exception; they all "succeeded" with wrong or empty output. Sentry is good to have but doesn't structurally prevent a repeat.
+- **Blind spot every peer-review pass caught independently:** no liability disclaimer / ToS language / professional-liability-insurance consideration exists anywhere for a tool giving quasi-legal guidance to real businesses. Worth addressing before real users, not after.
+- **Other blind spots raised in review, not yet acted on:** no post-launch safeguard (a continuous canary/golden-set check, or an active kill-switch back to ChromaDB if pgvector degrades after launch — the `pgvector_retrieval_enabled` flag exists but nothing currently watches for when to flip it); no billing/quota alerting (ironic, since that's exactly what silently killed today's verification run); the irony that Complio itself has never had its own GDPR data-handling posture independently audited; solo-developer bus-factor risk.
+
+None of the above blind-spot items were implemented this session — documenting them as backlog per the user's explicit "just document, continue tomorrow."
+
+### Open problems / next session
+
+1. **Top priority, blocks everything else:** once API credits are topped up, run `pytest tests/test_pipeline.py -m integration` from `backend/`. Rollback if it shows problems: flip `pgvector_retrieval_enabled = False` in `backend/config.py`.
+2. Consider a liability disclaimer/ToS pass before any real user relies on report output (council-flagged, not yet drafted).
+3. Consider billing/quota alerting so a negative API balance doesn't silently kill a verification run again with no advance warning.
+4. Consider whether the historical "silently returns zero/empty" bug class needs a general enforced invariant (hard error state, not just better logging) rather than relying on catching each instance individually as it's found.
+5. Deploy target still not chosen; off-host backups still not wired. Both need the user's own account/payment, unchanged from Session 30.
