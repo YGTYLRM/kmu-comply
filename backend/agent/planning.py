@@ -11,6 +11,7 @@ import json
 import logging
 import re
 from functools import lru_cache
+from pathlib import Path
 
 import anthropic
 
@@ -32,6 +33,9 @@ from services.threshold_engine import determine_applicable_regulations
 logger = logging.getLogger(__name__)
 
 
+_PGVECTOR_KILL_SWITCH_FILE = Path(__file__).parent.parent / "data" / "pgvector_kill_switch.json"
+
+
 def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> list[dict]:
     """Static-regulation retrieval entry point used by this module.
 
@@ -45,7 +49,16 @@ def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> li
     and fresh clones have historically never needed Postgres for retrieval
     (see .dev-notes.md's ChromaDB-only setup_data.py flow), and this flag
     flipping to true shouldn't force that requirement on them.
+
+    Also falls back to ChromaDB whenever scripts/canary_check.py's kill-switch
+    file exists — settings.pgvector_retrieval_enabled is a pydantic-settings
+    value loaded once at process start, so it can't be flipped without a
+    restart; this file is checked fresh on every call, giving the canary an
+    actually-active kill-switch rather than one that needs a human to notice
+    and redeploy. See canary_check.py's docstring for the full mechanism.
     """
+    if _PGVECTOR_KILL_SWITCH_FILE.exists():
+        return _retrieve_chroma(query, regulations, top_k)
     if settings.pgvector_retrieval_enabled and settings.database_url:
         return retrieve_pgvector(query, regulations, top_k)
     return _retrieve_chroma(query, regulations, top_k)

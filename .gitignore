@@ -80,6 +80,9 @@ logs/
 *.pdf
 backend/data/reports/
 
+# Runtime state written by scripts/canary_check.py — not source content
+backend/data/pgvector_kill_switch.json
+
 # Model cache (HuggingFace)
 .cache/
 
