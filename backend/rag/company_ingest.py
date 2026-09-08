@@ -23,11 +23,9 @@ import re
 import threading
 from pathlib import Path
 
-import chromadb
 import pdfplumber
 
 from rag.embeddings import embed_passages
-from rag.ingest import CHROMA_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -237,13 +235,30 @@ async def _delete_pgvector_company_chunks_async(job_id: str) -> None:
 
 
 def retrieve_company_docs(job_id: str, query: str, top_k: int = 8) -> list[dict]:
+    """Company-doc retrieval entry point — dispatches to pgvector or ChromaDB,
+    mirroring agent/planning.py::retrieve()'s dispatch logic for static
+    regulations exactly (same settings.pgvector_retrieval_enabled flag, same
+    PGVECTOR_KILL_SWITCH_FILE check, same "no DATABASE_URL configured" chroma
+    fallback for local dev). One kill switch governs both retrieval paths —
+    if pgvector is degraded, it's degraded for both, so there's no reason for
+    two independent flags."""
+    from config import settings, PGVECTOR_KILL_SWITCH_FILE
+    if PGVECTOR_KILL_SWITCH_FILE.exists():
+        return _retrieve_company_docs_chroma(job_id, query, top_k)
+    if settings.pgvector_retrieval_enabled and settings.database_url:
+        return retrieve_company_docs_pgvector(job_id, query, top_k)
+    return _retrieve_company_docs_chroma(job_id, query, top_k)
+
+
+def _retrieve_company_docs_chroma(job_id: str, query: str, top_k: int = 8) -> list[dict]:
     """
-    Query the per-job company document collection.
+    Query the per-job company document collection in ChromaDB.
     Returns an empty list if the collection does not exist.
     """
     col_name = collection_name(job_id)
     try:
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        from rag.ingest import _chroma_client
+        client = _chroma_client()
         existing = {c.name for c in client.list_collections()}
         if col_name not in existing:
             return []
@@ -252,8 +267,8 @@ def retrieve_company_docs(job_id: str, query: str, top_k: int = 8) -> list[dict]
         if collection.count() == 0:
             return []
 
-        from rag.embeddings import embed_passages
-        query_embedding = embed_passages([f"query: {query}"])[0]
+        from rag.embeddings import embed_query
+        query_embedding = embed_query(query)
 
         results = collection.query(
             query_embeddings=[query_embedding],
@@ -286,10 +301,79 @@ def retrieve_company_docs(job_id: str, query: str, top_k: int = 8) -> list[dict]
         return []
 
 
+def retrieve_company_docs_pgvector(job_id: str, query: str, top_k: int = 8) -> list[dict]:
+    """pgvector-backed mirror of _retrieve_company_docs_chroma — same dict
+    shape, same decrypt-with-legacy-fallback behavior. Only the raw ANN fetch
+    differs (SQL cosine-distance query against company_doc_chunks instead of
+    ChromaDB's collection.query()), mirroring rag/retrieval.py::retrieve_pgvector's
+    pattern for static regulations. Reuses that module's persistent background-
+    loop-thread + shared engine (rag.retrieval._get_loop_thread/_get_pg_engine)
+    rather than a fresh asyncio.run() per call or a second connection pool —
+    both are generic "run an async pg query from sync code" helpers, not
+    specific to RegulationChunk."""
+    try:
+        from rag.embeddings import embed_query
+        from rag.retrieval import _get_loop_thread
+        from services.document_store import _fernet
+
+        query_embedding = embed_query(query)
+        rows = _get_loop_thread().run(_pg_query_company_docs_one(job_id, query_embedding, top_k))
+        if not rows:
+            return []
+
+        chunks = []
+        for row in rows:
+            try:
+                text = _fernet().decrypt(row["content"].encode()).decode()
+            except Exception:
+                text = row["content"]  # legacy plaintext chunk, see _retrieve_company_docs_chroma
+            meta = row["metadata_extra"] or {}
+            chunks.append({
+                "text": text,
+                "source": meta.get("source_file", "uploaded document"),
+                "score": 1 - row["distance"],
+            })
+        return chunks
+    except Exception as exc:
+        logger.warning("company doc retrieval (pgvector) failed for job %s: %s", job_id, exc)
+        return []
+
+
+async def _pg_query_company_docs_one(job_id: str, query_embedding: list[float], top_k: int) -> list[dict]:
+    from sqlalchemy import select, func
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from db.models import CompanyDocChunk
+    from rag.retrieval import _get_pg_engine
+
+    engine = await _get_pg_engine()
+    async with AsyncSession(engine) as db:
+        count = (await db.execute(
+            select(func.count()).where(CompanyDocChunk.job_id == job_id)
+        )).scalar_one()
+        if count == 0:
+            return []
+        k = min(top_k, count)
+
+        distance = CompanyDocChunk.embedding.cosine_distance(query_embedding)
+        stmt = (
+            select(CompanyDocChunk, distance.label("distance"))
+            .where(CompanyDocChunk.job_id == job_id)
+            .order_by(distance)
+            .limit(k)
+        )
+        rows = (await db.execute(stmt)).all()
+
+    return [
+        {"content": chunk.content, "metadata_extra": chunk.metadata_extra, "distance": dist}
+        for chunk, dist in rows
+    ]
+
+
 def delete_company_docs(job_id: str) -> None:
     col_name = collection_name(job_id)
     try:
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        from rag.ingest import _chroma_client
+        client = _chroma_client()
         existing = {c.name for c in client.list_collections()}
         if col_name in existing:
             client.delete_collection(col_name)
