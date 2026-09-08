@@ -254,12 +254,30 @@ async def delete_report(job_id: str, current_user: dict = Depends(get_current_us
 async def delete_account(current_user: dict = Depends(get_current_user)):
     """Delete the user's account and all associated data (GDPR Art. 17).
 
-    Deletes: companies, reports, notifications, action_completions, subscriptions.
-    The Supabase auth user is deleted separately via supabase.auth.admin.deleteUser().
+    Deletes: companies, reports, notifications, subscriptions, action_completions,
+    expert_review_requests, rate_limit_events, job records (plus each job's
+    uploaded-document chunks in ChromaDB/pgvector), the profiles row itself, and
+    finally the Supabase auth user.
+
+    Found during a self-audit of Complio's own GDPR posture (ironic, given the
+    product's purpose): the previous version only deleted companies/reports/
+    notifications/subscriptions and never actually called
+    supabase.auth.admin.delete_user() despite its docstring claiming it did —
+    the auth account, profiles row, and four other user-linked tables
+    (action_completions, expert_review_requests, rate_limit_events, jobs) all
+    survived "deletion" indefinitely. Those four tables use a bare user_id
+    column with no FK/cascade (see db/models.py), so Postgres-level cascade
+    from deleting companies/profiles was never going to reach them either —
+    each has to be deleted explicitly here.
     """
     from db.database import AsyncSessionLocal
-    from db.models import Company, Report, Notification, Subscription
+    from db.models import (
+        Company, Report, Notification, Subscription, Profile,
+        ActionCompletion, ExpertReviewRequest, RateLimitEvent, JobRecord,
+    )
     from sqlalchemy import select, delete
+    from rag.company_ingest import delete_company_docs
+    from services.auth_service import get_supabase
 
     user_id = current_user["id"]
     async with AsyncSessionLocal() as db:
@@ -268,6 +286,13 @@ async def delete_account(current_user: dict = Depends(get_current_user)):
             select(Company.id).where(Company.user_id == user_id)
         )).scalars().all()
         company_ids = [str(c) for c in companies]
+
+        # Get all job IDs for this user so their uploaded-document chunks
+        # (ChromaDB job_<id> collection + pgvector company_doc_chunks rows)
+        # can be deleted now rather than waiting out document_ttl_seconds.
+        job_ids = (await db.execute(
+            select(JobRecord.id).where(JobRecord.user_id == user_id)
+        )).scalars().all()
 
         # Delete reports for all companies
         if company_ids:
@@ -282,7 +307,34 @@ async def delete_account(current_user: dict = Depends(get_current_user)):
         # Delete subscription
         await db.execute(delete(Subscription).where(Subscription.user_id == user_id))
 
+        # Delete the four previously-missed tables (no FK/cascade on any of these)
+        await db.execute(delete(ActionCompletion).where(ActionCompletion.user_id == user_id))
+        await db.execute(delete(ExpertReviewRequest).where(ExpertReviewRequest.user_id == user_id))
+        await db.execute(delete(RateLimitEvent).where(RateLimitEvent.user_id == user_id))
+        await db.execute(delete(JobRecord).where(JobRecord.user_id == user_id))
+
+        # Delete the profiles row itself — nothing else was doing this
+        await db.execute(delete(Profile).where(Profile.id == user_id))
+
         await db.commit()
+
+    for job_id in job_ids:
+        try:
+            delete_company_docs(str(job_id))
+        except Exception as exc:
+            logger.warning("account deletion: failed to clear docs for job %s: %s", job_id, exc)
+
+    try:
+        get_supabase().auth.admin.delete_user(user_id)
+    except Exception as exc:
+        logger.error(
+            "account deletion: Postgres data deleted but Supabase auth user %s "
+            "still exists — delete_user failed: %s", user_id, exc,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Account data was deleted but the login itself could not be removed. Contact support.",
+        )
 
     logger.info("user %s deleted their account and all associated data", user_id)
     return {"deleted": True, "message": "Account and all data deleted successfully."}
