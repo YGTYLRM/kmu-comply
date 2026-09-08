@@ -11,11 +11,10 @@ import json
 import logging
 import re
 from functools import lru_cache
-from pathlib import Path
 
 import anthropic
 
-from config import settings
+from config import settings, PGVECTOR_KILL_SWITCH_FILE
 from models.company_profile import EnrichedCompanyProfile
 from models.compliance_report import (
     ActionItem,
@@ -31,9 +30,6 @@ from rag.retrieval import deduplicate, retrieve as _retrieve_chroma, retrieve_pg
 from services.threshold_engine import determine_applicable_regulations
 
 logger = logging.getLogger(__name__)
-
-
-_PGVECTOR_KILL_SWITCH_FILE = Path(__file__).parent.parent / "data" / "pgvector_kill_switch.json"
 
 
 def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> list[dict]:
@@ -57,7 +53,7 @@ def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> li
     actually-active kill-switch rather than one that needs a human to notice
     and redeploy. See canary_check.py's docstring for the full mechanism.
     """
-    if _PGVECTOR_KILL_SWITCH_FILE.exists():
+    if PGVECTOR_KILL_SWITCH_FILE.exists():
         return _retrieve_chroma(query, regulations, top_k)
     if settings.pgvector_retrieval_enabled and settings.database_url:
         return retrieve_pgvector(query, regulations, top_k)
