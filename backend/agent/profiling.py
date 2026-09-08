@@ -126,6 +126,20 @@ async def enrich_profile(profile: CompanyProfile) -> EnrichedCompanyProfile:
         except (json.JSONDecodeError, ValueError) as exc:
             logger.warning("profiling: parse error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
+        except anthropic.BadRequestError as exc:
+            if "credit balance" in (exc.message or "").lower():
+                logger.error("profiling: LLM API BILLING EXHAUSTED — %s", exc.message)
+                return EnrichedCompanyProfile(
+                    **profile.model_dump(),
+                    inferred_characteristics=[],
+                    missing_optional_fields=missing,
+                    validation_warnings=warnings + [
+                        "LLM API billing/credit balance exhausted during profile enrichment — "
+                        "top up credits and re-run for a complete analysis."
+                    ],
+                )
+            logger.warning("profiling: API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
+            last_exc = exc
         except anthropic.APIError as exc:
             logger.warning("profiling: API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc

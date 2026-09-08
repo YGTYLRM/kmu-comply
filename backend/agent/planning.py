@@ -782,6 +782,22 @@ async def _async_llm_call(
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("%s: parse error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
+        except anthropic.BadRequestError as exc:
+            if "credit balance" in (exc.message or "").lower():
+                # Not transient — every retry would fail identically and just
+                # burn the exponential backoff for nothing. This exact failure
+                # (API balance going negative mid-run) previously killed a full
+                # pipeline verification run with no distinct signal, logged
+                # indistinguishably from any other API error. logger.error here
+                # (vs .warning elsewhere) plus the distinct message text makes
+                # it a clearly separate Sentry event from ordinary retryable
+                # failures, and failures[] carries the same distinct text into
+                # requires_manual_review / the job's failure record.
+                logger.error("%s: LLM API BILLING EXHAUSTED — %s", step_name, exc.message)
+                failures.append(f"{step_name}: LLM API billing/credit balance exhausted — top up and re-run")
+                return []
+            logger.warning("%s: API error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
+            last_exc = exc
         except anthropic.APIError as exc:
             logger.warning("%s: API error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
