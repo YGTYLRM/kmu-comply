@@ -172,13 +172,33 @@ def _delete_pgvector_company_chunks(job_id: str) -> None:
     leave uploaded-document content (potentially PII) in Postgres past its
     ChromaDB retention window, which is a real data-retention correctness
     issue for a product whose own job is GDPR compliance. No-ops if
-    DATABASE_URL isn't configured. Never raises."""
+    DATABASE_URL isn't configured. Never raises.
+
+    Unlike the write side (_upsert_pgvector_company_chunks, only ever reached
+    via loop.run_in_executor from compliance_agent.py, so it's always in a
+    thread with no running loop), delete_company_docs below is called
+    directly from *already-async* contexts — job_manager.py's periodic
+    cleanup loop, and routes/companies.py's account-deletion endpoint — where
+    a plain asyncio.run() raises "cannot be called from a running event
+    loop". Found via a live self-audit test of account deletion, not by
+    inspection: the isolated dual-write verification script in Session 31
+    only ever ran outside any event loop, so it never exercised this path.
+    Detect which situation applies and dispatch accordingly instead of
+    assuming one or the other.
+    """
     from config import settings
     if not settings.database_url:
         return
     import asyncio
     try:
-        asyncio.run(_delete_pgvector_company_chunks_async(job_id))
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(_delete_pgvector_company_chunks_async(job_id))
+        else:
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                pool.submit(asyncio.run, _delete_pgvector_company_chunks_async(job_id)).result()
     except Exception as exc:
         logger.warning("pgvector delete failed for job %s company docs: %s", job_id, exc)
 
