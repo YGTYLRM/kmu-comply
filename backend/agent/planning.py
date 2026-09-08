@@ -406,6 +406,22 @@ async def run_gap_analysis(
         for gap in gaps:
             gap.legal_version_date = legal_dates.get(gap.article_number)
 
+        if reg_chunks and not gaps:
+            # The prompt instructs the model to assess EVERY retrieved requirement
+            # chunk, so a genuinely empty result here is never legitimate "full
+            # compliance" — it's the same silent-empty-success failure mode as the
+            # max_tokens truncation case above, just via a call that didn't raise.
+            # Left unflagged, it renders only as a passive total_requirements=0
+            # state on the report (see _compute_scores) instead of an active
+            # manual-review item.
+            msg = (
+                f"gap analysis for {reg_key} returned zero findings despite "
+                f"{len(reg_chunks)} retrieved chunk(s) — likely a generation failure, "
+                f"not genuine full compliance; flagged for manual review"
+            )
+            logger.warning("step 4: %s", msg)
+            failures.append(msg)
+
         all_gaps.extend(gaps)
 
     return all_gaps
@@ -455,6 +471,14 @@ async def generate_action_plan(
                 prompt, _parse_actions, f"action_plan_batch_{i}", failures, max_tokens=8192,
                 tool=_TOOL_ACTION_PLAN, tool_result_key="actions",
             )
+            if batch and not batch_actions:
+                msg = (
+                    f"action plan batch {i}//{_ACTION_PLAN_BATCH_SIZE} returned zero items "
+                    f"for {len(batch)} actionable gap(s) — likely a generation failure, "
+                    f"flagged for manual review"
+                )
+                logger.warning("step 5: %s", msg)
+                failures.append(msg)
             all_actions.extend(batch_actions)
         return sorted(all_actions, key=lambda a: _PRIORITY_ORDER.get(a.priority, 4))
 
@@ -463,6 +487,17 @@ async def generate_action_plan(
         prompt, _parse_actions, "action_plan", failures, max_tokens=8192,
         tool=_TOOL_ACTION_PLAN, tool_result_key="actions",
     )
+    if actionable and not actions:
+        # Same rationale as run_gap_analysis's zero-findings guard: every
+        # actionable gap should produce at least one action item, so an empty
+        # result from a call that didn't raise is a silent failure, not a
+        # legitimate "nothing to do" outcome.
+        msg = (
+            f"action plan returned zero items for {len(actionable)} actionable gap(s) "
+            f"— likely a generation failure, flagged for manual review"
+        )
+        logger.warning("step 5: %s", msg)
+        failures.append(msg)
 
     return sorted(actions, key=lambda a: _PRIORITY_ORDER.get(a.priority, 4))
 
@@ -746,6 +781,22 @@ async def _async_llm_call(
 
         except (json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("%s: parse error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
+            last_exc = exc
+        except anthropic.BadRequestError as exc:
+            if "credit balance" in (exc.message or "").lower():
+                # Not transient — every retry would fail identically and just
+                # burn the exponential backoff for nothing. This exact failure
+                # (API balance going negative mid-run) previously killed a full
+                # pipeline verification run with no distinct signal, logged
+                # indistinguishably from any other API error. logger.error here
+                # (vs .warning elsewhere) plus the distinct message text makes
+                # it a clearly separate Sentry event from ordinary retryable
+                # failures, and failures[] carries the same distinct text into
+                # requires_manual_review / the job's failure record.
+                logger.error("%s: LLM API BILLING EXHAUSTED — %s", step_name, exc.message)
+                failures.append(f"{step_name}: LLM API billing/credit balance exhausted — top up and re-run")
+                return []
+            logger.warning("%s: API error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)
             last_exc = exc
         except anthropic.APIError as exc:
             logger.warning("%s: API error attempt %d/%d: %s", step_name, attempt + 1, max_attempts, exc)

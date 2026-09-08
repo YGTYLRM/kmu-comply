@@ -91,11 +91,112 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
                     _lock.release()
             logger.info("company doc %s: %d chunks", original_name, len(chunks))
             total += len(chunks)
+            _upsert_pgvector_company_chunks(job_id, original_name, chunks, embeddings)
         except Exception as exc:
             logger.warning("company doc %s: skipped (%s)", original_name, exc)
 
     logger.info("job %s: %d company doc chunks indexed in %s", job_id, total, col_name)
     return total
+
+
+def _upsert_pgvector_company_chunks(
+    job_id: str, source_file: str, chunks: list[dict], embeddings: list[list[float]],
+) -> None:
+    """Dual-write company-doc chunks to the pgvector-backed company_doc_chunks
+    table alongside the ChromaDB write above, mirroring rag/ingest.py's
+    _upsert_pgvector_chunks pattern for static regulations. Purely additive —
+    ChromaDB (via retrieve_company_docs) remains the only read path; nothing
+    reads company_doc_chunks yet. A plain insert (no upsert) is correct here:
+    each job_id is created once per analysis run and ingest_company_documents
+    is only ever called once per job, so there's no re-ingestion case to dedupe.
+
+    No-ops if DATABASE_URL isn't configured. Never raises — a pgvector write
+    failure must not affect the ChromaDB write that's actually serving
+    retrieval, same rationale as the static-regulation dual-write.
+    """
+    from config import settings
+    if not settings.database_url:
+        return
+    import asyncio
+    try:
+        asyncio.run(_upsert_pgvector_company_chunks_async(job_id, source_file, chunks, embeddings))
+    except Exception as exc:
+        logger.warning(
+            "pgvector dual-write failed for job %s / %s (%d chunks) — skipped, ChromaDB "
+            "write above already succeeded: %s", job_id, source_file, len(chunks), exc,
+        )
+
+
+async def _upsert_pgvector_company_chunks_async(
+    job_id: str, source_file: str, chunks: list[dict], embeddings: list[list[float]],
+) -> None:
+    import uuid
+    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from config import settings
+    from db.models import CompanyDocChunk
+
+    # Dedicated short-lived engine, not db.database's module-level singleton —
+    # this function is reached via asyncio.run() from a thread-pool executor
+    # call (ingest_company_documents is sync, invoked through
+    # loop.run_in_executor), so it gets a fresh event loop each time. Reusing
+    # the app's shared engine across separate event loops hits "Event loop is
+    # closed" the moment a pooled connection from a prior loop is reused —
+    # same issue documented in rag/ingest.py's dual-write.
+    engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+    rows = [
+        CompanyDocChunk(
+            id=str(uuid.uuid4()),
+            job_id=job_id,
+            source_file=source_file,
+            content=c["text"],
+            embedding=emb,
+            metadata_extra=c["metadata"],
+        )
+        for c, emb in zip(chunks, embeddings)
+    ]
+
+    try:
+        async with AsyncSessionLocal() as db:
+            db.add_all(rows)
+            await db.commit()
+    finally:
+        await engine.dispose()
+
+
+def _delete_pgvector_company_chunks(job_id: str) -> None:
+    """Mirror-delete a job's pgvector-backed company-doc chunks. Matched 1:1
+    with the ChromaDB delete in delete_company_docs below — writing to
+    company_doc_chunks without also deleting from it on job-TTL expiry would
+    leave uploaded-document content (potentially PII) in Postgres past its
+    ChromaDB retention window, which is a real data-retention correctness
+    issue for a product whose own job is GDPR compliance. No-ops if
+    DATABASE_URL isn't configured. Never raises."""
+    from config import settings
+    if not settings.database_url:
+        return
+    import asyncio
+    try:
+        asyncio.run(_delete_pgvector_company_chunks_async(job_id))
+    except Exception as exc:
+        logger.warning("pgvector delete failed for job %s company docs: %s", job_id, exc)
+
+
+async def _delete_pgvector_company_chunks_async(job_id: str) -> None:
+    from sqlalchemy import delete
+    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from config import settings
+    from db.models import CompanyDocChunk
+
+    engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    try:
+        async with AsyncSessionLocal() as db:
+            await db.execute(delete(CompanyDocChunk).where(CompanyDocChunk.job_id == job_id))
+            await db.commit()
+    finally:
+        await engine.dispose()
 
 
 def retrieve_company_docs(job_id: str, query: str, top_k: int = 8) -> list[dict]:
@@ -150,6 +251,7 @@ def delete_company_docs(job_id: str) -> None:
             logger.debug("deleted company doc collection %s", col_name)
     except Exception as exc:
         logger.warning("failed to delete company doc collection %s: %s", col_name, exc)
+    _delete_pgvector_company_chunks(job_id)
 
 
 # ── Text extraction ────────────────────────────────────────────────────────────
