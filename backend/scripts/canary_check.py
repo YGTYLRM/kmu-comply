@@ -42,7 +42,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 logger = logging.getLogger("canary")
 
 BACKEND_DIR = Path(__file__).parent.parent
-KILL_SWITCH_FILE = BACKEND_DIR / "data" / "pgvector_kill_switch.json"
+from config import PGVECTOR_KILL_SWITCH_FILE as KILL_SWITCH_FILE  # noqa: E402
 
 # Matches tests/test_retrieval_eval.py's CI smoke-test bar exactly — this
 # canary is that same gate, just run continuously against live pgvector

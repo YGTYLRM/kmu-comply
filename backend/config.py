@@ -1,10 +1,18 @@
 import os
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Defaults to .env (production credentials). Set ENV_FILE=.env.development
 # to point this process at the staging Supabase project instead.
 _ENV_FILE = os.environ.get("ENV_FILE", ".env")
+
+# Single source of truth for the pgvector kill-switch path — was previously
+# constructed independently in agent/planning.py, scripts/canary_check.py,
+# and (as of the company-doc cutover) rag/company_ingest.py, which is exactly
+# the kind of duplication that lets a path typo silently split the check from
+# the writer. All three now import this constant instead.
+PGVECTOR_KILL_SWITCH_FILE = Path(__file__).parent / "data" / "pgvector_kill_switch.json"
 
 
 class Settings(BaseSettings):
