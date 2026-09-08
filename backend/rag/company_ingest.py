@@ -5,6 +5,16 @@ The collection name is  job_<full-job-id>  — the full UUID, not a truncated
 prefix, so two jobs can never collide onto the same collection and leak each
 other's documents. It is deleted automatically when the job expires
 (JobManager.clear_job_docs).
+
+Chunk text is encrypted at rest (Fernet, same key/helper as document_store.py)
+in both ChromaDB's documents field and pgvector's company_doc_chunks.content —
+the original uploaded file was already encrypted at rest, but the chunked
+text derived from it for RAG was being stored in plaintext in both vector
+stores until this was found during a GDPR self-audit. Embeddings are still
+computed on the plaintext (semantic search needs that); only the stored text
+payload is encrypted. Decrypted transparently in retrieve_company_docs, with
+a fallback to treat undecryptable values as legacy plaintext chunks ingested
+before this was added, rather than erroring on them.
 """
 from __future__ import annotations
 
@@ -73,7 +83,9 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
                 continue
 
             texts = [c["text"] for c in chunks]
-            embeddings = embed_passages(texts)
+            embeddings = embed_passages(texts)  # computed on plaintext — semantic search needs this
+            from services.document_store import _fernet
+            encrypted_texts = [_fernet().encrypt(t.encode()).decode() for t in texts]
             ids = [f"{col_name}_{Path(original_name).stem}_{i}" for i in range(len(chunks))]
             from config import settings
             _lock = _chroma_write_lock if not settings.chroma_server_url else None
@@ -83,7 +95,7 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
                 collection.upsert(
                     ids=ids,
                     embeddings=embeddings,
-                    documents=texts,
+                    documents=encrypted_texts,
                     metadatas=[c["metadata"] for c in chunks],
                 )
             finally:
@@ -91,7 +103,10 @@ def ingest_company_documents(job_id: str, session_id: str) -> int:
                     _lock.release()
             logger.info("company doc %s: %d chunks", original_name, len(chunks))
             total += len(chunks)
-            _upsert_pgvector_company_chunks(job_id, original_name, chunks, embeddings)
+            encrypted_chunks = [
+                {"text": et, "metadata": c["metadata"]} for et, c in zip(encrypted_texts, chunks)
+            ]
+            _upsert_pgvector_company_chunks(job_id, original_name, encrypted_chunks, embeddings)
         except Exception as exc:
             logger.warning("company doc %s: skipped (%s)", original_name, exc)
 
@@ -106,7 +121,9 @@ def _upsert_pgvector_company_chunks(
     table alongside the ChromaDB write above, mirroring rag/ingest.py's
     _upsert_pgvector_chunks pattern for static regulations. Purely additive —
     ChromaDB (via retrieve_company_docs) remains the only read path; nothing
-    reads company_doc_chunks yet. A plain insert (no upsert) is correct here:
+    reads company_doc_chunks yet. `chunks[i]["text"]` is expected to already
+    be Fernet-encrypted by the caller — this function just stores whatever
+    text it's given, same as the ChromaDB write. A plain insert (no upsert) is correct here:
     each job_id is created once per analysis run and ingest_company_documents
     is only ever called once per job, so there's no re-ingestion case to dedupe.
 
@@ -244,14 +261,22 @@ def retrieve_company_docs(job_id: str, query: str, top_k: int = 8) -> list[dict]
             include=["documents", "metadatas", "distances"],
         )
 
+        from services.document_store import _fernet
         chunks = []
         for doc, meta, dist in zip(
             results["documents"][0],
             results["metadatas"][0],
             results["distances"][0],
         ):
+            try:
+                text = _fernet().decrypt(doc.encode()).decode()
+            except Exception:
+                # Legacy chunk ingested before encryption was added — stored
+                # as plaintext, so decryption fails; use it as-is rather than
+                # dropping the chunk or erroring the whole retrieval.
+                text = doc
             chunks.append({
-                "text": doc,
+                "text": text,
                 "source": meta.get("source_file", "uploaded document"),
                 "score": 1 - dist,
             })
