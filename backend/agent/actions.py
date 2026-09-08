@@ -398,6 +398,13 @@ async def _executive_summary(
                 messages=[{"role": "user", "content": prompt}],
             )
             return resp.content[0].text.strip()
+        except anthropic.BadRequestError as exc:
+            if "credit balance" in (exc.message or "").lower():
+                logger.error("actions: summary LLM API BILLING EXHAUSTED — %s", exc.message)
+                failures.append("executive_summary: LLM API billing/credit balance exhausted — top up and re-run")
+                return fallback
+            logger.warning("actions: summary API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
+            last_exc = exc
         except anthropic.APIError as exc:
             logger.warning("actions: summary API error attempt %d/%d: %s", attempt + 1, max_attempts, exc)
             last_exc = exc
