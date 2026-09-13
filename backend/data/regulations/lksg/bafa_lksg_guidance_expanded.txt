@@ -4,7 +4,7 @@ Fuer Unternehmen, die dem Lieferkettensorgfaltspflichtengesetz unterliegen
 
 ---
 
-bafa_lksg_risk_analysis_methodology
+lksg §5  (bafa_lksg_risk_analysis_methodology)
 Title: Risk analysis methodology under §5 LkSG — own operations, direct and indirect suppliers; annual update; risk weighting
 Obligation: MUST
 Threshold: All companies in scope of LkSG: from 1 January 2024, companies with registered seat or principal place of business in Germany and 1,000 or more employees including those of German subsidiaries
@@ -13,7 +13,7 @@ Keywords: LkSG §5, Risikoanalyse, risk analysis, own operations, direct supplie
 
 ---
 
-bafa_lksg_human_rights_due_diligence
+lksg §2  (bafa_lksg_human_rights_due_diligence)
 Title: Protected human rights positions under §2 LkSG — child labour, forced labour, slavery, adequate wages, freedom of association, health and safety
 Obligation: MUST
 Threshold: All LkSG-obligated companies; applies to own operations and direct suppliers; indirect suppliers where substantiated knowledge exists
@@ -22,7 +22,7 @@ Keywords: LkSG §2, protected positions, child labour, Kinderarbeit, forced labo
 
 ---
 
-bafa_lksg_direct_supplier_assessment
+lksg §6(4)  (bafa_lksg_direct_supplier_assessment)
 Title: Direct supplier assessment under §6(4) LkSG — questionnaires, on-site audits, third-party audits; frequency based on risk; documentation
 Obligation: MUST
 Threshold: All LkSG-obligated companies for all direct suppliers; depth of assessment proportionate to risk score and supply chain position
@@ -31,7 +31,7 @@ Keywords: LkSG §6(4), direct supplier, Zulieferer, supplier assessment, questio
 
 ---
 
-bafa_lksg_indirect_supplier_requirements
+lksg §9  (bafa_lksg_indirect_supplier_requirements)
 Title: Indirect supplier obligations under §9 LkSG — substantiated knowledge trigger; whistleblower reports; investigation obligation
 Obligation: CONDITIONAL
 Threshold: LkSG-obligated companies; duty arises when the company has substantiated knowledge (hinreichend konkrete Kenntnis) of a potential violation at an indirect supplier
@@ -40,7 +40,7 @@ Keywords: LkSG §9, indirect supplier, mittelbare Zulieferer, substantiated know
 
 ---
 
-bafa_lksg_policy_statement
+lksg §6(2)  (bafa_lksg_policy_statement)
 Title: Policy statement (Grundsatzerklarung) under §6(2) LkSG — mandatory content; annual publication; senior management approval
 Obligation: MUST
 Threshold: All LkSG-obligated companies; must be published on company website and updated at least annually
@@ -49,7 +49,7 @@ Keywords: LkSG §6(2), Grundsatzerklarung, policy statement, human rights strate
 
 ---
 
-bafa_lksg_complaints_mechanism
+lksg §8  (bafa_lksg_complaints_mechanism)
 Title: Complaints mechanism under §8 LkSG — accessible inside and outside Germany; anonymous reporting; 3-month response; confidentiality; independence
 Obligation: MUST
 Threshold: All LkSG-obligated companies; mechanism must be operational and publicly known before LkSG obligations apply
@@ -58,7 +58,7 @@ Keywords: LkSG §8, complaints mechanism, Beschwerdeverfahren, anonymous reporti
 
 ---
 
-bafa_lksg_preventive_measures
+lksg §6  (bafa_lksg_preventive_measures)
 Title: Preventive measures under §6 LkSG — contractual assurances; training; supplier selection; supplier development
 Obligation: MUST
 Threshold: All LkSG-obligated companies; preventive measures required for own operations and all direct supplier relationships
@@ -67,7 +67,7 @@ Keywords: LkSG §6, preventive measures, Praventionsmassnahmen, contractual assu
 
 ---
 
-bafa_lksg_remediation
+lksg §7  (bafa_lksg_remediation)
 Title: Remediation obligations under §7 LkSG — immediate action; phased elimination; contract termination as last resort; documentation
 Obligation: MUST
 Threshold: All LkSG-obligated companies upon discovery or reliable indication of a violation of a protected position in own operations or at a direct supplier
@@ -76,7 +76,7 @@ Keywords: LkSG §7, remediation, Abhilfemassnahmen, corrective action plan, cont
 
 ---
 
-bafa_lksg_reporting
+lksg §10  (bafa_lksg_reporting)
 Title: Annual report under §10 LkSG — mandatory content; public availability; 4-month deadline after financial year end; BAFA portal
 Obligation: MUST
 Threshold: All LkSG-obligated companies; report must be published within 4 months after the end of the financial year covered
@@ -85,7 +85,7 @@ Keywords: LkSG §10, annual report, Bericht, 4-month deadline, BAFA portal, mand
 
 ---
 
-bafa_lksg_enforcement
+lksg §13  (bafa_lksg_enforcement)
 Title: BAFA enforcement — inspections; orders; fines up to €8M or 2% annual revenue; public procurement exclusion
 Obligation: MUST
 Threshold: BAFA as competent enforcement authority for LkSG; enforcement actions apply to all in-scope companies
@@ -94,7 +94,7 @@ Keywords: BAFA, LkSG enforcement, Betriebspruefung, inspection, administrative f
 
 ---
 
-bafa_lksg_environmental_due_diligence
+lksg §2(3)  (bafa_lksg_environmental_due_diligence)
 Title: Environmental due diligence under LkSG — covered environmental violations; Basel Convention; Minamata Convention; nexus to human rights harm
 Obligation: MUST
 Threshold: All LkSG-obligated companies; environmental violations are covered where they cause or threaten to cause human rights harm as defined in §2 LkSG
@@ -103,7 +103,7 @@ Keywords: LkSG environmental, Umweltpflichten, Basel Convention, Minamata Conven
 
 ---
 
-bafa_lksg_sme_guidance
+lksg §3(2)  (bafa_lksg_sme_guidance)
 Title: BAFA guidance for smaller in-scope companies (1,000–3,000 employees) — proportionality principle; industry association tools; third-party assurance
 Obligation: CONDITIONAL
 Threshold: LkSG-obligated companies with 1,000 to 3,000 employees; proportionality principle under §3(2) LkSG applies
@@ -121,7 +121,7 @@ Keywords: LkSG sector, automotive, garment, textile, electronics, agriculture, c
 
 ---
 
-bafa_lksg_documentation
+lksg §10(2)  (bafa_lksg_documentation)
 Title: Documentation requirements under LkSG — risk analyses, preventive measures, investigations, remediation; 7-year retention; BAFA access
 Obligation: MUST
 Threshold: All LkSG-obligated companies; documentation obligations arise from §10(2) LkSG and are referenced in §§5–9 for specific due diligence steps
@@ -130,7 +130,7 @@ Keywords: LkSG documentation, Dokumentationspflicht, 7-year retention, BAFA insp
 
 ---
 
-bafa_lksg_2024_update
+lksg §1  (bafa_lksg_2024_update)
 Title: LkSG scope extension from 1 January 2024 — companies with 1,000+ employees now in scope; transition guidance for new entrants
 Obligation: MUST
 Threshold: Companies with registered seat or principal place of business in Germany with 1,000 or more employees (including employees of affiliated companies — §2(6) LkSG subsidiaries); from 1 January 2024
