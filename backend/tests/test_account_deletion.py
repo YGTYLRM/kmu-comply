@@ -1,7 +1,7 @@
 """
 Live integration test for DELETE /api/account (GDPR Art. 17).
 
-Found via a manual self-audit (see SESSION_LOG.md Session 31c) that this
+Found via a manual self-audit that this
 endpoint silently left most of a user's data behind — including the Supabase
 auth account itself — despite the privacy policy explicitly promising full
 self-service deletion. That bug had zero test coverage and shipped

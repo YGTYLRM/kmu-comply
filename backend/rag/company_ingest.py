@@ -196,8 +196,8 @@ def _delete_pgvector_company_chunks(job_id: str) -> None:
     cleanup loop, and routes/companies.py's account-deletion endpoint — where
     a plain asyncio.run() raises "cannot be called from a running event
     loop". Found via a live self-audit test of account deletion, not by
-    inspection: the isolated dual-write verification script in Session 31
-    only ever ran outside any event loop, so it never exercised this path.
+    inspection: an earlier isolated dual-write verification script only
+    ever ran outside any event loop, so it never exercised this path.
     Detect which situation applies and dispatch accordingly instead of
     assuming one or the other.
     """
