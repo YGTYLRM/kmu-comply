@@ -42,9 +42,8 @@ def retrieve(query: str, regulations: list[str], top_k: int | None = None) -> li
     directly.
 
     Falls back to ChromaDB when no DATABASE_URL is configured — local dev
-    and fresh clones have historically never needed Postgres for retrieval
-    (see .dev-notes.md's ChromaDB-only setup_data.py flow), and this flag
-    flipping to true shouldn't force that requirement on them.
+    and fresh clones have historically never needed Postgres for retrieval,
+    and this flag flipping to true shouldn't force that requirement on them.
 
     Also falls back to ChromaDB whenever scripts/canary_check.py's kill-switch
     file exists — settings.pgvector_retrieval_enabled is a pydantic-settings

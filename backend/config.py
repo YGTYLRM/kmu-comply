@@ -4,8 +4,7 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Defaults to .env (production credentials). Set ENV_FILE=.env.development
-# to point this process at the staging Supabase project instead — see
-# .dev-notes.md for the dev/staging/prod setup.
+# to point this process at the staging Supabase project instead.
 _ENV_FILE = os.environ.get("ENV_FILE", ".env")
 
 # Single source of truth for the pgvector kill-switch path — was previously
