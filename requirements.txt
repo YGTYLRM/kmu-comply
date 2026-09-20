@@ -40,7 +40,7 @@ ruff>=0.4.0
 python-multipart>=0.0.31  # CVE-2026-53538/53539/53540 fixed here
 
 # Email
-resend>=2.0.0
+resend>=2.46.0
 
 # Database
 sqlalchemy[asyncio]>=2.0.0
