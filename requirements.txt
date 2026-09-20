@@ -7,7 +7,7 @@ email-validator>=2.0.0
 python-dotenv>=1.0.0
 
 # LLM & Agent
-langchain>=0.2.0
+langchain>=1.4.1
 langchain-community>=0.2.0
 openai>=1.30.0
 anthropic>=0.28.0
