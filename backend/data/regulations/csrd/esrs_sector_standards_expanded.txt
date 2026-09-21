@@ -6,7 +6,7 @@ SMEs listed: from 1 January 2026 (voluntary VSME standard available)
 
 ---
 
-esrs1_double_materiality
+ESRS 1  (esrs1_double_materiality)
 Title: Double materiality assessment — financial and impact materiality, methodology requirement
 Obligation: MUST
 Threshold: All companies in scope of CSRD — first step before determining which standards apply
@@ -15,7 +15,7 @@ Keywords: double materiality, financial materiality, impact materiality, ESRS 1,
 
 ---
 
-esrs1_value_chain_scope
+ESRS 1  (esrs1_value_chain_scope)
 Title: Value chain scope of ESRS disclosures — upstream, own operations, downstream
 Obligation: MUST
 Threshold: All companies reporting under CSRD — determines scope of data collection
@@ -24,7 +24,7 @@ Keywords: value chain, upstream, downstream, own operations, Scope 3, supplier d
 
 ---
 
-esrs_e1_climate_governance
+ESRS E1  (esrs_e1_climate_governance)
 Title: ESRS E1 — Governance of climate-related risks and opportunities
 Obligation: MUST (if climate is material)
 Threshold: Companies for which climate change is a material topic (most large companies)
@@ -33,7 +33,7 @@ Keywords: ESRS E1, climate governance, TCFD, board oversight, management roles, 
 
 ---
 
-esrs_e1_ghg_emissions
+ESRS E1  (esrs_e1_ghg_emissions)
 Title: ESRS E1 — GHG emissions disclosure: Scope 1, 2, and 3
 Obligation: MUST (if climate is material)
 Threshold: Companies for which climate change is material — Scope 1 and 2 always required when climate is material; Scope 3 phased
@@ -42,7 +42,7 @@ Keywords: ESRS E1, Scope 1, Scope 2, Scope 3, GHG emissions, CO2 equivalent, GHG
 
 ---
 
-esrs_e1_transition_plan
+ESRS E1  (esrs_e1_transition_plan)
 Title: ESRS E1 — Climate transition plan disclosures
 Obligation: MUST (mandatory cross-cutting under ESRS 2 if material)
 Threshold: All large companies in CSRD scope — transition plan or explanation of absence required
@@ -51,7 +51,7 @@ Keywords: ESRS E1, transition plan, decarbonisation targets, 2030 targets, net z
 
 ---
 
-esrs_e1_physical_risks
+ESRS E1  (esrs_e1_physical_risks)
 Title: ESRS E1 — Physical climate risk assessment and adaptation measures
 Obligation: MUST (if climate is material)
 Threshold: Companies with material climate-related physical risks — particularly relevant for manufacturing, real estate, agriculture, and infrastructure
@@ -60,7 +60,7 @@ Keywords: ESRS E1, physical climate risk, acute risk, chronic risk, flooding, he
 
 ---
 
-esrs_s1_workforce_disclosures
+ESRS S1  (esrs_s1_workforce_disclosures)
 Title: ESRS S1 — Own workforce — headcount, contracts, and gender metrics
 Obligation: MUST (if own workforce is material — typically always material for employers)
 Threshold: All companies in CSRD scope with their own employees
@@ -69,7 +69,7 @@ Keywords: ESRS S1, own workforce, headcount, gender pay gap, full-time, part-tim
 
 ---
 
-esrs_s1_working_conditions
+ESRS S1  (esrs_s1_working_conditions)
 Title: ESRS S1 — Working conditions, health and safety performance indicators
 Obligation: MUST (if material)
 Threshold: All companies with employees — health and safety typically always material
@@ -78,7 +78,7 @@ Keywords: ESRS S1, health and safety, LTIR, lost time injury rate, fatalities, r
 
 ---
 
-esrs_s1_equal_treatment
+ESRS S1  (esrs_s1_equal_treatment)
 Title: ESRS S1 — Equal treatment, opportunities, and measures against discrimination
 Obligation: MUST (if material)
 Threshold: Companies with employees — typically material for all large employers
@@ -87,7 +87,7 @@ Keywords: ESRS S1, equal treatment, non-discrimination, gender pay gap, parental
 
 ---
 
-esrs_s2_value_chain_workers
+ESRS S2  (esrs_s2_value_chain_workers)
 Title: ESRS S2 — Workers in the value chain — due diligence and impacts
 Obligation: MUST (if value chain worker rights are material)
 Threshold: Companies with supply chains involving significant human rights risks (manufacturing, textiles, agriculture, electronics)
@@ -96,7 +96,7 @@ Keywords: ESRS S2, value chain workers, human rights, child labour, forced labou
 
 ---
 
-esrs_g1_business_conduct
+ESRS G1  (esrs_g1_business_conduct)
 Title: ESRS G1 — Business conduct — anti-corruption, anti-bribery, and fair competition
 Obligation: MUST (governance typically always material)
 Threshold: All companies in CSRD scope — business conduct is expected to be material for all large companies
@@ -105,7 +105,7 @@ Keywords: ESRS G1, anti-corruption, anti-bribery, lobbying, political contributi
 
 ---
 
-esrs_materiality_phased_requirements
+ESRS 1  (esrs_materiality_phased_requirements)
 Title: ESRS phase-in and transitional provisions — what can be omitted in early years
 Obligation: CONDITIONAL (phase-in applies to specific datapoints in first reporting years)
 Threshold: Companies reporting under CSRD for the first time in 2024, 2025, or 2026

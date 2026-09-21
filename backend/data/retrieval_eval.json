@@ -1405,8 +1405,7 @@
     "collection": "enefg",
     "question": "What energy efficiency obligations apply to large companies under EnEfG?",
     "expected_articles": [
-      "§ 8",
-      "enefg_scope_non_sme"
+      "§ 8"
     ],
     "notes": "Energy management or audit for large companies"
   },
@@ -1426,8 +1425,7 @@
     "collection": "enefg",
     "question": "What energy consumption reporting obligations exist for companies under EnEfG?",
     "expected_articles": [
-      "enefg_bafa_reporting_obligations",
-      "enefg_energy_monitoring"
+      "§ 8"
     ],
     "notes": "BAFA reporting of audit results and consumption data"
   },
@@ -1457,7 +1455,7 @@
     "collection": "enefg",
     "question": "What waste heat obligations apply to industrial companies under EnEfG?",
     "expected_articles": [
-      "§ 15"
+      "§ 16"
     ],
     "notes": "Abwärmenutzung obligation"
   },
@@ -1497,7 +1495,7 @@
     "collection": "enefg",
     "question": "What penalties apply if a large company fails to conduct a required energy audit?",
     "expected_articles": [
-      "§ 26"
+      "§ 13"
     ],
     "notes": "Bußgeld for energy audit non-compliance"
   },
@@ -1547,7 +1545,7 @@
     "collection": "enefg",
     "question": "What technical feasibility assessment must companies with significant waste heat conduct?",
     "expected_articles": [
-      "§ 15"
+      "§ 16"
     ],
     "notes": "Feasibility study for waste heat reuse"
   },
@@ -1587,7 +1585,7 @@
     "collection": "csrd",
     "question": "What does double materiality mean in the context of CSRD sustainability reporting?",
     "expected_articles": [
-      "Article 1"
+      "ESRS 1"
     ],
     "notes": "Materiality assessment — impact and financial"
   },
@@ -1617,7 +1615,7 @@
     "collection": "csrd",
     "question": "What climate-related disclosures must large companies include in their CSRD reports?",
     "expected_articles": [
-      "Article 1"
+      "ESRS E1"
     ],
     "notes": "Climate-specific ESRS requirements"
   },
@@ -1637,7 +1635,7 @@
     "collection": "csrd",
     "question": "What information about the company's value chain must be included in a CSRD report?",
     "expected_articles": [
-      "Article 1"
+      "ESRS 1"
     ],
     "notes": "Upstream and downstream value chain disclosure"
   },
@@ -2277,7 +2275,7 @@
     "collection": "csrd",
     "question": "What biodiversity and ecosystem impact disclosures are required under CSRD?",
     "expected_articles": [
-      "Article 1"
+      "ESRS E4"
     ],
     "notes": "ESRS E4 biodiversity reporting"
   },
@@ -2287,7 +2285,7 @@
     "collection": "csrd",
     "question": "What own-workforce social disclosures must a company include in its CSRD report?",
     "expected_articles": [
-      "Article 1"
+      "ESRS S1"
     ],
     "notes": "ESRS S1 own workforce"
   },
@@ -2297,7 +2295,7 @@
     "collection": "csrd",
     "question": "How must a company conduct a materiality assessment for its CSRD sustainability report?",
     "expected_articles": [
-      "Article 1"
+      "ESRS 1"
     ],
     "notes": "Double materiality assessment process"
   },
@@ -2307,7 +2305,7 @@
     "collection": "csrd",
     "question": "What governance structure disclosures are required under CSRD?",
     "expected_articles": [
-      "Article 1"
+      "ESRS 2"
     ],
     "notes": "ESRS G1 governance topics"
   },
@@ -2740,5 +2738,105 @@
       "Article 13"
     ],
     "notes": "Unfair contract terms in B2B data sharing"
+  },
+  {
+    "id": "euda-006",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What must a connected product be designed to allow regarding user access to the data it generates?",
+    "expected_articles": [
+      "Article 3"
+    ],
+    "notes": "Access-by-design obligation for connected products"
+  },
+  {
+    "id": "euda-007",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What must a manufacturer tell a prospective buyer about a connected product's data generation before the sale is concluded?",
+    "expected_articles": [
+      "Article 3"
+    ],
+    "notes": "Pre-contractual data-generation information duty"
+  },
+  {
+    "id": "euda-008",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "If a user asks a data holder to share their connected-product data with a third party, what must the data holder do?",
+    "expected_articles": [
+      "Article 5"
+    ],
+    "notes": "Third-party data sharing on user instruction"
+  },
+  {
+    "id": "euda-009",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "Can a data holder use data from a connected product to derive insights that undermine the user's commercial position?",
+    "expected_articles": [
+      "Article 6"
+    ],
+    "notes": "No-exclusive-use restriction on data holders"
+  },
+  {
+    "id": "euda-010",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What conditions must a data-sharing contract clause meet to avoid being considered unfair under the EU Data Act?",
+    "expected_articles": [
+      "Article 13"
+    ],
+    "notes": "Unfair contract terms test, second angle on Art. 13"
+  },
+  {
+    "id": "euda-011",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What kinds of obstacles to switching between data processing service providers must a company remove?",
+    "expected_articles": [
+      "Article 23"
+    ],
+    "notes": "Switching-obstacle removal duty, second angle on Art. 23"
+  },
+  {
+    "id": "euda-012",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "By when must cloud and data processing service switching fees be phased out under the EU Data Act?",
+    "expected_articles": [
+      "Article 25"
+    ],
+    "notes": "Switching fee phase-out deadline"
+  },
+  {
+    "id": "euda-013",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What is the maximum time a data processing service provider has to complete a customer's switch to a new provider?",
+    "expected_articles": [
+      "Article 25"
+    ],
+    "notes": "30-business-day switching completion limit"
+  },
+  {
+    "id": "euda-014",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "What must a data processing service provider set out in a written contract regarding a customer's switching rights?",
+    "expected_articles": [
+      "Article 25"
+    ],
+    "notes": "Switching contract clause requirement"
+  },
+  {
+    "id": "adv-euda-001",
+    "regulation": "eu_data_act",
+    "collection": "eu_data_act",
+    "question": "A logistics company's fleet-tracking devices generate location and engine data, but the company cannot access this data directly from the devices themselves. Can it request this data from the device manufacturer?",
+    "expected_articles": [
+      "Article 4"
+    ],
+    "notes": "Applied scenario: data access on request when direct access is unavailable"
   }
 ]
