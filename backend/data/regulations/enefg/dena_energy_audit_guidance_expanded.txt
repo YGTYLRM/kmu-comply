@@ -5,7 +5,7 @@ BAFA Enforcement and Guidance for Companies Subject to Energy Obligations
 
 ---
 
-enefg_scope_non_sme
+enefg §8  (enefg_scope_non_sme)
 Title: EnEfG scope — non-SME definition and applicability
 Obligation: MUST
 Threshold: Companies that are not small or medium enterprises (non-SME) under EU definition
@@ -14,7 +14,7 @@ Keywords: EnEfG scope, non-SME, SME definition, 250 employees, €50M revenue, �
 
 ---
 
-enefg_edlg_audit_obligation
+enefg §8  (enefg_edlg_audit_obligation)
 Title: EDL-G §8 energy audit obligation — 4-year cycle, accredited auditor requirement
 Obligation: MUST
 Threshold: Non-SME companies not operating a certified ISO 50001 energy management system
@@ -23,7 +23,7 @@ Keywords: EDL-G §8, energy audit, 4-year cycle, DIN EN 16247-1, BAFA, auditor a
 
 ---
 
-enefg_7500_mwh_threshold
+enefg §8(1)  (enefg_7500_mwh_threshold)
 Title: EnEfG §8(1) — additional obligations for companies consuming more than 7,500 MWh/year
 Obligation: MUST
 Threshold: Companies consuming more than 7,500 MWh of final energy per year across all facilities in Germany, regardless of size classification
@@ -32,7 +32,7 @@ Keywords: EnEfG §8(1), 7,500 MWh threshold, ISO 50001, EMAS, energy management 
 
 ---
 
-din_en_16247_methodology
+enefg §8  (din_en_16247_methodology)
 Title: DIN EN 16247-1 energy audit methodology — phases and minimum content requirements
 Obligation: MUST
 Threshold: All companies conducting energy audits under EDL-G §8
@@ -41,7 +41,7 @@ Keywords: DIN EN 16247, energy audit methodology, preparatory meeting, data coll
 
 ---
 
-iso_50001_energy_management
+enefg §8  (iso_50001_energy_management)
 Title: ISO 50001 energy management system — structure, certification, and benefits
 Obligation: MUST (if chosen as alternative to energy audit under EDL-G §8 or EnEfG §8(1))
 Threshold: Companies choosing ISO 50001 as the preferred compliance path
@@ -50,7 +50,7 @@ Keywords: ISO 50001, energy management system, certification, DAkkS, Plan-Do-Che
 
 ---
 
-enefg_waste_heat_utilisation
+enefg §16  (enefg_waste_heat_utilisation)
 Title: EnEfG waste heat obligation — identification and feasibility assessment
 Obligation: MUST
 Threshold: Non-SME companies and companies consuming more than 2,500 MWh/year of final energy
@@ -59,7 +59,7 @@ Keywords: waste heat, Abwärme, district heating, EnEfG waste heat obligation, f
 
 ---
 
-enefg_bafa_reporting_obligations
+enefg §8  (enefg_bafa_reporting_obligations)
 Title: BAFA reporting — submission of audit results, EnMS certificates, and consumption data
 Obligation: MUST
 Threshold: All companies subject to EDL-G §8 or EnEfG §8(1)
@@ -77,7 +77,7 @@ Keywords: GEG, Gebäudeenergiegesetz, building energy, 65% renewable heating, he
 
 ---
 
-enefg_energy_monitoring
+enefg §8  (enefg_energy_monitoring)
 Title: Energy monitoring and metering — data collection for management and reporting
 Obligation: SHOULD (monitoring systems) / MUST (data collection for audits and BAFA reporting)
 Threshold: All companies in scope of EDL-G §8 or EnEfG §8(1)
