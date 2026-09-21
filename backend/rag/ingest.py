@@ -476,9 +476,16 @@ def _chunk_separator_blocks(text: str, regulation: str, filename: str, url: str)
             continue
         lines = block.splitlines()
         first = lines[0].strip()
-        # Extract article reference (e.g. "hinschg §12(1)" → "§12(1)")
+        # Extract article reference (e.g. "hinschg §12(1)" → "§12(1)",
+        # "esrs E1 ..." → "ESRS E1" for CSRD's ESRS-standard guidance blocks)
         art_match = _re.search(r"§\s*(\S+)", first)
-        article_number = f"§ {art_match.group(1)}" if art_match else first[:40]
+        esrs_match = _re.search(r"\bESRS\s+(\S+)", first, _re.IGNORECASE) if not art_match else None
+        if art_match:
+            article_number = f"§ {art_match.group(1)}"
+        elif esrs_match:
+            article_number = f"ESRS {esrs_match.group(1).upper()}"
+        else:
+            article_number = first[:40]
         # Extract title from "Title: ..." line
         title = article_number
         for line in lines[1:6]:
