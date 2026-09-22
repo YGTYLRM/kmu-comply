@@ -13,14 +13,24 @@ from models.compliance_report import (
 )
 from models.enums import Regulation, ComplianceStatus, Priority
 from services.pdf_generator import generate_pdf
+from agent.actions import _weighted_score
+
+regulation_scores = [
+    RegulationScore(regulation=Regulation.GDPR,    total_requirements=3, compliant=1, partially_compliant=1, non_compliant=1, cannot_assess=0, score_percent=33.0),
+    RegulationScore(regulation=Regulation.HINSCHG, total_requirements=1, compliant=0, partially_compliant=0, non_compliant=1, cannot_assess=0, score_percent=0.0),
+    RegulationScore(regulation=Regulation.ARBSCHG, total_requirements=1, compliant=1, partially_compliant=0, non_compliant=0, cannot_assess=0, score_percent=100.0),
+    RegulationScore(regulation=Regulation.AI_ACT,  total_requirements=1, compliant=0, partially_compliant=1, non_compliant=0, cannot_assess=0, score_percent=50.0),
+    RegulationScore(regulation=Regulation.AGG,     total_requirements=1, compliant=1, partially_compliant=0, non_compliant=0, cannot_assess=0, score_percent=100.0),
+    RegulationScore(regulation=Regulation.MILOG,   total_requirements=1, compliant=0, partially_compliant=0, non_compliant=0, cannot_assess=1, score_percent=50.0),
+]
 
 report = ComplianceReport(
     job_id="preview-001",
     company_name="Muster GmbH",
     generated_at="2026-05-10T12:00:00",
-    overall_score_percent=47.3,
+    overall_score_percent=_weighted_score(regulation_scores),
     executive_summary=(
-        "Die Muster GmbH zeigt eine teilweise Compliance über die acht anwendbaren Vorschriften. "
+        "Die Muster GmbH zeigt eine teilweise Compliance über die sieben anwendbaren Vorschriften. "
         "Kritische Lücken bestehen bei den Betroffenenrechten nach DSGVO sowie beim verpflichtenden "
         "Hinweisgebersystem nach HinSchG. Das Unternehmen verfügt über eine solide Grundlage im "
         "Arbeitsschutz, benötigt jedoch dringend Aufmerksamkeit bei Auftragsverarbeitungsverträgen und "
@@ -163,14 +173,7 @@ report = ComplianceReport(
             dependencies=[],
         ),
     ],
-    regulation_scores=[
-        RegulationScore(regulation=Regulation.GDPR,    total_requirements=3, compliant=1, partially_compliant=1, non_compliant=1, cannot_assess=0, score_percent=33.0),
-        RegulationScore(regulation=Regulation.HINSCHG, total_requirements=1, compliant=0, partially_compliant=0, non_compliant=1, cannot_assess=0, score_percent=0.0),
-        RegulationScore(regulation=Regulation.ARBSCHG, total_requirements=1, compliant=1, partially_compliant=0, non_compliant=0, cannot_assess=0, score_percent=100.0),
-        RegulationScore(regulation=Regulation.AI_ACT,  total_requirements=1, compliant=0, partially_compliant=1, non_compliant=0, cannot_assess=0, score_percent=50.0),
-        RegulationScore(regulation=Regulation.AGG,     total_requirements=1, compliant=1, partially_compliant=0, non_compliant=0, cannot_assess=0, score_percent=100.0),
-        RegulationScore(regulation=Regulation.MILOG,   total_requirements=1, compliant=0, partially_compliant=0, non_compliant=0, cannot_assess=1, score_percent=50.0),
-    ],
+    regulation_scores=regulation_scores,
 )
 
 pdf_bytes = generate_pdf(report)
