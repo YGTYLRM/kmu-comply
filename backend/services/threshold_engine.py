@@ -35,6 +35,7 @@ class EnEfGResult:
     applies: bool
     edl_g_audit_required: bool
     energy_management_required: bool
+    implementation_plan_required: bool
     waste_heat_reporting_required: bool
     reason: str
 
@@ -312,7 +313,15 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
       ⚠ THRESHOLD IS A 3-YEAR AVERAGE, not a single year's consumption.
 
     TRACK 2 — EnEfG §9: Energy-saving implementation plans:
-      Required for companies subject to §8(1) (>7.5 GWh).
+      [Verified from official text — gesetze-im-internet.de/enefg/__9.html]:
+      "Unternehmen mit einem jährlichen durchschnittlichen Gesamtendenergieverbrauch
+       innerhalb der letzten drei abgeschlossenen Kalenderjahre von mehr als
+       2,5 Gigawattstunden sind verpflichtet, [...] konkrete, durchführbare
+       Umsetzungspläne zu erstellen und zu veröffentlichen."
+      → Independent of §8(1): applies to ANY company (SME or not) with >2.5 GWh
+        AVERAGE consumption, a lower threshold than the >7.5 GWh EnMS duty, so a
+        company between 2.5 and 7.5 GWh owes implementation plans without yet
+        owing an EnMS.
 
     Waste heat — EnEfG §15 (now §16 after 2024 renumbering):
       Non-SME companies with technically usable waste heat ≥200 kW must assess,
@@ -336,10 +345,15 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
     # regardless of SME status. Previous code incorrectly gated this on non-SME.
     enms_required = energy_gwh > 7.5
 
+    # TRACK 2: EnEfG §9 — independent, lower 2.5 GWh threshold for implementation
+    # plans. Every company subject to §8(1) (>7.5 GWh) is also above this, but a
+    # company between 2.5 and 7.5 GWh owes this duty without owing an EnMS.
+    implementation_plan_required = energy_gwh > 2.5
+
     # TRACK 1: EDL-G §8 audit — applies only to non-SME companies
     edl_g_audit_required = is_non_sme
 
-    applies = is_non_sme or enms_required
+    applies = is_non_sme or enms_required or implementation_plan_required
 
     if not applies:
         unmet = []
@@ -356,18 +370,19 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
                 else f"Bilanzsumme {profile.balance_sheet_total_eur:,.0f} EUR <= 43 Mio."
             )
         energy_note = (
-            "jährlicher Energieverbrauch nicht angegeben - bitte angeben, um §8 Abs. 1 EnEfG zu prüfen"
+            "jährlicher Energieverbrauch nicht angegeben - bitte angeben, um §8 Abs. 1 und §9 EnEfG zu prüfen"
             if energy_mwh == 0
-            else f"Energieverbrauch {energy_gwh:.1f} GWh <= Schwellenwert von 7,5 GWh"
+            else f"Energieverbrauch {energy_gwh:.1f} GWh <= Schwellenwert von 2,5 GWh"
         )
         return EnEfGResult(
             applies=False,
             edl_g_audit_required=False,
             energy_management_required=False,
+            implementation_plan_required=False,
             waste_heat_reporting_required=False,
             reason=(
                 f"EnEfG / EDL-G sind nicht anwendbar - das Unternehmen gilt als EU-KMU "
-                f"({'; '.join(unmet)}) und {energy_note} (§8 Abs. 1 EnEfG)."
+                f"({'; '.join(unmet)}) und {energy_note} (§8 Abs. 1, §9 EnEfG)."
             ),
         )
 
@@ -385,7 +400,7 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
 
     if energy_mwh == 0:
         obligations.append(
-            "jährlicher Energieverbrauch nicht angegeben - Status nach §8 Abs. 1 EnEfG kann "
+            "jährlicher Energieverbrauch nicht angegeben - Status nach §8 Abs. 1 und §9 EnEfG kann "
             "nicht bestätigt werden; bitte 3-Jahres-Durchschnittsverbrauch in GWh angeben"
         )
     elif enms_required:
@@ -393,6 +408,12 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
             f"Energieverbrauch {energy_gwh:.1f} GWh > 7,5 GWh (3-Jahres-Durchschnitt) - "
             f"zertifiziertes Energie- oder Umweltmanagementsystem (ISO 50001 oder EMAS) "
             f"verpflichtend (§8 Abs. 1 EnEfG); Energieeinsparungs-Umsetzungspläne erforderlich (§9 EnEfG)"
+        )
+    elif implementation_plan_required:
+        obligations.append(
+            f"Energieverbrauch {energy_gwh:.1f} GWh > 2,5 GWh (3-Jahres-Durchschnitt) - "
+            f"konkrete Energieeinsparungs-Umsetzungspläne erforderlich (§9 EnEfG), auch ohne "
+            f"Pflicht zum Energie- oder Umweltmanagementsystem"
         )
 
     reason = (
@@ -404,6 +425,7 @@ def check_enefg(profile: CompanyProfile) -> EnEfGResult:
         applies=True,
         edl_g_audit_required=edl_g_audit_required,
         energy_management_required=enms_required,
+        implementation_plan_required=implementation_plan_required,
         waste_heat_reporting_required=is_non_sme,
         reason=reason,
     )
