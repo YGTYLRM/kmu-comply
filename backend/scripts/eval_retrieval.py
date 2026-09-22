@@ -47,7 +47,10 @@ def _normalise(article: str) -> str:
     # Remove subsection suffix on § numbers: § 12a → § 12a (keep letter), but § 12(1) already stripped
     # Normalise various "Article N" formats
     a = _re.sub(r'\b(?:eu_ai_act|nis2|gdpr|csrd|hinschg|arbschg|workplace_law|lksg|enefg|bdsg|agg|milog)\s+', '', a)
-    a = _re.sub(r'\bart\.?\s+', 'article ', a)
+    # "Artikel" is the German spelling of "Article" -- German-language
+    # eval questions retrieve chunks tagged "Artikel N", which must
+    # normalise the same as "Article N" / "Art. N" to be scored correctly.
+    a = _re.sub(r'\bart(?:ikel|\.)?\s+', 'article ', a)
     a = a.strip()
     return a
 
