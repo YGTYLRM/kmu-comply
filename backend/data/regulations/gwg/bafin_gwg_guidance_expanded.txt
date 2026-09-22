@@ -5,7 +5,7 @@ FATF Recommendations applicable to Germany — Version 2024
 
 ---
 
-bafin_gwg_obligated_entities
+gwg §2  (bafin_gwg_obligated_entities)
 Title: GwG obligated entities — who is subject to AML/CFT obligations under §2 GwG
 Obligation: MUST
 Threshold: All entities listed in §2 GwG regardless of size
@@ -14,7 +14,7 @@ Keywords: GwG §2, obligated entities, Verpflichtete, AML scope, BaFin, real est
 
 ---
 
-bafin_gwg_risk_analysis_sec5
+gwg §5  (bafin_gwg_risk_analysis_sec5)
 Title: §5 GwG — AML/CFT risk analysis obligation for all obligated entities
 Obligation: MUST
 Threshold: All obligated entities under §2 GwG regardless of size
@@ -23,7 +23,7 @@ Keywords: GwG §5, risk analysis, money laundering risk, terrorist financing, Ri
 
 ---
 
-bafin_gwg_standard_cdd_sec10
+gwg §10  (bafin_gwg_standard_cdd_sec10)
 Title: §10 GwG — standard customer due diligence (CDD) requirements
 Obligation: MUST
 Threshold: All obligated entities — for all business relationships and certain transactions
@@ -32,7 +32,7 @@ Keywords: §10 GwG, standard CDD, customer identification, KYC, beneficial owner
 
 ---
 
-bafin_gwg_beneficial_owner_sec3_sec19
+gwg §3  (bafin_gwg_beneficial_owner_sec3_sec19)
 Title: §3 and §19 GwG — beneficial owner identification and Transparenzregister
 Obligation: MUST
 Threshold: All obligated entities when establishing a business relationship with a legal entity
@@ -41,7 +41,7 @@ Keywords: beneficial owner, wirtschaftlich Berechtigter, §3 GwG, §19 GwG, Tran
 
 ---
 
-bafin_gwg_pep_requirements
+gwg §13  (bafin_gwg_pep_requirements)
 Title: §13 GwG — enhanced due diligence for politically exposed persons (PEPs)
 Obligation: MUST
 Threshold: All obligated entities when the customer or beneficial owner is a PEP or PEP associate
@@ -50,7 +50,7 @@ Keywords: PEP, politically exposed person, §13 GwG, enhanced due diligence, sou
 
 ---
 
-bafin_gwg_enhanced_cdd_sec15
+gwg §15  (bafin_gwg_enhanced_cdd_sec15)
 Title: §15 GwG — enhanced due diligence triggers and measures for high-risk situations
 Obligation: MUST
 Threshold: All obligated entities — when high-risk factors are identified
@@ -59,7 +59,7 @@ Keywords: §15 GwG, enhanced CDD, high-risk third countries, ECDD triggers, sour
 
 ---
 
-bafin_gwg_simplified_cdd_sec14
+gwg §14  (bafin_gwg_simplified_cdd_sec14)
 Title: §14 GwG — simplified due diligence for lower-risk customers
 Obligation: MAY (at entity's discretion when criteria are met)
 Threshold: All obligated entities — applicable only to customers classified as low-risk
@@ -68,7 +68,7 @@ Keywords: §14 GwG, simplified CDD, SCDD, low-risk customers, regulated institut
 
 ---
 
-bafin_gwg_sar_reporting_sec43
+gwg §43  (bafin_gwg_sar_reporting_sec43)
 Title: §43 GwG — suspicious activity reporting (SAR) to the German FIU
 Obligation: MUST
 Threshold: All obligated entities — upon formation of suspicion regardless of transaction amount
@@ -77,7 +77,7 @@ Keywords: §43 GwG, SAR, suspicious activity report, Verdachtsmeldung, FIU, Zoll
 
 ---
 
-bafin_gwg_record_keeping_sec8
+gwg §8  (bafin_gwg_record_keeping_sec8)
 Title: §8 GwG — record keeping obligations for CDD documentation
 Obligation: MUST
 Threshold: All obligated entities — for all CDD records and transaction documentation
@@ -86,16 +86,25 @@ Keywords: §8 GwG, record keeping, 5-year retention, CDD records, transaction re
 
 ---
 
-bafin_gwg_internal_safeguards_sec6
-Title: §6 GwG — internal safeguards: AML officer, training, internal controls, whistleblowing
+gwg §6  (bafin_gwg_internal_safeguards_sec6)
+Title: §6 GwG — internal safeguards: employee training, reliability screening, whistleblowing channel
 Obligation: MUST
 Threshold: All obligated entities — specific organisational requirements
-Text: Section 6 GwG requires obligated entities to implement internal AML/CFT safeguards appropriate to the nature and size of the business. The core requirements are: (1) Appointment of a money laundering reporting officer (Geldwäschebeauftragter, MLRO): the MLRO must be at management level or directly reporting to management; they are the central point of contact for AML/CFT matters within the entity and for the supervisory authority; they must have sufficient resources, authority, and access to relevant information; the MLRO and their deputy must be notified to the competent supervisory authority. Smaller obligated entities may be exempt from the mandatory MLRO requirement if their supervisory authority grants an exemption based on proportionality — but this does not exempt them from the substantive AML obligations. (2) Employee training: all employees involved in or relevant to AML/CFT compliance must receive training on the legal requirements, the entity's internal AML procedures, current money laundering typologies, and the SAR reporting procedure; training must be conducted at minimum annually and documented; records must show individual employee name, date, content, and completion. (3) Reliability screening of employees: employees must be assessed for reliability (Zuverlässigkeit) at hiring in AML-relevant roles; ongoing monitoring for changes that affect reliability. (4) Whistleblowing channel: obligated entities must maintain a channel through which employees can confidentially report AML violations; this channel must be independent from the line management of the AML officer.
-Keywords: §6 GwG, MLRO, Geldwäschebeauftragter, internal safeguards, AML officer, employee training, reliability screening, whistleblowing, AML internal controls, organisational requirements
+Text: Section 6 GwG requires obligated entities to implement internal AML/CFT safeguards appropriate to the nature and size of the business, alongside the separate obligation under §7 GwG to appoint a money laundering reporting officer. The §6 requirements are: (1) Employee training: all employees involved in or relevant to AML/CFT compliance must receive training on the legal requirements, the entity's internal AML procedures, current money laundering typologies, and the SAR reporting procedure; training must be conducted at minimum annually and documented; records must show individual employee name, date, content, and completion. (2) Reliability screening of employees: employees must be assessed for reliability (Zuverlässigkeit) at hiring in AML-relevant roles; ongoing monitoring for changes that affect reliability. (3) Whistleblowing channel: obligated entities must maintain a channel through which employees can confidentially report AML violations; this channel must be independent from the line management of the AML officer.
+Keywords: §6 GwG, internal safeguards, employee training, reliability screening, whistleblowing, AML internal controls, organisational requirements
 
 ---
 
-bafin_gwg_real_estate_specifics
+gwg §7  (bafin_gwg_mlro_appointment_sec7)
+Title: §7 GwG — appointment of a Geldwäschebeauftragter (money laundering reporting officer, MLRO) and deputy
+Obligation: MUST
+Threshold: Obligated entities under §2(1) Nr. 1-3, 6, 7, 9 and 15 GwG (credit and financial-services institutions, payment and e-money institutions, insurance and gambling undertakings among others); supervisory authority may order appointment for other categories, and may exempt smaller entities on request
+Text: Section 7 GwG requires obligated entities listed in §2(1) Nr. 1 to 3, 6, 7, 9 and 15 GwG to appoint a money laundering reporting officer (Geldwäschebeauftragter, MLRO) at management level, together with a deputy (§7(1)). The MLRO is responsible for compliance with AML/CFT law, without relieving senior management of its own responsibility, and reports directly to management. The competent supervisory authority may exempt an obligated entity from the duty to appoint an MLRO where it is satisfied that the risk of information loss from a divided organisational structure does not exist and that other risk-based safeguards are in place (§7(2)). The supervisory authority may also order entities under §2(1) Nr. 4, 5, 8, 10 to 14 and 16 GwG to appoint an MLRO where it considers this appropriate, and as a rule will do so for dealers in high-value goods whose main activity is trading in such goods (§7(3)). The appointment of the MLRO and deputy, and any subsequent removal, must be notified to the supervisory authority in advance; the authority may require an MLRO to be replaced if they lack the necessary qualification or reliability (§7(4)). The MLRO must perform the role domestically, act as the point of contact for law enforcement, the Financial Intelligence Unit, and the supervisory authority, and must be given sufficient authority, resources, and unhindered access to all relevant information, data, records, and systems, reporting directly to senior management (§7(5)). Data obtained by the MLRO may be used only to fulfil their duties (§7(6)). The MLRO and deputy are protected against dismissal or other employment disadvantage on account of performing their duties, including for one year after leaving the role, except for good cause (§7(7)).
+Keywords: §7 GwG, Geldwäschebeauftragter, money laundering reporting officer, MLRO appointment, deputy, exemption, notification to supervisory authority, employment protection, senior management reporting
+
+---
+
+gwg §2  (bafin_gwg_real_estate_specifics)
 Title: GwG obligations for real estate agents — §2(1) Nr. 14 GwG
 Obligation: MUST
 Threshold: Real estate agents (Immobilienmakler) — for covered transactions
@@ -104,7 +113,7 @@ Keywords: real estate agents, Immobilienmakler, §2(1) Nr. 14, annual rent €10
 
 ---
 
-bafin_gwg_crypto_vasps
+gwg §2  (bafin_gwg_crypto_vasps)
 Title: GwG obligations for crypto asset service providers (VASPs) — §2(1) Nr. 10 GwG
 Obligation: MUST
 Threshold: Crypto exchanges, wallet service providers, and other VASPs registered with BaFin
@@ -113,7 +122,7 @@ Keywords: VASP, crypto, §2(1) Nr. 10, BaFin crypto registration, Travel Rule, F
 
 ---
 
-bafin_gwg_penalties
+gwg §56  (bafin_gwg_penalties)
 Title: §56 GwG — administrative fines and BaFin enforcement measures
 Obligation: MUST (legal consequence of non-compliance)
 Threshold: All obligated entities — BaFin and sector supervisors enforce

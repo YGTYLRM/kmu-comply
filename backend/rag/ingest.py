@@ -104,10 +104,29 @@ def _extract_pdf(path: Path) -> str:
         return "\n".join(pages)
 
 
+# EDPB Guidelines 1/2024's public-consultation draft was PDF-extracted with
+# its page footer ("<page number>\nAdopted - version for public consultation")
+# baked into the running text. _RE_SECTION (numbered-heading detector) reads
+# each footer's page number as a section heading, producing 19 chunks tagged
+# with bare page numbers (e.g. "30", "33") instead of real citations — several
+# of which happen to collide with real GDPR article numbers the guidance text
+# discusses, so they compete in ranking against the real "Article N" chunk
+# without ever being able to match an eval's expected "Article N" citation
+# (observed: 7 of gdpr's retrieval misses had a bare-number chunk from this
+# file crowding out the correct Article chunk from the top 5). Stripping the
+# footer before chunking removes the false heading pattern; the document then
+# falls back to _chunk_fixed's generic word-based chunks (correct — this is
+# discursive guidance prose with no citable heading structure of its own).
+_RE_EDPB_FOOTER = re.compile(r"(?m)^\d+\nAdopted - version for public consultation\n?")
+
+
 def _load(path: Path) -> str:
     if path.suffix == ".pdf":
         return _extract_pdf(path)
-    return path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8")
+    if path.name == "edpb_legitimate_interests_guidelines.pdf.txt":
+        text = _RE_EDPB_FOOTER.sub("", text)
+    return text
 
 
 # ---------------------------------------------------------------------------
@@ -337,6 +356,44 @@ def _chunk_german_law(text: str, regulation: str, filename: str, url: str) -> li
     return chunks
 
 
+# An EU amending directive's outer "Artikel N" ("Änderung der Richtlinie
+# ...") bundles every amendment to the target law into one article — CSRD's
+# Artikel 1 (amending the Accounting Directive) runs to ~175K chars covering
+# everything from reporting scope to assurance to penalties. _split_oversized
+# has no notion of this structure and halves it by raw word count, so a
+# question about e.g. assurance requirements can land in the same arbitrary
+# slice as scope-definition prose, embedding poorly against either topic
+# (observed: csrd's "Article 1"-cited questions — the majority of its eval
+# set — sat at 41% Top-1 / 59% Top-5 before this fix). The directive text
+# itself already marks each real amendment at a legislative instruction line
+# ("Artikel 19a erhält folgende Fassung:", "Artikel 34 wird wie folgt
+# geändert:", ...); splitting there instead keeps each chunk to one real
+# provision. article_number stays unchanged ("Artikel 1") for every resulting
+# chunk — this only changes chunk boundaries, not what they're tagged as, so
+# it can't affect any other collection's or any already-passing case's
+# citation matching.
+_RE_AMENDMENT_INSTRUCTION = re.compile(
+    r"(?m)^\s*(?:Dem\s+|In\s+)?Artikel\s*\d+[a-z]?\b[^\n]{0,120}?"
+    r"(?:erhält folgende Fassung|wird wie folgt geändert|wird folgende[rn]?\s|"
+    r"werden die folgende[nr]?\s|wird die folgende\s|wird eingefügt|angefügt)"
+)
+
+
+def _split_amendment_instructions(text: str) -> list[str] | None:
+    """Split an amending directive's mega-article body at its real per-
+    provision instruction boundaries. Returns None (caller falls back to
+    _split_oversized) if fewer than 2 markers are found."""
+    marks = list(_RE_AMENDMENT_INSTRUCTION.finditer(text))
+    if len(marks) < 2:
+        return None
+    parts = []
+    for i, m in enumerate(marks):
+        start = m.start()
+        end = marks[i + 1].start() if i + 1 < len(marks) else len(text)
+        parts.append(text[start:end].strip())
+    return parts
+
+
 def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[dict]:
     """Try German 'Artikel' then English 'Article' pattern. Deduplicate by article number."""
     pattern = _RE_EU_ARTIKEL
@@ -372,7 +429,15 @@ def _chunk_eu_law(text: str, regulation: str, filename: str, url: str) -> list[d
             chunks.extend(esrs_chunks)
             continue
         header = f"{item['label']} {item['num']} {item['title']}"
-        for i, sub in enumerate(_split_oversized(item["text"], header)):
+        pieces = None
+        if len(item["text"]) > MAX_CHUNK_CHARS:
+            pieces = _split_amendment_instructions(item["text"])
+        if pieces is None:
+            pieces = [item["text"]]
+        subs: list[str] = []
+        for piece in pieces:
+            subs.extend(_split_oversized(piece, header))
+        for i, sub in enumerate(subs):
             chunks.append(_make_chunk(sub, regulation, key, item["title"], "law",
                                       filename, url, str(i + 1) if i else ""))
     return chunks
@@ -476,9 +541,16 @@ def _chunk_separator_blocks(text: str, regulation: str, filename: str, url: str)
             continue
         lines = block.splitlines()
         first = lines[0].strip()
-        # Extract article reference (e.g. "hinschg §12(1)" → "§12(1)")
+        # Extract article reference (e.g. "hinschg §12(1)" → "§12(1)",
+        # "esrs E1 ..." → "ESRS E1" for CSRD's ESRS-standard guidance blocks)
         art_match = _re.search(r"§\s*(\S+)", first)
-        article_number = f"§ {art_match.group(1)}" if art_match else first[:40]
+        esrs_match = _re.search(r"\bESRS\s+(\S+)", first, _re.IGNORECASE) if not art_match else None
+        if art_match:
+            article_number = f"§ {art_match.group(1)}"
+        elif esrs_match:
+            article_number = f"ESRS {esrs_match.group(1).upper()}"
+        else:
+            article_number = first[:40]
         # Extract title from "Title: ..." line
         title = article_number
         for line in lines[1:6]:

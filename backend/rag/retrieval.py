@@ -54,6 +54,19 @@ _SIMILARITY_FLOOR = 0.35   # drop chunks below this cosine similarity (too far f
 _RE_STATUTE_CITATION = re.compile(r"(?:^|\s)(§|Art(ikel|icle|\.)?)\s*\d|(?:^|\s)ESRS\s+\S")
 _STATUTE_BONUS = 0.2
 
+# Recitals (non-binding preamble text) embed unusually close to ordinary
+# "what must a company do" queries in the gdpr_dsgvo collection, because
+# they restate operative articles in plain explanatory language -- without
+# a counterweight they systematically outrank the binding article that
+# actually answers the question (observed: 274-case eval, gdpr Top-5
+# accuracy capped around 69-74% with most misses being Recital-dominated
+# top-5 lists for a query whose ground truth is a specific Article). Scoped
+# to gdpr_dsgvo only: no other collection's chunks are tagged "Recital N",
+# so this cannot affect ranking anywhere else.
+_RECITAL_PENALTY_COLLECTIONS = {"gdpr_dsgvo"}
+_RECITAL_PENALTY = 0.15
+_RE_RECITAL = re.compile(r"^\s*recital\s*\d", re.IGNORECASE)
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -204,12 +217,17 @@ def retrieve(
                 continue  # drop below threshold
             bm25 = _bm25_score(query_terms, doc)
             is_statute = bool(_RE_STATUTE_CITATION.search(meta.get("article_number", "")))
+            is_recital = (
+                collection_name in _RECITAL_PENALTY_COLLECTIONS
+                and bool(_RE_RECITAL.match(meta.get("article_number", "") or ""))
+            )
             # Combined score: weights sum to 1.0 (56% dense / 24% BM25 / 20%
             # statute bonus) so the max stays in [0, 1] whether or not the
             # bonus applies — same dense:BM25 ratio as before, just rescaled
             # to make room for the bonus term.
             combined = round(
-                0.56 * dense_score + 0.24 * bm25 + (_STATUTE_BONUS if is_statute else 0.0),
+                0.56 * dense_score + 0.24 * bm25 + (_STATUTE_BONUS if is_statute else 0.0)
+                - (_RECITAL_PENALTY if is_recital else 0.0),
                 4,
             )
             results.append({
@@ -360,8 +378,13 @@ def retrieve_pgvector(
             doc = row["text"]
             bm25 = _bm25_score(query_terms, doc)
             is_statute = bool(_RE_STATUTE_CITATION.search(row.get("article_number", "") or ""))
+            is_recital = (
+                collection_name in _RECITAL_PENALTY_COLLECTIONS
+                and bool(_RE_RECITAL.match(row.get("article_number", "") or ""))
+            )
             combined = round(
-                0.56 * dense_score + 0.24 * bm25 + (_STATUTE_BONUS if is_statute else 0.0),
+                0.56 * dense_score + 0.24 * bm25 + (_STATUTE_BONUS if is_statute else 0.0)
+                - (_RECITAL_PENALTY if is_recital else 0.0),
                 4,
             )
             meta = {k2: v for k2, v in row.items() if k2 not in ("text", "distance")}
