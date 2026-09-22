@@ -118,7 +118,7 @@ report = ComplianceReport(
             article_number="17",
             article_title="Dokumentationspflicht",
             status=ComplianceStatus.CANNOT_ASSESS,
-            evidence="Es kann nicht bestätigt werden, ob Arbeitszeitnachweise für alle Mitarbeiterkategorien vorliegen. Angestellte mit einem Bruttogehalt über 2.958 Euro/Monat sind ausgenommen, Nachweise für Stunden- oder Teilzeitkräfte wurden nicht eingereicht.",
+            evidence="Es kann nicht bestätigt werden, ob Arbeitszeitnachweise für alle Mitarbeiterkategorien vorliegen. Angestellte mit einem Bruttogehalt über 2.000 Euro/Monat sind ausgenommen, Nachweise für Stunden- oder Teilzeitkräfte wurden nicht eingereicht.",
         ),
     ],
     action_plan=[
