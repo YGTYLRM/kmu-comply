@@ -280,8 +280,11 @@ class RuleEngine:
             or (profile.balance_sheet_total_eur is not None and profile.balance_sheet_total_eur > 43_000_000)
         )
         high_energy = energy_gwh > 7.5
+        # EnEfG §9 implementation-plan duty triggers independently at a lower
+        # threshold than the §8 Abs. 1 EnMS duty (see threshold_engine.check_enefg).
+        plan_required = energy_gwh > 2.5
 
-        applies = is_non_sme or high_energy
+        applies = is_non_sme or high_energy or plan_required
 
         # Confidence reduced if energy consumption not provided (common trigger)
         energy_known = profile.annual_energy_consumption_mwh is not None
@@ -293,12 +296,14 @@ class RuleEngine:
                 parts.append(f"{profile.employee_count} Mitarbeiter >= 250 (kein KMU) → EDL-G §8 Energieaudit")
             if high_energy:
                 parts.append(f"Energieverbrauch {energy_gwh:.1f} GWh > 7,5 GWh → EnEfG §8 Abs. 1 Energiemanagementsystem")
+            elif plan_required:
+                parts.append(f"Energieverbrauch {energy_gwh:.1f} GWh > 2,5 GWh → EnEfG §9 Umsetzungspläne")
             reason = f"EnEfG / EDL-G gelten: {'; '.join(parts)}."
         else:
             energy_note = (
-                "Energieverbrauch nicht angegeben (bitte ergänzen zur Prüfung von EnEfG §8 Abs. 1)"
+                "Energieverbrauch nicht angegeben (bitte ergänzen zur Prüfung von EnEfG §8 Abs. 1 und §9)"
                 if not energy_known
-                else f"Energieverbrauch {energy_gwh:.1f} GWh <= 7,5 GWh"
+                else f"Energieverbrauch {energy_gwh:.1f} GWh <= 2,5 GWh"
             )
             reason = (
                 f"EnEfG / EDL-G gelten nicht: {profile.employee_count} Mitarbeiter < 250 (gilt als KMU); "
