@@ -37,7 +37,7 @@ pytest-cov>=5.0.0
 
 # Dev utilities
 ruff>=0.4.0
-python-multipart>=0.0.31  # CVE-2026-53538/53539/53540 fixed here
+python-multipart>=0.0.32  # CVE-2026-53538/53539/53540 fixed here
 
 # Email
 resend>=2.0.0
