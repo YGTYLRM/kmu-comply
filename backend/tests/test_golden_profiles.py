@@ -328,7 +328,7 @@ async def test_e2e_fully_compliant_profile():
     ]
     assert not non_compliant, (
         f"Fully-documented company should have zero NON_COMPLIANT gaps. "
-        f"Got: {[(g.regulation, g.article) for g in non_compliant]}"
+        f"Got: {[(g.regulation, g.article_number) for g in non_compliant]}"
     )
 
 
