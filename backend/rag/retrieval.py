@@ -153,6 +153,12 @@ def retrieve(
     query_embedding = embed_query(query)
     query_terms = [t for t in re.sub(r'[^\w\s]', ' ', query.lower()).split() if len(t) > 2]
     results: list[dict] = []
+    # Some collections were built from two overlapping source files (e.g.
+    # bdsg_full_text.txt and bdsg_full_text2.txt), so the same paragraph is
+    # indexed twice under different ids. Without this, both copies land next
+    # to each other in the ranking and push a different relevant article out
+    # of the top results.
+    seen_hashes: set[str] = set()
 
     for regulation in regulations:
         collection_name = REGULATION_COLLECTIONS.get(regulation)
@@ -215,6 +221,10 @@ def retrieve(
             dense_score = round(1.0 - dist, 4)
             if dense_score < _SIMILARITY_FLOOR:
                 continue  # drop below threshold
+            content_hash = meta.get("content_hash") or doc
+            if content_hash in seen_hashes:
+                continue
+            seen_hashes.add(content_hash)
             bm25 = _bm25_score(query_terms, doc)
             is_statute = bool(_RE_STATUTE_CITATION.search(meta.get("article_number", "")))
             is_recital = (
@@ -356,6 +366,7 @@ def retrieve_pgvector(
     query_embedding = embed_query(query)
     query_terms = [t for t in re.sub(r'[^\w\s]', ' ', query.lower()).split() if len(t) > 2]
     results: list[dict] = []
+    seen_hashes: set[str] = set()  # same duplicate-paragraph guard as retrieve()
 
     for regulation in regulations:
         collection_name = REGULATION_COLLECTIONS.get(regulation)
@@ -376,6 +387,10 @@ def retrieve_pgvector(
             if dense_score < _SIMILARITY_FLOOR:
                 continue
             doc = row["text"]
+            content_hash = row.get("content_hash") or doc
+            if content_hash in seen_hashes:
+                continue
+            seen_hashes.add(content_hash)
             bm25 = _bm25_score(query_terms, doc)
             is_statute = bool(_RE_STATUTE_CITATION.search(row.get("article_number", "") or ""))
             is_recital = (
