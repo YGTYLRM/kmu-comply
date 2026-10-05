@@ -18,7 +18,7 @@ sentence-transformers>=3.0.0
 torch>=2.3.0
 
 # PDF Generation (run: playwright install chromium)
-playwright>=1.40.0
+playwright>=1.63.0
 
 # HTTP client
 httpx>=0.27.0
